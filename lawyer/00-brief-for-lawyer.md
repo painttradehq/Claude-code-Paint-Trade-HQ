@@ -25,6 +25,8 @@ Each painting business is a separate, isolated workspace. Paint Trade HQ never d
 
 ## 3. What we are asking the lawyer to do
 
+We are working to a budget. Please quote before starting, do what is necessary for the tester program and the first paying customers first (A, B, C and D), and tell us which of the rest can wait until after launch.
+
 **A. Terms of Service (01).** Review and finalise for the tester program now, with a note on what changes for public launch. Please look in particular at: the liability cap (greater of fees paid and AUD 100) and the indemnity, given the Australian Consumer Law unfair contract terms rules for small-business standard-form contracts (the painters are small businesses); the right to change terms on 14 days' email notice; closing accounts unused for 12 months; the feedback licence and tester confidentiality in section 1; the governing-law clause; crew members aged 15 to 17.
 
 **B. Privacy Policy (02).** Review against the Australian Privacy Principles. Specific questions:
@@ -52,17 +54,15 @@ Each painting business is a separate, isolated workspace. Paint Trade HQ never d
 
 **F. AI.** Data from a business's workspace (today's jobs, recent quotes, a client's message history, text to polish) is sent to Anthropic's API under the business owner's own API key. Anthropic's commercial API terms say customer data is not used to train models. Lucy also stores reminders and ideas the owner dictates. Please check Terms §6 and the AI row in Privacy §5, and whether any further disclosure or consent is needed for the painter's clients' information being processed by Anthropic.
 
-**G. Intellectual property and registrations.** The owner wants every registration that protects the app done properly. Please list what applies, with cost and timing, and handle or instruct each:
+**G. Intellectual property and registrations — only what is necessary to start.** We are working to a budget. Please tell us which of the following are necessary before the first paying customer, which can wait until after launch, and the cost and timing of each; we will do the necessary ones now and the rest later.
 
-1. **Copyright in the app** (code, design, templates, wording, logo). We understand copyright is automatic in Australia and there is no register; please confirm, and confirm the ownership chain: the code was produced on the Emergent platform and with Anthropic's Claude Code, whose terms (we understand) assign output to the customer, with the design work done by the owner with Claude. Tell us if a US copyright registration is worth doing for enforcement there, and what evidence of authorship we should keep (dated source archives, this repository history).
-2. **Trade mark** for the name "Paint Trade HQ" and the logo with IP Australia: search first, then file. We assumed classes 9 and 42; please confirm, and whether 35 or 37 matter.
-3. **Business and company registrations**: confirm the operating entity, ABN and any registered business name are in order for a software business, and whether the app name needs its own registered business name.
-4. **Design registration** for the app's screens, if it is worth having.
-5. **Domain names**: the main domain and obvious variants; anything needed to protect them.
-6. **People**: a written IP assignment and confidentiality clause for the contractor about to join (Adam) and for any future staff, so everything they produce belongs to the entity.
-7. The **© notice** on the app and the **licence clause** already in Terms §11: confirm the wording.
+1. **Copyright** in the app (code, design, templates, wording, logo). We understand copyright is automatic in Australia with no register, so no cost; please confirm, and confirm the ownership chain — the code was produced on the Emergent platform and with Anthropic's Claude Code, whose terms (we understand) assign output to the customer. What evidence of authorship should we keep?
+2. **Trade mark** for the name "Paint Trade HQ" and the logo with IP Australia (we assumed classes 9 and 42). Necessary now, or can it wait?
+3. **Entity, ABN and business name**: confirm what we have is enough for a software business, and whether the app name needs its own registered business name.
+4. **People**: a written IP assignment and confidentiality clause for the contractor about to join (Adam), so what he produces belongs to the entity. We assume this one is necessary now.
+5. The **© notice** on the app and the **licence clause** already in Terms §11: confirm the wording.
 
-Patents are, we understand, not worth pursuing for this kind of app; say so if you disagree.
+Not asked for now: design registration, patents, overseas registrations, domain-name variants — unless you think one of them is necessary to start.
 
 **H. Later: subscriptions.** When paid plans start (Terms §8): auto-renewal disclosure, price-change notice, refunds under the ACL, Stripe billing. A note now on what section 8 must say is enough; the detail can wait.
 
