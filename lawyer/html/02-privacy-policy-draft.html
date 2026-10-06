@@ -12,9 +12,9 @@ li { margin: 2pt 0; } .doc { page-break-before: always; } .doc:first-child { pag
 .cover { text-align: center; padding-top: 120pt; } .cover h1 { font-size: 28pt; } .cover p { color: #6B6479; font-size: 12pt; }
 .cover ol { text-align: left; display: inline-block; margin-top: 30pt; font-size: 12pt; }
 </style></head><body><h1>Paint Trade HQ — Privacy Policy</h1>
-<p><strong>Draft for review · Version 1.0-draft · 18 September 2026</strong></p>
+<p><strong>Draft for review · Version 1.1-draft · 6 October 2026</strong></p>
 <blockquote>
-<p>Draft prepared for the tester program, written to the Australian Privacy Principles (APPs) in the <em>Privacy Act 1988 (Cth)</em>. Have a lawyer review it before the public launch. Square-bracket items must be filled in before publishing. Even if the business is under the $3 million small-business threshold, publishing and following this policy is expected by testers and by the app stores.</p>
+<p>Draft prepared for the tester program, written to the Australian Privacy Principles (APPs) in the <em>Privacy Act 1988 (Cth)</em>, and brought up to date with the app as it stands on 6 October 2026. Square-bracket items must be filled in before publishing. Even if the business is under the $3 million small-business threshold, publishing and following this policy is expected by testers and by the app stores.</p>
 </blockquote>
 <p>This policy explains what personal information <strong>[Legal entity name] (ABN [ABN])</strong> trading as Paint Trade HQ ("we", "us") collects through the Paint Trade HQ web app, employee app and client links (the "Service"), why, who we share it with, and your rights.</p>
 <h2>1. Two kinds of people, two roles</h2>
@@ -26,14 +26,14 @@ li { margin: 2pt 0; } .doc { page-break-before: always; } .doc:first-child { pag
 <p><strong>When a business signs up:</strong> business name, owner name, email address (used as the sign-in name), mobile number, password (stored as a one-way hash), tester access code, agreement to the terms with date and version, IP address and browser details at sign-up.</p>
 <p><strong>Business profile:</strong> trading name, ABN, address, phone, website, logo, signature image, bank details for invoices, Google review link, warranty and care-note wording, invoice and quote settings.</p>
 <p><strong>Team members and crew:</strong> name, email, phone, role, start date, pay rate, date of birth (for birthday reminders), emergency contact, licences and qualifications with expiry dates and uploaded copies, contract and induction records, training progress, timesheets, leave, strikes and recognition notes, feedback, equipment issued, profile photo.</p>
-<p><strong>Timeclock location.</strong> When a crew member signs in or out of a job in the employee app, the app records the time and, if the phone allows it, the GPS position and its distance from the job site. This is used to show the owner who is on site and to flag sign-ins far from the job. Location is captured only at sign-in and sign-out, not continuously.</p>
+<p><strong>Timeclock location.</strong> When a crew member signs in or out of a job in the employee app, the app records the time and, if the phone allows it, the GPS position and its distance from the job site. Each job has a radius set by the business; a sign-in outside it is marked "off site" with the distance. This is used to show the owner who is on site and to flag sign-ins far from the job. Location is captured only at sign-in and sign-out, not continuously.</p>
 <p><strong>Clients and leads (entered by the business):</strong> name, company, phone, email, site and postal address, how they found the business, notes, tags, call and message history, quote, invoice, payment and project history, review and follow-up preferences, SMS opt-out status.</p>
-<p><strong>Website enquiry forms:</strong> name, email, phone, address, message, the page it came from, IP address and browser details (for spam control).</p>
 <p><strong>Quotes, projects and photos:</strong> measurements and prices, site photos and before/after photos including any mark-ups and notes, daily site reports, variation approvals with the approver's name, time and IP address, completion reports.</p>
 <p><strong>Messages:</strong> emails and SMS sent and received through the Service, including through a connected Gmail, Microsoft 365 or IMAP inbox and a connected Twilio number.</p>
 <p><strong>Client link activity:</strong> when a quote, invoice, variation or completion report link is opened, we record the time, IP address and browser, and whether it was accepted, declined or paid.</p>
-<p><strong>Payments:</strong> card payments on client links are handled by Stripe. We receive the payment result, amount, last four digits and a payment reference. We never see full card numbers. Bank-transfer payments recorded by the business are stored as the business enters them.</p>
-<p><strong>Connected services:</strong> access tokens for Google Drive, Google Calendar, Gmail, Microsoft 365, IMAP and Apple Calendar (iCloud app-specific password, encrypted at rest), and Twilio credentials, so the Service can act on the business's behalf.</p>
+<p><strong>Payments:</strong> clients pay the business directly by bank transfer or another method the business records (cash, card in person, cheque). We hold no card details. Payments are stored as the business enters them.</p>
+<p><strong>Connected services:</strong> access tokens for Google Drive, Google Calendar, Gmail, Microsoft 365 (OneDrive, Outlook calendar and mail), IMAP and Apple Calendar (iCloud app-specific password, encrypted at rest), and Twilio credentials, so the Service can act on the business's behalf.</p>
+<p><strong>Tester program and product updates:</strong> feedback and screenshots sent through the in-app helper, tester invite codes and failed-code attempts, and which product-update notices each user has seen.</p>
 <p><strong>Usage and technical data:</strong> log-in times and devices, error reports from the app (page, error text, browser), and basic usage of features. We do not use advertising trackers.</p>
 <h2>3. How we use it</h2>
 <ul>
@@ -41,14 +41,14 @@ li { margin: 2pt 0; } .doc { page-break-before: always; } .doc:first-child { pag
 <li>To send messages the business asks us to send: quotes, invoices, reminders, follow-ups, review requests, completion reports, welcome and onboarding emails.</li>
 <li>To keep accounts safe: sign-in security, rate limiting, fraud and abuse prevention, error diagnosis.</li>
 <li>To improve the Service, using aggregated or de-identified information where possible.</li>
-<li><strong>AI features.</strong> Some features send parts of a business's own data (for example today's jobs, recent quotes, a client's message history, or text to polish) to an AI model provider to produce a summary or draft. Only that business's data is included. The provider is contractually not permitted to use it to train models. See section 5.</li>
+<li><strong>AI features.</strong> Some features send parts of a business's own data (for example today's jobs, recent quotes, a client's message history, or text to polish) to Anthropic's AI model (Claude) to produce a summary or draft. Only that business's data is included, and crew members have no AI features. Anthropic's commercial terms do not permit it to use the data to train models. See section 5.</li>
 <li>To meet legal obligations, such as tax records and responding to lawful requests.</li>
 </ul>
 <p>We do not sell personal information. We do not use it for advertising.</p>
 <h2>4. Photos and shared links — please read</h2>
 <ul>
 <li><strong>Client links.</strong> Quotes, invoices, variations and completion reports are shared with clients through links containing a long random code. Anyone who has the link can open it without a password. Businesses should send links only to the client and ask clients not to forward them.</li>
-<li><strong>Photos.</strong> When a business connects Google Drive, site and quote photos are stored in that business's own Drive. To display them in the app and on client links, each photo file is set to "anyone with the link can view". The link is long and random, but it does not expire, so anyone who obtains it can view the photo. Do not photograph anything you would not want a client to see, and blur or crop people who have not agreed to be photographed. When Drive is not connected, photos are stored inside the Service.</li>
+<li><strong>Photos.</strong> When a business connects Google Drive or Microsoft OneDrive, site and quote photos are stored in that business's own Drive or OneDrive. To display them in the app and on client links, each photo file is set to "anyone with the link can view". The link is long and random, but it does not expire, so anyone who obtains it can view the photo. Do not photograph anything you would not want a client to see, and blur or crop people who have not agreed to be photographed. When neither is connected, photos are stored inside the Service.</li>
 <li><strong>Calendar feed.</strong> A business can subscribe a phone calendar to a feed link that shows jobs, client names, addresses and invoice due amounts. The link is the only protection; reset it in Settings if it is shared by mistake.</li>
 <li><strong>Staff documents</strong> (licences, IDs, contracts) are not stored in Drive and are not shared by link. They are visible only to the business's admin users and to the staff member concerned.</li>
 </ul>
@@ -64,7 +64,7 @@ li { margin: 2pt 0; } .doc { page-break-before: always; } .doc:first-child { pag
 </thead>
 <tbody>
 <tr>
-<td>[Hosting provider, e.g. Emergent / cloud region]</td>
+<td>Emergent</td>
 <td>Servers and database for the Service</td>
 <td>[Region — confirm]</td>
 </tr>
@@ -80,7 +80,7 @@ li { margin: 2pt 0; } .doc { page-break-before: always; } .doc:first-child { pag
 </tr>
 <tr>
 <td>Stripe</td>
-<td>Card payments on client links; our own subscription billing later</td>
+<td>Our own subscription billing, when paid plans start (no client payments)</td>
 <td>United States, Australia</td>
 </tr>
 <tr>
@@ -89,8 +89,8 @@ li { margin: 2pt 0; } .doc { page-break-before: always; } .doc:first-child { pag
 <td>Global</td>
 </tr>
 <tr>
-<td>Microsoft 365</td>
-<td>Inbox sync, when connected</td>
+<td>Microsoft 365 (OneDrive, Outlook calendar, mail)</td>
+<td>Photo storage, calendar overlay, inbox sync — only when the business connects them</td>
 <td>Global</td>
 </tr>
 <tr>
@@ -99,14 +99,14 @@ li { margin: 2pt 0; } .doc { page-break-before: always; } .doc:first-child { pag
 <td>Global</td>
 </tr>
 <tr>
-<td>AI model provider (currently OpenAI, accessed through Emergent)</td>
-<td>AI summaries, briefings, drafts</td>
+<td>Anthropic (Claude)</td>
+<td>The assistant, morning brief, summaries and drafts</td>
 <td>United States</td>
 </tr>
 <tr>
-<td>A weather service and a geocoding service</td>
-<td>Weather in the briefing; turning addresses into map positions</td>
-<td>[Provider — confirm]</td>
+<td>Open-Meteo</td>
+<td>Weather in the morning brief; turning job addresses into map positions</td>
+<td>Germany</td>
 </tr>
 </tbody>
 </table>
@@ -115,7 +115,7 @@ li { margin: 2pt 0; } .doc { page-break-before: always; } .doc:first-child { pag
 <h2>6. Security</h2>
 <p>Passwords are hashed. Traffic is encrypted in transit (HTTPS). Sessions expire and can be signed out from other devices. Each business's data is separated from every other business's, and this separation is tested automatically as part of our release process. Third-party credentials are encrypted at rest or held only as revocable tokens. Access to production systems is limited to the people who need it. No system is perfectly secure; if we become aware of a data breach likely to cause serious harm, we will notify affected people and the Office of the Australian Information Commissioner as the <em>Notifiable Data Breaches</em> scheme requires.</p>
 <h2>7. Cookies and local storage</h2>
-<p>The app stores your sign-in token, role and a few display preferences in your browser's local storage so you stay signed in and the app remembers your settings. We do not use third-party advertising cookies. Payment pages use Stripe's own cookies.</p>
+<p>The app stores your sign-in token, role and a few display preferences in your browser's local storage so you stay signed in and the app remembers your settings. We do not use third-party advertising cookies.</p>
 <h2>8. How long we keep it</h2>
 <ul>
 <li><strong>While the account is open:</strong> for as long as the business keeps it.</li>

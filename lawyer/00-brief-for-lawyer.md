@@ -1,6 +1,6 @@
 # Paint Trade HQ — Brief for legal review
 
-**Prepared 6 October 2026 for the business owner (Josh Sano) to hand to the reviewing lawyer.** Everything in this pack was pulled from the app as it stands today (code at Round 64, 4 October 2026). Where the published drafts no longer match the app, section 4 says so.
+**Prepared 6 October 2026 for the business owner (Josh Sano) to hand to the reviewing lawyer.** Everything in this pack reflects the app as it stands today (code at Round 64, 4 October 2026); the Terms and Privacy Policy drafts were brought up to date on 6 October before being included.
 
 ## 1. What Paint Trade HQ is
 
@@ -16,9 +16,9 @@ Each painting business is a separate, isolated workspace. Paint Trade HQ never d
 
 | File | What it is |
 |---|---|
-| 00 (this file) | The brief: what the product does, what we are asking for, what has changed since the drafts were written |
-| 01 Terms of Service — draft 1.0-draft, 18 Sept 2026 | Live on the app at /terms. Accepted at sign-up (version, time and IP recorded on the account) |
-| 02 Privacy Policy — draft 1.0-draft, 18 Sept 2026 | Live on the app at /privacy |
+| 00 (this file) | The brief: what the product does and what we are asking for |
+| 01 Terms of Service — draft 1.1-draft, 6 Oct 2026 | Shown on the app at /terms and accepted at sign-up (version, time and IP recorded on the account) |
+| 02 Privacy Policy — draft 1.1-draft, 6 Oct 2026 | Shown on the app at /privacy |
 | 03 Client-facing terms and the acceptance flow | What a painter's client sees and signs: the default quote terms, the acceptance dialog, the record kept, invoice terms, the warranty line |
 | 04 Employment documents | How the crew contracts feature works and the ground rules it is built on |
 | 05 Data map | Every category of personal information the app holds, where it is stored, which third parties touch it, and for how long |
@@ -70,32 +70,11 @@ Not asked for now: design registration, patents, overseas registrations, domain-
 
 **J. Outside the documents.** Any insurance the entity should hold (professional indemnity, cyber), and whether the entity structure is right for a software business. If this is out of scope, say so.
 
-## 4. What has changed since the drafts were written (fold these into 01 and 02)
+## 4. Placeholders Josh fills in before the lawyer starts
 
-The drafts are dated 18 September 2026. The app has moved on. The lawyer should treat these as facts to write in:
+In 01 and 02: [Legal entity name], [ABN], [registered address] / [address], [support email], [legal email], [privacy email], [phone], [Victoria] (governing law state) and the hosting [Region — confirm].
 
-1. **No card payments on client links.** Stripe checkout, Apple Pay and Google Pay were removed on 4 October. Clients pay by bank transfer using the details printed on the invoice. Stripe will be used only for our own subscription billing later. Terms §4 "Online payments" and Privacy §2 "Payments" and the Stripe row in §5 need rewording.
-2. **AI provider is Anthropic (Claude), not OpenAI.** Calls go to Anthropic's API under the business owner's own key, through our backend. Privacy §5 row "AI model provider (currently OpenAI, accessed through Emergent)" is wrong. Crew members have no AI features. The assistant ("Lucy") is live; it also keeps reminders and ideas the owner gives it.
-3. **Storage options.** Photos and attachments are stored either in the built-in store (today: inside our database; a cloud bucket is planned before testers upload real photos), in the painter's Google Drive, or in the painter's Microsoft OneDrive (new). Privacy §4 mentions Drive only.
-4. **Calendars.** Google Calendar, Apple iCloud calendar and now Microsoft 365 / Outlook calendar can be connected (read only). Add Microsoft to Terms §5 and Privacy §5.
-5. **Website enquiry forms were removed.** Leads are typed in by the painter. Delete Privacy §2 "Website enquiry forms".
-6. **Weather and geocoding provider** is Open-Meteo (Germany), used for the morning brief's weather and for turning job addresses into map positions. Fill the placeholder row in Privacy §5.
-7. **Hosting** is Emergent; Josh to confirm the region for the placeholder row. The app will move to its own hosting before launch.
-8. **Employee location** also includes a per-job geofence radius and an "off-site" flag with the distance when a sign-in is outside it. Privacy §2 "Timeclock location" is still accurate but could say so.
-9. **Deletion after closure** (Terms §10, Privacy §8): the 30-day automated purge is not built. See question B6.
-10. **Platform administrator.** The owner of Paint Trade HQ can see tester feedback, sign-up leads and tester invites across all businesses (not the businesses' client or job data). Add to Privacy §5 if the lawyer thinks it needs saying.
-11. **Product updates.** The app shows a "what's new" pop-up to every signed-in user after a release and can email the same content to everyone; these are service messages, not marketing.
-12. **Tester access codes** lock after five wrong attempts and the tester is emailed. Terms §1 "Access codes" could mention the lock.
-13. **Exports** available today: PDFs of quotes, invoices and reports; CSV of daily reports, timesheets and sign-in sessions. Terms §10 says "client, invoice and timesheet lists as CSV" — slightly different; align.
-14. **Crew app terms.** Crew never see the Terms; the onboarding wizard sets "agreed to terms" to true automatically (question D).
-15. **Quote acceptance checkbox is pre-ticked** (question C1).
-16. **Birthday reminders** use the employee's date of birth (Privacy §2 says so already) and the app emails the owner a daily birthday check.
-
-## 5. Placeholders Josh fills in before the lawyer starts
-
-In 01 and 02: [Legal entity name], [ABN], [registered address] / [address], [support email], [legal email], [privacy email], [phone], [Victoria] (governing law state), [Hosting provider, e.g. Emergent / cloud region] and [Region — confirm]. The weather/geocoding placeholder is answered above (Open-Meteo).
-
-## 6. Facts the lawyer may ask about
+## 5. Facts the lawyer may ask about
 
 - Sign-up records the Terms version, the time and the IP address on the account. When the Terms version changes, the next sign-in shows a one-time "we've updated our Terms" banner with a Dismiss that records acceptance again. No blocking modal.
 - Passwords are hashed; traffic is HTTPS; each business's data is separated and that separation is tested automatically on every release; third-party tokens are encrypted at rest or held as revocable tokens.
