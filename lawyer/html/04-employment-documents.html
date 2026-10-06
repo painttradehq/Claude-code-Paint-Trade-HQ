@@ -1,0 +1,47 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@page { size: A4; margin: 22mm 18mm; }
+body { font-family: 'Segoe UI', Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.45; color: #1F1B2E; }
+h1 { font-size: 20pt; margin: 0 0 6pt; color: #34295E; } h2 { font-size: 14pt; margin: 18pt 0 6pt; color: #34295E; border-bottom: 1px solid #DCD3F0; padding-bottom: 3pt; }
+h3 { font-size: 12pt; margin: 14pt 0 4pt; }
+table { border-collapse: collapse; width: 100%; margin: 8pt 0 12pt; font-size: 9.5pt; }
+th, td { border: 1px solid #C9C4DA; padding: 4pt 6pt; vertical-align: top; text-align: left; } th { background: #F1EEF9; }
+tr { page-break-inside: avoid; }
+blockquote { border-left: 3px solid #B45309; background: #FFF7E6; margin: 8pt 0; padding: 6pt 10pt; color: #5A4A1E; }
+code { font-family: Consolas, monospace; font-size: 9.5pt; background: #F4F2F9; padding: 0 2pt; }
+li { margin: 2pt 0; } .doc { page-break-before: always; } .doc:first-child { page-break-before: auto; }
+.cover { text-align: center; padding-top: 120pt; } .cover h1 { font-size: 28pt; } .cover p { color: #6B6479; font-size: 12pt; }
+.cover ol { text-align: left; display: inline-block; margin-top: 30pt; font-size: 12pt; }
+</style></head><body><h1>04 — Employment documents (the Contracts feature)</h1>
+<p>How the app handles employment agreements and related documents between a painting business and its crew. Built September 2026 (Round 22). Pulled from the specification and the code on 6 October 2026.</p>
+<h2>1. Ground rules the feature is built on</h2>
+<ol>
+<li><strong>No legal advice from the app.</strong> The app never ships contract wording. Every template screen shows this notice: <em>"Your document, your responsibility. Paint Trade HQ fills in the fields, collects signatures and keeps the record. It does not give legal advice. Have the wording checked by a lawyer or Fair Work, and keep it in line with the award and the National Employment Standards."</em> The employment template adds: <em>"For employment agreements, the free Employment Contract Tool on business.gov.au produces award-based wording you can paste here."</em></li>
+<li><strong>Electronic signature record.</strong> For every signature the app stores the exact document text as signed (frozen per issued document), the signer, the timestamp (UTC, shown in the business time zone), the IP address, the method (typed or drawn) and the template version. The crew member always receives a copy.</li>
+<li><strong>Nothing signed is ever edited or hard-deleted.</strong> Issued documents are append-only apart from status changes, the countersignature, the "also given" checklist and audit entries. "Withdraw" exists only before signing and keeps the record.</li>
+<li><strong>Ending employment is recorded, not performed.</strong> "Record the end" stores a date and a note and shows: <em>"This only records the end in the app. Notice periods, final pay and unfair-dismissal rules apply separately under the Fair Work Act. The app does not send any letter."</em></li>
+<li><strong>Retention.</strong> Issued documents, signatures and PDFs are kept for at least seven years and treated as records, not app data, by any purge or export.</li>
+<li><strong>Signature images are private</strong> — never on a public link.</li>
+<li><strong>Unfilled placeholders stay visible</strong> (highlighted) to the admin before sending and to the crew member when signing; the app never silently blanks them.</li>
+</ol>
+<h2>2. Document types</h2>
+<p>Employment agreement · Confidentiality · Code of conduct · Safety agreement · Social media &amp; photo consent · one "Other" the business names. One template per type per business, written by the business; saving makes a new version; documents already sent keep the version they were sent with.</p>
+<h2>3. Fields the app fills in</h2>
+<p>[EMPLOYEE FULL NAME] [EMPLOYEE ADDRESS] [POSITION] [EMPLOYMENT TYPE] (Casual / Part-time / Full-time) [AWARD CLASSIFICATION] [START DATE] [OFFER DATE] [HOURLY RATE] [CASUAL LOADING] (default 25%) [ORDINARY HOURS] [NOTICE PERIOD] [BUSINESS NAME] [ABN] [BUSINESS ADDRESS] [DATE SIGNED]. Hints shown to the business: "From the Fair Work pay guide for your award." and "Must be at or above the award rate for the classification."</p>
+<h2>4. Flow</h2>
+<ol>
+<li>The business issues one or more documents to a crew member; the crew member is emailed and sees them in the crew app.</li>
+<li>The crew member reads the filled document, signs (draw or type) and can ask a question (goes to the owner).</li>
+<li>The business countersigns by typing the owner's full name exactly.</li>
+<li>The app renders a signed PDF (filled text, then a signature block with crew name, method, time, IP; business signer and time; footer "Template v{n} · Document {ID} · Paint Trade HQ record"), emails it to the crew member and the owner, and stores it privately on the employee record.</li>
+<li><strong>"Also given" checklist</strong> on employment documents, with links to the official copies: Fair Work Information Statement; Casual Employment Information Statement (casual only); Superannuation standard choice form; Tax file number declaration. The business ticks each with a date.</li>
+<li>Replace with a new version (old becomes superseded once the new one is countersigned); Record the end; Withdraw before signing.</li>
+</ol>
+<h2>5. Crew app and crew data</h2>
+<ul>
+<li>Crew members sign in to a separate employee web app with a QR onboarding link from their employer.</li>
+<li>The onboarding wizard collects: name, phone, email, address, emergency contact, date of birth, licences and qualifications with uploaded copies (15 MB cap per file), bank and super details if the business asks for them, a profile photo. <strong>The wizard sets an "agreed to terms" flag automatically; crew members are not shown Paint Trade HQ's Terms or Privacy Policy.</strong></li>
+<li>Crew members can be 15 or older (Terms §2); Privacy §10 says 15 to 17 need the employer to have guardian consent where required.</li>
+<li>Sign-in/sign-out on a job records time and, if the phone allows, GPS position and distance from the job site; sign-ins outside the job's geofence radius are flagged "off-site" with the distance. Location is not tracked between sign-in and sign-out.</li>
+<li>Staff documents (licences, IDs, contracts) are visible only to the business's admin users and to the staff member concerned; never on a public link.</li>
+<li>Timesheets, leave, strikes and recognition notes, training progress, equipment issued and performance ratings (1–10 with a 90-day score) are kept by the business.</li>
+</ul></body></html>

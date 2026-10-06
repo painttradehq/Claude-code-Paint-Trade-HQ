@@ -1,0 +1,53 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@page { size: A4; margin: 22mm 18mm; }
+body { font-family: 'Segoe UI', Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.45; color: #1F1B2E; }
+h1 { font-size: 20pt; margin: 0 0 6pt; color: #34295E; } h2 { font-size: 14pt; margin: 18pt 0 6pt; color: #34295E; border-bottom: 1px solid #DCD3F0; padding-bottom: 3pt; }
+h3 { font-size: 12pt; margin: 14pt 0 4pt; }
+table { border-collapse: collapse; width: 100%; margin: 8pt 0 12pt; font-size: 9.5pt; }
+th, td { border: 1px solid #C9C4DA; padding: 4pt 6pt; vertical-align: top; text-align: left; } th { background: #F1EEF9; }
+tr { page-break-inside: avoid; }
+blockquote { border-left: 3px solid #B45309; background: #FFF7E6; margin: 8pt 0; padding: 6pt 10pt; color: #5A4A1E; }
+code { font-family: Consolas, monospace; font-size: 9.5pt; background: #F4F2F9; padding: 0 2pt; }
+li { margin: 2pt 0; } .doc { page-break-before: always; } .doc:first-child { page-break-before: auto; }
+.cover { text-align: center; padding-top: 120pt; } .cover h1 { font-size: 28pt; } .cover p { color: #6B6479; font-size: 12pt; }
+.cover ol { text-align: left; display: inline-block; margin-top: 30pt; font-size: 12pt; }
+</style></head><body><h1>03 — Client-facing terms and the acceptance flow (what a painter's client sees and signs)</h1>
+<p>Pulled from the app code on 6 October 2026. The painter can edit every piece of wording below in Settings; these are the defaults the app ships with.</p>
+<h2>1. Default quote terms (printed on every quote unless the painter replaces them)</h2>
+<ol>
+<li><strong>Quote Validity</strong> — This quote is valid for the number of days shown above. Prices may be reviewed after that if material costs shift.</li>
+<li><strong>Deposit &amp; Payment</strong> — A deposit secures your start date. Progress and final payments are due per the milestone schedule.</li>
+<li><strong>Variations</strong> — Any changes to scope, colour or substrate are captured as a written variation and priced before works proceed.</li>
+<li><strong>Access &amp; Preparation</strong> — Client to provide clear access to work areas. Fragile items and valuables to be removed by the client prior to start.</li>
+<li><strong>Site Conduct</strong> — We keep the site tidy, dust-sheet all surfaces, and clean up at end of each day.</li>
+<li><strong>Workmanship Warranty</strong> — All labour is warranted for 2 years from practical completion against defective preparation or application.</li>
+<li><strong>Cancellations</strong> — Cancellations within 48 hours of the start date may forfeit the deposit to cover crew scheduling.</li>
+<li><strong>Liability</strong> — We carry $20M public liability insurance. Damage caused by pre-existing substrate defects is excluded.</li>
+</ol>
+<p>The quote also carries: the painter's business name, ABN, address, phone, email and licence number (as entered in Settings); a validity period in days (default 30); the payment schedule (default milestones: Deposit 30% on acceptance, Progress 40%, Final 30% on completion — the painter can change the number of milestones and percentages); GST shown separately; an optional "About us" block with public-liability and warranty figures the painter types in.</p>
+<p><strong>Contract terms template.</strong> Separately from the eight clauses above, the painter can write a longer "contract terms" text (Settings › Estimates › Terms) that prints with the quote. The app ships no wording for it; it is empty until the painter writes it.</p>
+<h2>2. How a client accepts a quote</h2>
+<p>The client receives an email or SMS with a link to a public page (no login; the link contains a long random token). The page shows the full quote, the terms above, the payment schedule and any optional extras the client can tick on or off.</p>
+<p><strong>Accept dialog</strong> ("Accept this quote · EST-0192 · Sano Painting Co."):
+- Name field.
+- Signature: <strong>draw</strong> on a signature pad, or <strong>type</strong> the name (rendered as a signature image).
+- Checkbox: <strong>"I have read and agree to the terms and conditions and the payment schedule above."</strong> — this box is <strong>ticked by default</strong> when the dialog opens.
+- Line under it: "Your signature, name, the date and time, and the extras you chose are saved with the quote."
+- Button: Accept.</p>
+<p><strong>What the app records on acceptance:</strong> signer name, the signature image, the time (UTC), the client's IP address, the accepted optional extras, and the quote content as it was at that moment (quotes are frozen once accepted). The painter is shown "Accepted by {name} on {date}" and the signature prints on the quote PDF. An "accepted" event is written to the quote's history, a project is created from the quote, and the deposit invoice is created as a draft for the painter to review and send.</p>
+<p><strong>Decline:</strong> the client can decline with an optional reason; recorded the same way without a signature.</p>
+<h2>3. Variations (changes to the job after acceptance)</h2>
+<p>The painter sends a variation (added or removed work with a price) to the client by email or SMS. The client opens a link and approves or declines by <strong>typing their name</strong> (no drawn signature); the app records the name, time and IP address. Approved variations are added to the job total.</p>
+<h2>4. Invoices</h2>
+<ul>
+<li>Raised from the accepted quote's payment schedule (deposit / progress / final) or as stand-alone invoices.</li>
+<li>Sent by email (PDF attached) and/or SMS with a link to a public invoice page. The page shows the invoice, "How to pay" with the painter's bank details (account name, BSB, account number, reference = the invoice number) and the payment terms.</li>
+<li><strong>Default payment terms line:</strong> "Payable within 14 days of the issue date." followed by the painter's own invoice terms text. The app's default for that text is: <strong>"Overdue balances may attract interest at 1.5% per month. Title to materials passes on payment in full."</strong></li>
+<li>Default footer: "Thank you for your business."</li>
+<li>No online card payment. The painter records payments received (bank transfer, cash, card in person, cheque).</li>
+<li>Credit notes can be issued against an invoice.</li>
+</ul>
+<h2>5. Completion report and warranty</h2>
+<p>At the end of a job the painter can send a completion report (before/after photos, scope, a warranty and care-notes section). <strong>Default warranty text:</strong> "All workmanship is covered by our 2-year warranty. If any area of the finish lifts, peels or flakes because of how it was applied, we come back and fix it at no cost." The painter can edit it.</p>
+<h2>6. Public links generally</h2>
+<p>Quotes, invoices, variations and completion reports are opened through links containing a long random code; no password. The app records when a link is opened (time, IP, browser). Links do not expire. The client can download the PDF and print from the page. Every public page carries the painter's business details; the pages are branded Paint Trade HQ in the footer with links to our Terms and Privacy Policy.</p></body></html>

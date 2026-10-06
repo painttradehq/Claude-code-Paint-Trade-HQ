@@ -1,0 +1,277 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@page { size: A4; margin: 22mm 18mm; }
+body { font-family: 'Segoe UI', Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.45; color: #1F1B2E; }
+h1 { font-size: 20pt; margin: 0 0 6pt; color: #34295E; } h2 { font-size: 14pt; margin: 18pt 0 6pt; color: #34295E; border-bottom: 1px solid #DCD3F0; padding-bottom: 3pt; }
+h3 { font-size: 12pt; margin: 14pt 0 4pt; }
+table { border-collapse: collapse; width: 100%; margin: 8pt 0 12pt; font-size: 9.5pt; }
+th, td { border: 1px solid #C9C4DA; padding: 4pt 6pt; vertical-align: top; text-align: left; } th { background: #F1EEF9; }
+tr { page-break-inside: avoid; }
+blockquote { border-left: 3px solid #B45309; background: #FFF7E6; margin: 8pt 0; padding: 6pt 10pt; color: #5A4A1E; }
+code { font-family: Consolas, monospace; font-size: 9.5pt; background: #F4F2F9; padding: 0 2pt; }
+li { margin: 2pt 0; } .doc { page-break-before: always; } .doc:first-child { page-break-before: auto; }
+.cover { text-align: center; padding-top: 120pt; } .cover h1 { font-size: 28pt; } .cover p { color: #6B6479; font-size: 12pt; }
+.cover ol { text-align: left; display: inline-block; margin-top: 30pt; font-size: 12pt; }
+</style></head><body><h1>05 — Data map (what the app holds, where, who touches it, how long)</h1>
+<p>Pulled from the code on 6 October 2026. "Business" = the painting business that holds the account. "We" = Paint Trade HQ.</p>
+<h2>1. Categories of personal information</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>About whom</th>
+<th>Entered by</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Account holder</td>
+<td>Business owner, office team</td>
+<td>Themselves</td>
+<td>Name, email (sign-in), mobile, hashed password, Terms version + acceptance time + IP, tester access code, sign-in times and devices</td>
+</tr>
+<tr>
+<td>Business profile</td>
+<td>The business</td>
+<td>Owner</td>
+<td>Trading name, ABN, address, licence number, logo, signature image, bank details, Google review link, quote/invoice/contract wording</td>
+</tr>
+<tr>
+<td>Crew</td>
+<td>Employees</td>
+<td>Owner and the employee (onboarding)</td>
+<td>Name, contact details, address, emergency contact, date of birth, pay rate, award classification, licences/qualifications with uploaded copies, employment documents and signatures, timesheets, sign-in GPS positions and off-site flags, leave, strikes/recognition, training progress, equipment issued, performance ratings, profile photo</td>
+</tr>
+<tr>
+<td>Clients and leads</td>
+<td>The business's customers</td>
+<td>Owner/team</td>
+<td>Name, company, phone, email, site and postal address, source, notes, tags, call/message history, quotes, invoices, payments, projects, review and follow-up preferences, SMS opt-out</td>
+</tr>
+<tr>
+<td>Other contacts</td>
+<td>A client's additional contacts</td>
+<td>Owner/team</td>
+<td>Name, role, email, phone, "gets quotes / gets invoices" flags</td>
+</tr>
+<tr>
+<td>Job records</td>
+<td>Clients' properties</td>
+<td>Owner/team/crew</td>
+<td>Measurements, prices, site photos and before/after photos (with mark-ups), daily reports, variations with approver name/time/IP, completion reports</td>
+</tr>
+<tr>
+<td>Messages</td>
+<td>Clients, crew</td>
+<td>Business (sent), clients (received)</td>
+<td>Email and SMS sent and received through the app, including via a connected Gmail / Microsoft 365 / IMAP inbox and a connected Twilio number</td>
+</tr>
+<tr>
+<td>Public-link activity</td>
+<td>Clients</td>
+<td>Automatic</td>
+<td>Time, IP address and browser when a quote/invoice/variation/report link is opened; accepted/declined/paid</td>
+</tr>
+<tr>
+<td>Quote acceptance</td>
+<td>Clients</td>
+<td>The client</td>
+<td>Signer name, signature image, time, IP, options chosen</td>
+</tr>
+<tr>
+<td>Payments</td>
+<td>Clients</td>
+<td>Business</td>
+<td>Bank-transfer / cash / card-in-person / cheque payments as the business records them (no card data)</td>
+</tr>
+<tr>
+<td>Connected services</td>
+<td>The business</td>
+<td>Owner</td>
+<td>OAuth tokens for Google Drive/Calendar/Gmail, Microsoft 365 (OneDrive, Outlook calendar, mail), IMAP credentials, Apple iCloud app-specific password (encrypted at rest), Twilio credentials</td>
+</tr>
+<tr>
+<td>AI</td>
+<td>The business</td>
+<td>Automatic / owner</td>
+<td>Prompts and responses for drafts and the morning brief; reminders and ideas the owner gives Lucy; per-business audit log of AI calls and daily usage</td>
+</tr>
+<tr>
+<td>Tester program</td>
+<td>Testers (owners)</td>
+<td>Testers</td>
+<td>Feedback messages and screenshots sent through the in-app helper, sign-up leads, invite codes, failed-code attempts</td>
+</tr>
+<tr>
+<td>Product updates</td>
+<td>All users</td>
+<td>Automatic</td>
+<td>Which "what's new" updates a user has seen or snoozed</td>
+</tr>
+<tr>
+<td>Technical</td>
+<td>All users</td>
+<td>Automatic</td>
+<td>Error reports (page, error text, browser), request timing logs (route, duration, business id), security/rate-limit logs</td>
+</tr>
+</tbody>
+</table>
+<h2>2. Where it is stored</h2>
+<table>
+<thead>
+<tr>
+<th>Data</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Everything above except files</td>
+<td>MongoDB database on the Emergent hosting platform (region: Josh to confirm)</td>
+</tr>
+<tr>
+<td>Photos, attachments, staff documents, signatures, PDFs</td>
+<td><strong>Built-in store</strong> (today: inside the database as encoded data; a Google Cloud Storage bucket is planned before testers upload real photos), <strong>or</strong> the business's own <strong>Google Drive</strong>, <strong>or</strong> the business's own <strong>Microsoft OneDrive</strong> — the business chooses in Settings. Staff documents and signature images are always private (never a public link). Photos in Drive/OneDrive are set to "anyone with the link can view" so they can be shown on client links</td>
+</tr>
+<tr>
+<td>Browser</td>
+<td>Sign-in token, role and a few display preferences in local storage; no advertising cookies</td>
+</tr>
+</tbody>
+</table>
+<h2>3. Third parties that process personal information</h2>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>What for</th>
+<th>Data sent</th>
+<th>Where</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Emergent</td>
+<td>Hosting (servers, database)</td>
+<td>Everything</td>
+<td>Region to confirm</td>
+<td>Always (until the move to own hosting)</td>
+</tr>
+<tr>
+<td>Resend</td>
+<td>Sending email</td>
+<td>Recipient address, subject, body, PDF attachments</td>
+<td>United States</td>
+<td>Every email the app sends</td>
+</tr>
+<tr>
+<td>Twilio</td>
+<td>SMS sending and receiving</td>
+<td>Phone numbers, message text</td>
+<td>United States</td>
+<td>Only when the business connects a Twilio number</td>
+</tr>
+<tr>
+<td>Anthropic (Claude API)</td>
+<td>AI drafts, morning brief, assistant</td>
+<td>Parts of the business's own data: today's jobs, recent quotes, a client's message history, text to polish; the owner's reminders/ideas</td>
+<td>United States</td>
+<td>Under the business owner's own API key; Anthropic's commercial terms: not used for training</td>
+</tr>
+<tr>
+<td>Open-Meteo</td>
+<td>Weather for the brief; geocoding job addresses</td>
+<td>Job suburb/address coordinates</td>
+<td>Germany (EU)</td>
+<td>Daily brief; when an address is saved</td>
+</tr>
+<tr>
+<td>Google</td>
+<td>Drive storage, Calendar overlay, Gmail inbox sync</td>
+<td>Photos/files; calendar events; emails</td>
+<td>Global</td>
+<td>Only when the business connects them</td>
+</tr>
+<tr>
+<td>Microsoft</td>
+<td>OneDrive storage, Outlook calendar, Microsoft 365 mail</td>
+<td>Photos/files; calendar events; emails</td>
+<td>Global</td>
+<td>Only when the business connects them</td>
+</tr>
+<tr>
+<td>Apple</td>
+<td>iCloud calendar overlay</td>
+<td>Calendar events</td>
+<td>Global</td>
+<td>Only when the business connects it</td>
+</tr>
+<tr>
+<td>Stripe</td>
+<td>Our subscription billing (later)</td>
+<td>Owner's card details (held by Stripe, not us)</td>
+<td>US/Australia</td>
+<td>Not yet</td>
+</tr>
+<tr>
+<td>marker.js (library)</td>
+<td>Photo mark-up tool in the browser</td>
+<td>None leaves the browser</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>No advertising or analytics trackers.</p>
+<h2>4. Retention today</h2>
+<table>
+<thead>
+<tr>
+<th>Data</th>
+<th>Kept</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Everything in an open account</td>
+<td>While the account is open</td>
+</tr>
+<tr>
+<td>Archived items (quotes, clients, projects, reports, ratings)</td>
+<td>Soft-deleted ("archived") and restorable; a nightly job <strong>reports</strong> what is older than 30 days but <strong>does not yet delete</strong> it (the 30-day hard purge is planned)</td>
+</tr>
+<tr>
+<td>Closed accounts</td>
+<td>Policy says 30 days then deletion, backups within a further 60 days — <strong>not automated yet</strong></td>
+</tr>
+<tr>
+<td>Employment documents, signatures, signed PDFs</td>
+<td>At least 7 years, treated as records</td>
+</tr>
+<tr>
+<td>Quote/invoice/variation acceptance records and events</td>
+<td>With the document (never edited or hard-deleted)</td>
+</tr>
+<tr>
+<td>Public-link activity, error reports, security logs</td>
+<td>Policy says up to 12 months; no automated trim yet</td>
+</tr>
+<tr>
+<td>AI audit log and cached briefs</td>
+<td>Kept per business; no trim yet</td>
+</tr>
+<tr>
+<td>Tester feedback</td>
+<td>Kept by the platform admin; exported for development</td>
+</tr>
+</tbody>
+</table>
+<h2>5. Who can see what</h2>
+<ul>
+<li>A business's admin users: everything in their workspace. Team members can be limited per module (customisable team access).</li>
+<li>Crew: their own records, documents, timesheets, the jobs they are assigned, the crew-side training and equipment screens. No AI.</li>
+<li>Clients: only their own quote/invoice/variation/report pages via the links.</li>
+<li>The Paint Trade HQ platform administrator (Josh): tester invites, sign-up leads, tester feedback, product updates across all businesses. Not the businesses' client or job data through the app (the hosting provider's database is accessible to the operator for support and backups).</li>
+<li>Tenant separation is tested automatically on every release.</li>
+</ul></body></html>
