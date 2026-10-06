@@ -52,7 +52,17 @@ Each painting business is a separate, isolated workspace. Paint Trade HQ never d
 
 **F. AI.** Data from a business's workspace (today's jobs, recent quotes, a client's message history, text to polish) is sent to Anthropic's API under the business owner's own API key. Anthropic's commercial API terms say customer data is not used to train models. Lucy also stores reminders and ideas the owner dictates. Please check Terms §6 and the AI row in Privacy §5, and whether any further disclosure or consent is needed for the painter's clients' information being processed by Anthropic.
 
-**G. Intellectual property.** Please advise on: a trade mark search and filing for the name "Paint Trade HQ" and the logo (we assumed classes 9 and 42; please confirm, and whether 35 or 37 matter); confirming the code is owned by the operating entity — it was produced on the Emergent platform and with Anthropic's Claude Code, whose terms (we understand) assign output to the customer; a written IP assignment and confidentiality clause for a contractor who is about to join (Adam) and for any future staff; the © notice and the licence clause already in Terms §11; whether anything is needed for the domain.
+**G. Intellectual property and registrations.** The owner wants every registration that protects the app done properly. Please list what applies, with cost and timing, and handle or instruct each:
+
+1. **Copyright in the app** (code, design, templates, wording, logo). We understand copyright is automatic in Australia and there is no register; please confirm, and confirm the ownership chain: the code was produced on the Emergent platform and with Anthropic's Claude Code, whose terms (we understand) assign output to the customer, with the design work done by the owner with Claude. Tell us if a US copyright registration is worth doing for enforcement there, and what evidence of authorship we should keep (dated source archives, this repository history).
+2. **Trade mark** for the name "Paint Trade HQ" and the logo with IP Australia: search first, then file. We assumed classes 9 and 42; please confirm, and whether 35 or 37 matter.
+3. **Business and company registrations**: confirm the operating entity, ABN and any registered business name are in order for a software business, and whether the app name needs its own registered business name.
+4. **Design registration** for the app's screens, if it is worth having.
+5. **Domain names**: the main domain and obvious variants; anything needed to protect them.
+6. **People**: a written IP assignment and confidentiality clause for the contractor about to join (Adam) and for any future staff, so everything they produce belongs to the entity.
+7. The **© notice** on the app and the **licence clause** already in Terms §11: confirm the wording.
+
+Patents are, we understand, not worth pursuing for this kind of app; say so if you disagree.
 
 **H. Later: subscriptions.** When paid plans start (Terms §8): auto-renewal disclosure, price-change notice, refunds under the ACL, Stripe billing. A note now on what section 8 must say is enough; the detail can wait.
 
