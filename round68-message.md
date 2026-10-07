@@ -1,4 +1,4 @@
-# Round 68 — Fix Round E: estimate builder, the owner's eleven notes — DRAFT 7 Oct, awaiting the owner's "send" (after Round 67)
+# Round 68 — Fix Round E: estimate builder, the owner's eleven notes — SENT 7 Oct (after Round 67 done)
 
 Round 68 — Fix Round E. The owner has uploaded estimate-builder-fix-e.html (the prototype) and fix-round-e-notes.md (the spec — save both to memory/specs/builder-fixes/). Walk the prototype at 1440 then 1024 first, following the path at the top of the spec. The spec is pasted below verbatim and is the source of truth: eleven owner notes, one decision each; E3 is "already so" and E9 is a bug to find and fix. Owner rules: no notices or banners under the cards; nothing duplicated; every panel on the right; no mobile / crew-app work; nothing changes beyond what is listed.
 
