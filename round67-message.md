@@ -1,0 +1,9 @@
+# Round 67 — Start fresh (Settings › Platform): remove a business's job records — DRAFT 7 Oct, awaiting the owner's "send"
+
+Round 67 — Start fresh. The owner has uploaded start-fresh-panel.html (the prototype: Settings › Platform › the Start fresh tab → the right-side panel → ticks → typed business name → progress → done; open with ?page=platform&tab=reset) and start-fresh-notes.md (the spec — save both to memory/specs/platform/). Walk the prototype at 1440 then 1024 first. The spec is pasted below verbatim and is the source of truth. Owner rules: platform admin only; acts only on the admin's own business; a full export is written before any row is removed; runs through the Round 63 worker as an ai_jobs kind; never run it on the owner's real tenant in this round — seed a TS_ tenant with every record type and run it there; report the counts endpoint's result for the owner's tenant (reads only) so the owner knows what the first real run would remove.
+
+<spec pasted here verbatim when sent>
+
+What's new draft: none — this is a platform-admin tool testers never see.
+
+Rules for this round: no guess work — where the spec is silent, ask in the report rather than invent; where the code's collection names differ from the spec, follow the code and list the difference. Report in memory/reports/round67-start-fresh-report.md: files changed, routes and the job kind, the exact collection list removed and kept (from the code), the export's contents, each verify item as agent-tested or Unverified with the testing-agent iteration number at 1440 and 1024, suite numbers before and after, records created and removed on TS_ tenants, the owner tenant's counts (reads only, nothing changed). Start the report with "Round 67 done". Checkpoint if context runs short. Do not start anything else after it. Do not offer next action items. No Code review.
