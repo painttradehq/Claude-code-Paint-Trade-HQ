@@ -31,7 +31,7 @@ Build a **separate, static marketing site** at `www.painttradehq.com` (Astro, ke
 | C. Framer / Webflow | You can tweak visuals yourself, quick to look polished | Monthly cost, forms need glue (Zapier) to reach the leads endpoint, harder for Claude Code to maintain, brand consistency drifts from the app |
 
 ### D2 — Launch posture
-- **"Early access / Join the tester program"** (truthful today: `SIGNUP_INVITE_CODE` gate, tester invites with access dates) — **recommended now**.
+- **"Early access / Join the tester program"** (truthful today: `TESTER_INVITES_REQUIRED=1` with per-tester invite codes and access dates) — **recommended now**.
 - "Start your free trial" — only once the invite gate is off.
 
 ### D3 — Trial length (the code disagrees with itself)
@@ -41,7 +41,7 @@ Build a **separate, static marketing site** at `www.painttradehq.com` (Astro, ke
 - **Recommendation:** during early access say "Free while you're in the tester program" and publish no number. Fix the 14 vs 90 split in the app before public launch.
 
 ### D4 — Show pricing during early access?
-Plans in code: **Standard $49/mo or $470/yr, Pro $119/mo or $1,140/yr, AUD** (`billing.py` pricing-config). Note: that endpoint sits behind the owner-billing router dependency, so the website cannot fetch it anonymously today; either hardcode on the site or open that one route.
+Plans in code: **Standard $49/mo or $470/yr, Pro $119/mo or $1,140/yr, AUD** (`billing.py` pricing-config). That endpoint is public (verified: the router dependency passes anonymous GETs), so the site can read plans, prices and trial days live instead of hardcoding them.
 - Show it (transparency wins with tradies; filters tyre-kickers) — **recommended**, labelled "Pricing at launch · free during early access".
 - Hide it until launch.
 
@@ -107,7 +107,9 @@ Output to `website/public/screens/`. Re-run on demand or on each app release.
 | `memory/reports/shots/` (72 JPEGs, Sept 2026) | Current light theme: onboarding, estimates list, builder, public quote, accept dialog, signed state | For mock-ups yes; re-capture before publishing (Josh Sano branding + test names) |
 | `design-captures/batch-b-populated/` and the numbered folders | Mixed eras from the redesign | Check per image; many are pre-redesign |
 | `frontend/assets/marketing/screen-*.jpg` | **Legacy dark theme** with the old JSPD logo (used by the old welcome page) | No |
-| `frontend/public/marketing/img_01..10.png` | AI-style illustrations, teal, off-brand | No |
+| `frontend/assets/images/team-photo.jpg` | Real photo of three Josh Sano painters beside the branded van (1600×1066) | Yes, with consent, where the site shows JSPD as customer zero |
+| `frontend/public/marketing/img_01..10.png` | Lifestyle photos of tradies with phones and tablets (1408×768, likely AI-generated, provenance unknown, unreferenced in code) plus a couple of teal illustrations | Mood imagery only, and only once provenance is confirmed; real photos preferred |
+| `frontend/public/library-photos/*.webp` | 127 clean 640×640 surface photos (doors, fences, gutters, ceilings) shipped with the item library | Yes, for a small "surface library" strip; too small for hero use |
 | `design-samples/claude-round5/*.html`, `memory/specs/**/*.html` | HTML prototypes | Reference only |
 
 ---
@@ -119,7 +121,7 @@ Output to `website/public/screens/`. Re-run on demand or on each app release.
 |---|---|---|
 | Lead form | `POST /api/signup-leads` (public, no token) | Fields: `business_name`, `owner_name`, `email`, `phone`, `notes`. **No rate limit and no spam check on this route** (only `/api/auth/signup` is limited). Add a honeypot field on the site and a per-IP limit on the backend, or Cloudflare Turnstile, before going live. No auto-reply email is sent today. |
 | Sign-up CTA | `app.painttradehq.com/signup?code=&email=` | Invite-code gated via `SIGNUP_INVITE_CODE` / tester invites. `GET /api/auth/signup-config` (public) tells the site whether a code is required, so the CTA copy can switch automatically. |
-| Pricing | `GET /api/billing/pricing-config` | Docstring says public, but the billing router is mounted with the owner-billing dependency, so it is not reachable anonymously. Hardcode on the site, or open that one route. |
+| Pricing | `GET /api/billing/pricing-config` | Public (verified: the router dependency passes anonymous GETs). Returns plans, AUD prices, `trial_days` and the Stripe publishable key. Read it live so prices never drift. |
 | Legal text | `GET /api/public/legal/terms` and `/privacy` (public) | Returns markdown + version. Render on the site so the app and site never drift. Docs are 1.0-draft with `[Legal entity name]` placeholders. |
 | App version | `GET /api/version` (public) | Could power a small "latest build" line. |
 | What's new | `GET /api/updates` (signed-in only) | Public changelog is v2 and needs a small backend change. |
@@ -147,6 +149,16 @@ Stripe (subscription billing, platform-managed) · Resend email · Google Calend
 - "14-day free trial". (See D3.)
 - Xero/MYOB integration.
 - SMS "out of the box". (Needs the business's own Twilio credentials.)
+- Geofence warnings on clock-in. (The backend supports it, but the crew screens never send a project id, so no warning ever appears. Say "GPS-stamped clock-in".)
+- Daily reports going to clients. (Crew-to-owner only. The client-facing document is the completion report.)
+- "AI morning briefing". (The Today briefing is built by code; the AI-written brief is never displayed.)
+- Drag-and-drop Kanban. (Status columns with advance buttons.)
+- Two-way calendar sync. (Read-only overlays of Google, Outlook and iCloud.)
+- "Send from your own domain". (Partial; no screen sets the from-address.)
+- Lucy "does things for you". (She reads your data and saves reminders and ideas; she does not send, book or edit.)
+- A sales pipeline board. (Lead statuses only.)
+- Text polish or voice notes. (Removed.)
+- Full admin on your phone. (Below 768 px the admin shell has no navigation; crew screens are phone-first, admin is desktop-first.)
 
 ---
 
