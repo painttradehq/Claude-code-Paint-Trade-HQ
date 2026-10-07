@@ -20,6 +20,6 @@ for f in files:
     open('html/' + f[:-3] + '.html', 'w', encoding='utf-8').write('<!doctype html><html><head><meta charset="utf-8">' + CSS + '</head><body>' + html + '</body></html>')
     parts.append('<div class="doc">' + html + '</div>')
 titles = [re.match(r'^#\s+(.*)', open(f, encoding='utf-8').readline()).group(1) for f in files]
-cover = '<div class="cover doc"><h1>Paint Trade HQ</h1><p>Legal review pack · prepared 6 October 2026</p><ol>' + ''.join(f'<li>{t}</li>' for t in titles) + '</ol></div>'
+cover = '<div class="cover doc"><h1>Paint Trade HQ</h1><p>Legal review pack · prepared 6 October 2026, brief updated 7 October 2026</p><ol>' + ''.join(f'<li>{t}</li>' for t in titles) + '</ol></div>'
 open('html/combined.html', 'w', encoding='utf-8').write('<!doctype html><html><head><meta charset="utf-8">' + CSS + '</head><body>' + cover + ''.join(parts) + '</body></html>')
 print('html ok')
