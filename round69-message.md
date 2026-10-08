@@ -1,4 +1,4 @@
-# Round 69 — Xero connection (Settings › Business › Accounting + one line on the invoice) — DRAFT, not sent (goes after Round 66)
+# Round 69 — Xero connection (Settings › Business › Accounting + one line on the invoice) — SENT 8 Oct
 
 Round 69 — Xero connection. The owner has uploaded xero-settings.html and xero-invoice.html (the prototypes) and xero-notes.md (the spec — save all three to memory/specs/integrations/). Walk both prototypes at 1440 then 1024 first, following the paths at the top of the spec. The spec is pasted below verbatim and is the source of truth. Owner rules: Xero only this round, built so other accounting apps can be added as further rows later; invoices go across when sent, never drafts, from the connection date; one connection per business; every panel on the right; no banners, no "coming soon" rows; the invoice's Xero state is shown on the invoice only; no mobile / crew-app work; nothing changes beyond what is listed; never a real call to Xero in tests (mock the API); the owner's tenant stays read-only.
 

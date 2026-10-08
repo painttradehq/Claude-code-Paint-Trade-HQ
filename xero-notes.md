@@ -80,7 +80,7 @@ One line `inv-xero` under the GST line, only when the tenant is connected (other
 
 1. Settings › Business shows the Accounting section sixth, as in the prototype at 1440 and 1024; without credentials the Connect button is disabled with the muted line.
 2. With test credentials (mock Xero on a TS_ tenant): Connect → the panel opens by itself with the accounts loaded; Save → the status line reads connected · account · last sync; Settings reopens with the saved values; Escape/× close without saving; Disconnect confirms and returns to Not connected.
-3. Invoice: a draft shows "Goes to Xero when you send it"; sending enqueues the push and the line turns green with Open in Xero; a failed push shows the red line and Retry re-queues it; `?` nothing on the list, drawer, public page or PDF changed.
+3. Invoice: a draft shows "Goes to Xero when you send it"; sending enqueues the push and the line turns green with Open in Xero; a failed push shows the red line and Retry re-queues it; nothing on the list, drawer, public page or PDF changed.
 4. Credit-and-reissue pushes the credit note and the new invoice; a recorded payment is pushed; a payment reconciled in (mock) Xero marks the app invoice paid on the next pull.
 5. Suite green before and after; isolation; TS_ torn down; the owner's tenant untouched; no email or SMS; no real call to Xero in tests.
 
