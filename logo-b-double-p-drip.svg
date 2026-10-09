@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="6 4 56 62" width="256" height="256">
-<g transform="skewX(-9) translate(7 0)">
-<path fill="#9B90CF" fill-rule="evenodd" d="M14 8h21a13 13 0 0 1 0 26H24v20H14z M24 16h10a5 5 0 0 1 0 10H24z"/>
-<path fill="#34295E" fill-opacity=".94" fill-rule="evenodd" d="M21 14h21a13 13 0 0 1 0 26H31v20H21z M31 22h10a5 5 0 0 1 0 10H31z"/>
-<path fill="#34295E" d="M22.5 59c0 2.6 1.8 4.2 4 4.2s4-1.6 4-4.2c0-2.9-4-7.2-4-7.2S22.5 56.1 22.5 59z"/>
-</g></svg>
