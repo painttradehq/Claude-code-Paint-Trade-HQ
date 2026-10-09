@@ -1,0 +1,9 @@
+# Estimate builder — the Add work sheet takes the Add area picker's size (Round 68 follow-up, DRAFT, not sent)
+
+Round 68 follow-up, small, not a new round. Owner (9 Oct): "fix the Add work page to the same size as the Add area page." Prototype `estimate-builder-add-work.html` (owner-reviewed): click "+ Add work to …" on an area and the sheet opens at the picker's size.
+
+**What to change.** `AddWorkSheet.tsx` (the "Add work to {area}" sheet with Library · Custom line · Repair) uses the same shell and size as the Round 68 E8 item picker (`AreaPicker.tsx`): a full-height right-side panel **860 px wide, max 96 % of the window**, and the picker's inner padding (20 px top, 26 px sides). The line-details panel (460 px) is not part of this and stays as it is. Nothing inside the sheet changes: tabs, search, category chips, Library rows, the Custom line form, Repair rows, the measure strip, the footer and every test id stay as built. If the sheet and the picker already share one shell component, this is a width prop; if not, give them the same shell rather than copying numbers twice.
+
+**Verify** at 1440 then 1024 (testing agent, iteration number in the report): open the Add area picker and measure its box; open Add work on an area and measure the sheet; the two boxes have the same width and height at both widths (860 px at 1440 and at 1024 — the 96 % cap only matters on windows narrower than about 896 px); the Library list, Custom line and Repair tabs render and work as before; no console errors; suite green before and after; nothing created on any tenant beyond TS_ (cancel out of the owner's builder; read-only).
+
+Report: append a section "Round 68 follow-up — Add work sheet size" to `memory/reports/round68-fix-e-report.md`: files changed, the measurements at both widths, suite numbers. No What's new draft. Do not start anything else after it. No next action items. No Code review.
