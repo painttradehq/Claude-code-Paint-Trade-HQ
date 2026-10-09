@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sidekick and Notion closer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --accent:#4B3E86; --accent-ink:#34295E; --accent-light:#9B90CF; --accent-pale:#C9C2E8; --accent-bg:#EFECF8;
+  --cream:#F3E7D8; --brown:#8B6A46; --ink:#1B1A22; --muted:#6B6880; --border:#E6E4EE; --bg:#F4F3F7; --success:#1C8A4B;
+  --display:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,-apple-system,Segoe UI,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans)}
+.wrap{max-width:1400px;margin:0 auto;padding:28px 24px 60px}
+h1{font:600 30px/1.15 var(--display);margin:0 0 6px}
+h2{font:600 22px/1.2 var(--display);margin:36px 0 2px}
+h3.sub{font:500 15px/1.4 var(--sans);color:var(--muted);margin:0 0 14px}
+.lede{color:var(--muted);margin:0 0 4px;max-width:960px}
+.lede b{color:var(--ink)}
+figure{margin:0}
+figcaption{margin-top:10px;font-size:13px;line-height:1.5;color:var(--muted)}
+figcaption b{color:var(--ink);font-size:14px;display:block;margin-bottom:2px}
+figcaption i{font-style:normal;color:var(--accent-ink);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 20px;margin-top:12px;align-items:start}
+@media (max-width:1100px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:720px){.grid{grid-template-columns:1fr}.wrap{padding:20px 16px 40px}}
+.facts{margin:14px 0 0;padding:14px 18px;background:#fff;border:1px solid var(--border);border-radius:14px;font-size:13px;color:var(--muted)}
+.facts b{color:var(--ink)}
+.facts ul{margin:6px 0 0;padding-left:18px}
+.facts li{margin:3px 0}
+.ic{width:14px;height:14px;display:inline-block;vertical-align:-3px;flex:none}
+
+/* ---------- sketch frames ---------- */
+.sk{width:100%;height:560px;border-radius:14px;overflow:hidden;position:relative;border:1px solid var(--border);box-shadow:0 10px 30px rgba(27,26,34,.08);background:#F1F1F1;font-size:12px}
+
+/* ===== Shopify ===== */
+.sh{color:#303030}
+.sh .top{position:absolute;left:0;right:0;top:0;height:40px;background:#1A1A1A;display:flex;align-items:center;padding:0 14px;gap:12px;color:#E3E3E3}
+.sh .top .logo{width:20px;height:20px;border-radius:5px;background:#95BF47;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:11px}
+.sh .top .search{flex:1;max-width:260px;height:24px;border-radius:7px;background:#303030;color:#8A8A8A;display:flex;align-items:center;padding:0 10px;font-size:11px}
+.sh .top .sp{flex:1}
+.sh .top .skbtn{display:flex;align-items:center;gap:6px;color:#fff;background:#303030;border-radius:7px;padding:4px 9px;font-size:11px}
+.sh .star{color:#8C6FF2}
+.sh .side{position:absolute;left:0;top:40px;bottom:0;width:120px;background:#EBEBEB;padding:14px 10px;color:#5C5C5C;font-size:11px}
+.sh .side div{padding:5px 8px;border-radius:6px;margin-bottom:2px}
+.sh .side div.on{background:#fff;font-weight:600;color:#303030}
+.sh .main{position:absolute;left:120px;top:40px;bottom:0;right:300px;padding:16px;color:#B5B5B5}
+.sh .main h4{margin:0 0 12px;font:700 15px var(--sans);color:#C4C4C4}
+.sh .main .card{background:#fff;border-radius:10px;padding:12px;margin-bottom:10px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.sh .main .bar{height:7px;border-radius:3px;background:#E6E6E6;margin:6px 0}
+.sh .panel{position:absolute;right:0;top:40px;bottom:0;width:300px;background:#fff;border-left:1px solid #E3E3E3;display:flex;flex-direction:column}
+.sh .ph{display:flex;align-items:center;gap:7px;padding:12px 12px 10px;font-weight:600;font-size:13px;border-bottom:1px solid #F0F0F0}
+.sh .ph .sp{flex:1}
+.sh .ph .ib{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#616161;font-size:12px}
+.sh .pb{flex:1;padding:14px 12px;overflow:hidden;display:flex;flex-direction:column}
+.sh .greet{font:600 15px/1.3 var(--sans);color:#303030;margin:36px 0 14px}
+.sh .try{font-size:11px;color:#8A8A8A;margin:auto 0 8px}
+.sh .pc{border:1px solid #E3E3E3;border-radius:10px;padding:9px 10px;font-size:12px;display:flex;gap:8px;align-items:flex-start;margin-bottom:7px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.04);color:#303030}
+.sh .pc .ic{color:#616161;margin-top:2px}
+.sh .pf{padding:0 12px 12px}
+.sh .comp{border:1px solid #D4D4D4;border-radius:12px;padding:9px 10px;display:flex;align-items:center;gap:8px;color:#8A8A8A;font-size:12px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sh .comp .pl{flex:1}
+.sh .comp .ib{color:#616161}
+.sh .hint{font-size:10.5px;color:#9A9A9A;margin-top:6px;text-align:center}
+.sh .um{align-self:flex-end;background:#F1F1F1;border-radius:12px 12px 4px 12px;padding:8px 11px;font-size:12px;max-width:88%;margin-bottom:12px;color:#303030}
+.sh .am{font-size:12px;color:#303030;margin-bottom:10px;line-height:1.5}
+.sh .prev{border:1px solid #E3E3E3;border-radius:10px;overflow:hidden;margin-bottom:8px}
+.sh .prev .t{background:#F6F6F6;padding:7px 10px;font-weight:600;font-size:11.5px;display:flex;justify-content:space-between}
+.sh .prev .t span{color:#8A8A8A;font-weight:500}
+.sh .prev .f{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px 10px}
+.sh .prev .f label{font-size:10px;color:#8A8A8A;display:block}
+.sh .prev .f div{border:1px solid #E3E3E3;border-radius:6px;padding:4px 7px;font-size:11.5px;margin-top:2px;background:#fff}
+.sh .prev .a{display:flex;gap:6px;padding:0 10px 10px}
+.sh .btn{border-radius:8px;padding:6px 10px;font-size:11.5px;font-weight:600;border:1px solid #D4D4D4;background:#fff;color:#303030}
+.sh .btn.p{background:#303030;border-color:#303030;color:#fff}
+.sh .fb{display:flex;gap:8px;color:#9A9A9A;font-size:11px;margin-bottom:8px}
+.sh .todo{border:1px solid #E3E3E3;border-radius:10px;padding:8px 10px;font-size:12px}
+.sh .todo div{display:flex;gap:8px;align-items:center;padding:4px 0}
+.sh .todo .cb{width:14px;height:14px;border-radius:4px;border:1.5px solid #B5B5B5;flex:none}
+.sh .todo .cb.d{background:#303030;border-color:#303030}
+.sh .pulse{position:absolute;left:120px;top:40px;bottom:0;right:0;padding:16px;color:#303030}
+.sh .pulse h4{margin:0 0 4px;font:700 16px var(--sans);color:#303030}
+.sh .pulse .sub{font-size:11.5px;color:#8A8A8A;margin-bottom:12px}
+.sh .pulse .rec{background:#fff;border-radius:10px;padding:11px 12px;margin-bottom:8px;box-shadow:0 1px 2px rgba(0,0,0,.05);display:flex;gap:10px;align-items:flex-start}
+.sh .pulse .rec .ic2{width:26px;height:26px;border-radius:7px;background:#F1EEFB;color:#8C6FF2;display:flex;align-items:center;justify-content:center;flex:none}
+.sh .pulse .rec b{display:block;font-size:12.5px;margin-bottom:2px}
+.sh .pulse .rec p{margin:0;font-size:11.5px;color:#616161}
+.sh .pulse .rec .btn{margin-left:auto;flex:none;align-self:center}
+.sh .pulse .grey{background:#fff;border-radius:10px;padding:12px;margin-top:10px;color:#B5B5B5}
+
+/* ===== Notion ===== */
+.no{background:#fff;color:#37352F}
+.no .page{position:absolute;inset:0;padding:40px 36px 0 36px}
+.no .page .crumb{position:absolute;top:12px;left:14px;font-size:11px;color:#9B9A97}
+.no .page h4{margin:0 0 10px;font:700 24px var(--sans);color:#37352F}
+.no .page p{margin:0 0 10px;height:8px;border-radius:4px;background:#F1F1EF;width:86%}
+.no .page p:nth-of-type(2){width:64%}.no .page p:nth-of-type(4){width:72%}
+.no .page .sel{background:#DDEBFF;height:8px;border-radius:4px;width:52%;margin:0 0 10px}
+.no .face{width:34px;height:34px;border-radius:50%;background:#fff;border:1.5px solid #37352F;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.14)}
+.no .face svg{width:20px;height:20px}
+.no .corner{position:absolute;right:14px;bottom:12px}
+.no .panel{position:absolute;right:14px;bottom:56px;width:300px;background:#fff;border:1px solid #E6E5E1;border-radius:12px;box-shadow:0 12px 36px rgba(0,0,0,.16);padding:10px 10px 8px;display:flex;flex-direction:column}
+.no .panel .h{display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:12.5px;margin:2px 2px 8px}
+.no .panel .h span{color:#9B9A97;font-weight:500;font-size:12px;display:flex;gap:10px}
+.no .row{display:flex;gap:9px;align-items:center;padding:6px 7px;border-radius:6px;font-size:12.5px;color:#37352F}
+.no .row:hover{background:#F1F1EF}
+.no .row .ic{color:#6F6E69}
+.no .row small{margin-left:auto;color:#B4B2AC;font-size:10.5px}
+.no .comp{margin-top:8px;border:1px solid #E6E5E1;border-radius:10px;padding:8px 9px 7px;background:#FBFBFA}
+.no .comp .pl{color:#9B9A97;font-size:12.5px;margin-bottom:8px}
+.no .comp .b{display:flex;align-items:center;gap:8px;font-size:11px;color:#6F6E69}
+.no .comp .chip{border:1px solid #E6E5E1;border-radius:6px;padding:2px 7px;background:#fff}
+.no .comp .sp{flex:1}
+.no .comp .go{width:20px;height:20px;border-radius:5px;background:#37352F;color:#fff;display:flex;align-items:center;justify-content:center}
+.no .um{align-self:flex-end;background:#F1F1EF;border-radius:10px;padding:7px 10px;font-size:12.5px;max-width:88%;margin:2px 0 10px}
+.no .am{font-size:12.5px;line-height:1.55;color:#37352F;margin:0 2px 8px}
+.no .am sup{font-size:9px;color:#fff;background:#37352F;border-radius:3px;padding:0 3px;margin-left:2px}
+.no .src{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.no .src span{border:1px solid #E6E5E1;border-radius:6px;padding:3px 7px;font-size:11px;color:#37352F;display:flex;gap:5px;align-items:center;background:#fff}
+.no .act{display:flex;gap:6px;margin:0 0 6px}
+.no .act span{border:1px solid #E6E5E1;border-radius:6px;padding:4px 8px;font-size:11px;color:#37352F;background:#fff}
+.no .act .t{border:0;color:#9B9A97}
+.no .faces{position:absolute;inset:0;padding:22px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:14px}
+.no .faces figure{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#FBFBFA;border:1px solid #F1F1EF;border-radius:12px;padding:10px}
+.no .faces .face{width:72px;height:72px;border-width:2px}
+.no .faces .face svg{width:44px;height:44px}
+.no .faces figcaption{margin:0;text-align:center;font-size:12px;color:#37352F}
+.no .faces figcaption small{display:block;color:#9B9A97;font-size:11px}
+
+/* ===== Lucy boxes ===== */
+.dir .tag{display:inline-block;margin:0 0 10px;font:600 11px var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--accent);background:#fff;border:1px solid var(--accent-pale);border-radius:999px;padding:3px 9px}
+.dir .box{width:440px;height:640px;max-width:100%;border-radius:20px;overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(27,26,34,.14);border:1px solid var(--border);background:#fff}
+.box .head{display:flex;align-items:center;gap:10px;padding:12px 10px 12px 16px;min-height:52px;background:linear-gradient(135deg,#34295E,#4B3E86);color:#fff}
+.box .head .av{width:30px;height:30px;border-radius:50%;background:var(--cream);color:var(--brown);display:flex;align-items:center;justify-content:center;font:700 14px var(--sans);flex:none}
+.box .head .av svg{width:18px;height:18px}
+.box .head .t{font:600 15px var(--sans);flex:1}
+.box .head button{appearance:none;border:0;background:transparent;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.9)}
+.box .head button svg{width:18px;height:18px}
+.box .body{flex:1;overflow:hidden;padding:16px 20px;background:linear-gradient(180deg,#F5F2FC 0%,#fff 40%);display:flex;flex-direction:column}
+.box .body>*{flex-shrink:0}
+.box .foot{padding:0 14px 14px}
+.box .comp{border:1px solid #D9D2F0;border-radius:16px;background:#fff;padding:10px 10px 8px;display:grid;grid-template-columns:32px 1fr 36px;gap:8px;align-items:end;box-shadow:0 2px 10px rgba(75,62,134,.06)}
+.box .comp .ta{font:15px/1.4 var(--sans);color:var(--muted);min-height:66px;padding:4px 2px}
+.box .comp .plus{width:32px;height:32px;border-radius:50%;background:var(--accent-bg);color:var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:2px}
+.box .comp .send{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(75,62,134,.3)}
+.box .comp svg{width:18px;height:18px}
+.box .greet{font:600 21px/1.15 var(--display);margin:0 0 10px}
+.box .what{display:inline-block;margin-top:12px;font-weight:600;color:var(--accent);font-size:13.5px}
+.box .um{align-self:flex-end;background:var(--accent);color:#fff;border-radius:14px 14px 4px 14px;padding:8px 12px;font-size:14px;max-width:85%;margin:0 0 10px}
+.box .am{display:flex;gap:8px;align-items:flex-start;margin:0 0 10px}
+.box .am .sav{width:24px;height:24px;border-radius:50%;background:var(--cream);color:var(--brown);display:flex;align-items:center;justify-content:center;flex:none;font:700 11px var(--sans)}
+.box .am .sav svg{width:15px;height:15px}
+.box .am .b{background:#fff;border:1px solid var(--border);border-radius:14px 14px 14px 4px;padding:9px 12px;font-size:14px;max-width:88%}
+/* D cards */
+.box-d .pc{border:1px solid var(--border);border-radius:12px;padding:11px 12px;font-size:14px;display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;background:#fff;box-shadow:0 1px 2px rgba(75,62,134,.05)}
+.box-d .pc .ic{color:var(--accent);margin-top:3px;width:16px;height:16px}
+.box-d .prop{border:1px solid var(--accent-pale);border-radius:12px;overflow:hidden;margin:0 0 6px 32px;max-width:88%;background:#fff}
+.box-d .prop .t{background:var(--accent-bg);padding:7px 11px;font-weight:600;font-size:12.5px;color:var(--accent-ink);display:flex;justify-content:space-between}
+.box-d .prop .t span{font-weight:500;color:var(--muted)}
+.box-d .prop .f{padding:7px 11px;font-size:13.5px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px}
+.box-d .prop .f label{color:var(--muted);font-size:12px}
+.box-d .prop .a{display:flex;gap:6px;padding:0 11px 10px}
+.box-d .btn{border-radius:8px;padding:6px 11px;font-size:12.5px;font-weight:600;border:1px solid var(--accent-pale);background:#fff;color:var(--accent-ink)}
+.box-d .btn.p{background:var(--accent);border-color:var(--accent);color:#fff}
+.box-d .try{font-size:12px;color:var(--muted);margin:10px 0 8px}
+/* E rows + faces */
+.box-e .row{display:flex;gap:10px;align-items:center;padding:7px 10px;border-radius:10px;font-size:14px;color:var(--ink)}
+.box-e .row:hover{background:var(--accent-bg)}
+.box-e .row .ic{color:var(--accent);width:17px;height:17px}
+.box-e .row small{margin-left:auto;color:var(--muted);font-size:12px}
+.box-e .src{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0 32px}
+.box-e .src span{border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11.5px;color:var(--ink);background:#fff;display:flex;gap:5px;align-items:center}
+.box-e .src .ic{width:12px;height:12px;color:var(--accent)}
+.box-e .comp .ta{min-height:66px}
+.box-e .bar{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);padding:2px 2px 0;border-top:1px solid var(--border);margin-top:4px;padding-top:7px}
+.box-e .bar .chip{border:1px solid var(--border);border-radius:6px;padding:2px 7px;background:#fff}
+.box-e .bar .sp{flex:1}
+.lfaces{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap}
+.lfaces figure{display:flex;flex-direction:column;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px;min-width:120px}
+.lfaces .lf{width:64px;height:64px;border-radius:50%;background:var(--cream);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(75,62,134,.14)}
+.lfaces .lf svg{width:40px;height:40px}
+.lfaces figcaption{margin:0;text-align:center;font-size:12.5px;color:var(--ink)}
+.lfaces figcaption small{display:block;color:var(--muted);font-size:11.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Sidekick and Notion AI, closer</h1>
+  <p class="lede">Bigger sketches of the two you asked about, drawn from their help pages, changelogs and reviews (the sites themselves are blocked from this sandbox, so these are my drawings, not screenshots). Three states each, then the Notion face in its moods, then <b>what each would look like on Lucy</b> at real size.</p>
+
+  <h2>Shopify Sidekick</h2>
+  <h3 class="sub">A side panel inside the admin. Opened from a Sidekick button in the black top bar; also voice, and on desktop it can watch your screen and walk you through a task.</h3>
+  <div class="grid">
+
+    <figure>
+      <div class="sk sh">
+        <div class="top"><span class="logo">S</span><span class="search">⌕ Search</span><span class="sp"></span><span class="skbtn"><span class="star">✦</span>Sidekick</span></div>
+        <div class="side"><div>Home</div><div class="on">Orders</div><div>Products</div><div>Customers</div><div>Marketing</div><div>Discounts</div><div>Analytics</div></div>
+        <div class="main"><h4>Orders</h4><div class="card"><div class="bar" style="width:40%"></div><div class="bar"></div><div class="bar" style="width:70%"></div></div><div class="card"><div class="bar" style="width:55%"></div><div class="bar"></div></div></div>
+        <div class="panel">
+          <div class="ph"><span class="star">✦</span>Sidekick<span class="sp"></span><span class="ib" title="New chat">＋</span><span class="ib" title="Full screen">⤢</span><span class="ib">✕</span></div>
+          <div class="pb">
+            <div class="greet">Hi Josh, what can I help you with?</div>
+            <div class="try">Try asking</div>
+            <div class="pc"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V5M4 19h16M8 15l4-5 3 3 5-7"/></svg>How did sales go this week compared to last?</div>
+            <div class="pc"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg>Write a product description for the new range</div>
+            <div class="pc"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7l-8 5-8-5M4 7h16v10H4z"/></svg>Which orders still need to be shipped?</div>
+          </div>
+          <div class="pf"><div class="comp"><span class="pl">Ask Sidekick…</span><span class="ib">🎙</span><span class="ib">⧉</span><span class="star">✦</span></div><div class="hint">Type / for a saved skill · Shift-click the icon for full screen</div></div>
+        </div>
+      </div>
+      <figcaption><b>1 · Empty panel</b> Greeting with the merchant's name, three "Try asking" cards written about the shop, and the input at the bottom with mic (voice) and screen-share. Top right: new chat, full screen, close. Saved prompts ("skills", up to 25) fire with "/" + name.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="sk sh">
+        <div class="top"><span class="logo">S</span><span class="search">⌕ Search</span><span class="sp"></span><span class="skbtn"><span class="star">✦</span>Sidekick</span></div>
+        <div class="side"><div>Home</div><div>Orders</div><div>Products</div><div>Customers</div><div>Marketing</div><div class="on">Discounts</div><div>Analytics</div></div>
+        <div class="main"><h4>Discounts</h4><div class="card"><div class="bar" style="width:40%"></div><div class="bar"></div></div><div class="card"><div class="bar" style="width:55%"></div><div class="bar"></div><div class="bar" style="width:30%"></div></div></div>
+        <div class="panel">
+          <div class="ph"><span class="star">✦</span>Sidekick<span class="sp"></span><span class="ib">＋</span><span class="ib">⤢</span><span class="ib">✕</span></div>
+          <div class="pb">
+            <div class="um">Make a 10% discount for returning customers, ends Sunday</div>
+            <div class="am">Here's a draft. Check the details and save it when it looks right — nothing changes until you do.</div>
+            <div class="prev">
+              <div class="t">Discount <span>Draft</span></div>
+              <div class="f"><div><label>Code</label><div>WELCOMEBACK10</div></div><div><label>Value</label><div>10% off</div></div><div><label>Applies to</label><div>Returning customers</div></div><div><label>Ends</label><div>Sun 12 Oct</div></div></div>
+              <div class="a"><span class="btn p">Save discount</span><span class="btn">Edit</span></div>
+            </div>
+            <div class="fb"><span>👍</span><span>👎</span></div>
+          </div>
+          <div class="pf"><div class="comp"><span class="pl">Ask Sidekick…</span><span class="ib">🎙</span><span class="star">✦</span></div></div>
+        </div>
+      </div>
+      <figcaption><b>2 · Nothing happens until you say so</b> A request becomes a preview card with editable fields and a Save button. Every reply carries thumbs up / down. For bulk edits each change is shown for approval; theme edits still need a manual save. Long tasks keep running after you close the panel and it tells you when the result is ready.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="sk sh">
+        <div class="top"><span class="logo">S</span><span class="search">⌕ Search</span><span class="sp"></span><span class="skbtn"><span class="star">✦</span>Sidekick</span></div>
+        <div class="side"><div class="on">Home</div><div>Orders</div><div>Products</div><div>Customers</div><div>Marketing</div><div>Discounts</div><div>Analytics</div></div>
+        <div class="pulse">
+          <h4><span class="star">✦</span> Sidekick Pulse</h4>
+          <div class="sub">Looked at your store overnight. Three things worth doing today.</div>
+          <div class="rec"><span class="ic2">▦</span><div><b>3 products are nearly out of stock</b><p>Linen throw, Oak tray and Candle set will sell out by Thursday at this pace.</p></div><span class="btn">Start</span></div>
+          <div class="rec"><span class="ic2">⟲</span><div><b>Abandoned checkouts are up 18 %</b><p>Most leave at shipping. A free-shipping threshold would cover 70 % of them.</p></div><span class="btn">Start</span></div>
+          <div class="rec"><span class="ic2">✎</span><div><b>12 products have no description</b><p>Draft them from the titles and photos; you approve each one.</p></div><span class="btn">Start</span></div>
+          <div class="todo" style="margin-top:12px;background:#fff"><div><span class="cb d"></span>Pick the three products</div><div><span class="cb"></span>Set reorder quantities</div><div><span class="cb"></span>Send the purchase order</div></div>
+        </div>
+      </div>
+      <figcaption><b>3 · Pulse, the proactive side</b> On the admin Home, cards it worked out overnight, each with one Start button. Starting one opens a conversation and builds a to-do list you tick through. Thin for small stores, which is an honest limit.</figcaption>
+    </figure>
+  </div>
+  <div class="facts"><b>Worth copying from Sidekick</b>
+    <ul>
+      <li><b>Starters in the business's own words</b>, three of them, right above the input, not generic "Summarise text".</li>
+      <li><b>Approve before it happens:</b> a proposal card with the fields visible and one primary button. Lucy already sets reminders and keeps ideas; showing the card first makes it feel safe.</li>
+      <li><b>Full-screen for long chats</b> and a panel that keeps working after you close it.</li>
+      <li><b>Not for Lucy:</b> the side-panel-in-the-admin layout (Lucy is a floating box), voice, screen share, Pulse on Home (the morning brief already does that job).</li>
+    </ul>
+  </div>
+
+  <h2>Notion AI</h2>
+  <h3 class="sub">A face in the corner of every page. Drawn in-house (the brief: make Notion feel more like a game than a productivity app), then animated by the studio BUCK with only eyes, brows and a nose.</h3>
+  <div class="grid">
+
+    <figure>
+      <div class="sk no">
+        <div class="faces">
+          <figure><div class="face"><svg viewBox="0 0 24 24" fill="none" stroke="#37352F" stroke-width="2" stroke-linecap="round"><path d="M6.5 7.5h3M14.5 7.5h3"/><circle cx="8" cy="11" r="1.1" fill="#37352F" stroke="none"/><circle cx="16" cy="11" r="1.1" fill="#37352F" stroke="none"/><path d="M12 11v4h2"/></svg></div><figcaption>Idle<small>brows flat, looking at you</small></figcaption></figure>
+          <figure><div class="face"><svg viewBox="0 0 24 24" fill="none" stroke="#37352F" stroke-width="2" stroke-linecap="round"><path d="M6 8.5l3-1.5M14.5 6.5l3 1"/><circle cx="9" cy="10.5" r="1.1" fill="#37352F" stroke="none"/><circle cx="17" cy="10.5" r="1.1" fill="#37352F" stroke="none"/><path d="M12 11v4h2"/></svg></div><figcaption>Thinking<small>eyebrows wave, eyes drift up</small></figcaption></figure>
+          <figure><div class="face"><svg viewBox="0 0 24 24" fill="none" stroke="#37352F" stroke-width="2" stroke-linecap="round"><path d="M6.5 6.5h3M14.5 6.5h3"/><path d="M6.5 11.5a1.8 1.8 0 0 1 3 0M14.5 11.5a1.8 1.8 0 0 1 3 0"/><path d="M12 11v4h2"/></svg></div><figcaption>Done<small>eyes close into little smiles</small></figcaption></figure>
+          <figure><div class="face"><svg viewBox="0 0 24 24" fill="none" stroke="#37352F" stroke-width="2" stroke-linecap="round"><path d="M6.5 7.5h3M14.5 7.5h3"/><circle cx="8" cy="11" r="1.6" fill="none"/><circle cx="16" cy="11" r="1.6" fill="none"/><path d="M12 11v4h2"/></svg></div><figcaption>Listening<small>eyes widen while you type</small></figcaption></figure>
+          <figure><div class="face"><svg viewBox="0 0 24 24" fill="none" stroke="#37352F" stroke-width="2" stroke-linecap="round"><path d="M5 9l3-2M15 5l3 2"/><circle cx="7.5" cy="12.5" r="1.1" fill="#37352F" stroke="none"/><circle cx="17" cy="9.5" r="1.1" fill="#37352F" stroke="none"/><path d="M11 13l1 4 2-1"/></svg></div><figcaption>Error<small>the face falls apart</small></figcaption></figure>
+          <figure><div class="face"><svg viewBox="0 0 24 24" fill="none" stroke="#37352F" stroke-width="2" stroke-linecap="round"><path d="M6.5 7h3M14.5 7h3"/><circle cx="8" cy="11" r="1.1" fill="#37352F" stroke="none"/><path d="M14.5 11h3"/><path d="M12 11v4h2"/></svg></div><figcaption>Wink<small>when it found exactly the thing</small></figcaption></figure>
+        </div>
+      </div>
+      <figcaption><b>1 · The face and its moods</b> No sparkle, no robot. Three strokes that read as a character, and the same drawing sits bottom-right of every page, in the sidebar and in the toolbar. Notion's design head Randy Hunt: "You can't have every new tool screaming at you."</figcaption>
+    </figure>
+
+    <figure>
+      <div class="sk no">
+        <div class="page"><div class="crumb">Workspace / Projects / Spring launch</div><h4>Spring launch</h4><p></p><p></p><div class="sel"></div><p></p><p></p></div>
+        <div class="panel">
+          <div class="h">Notion AI <span><span>⤢</span><span>✕</span></span></div>
+          <div class="row"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Ask a question about this page</div>
+          <div class="row"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg>Draft anything</div>
+          <div class="row"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h10M4 17h7"/></svg>Summarise this page</div>
+          <div class="row"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12l4 4L19 6"/></svg>Find action items<small>from the selection</small></div>
+          <div class="row"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v12H8l-4 4z"/></svg>Chats with Notion AI<small>⇧⌘J</small></div>
+          <div class="comp"><div class="pl">Ask, search, or make anything…</div><div class="b"><span class="chip">All sources ▾</span><span class="chip">Auto ▾</span><span class="sp"></span><span>@</span><span class="go">↵</span></div></div>
+        </div>
+        <div class="corner"><div class="face"><svg viewBox="0 0 24 24" fill="none" stroke="#37352F" stroke-width="2" stroke-linecap="round"><path d="M6.5 7.5h3M14.5 7.5h3"/><circle cx="8" cy="11" r="1.6" fill="none"/><circle cx="16" cy="11" r="1.6" fill="none"/><path d="M12 11v4h2"/></svg></div></div>
+        </div>
+      <figcaption><b>2 · The panel, empty</b> Opens above the face. Five rows that are verbs, not a paragraph; a plain field with "All sources" to narrow where it looks (one page, a knowledge base, Google Drive), a model picker that defaults to Auto, an @ to point at a page, and Enter. Grey and black, all typography.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="sk no">
+        <div class="page"><div class="crumb">Workspace / Projects / Spring launch</div><h4>Spring launch</h4><p></p><p></p><p></p><p></p></div>
+        <div class="panel" style="bottom:56px">
+          <div class="h">Notion AI <span><span>⤢</span><span>✕</span></span></div>
+          <div class="um">What did we decide about the pricing page?</div>
+          <div class="am">Three tiers, with the middle one marked as recommended<sup>1</sup>. The annual discount stays at 20 %<sup>2</sup>, and the comparison table moves below the fold after the user tests<sup>3</sup>.</div>
+          <div class="src"><span>📄 Pricing review · 2 Oct</span><span>📄 Decisions log</span><span>📄 User test notes</span></div>
+          <div class="act"><span>Insert into page</span><span>Copy</span><span class="t">👍 👎</span></div>
+          <div class="comp"><div class="pl">Ask a follow-up…</div><div class="b"><span class="chip">All sources ▾</span><span class="chip">Auto ▾</span><span class="sp"></span><span>@</span><span class="go">↵</span></div></div>
+        </div>
+        <div class="corner"><div class="face"><svg viewBox="0 0 24 24" fill="none" stroke="#37352F" stroke-width="2" stroke-linecap="round"><path d="M6.5 6.5h3M14.5 6.5h3"/><path d="M6.5 11.5a1.8 1.8 0 0 1 3 0M14.5 11.5a1.8 1.8 0 0 1 3 0"/><path d="M12 11v4h2"/></svg></div></div>
+      </div>
+      <figcaption><b>3 · An answer</b> Plain text with small numbered marks, then the sources as chips you can click, then what to do with it (insert, copy) and the thumbs. The face in the corner smiles when it is done.</figcaption>
+    </figure>
+  </div>
+  <div class="facts"><b>Worth copying from Notion</b>
+    <ul>
+      <li><b>A face instead of a letter.</b> Lucy's cream circle with three brown strokes could wake up while she thinks and close its eyes when she's done. One drawing, used everywhere she appears.</li>
+      <li><b>Verbs as rows</b> on the empty state, each a thing Lucy actually does.</li>
+      <li><b>Sources as chips</b> under an answer (Lucy already has a sources line; chips make it readable) and a small "Copy" under long answers.</li>
+      <li><b>Not for Lucy:</b> the sources picker and model picker (one business, one model), the @ page mention, the keyboard-shortcut culture.</li>
+    </ul>
+  </div>
+
+  <h2>What each would look like on Lucy — real size 440 × 640</h2>
+  <p class="lede">Both keep the minimal rules: ⋯ and × only in the header, "What can Lucy do?", the three-line box with + and send inside, every existing id. Colour as in the current coloured version (purple header, cream avatar).</p>
+  <div class="grid">
+
+    <figure class="dir">
+      <span class="tag">D · Sidekick on Lucy</span>
+      <div class="box box-d">
+        <div class="head"><div class="av">L</div><div class="t">Lucy</div><button aria-label="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button><button aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+        <div class="body">
+          <div class="um">Remind me to call Jane about the Smith quote tomorrow</div>
+          <div class="am"><div class="sav">L</div><div class="b">Here's the reminder. Set it when it looks right.</div></div>
+          <div class="prop">
+            <div class="t">Reminder <span>Draft</span></div>
+            <div class="f"><label>What</label><div>Call Jane · Smith quote</div><label>When</label><div>Tomorrow, Fri 10 Oct · 9:00</div><label>Shows</label><div>Morning brief · Lucy's setup</div></div>
+            <div class="a"><span class="btn p">Set reminder</span><span class="btn">Change</span></div>
+          </div>
+          <div class="try">Try asking</div>
+          <div class="pc"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Which jobs are running over the estimate this week?</div>
+        </div>
+        <div class="foot"><div class="comp"><span class="plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><div class="ta">Ask Lucy…</div><span class="send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></span></div></div>
+      </div>
+      <figcaption><b>D · Sidekick on Lucy</b> Starters are cards in a painter's words, two or three, above the box. When Lucy is about to do something (a reminder, a note on a job, an idea saved) she shows a draft card with the fields and one purple button, and nothing happens until you press it. The ⋯ menu gains "Open full screen" for long chats. Everything else as the coloured minimal box.</figcaption>
+    </figure>
+
+    <figure class="dir">
+      <span class="tag">E · Notion on Lucy</span>
+      <div class="box box-e">
+        <div class="head"><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="#8B6A46" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 7.5h3M14.5 7.5h3"/><circle cx="8" cy="11" r="1.2" fill="#8B6A46" stroke="none"/><circle cx="16" cy="11" r="1.2" fill="#8B6A46" stroke="none"/><path d="M12 11v4h2"/></svg></div><div class="t">Lucy</div><button aria-label="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button><button aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+        <div class="body">
+          <h3 class="greet">Hi Josh, what do you want to know?</h3>
+          <div class="row"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Who's on site today?</div>
+          <div class="row"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 3v18M7 8h7a3 3 0 0 1 0 6H8"/></svg>What's owed?</div>
+          <div class="row"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>What's on tomorrow?</div>
+          <div class="row"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M21 12a8 8 0 1 1-4.7-7.3"/><path d="M21 4v5h-5"/></svg>Which quotes have gone quiet?</div>
+          <div class="row"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="9"/></svg>Remind me…<small>type it in the box</small></div>
+          <div class="row"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>I've got an idea<small>type it in the box</small></div>
+          <div class="am" style="margin-top:10px"><div class="sav"><svg viewBox="0 0 24 24" fill="none" stroke="#8B6A46" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 6.5h3M14.5 6.5h3"/><path d="M6.5 11.5a1.8 1.8 0 0 1 3 0M14.5 11.5a1.8 1.8 0 0 1 3 0"/><path d="M12 11v4h2"/></svg></div><div class="b">Two quotes have gone quiet: Smith (9 days) and Nguyen (12 days).</div></div>
+          <div class="src"><span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/></svg>Estimates</span><span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/></svg>CRM</span><span>Copy</span></div>
+        </div>
+        <div class="foot"><div class="comp"><span class="plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><div class="ta">Ask Lucy…</div><span class="send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></span><div class="bar"><span class="chip">Enter to send</span><span class="sp"></span><span>Shift + Enter for a new line</span></div></div></div>
+      </div>
+      <figcaption><b>E · Notion on Lucy</b> Lucy gets a face: three brown strokes on her cream circle, eyebrows up while she thinks, eyes closed into smiles when she's done. The empty state is six verb rows (the four starters plus the two things you can type), no paragraph. Answers end with source chips and Copy. Quiet, typographic, the colour stays in the header and the send button.</figcaption>
+    </figure>
+
+    <figure>
+      <div class="lfaces">
+        <figure><div class="lf"><svg viewBox="0 0 24 24" fill="none" stroke="#8B6A46" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 7.5h3M14.5 7.5h3"/><circle cx="8" cy="11" r="1.2" fill="#8B6A46" stroke="none"/><circle cx="16" cy="11" r="1.2" fill="#8B6A46" stroke="none"/><path d="M12 11v4h2"/></svg></div><figcaption>Lucy idle<small>on the bubble and header</small></figcaption></figure>
+        <figure><div class="lf"><svg viewBox="0 0 24 24" fill="none" stroke="#8B6A46" stroke-width="2.2" stroke-linecap="round"><path d="M6 8.5l3-1.5M14.5 6.5l3 1"/><circle cx="9" cy="10.5" r="1.2" fill="#8B6A46" stroke="none"/><circle cx="17" cy="10.5" r="1.2" fill="#8B6A46" stroke="none"/><path d="M12 11v4h2"/></svg></div><figcaption>Thinking<small>instead of the typing dots</small></figcaption></figure>
+        <figure><div class="lf"><svg viewBox="0 0 24 24" fill="none" stroke="#8B6A46" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 6.5h3M14.5 6.5h3"/><path d="M6.5 11.5a1.8 1.8 0 0 1 3 0M14.5 11.5a1.8 1.8 0 0 1 3 0"/><path d="M12 11v4h2"/></svg></div><figcaption>Done<small>for a second, then idle</small></figcaption></figure>
+        <figure><div class="lf"><svg viewBox="0 0 24 24" fill="none" stroke="#8B6A46" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 7.5h3M14.5 7.5h3"/><circle cx="8" cy="11" r="1.7" fill="none"/><circle cx="16" cy="11" r="1.7" fill="none"/><path d="M12 11v4h2"/></svg></div><figcaption>Listening<small>while you type</small></figcaption></figure>
+        <figure><div class="lf"><svg viewBox="0 0 24 24" fill="none" stroke="#8B6A46" stroke-width="2.2" stroke-linecap="round"><path d="M5 9l3-2M15 5l3 2"/><circle cx="7.5" cy="12.5" r="1.2" fill="#8B6A46" stroke="none"/><circle cx="17" cy="9.5" r="1.2" fill="#8B6A46" stroke="none"/><path d="M11 13l1 4 2-1"/></svg></div><figcaption>Something went wrong<small>allowance used up, no key</small></figcaption></figure>
+      </div>
+      <figcaption><b>Lucy's face, if you want it</b> Same strokes as Notion's idea but Lucy's own: brown on cream, no outline ring. It would replace the "L" on the bubble, the header and beside her messages, and the moods replace the typing dots. The brand mark (the P) is untouched.</figcaption>
+    </figure>
+  </div>
+</div>
+</body>
+</html>
