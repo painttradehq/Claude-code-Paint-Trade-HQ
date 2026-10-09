@@ -71,7 +71,33 @@ CSS = """
   .tc-foot .amenu .ib svg{ width:16px; height:16px; }
   .attach{ padding:0 18px 4px; }
 """
-s = rep1(s, '</style>', CSS + '</style>')
+CSS2 = """
+  /* ---- colour and warmth back (owner, 9 Oct): light on options, not on life ---- */
+  .tc-head{ background:linear-gradient(135deg,#34295E 0%,#4B3E86 100%); color:#fff; border-bottom:none; padding:11px 10px 11px 14px; }
+  .tc-head .av{ width:30px; height:30px; background:#F3E7D8; color:#8B6A46; box-shadow:0 2px 8px rgba(0,0,0,.18); }
+  .tc-head .av .l{ font-size:14px; }
+  .tc-head .t b{ color:#fff; }
+  .tc-head .tools button{ color:rgba(255,255,255,.85); }
+  .tc-head .tools button:hover, .tc-head .tools button.on{ background:rgba(255,255,255,.18); color:#fff; }
+  .tc-head .back{ color:#fff; }
+  .tc-body{ background:linear-gradient(180deg,#F5F2FC 0%,#FFFFFF 42%); }
+  .welcome .wav{ width:48px; height:48px; border-radius:50%; background:#F3E7D8; color:#8B6A46; font-weight:700; font-size:21px; display:flex; align-items:center; justify-content:center; margin:0 0 12px; box-shadow:0 8px 20px rgba(75,62,134,.16); }
+  .welcome .big{ font-size:22px; margin-bottom:6px; }
+  .welcome .hey{ font-size:13px; color:var(--text-muted); margin:0 0 16px; }
+  .picks{ flex-direction:row; flex-wrap:wrap; gap:8px; }
+  .picks button{ padding:9px 14px; border-radius:999px; background:var(--accent-bg); color:var(--accent-ink); border:1px solid transparent; font-size:13.5px; font-weight:600; }
+  .picks button::before{ content:none; }
+  .picks button:hover{ background:#E4DEF6; border-color:var(--accent); color:var(--accent-ink); }
+  .welcome .what{ color:var(--accent); text-decoration:none; font-weight:600; padding-top:12px; }
+  .msg.ai{ background:#fff; border:1px solid var(--border); }
+  .tc-foot .box{ border-color:#D9D2F0; background:#fff; box-shadow:0 2px 10px rgba(75,62,134,.06); }
+  .tc-foot .ib#tcPlus{ background:var(--accent-bg); color:var(--accent); border-radius:50%; width:32px; height:32px; }
+  .tc-foot .ib#tcPlus:hover{ background:#E4DEF6; }
+  .tc-foot .ib.send{ border-radius:50%; width:34px; height:34px; box-shadow:0 4px 12px rgba(75,62,134,.3); }
+  .tc-menu button svg{ color:var(--accent); }
+  .tc-ctx.show{ color:var(--warning); font-weight:600; }
+"""
+s = rep1(s, '</style>', CSS + CSS2 + '</style>')
 
 # ---- header: back link (help mode), one ⋯ button + × ; the old action buttons move into the ⋯ menu
 s = rep(s, '<div class="tc-head"><div class="av" id="tcAv"><span class="l">L</span></div><div class="t"><b id="tcTitle">Lucy</b><span id="tcSub">Sano Painting &amp; Decorating · your team\'s assistant</span></div>\n    <div class="tools">',
@@ -110,7 +136,7 @@ s = s[:j] + '</div>' + s[j:]
 s = rep(s, """const STARTERS = [['site', "Who's on site today?"], ['owed', "What's owed and by whom?"], ['leads', 'Any new leads this week?'], ['calendar', "What's on the calendar tomorrow?"], ['quiet', 'Which quotes have gone quiet?'], ['remind', 'Remind me to call Jane tomorrow'], ['idea', 'I’ve got an idea…']];""",
            """const STARTERS = [['site', "Who's on site today?"], ['owed', "What's owed?"], ['calendar', "What's on tomorrow?"], ['quiet', 'Which quotes have gone quiet?']];""")
 # welcome: one line, the paragraph hidden behind "What can Lucy do?"
-s = rep(s, '<div class="big">Hi ${ME}, I’m Lucy. What do you want to know?</div><p>', '<div class="big">Hi ${ME} — what do you want to know?</div><p id="tcWhat" class="${WHAT ? \'on\' : \'\'}">')
+s = rep(s, '<div class="big">Hi ${ME}, I’m Lucy. What do you want to know?</div><p>', '<div class="wav">L</div><div class="big">Hi ${ME} — what do you want to know?</div><div class="hey">Ask me anything about this business.</div><p id="tcWhat" class="${WHAT ? \'on\' : \'\'}">')
 s = rep(s, "<div class=\"picks\">${STARTERS.map(([k, l]) => `<button data-starter=\"${k}\" data-testid=\"ai-starter-${k}\">${l}</button>`).join('')}</div></div>`;",
            "<div class=\"picks\">${STARTERS.map(([k, l]) => `<button data-starter=\"${k}\" data-testid=\"ai-starter-${k}\">${l}</button>`).join('')}</div><button class=\"what\" id=\"tcWhatBtn\" data-testid=\"ai-what\">${WHAT ? 'Hide' : 'What can Lucy do?'}</button></div>`;")
 # usage line: only when nearly used up (?usage=high) — otherwise it lives in Lucy's setup
