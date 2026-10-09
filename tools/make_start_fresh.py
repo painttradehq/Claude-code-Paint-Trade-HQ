@@ -86,9 +86,10 @@ const SF_JOB = [
   ['ai', 'Lucy conversations, cached briefs, reminders and ideas', 14],
   ['equipment', 'Equipment items, check-outs and requests', 30],
   ['archived', 'Archived items of every kind', 7],
+  ['library', 'Library prices and times (the cards stay)', 41],
 ];
 const SF_EMP = ['employees', 'Crew and office staff with timesheets, documents, contracts, leave and ratings', 74];
-const SF_STAYS = 'Business profile and settings · your products and the catalogue · quote and invoice setup · contract, message and automation templates · training videos · your owner account and team admins · Lucy\\'s settings · tester invites and feedback.';
+const SF_STAYS = 'Business profile and settings · your products · the Library\\'s cards (names, descriptions, photos and methods — their prices and times are cleared) · quote and invoice setup · contract, message and automation templates · training videos · your owner account and team admins · Lucy\\'s settings · tester invites and feedback.';
 let sfState = { last: null };
 const sfTotal = (emp) => SF_JOB.reduce((a, r) => a + r[2], 0) + (emp ? SF_EMP[2] : 0);
 function renderSf() {
