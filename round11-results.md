@@ -81,3 +81,8 @@
 - **Where secrets go in Emergent (from Emergent):** preview = the chat's **Secrets panel** (the platform writes it into the backend `.env`; the running backend needs a restart afterwards), never the chat text; deployed app = **Publish/Redeploy → Manage Publishes → Secrets → Custom Keys → Save → Redeploy** (saving alone does not restart production).
 - Housekeeping message sent (no build work): remove `EMERGENT_EMAIL_KEY`, set `RESEND_FROM` / `RESEND_REPLY_TO`, confirm `RESEND_API_KEY` present by name, restart, report the email status; apply `ANTHROPIC_API_KEY` from the Secrets panel, restart, re-run the three AI tests; Google secret later. Names only, never values.
 - Drafts now waiting for Josh to publish after the deploy check: "Quicker estimates" (a4b0467f), "Xero connection" (e660d42e), "Addresses that finish themselves" (9f95eccd). Save to GitHub due (Rounds 69–70 at least).
+
+## Parking lot (9 Oct, Josh)
+- **Lucy chat box redesign** — less crowded (Josh's words); prototype here first when its turn comes.
+- **Lucy more humanised** — tone, name, how she speaks and reacts; relates to the parked A20 (press-and-hold "ask Lucy") and A21 (animated painter character).
+- **Lucy skills** — "add skills and skills": give Lucy defined skills (repeatable jobs she can do well, e.g. draft a follow-up, price-check a quote, write the morning brief, chase overdue invoices) rather than one open chat. To be scoped with Josh before a spec.
