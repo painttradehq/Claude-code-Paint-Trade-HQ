@@ -1,0 +1,62 @@
+// Lucy minimal box — Playwright checks at 1440 then 1024.
+// Run: NODE_PATH=$(npm root -g) node tools/test_lucy_minimal.js
+const { chromium } = require('playwright'); const path = require('path'); const fs = require('fs');
+const SHOTS = process.env.SHOTS || path.join(process.env.HOME || '/tmp', 'shots'); fs.mkdirSync(SHOTS, { recursive: true });
+const U = 'file://' + path.resolve('lucy-chat-minimal.html');
+let pass = 0, fail = 0;
+const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail++; console.log('  FAIL', m); } };
+(async () => {
+  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+  for (const W of [1440, 1024]) {
+    console.log(`\n== ${W} ==`);
+    const p = await b.newPage({ viewport: { width: W, height: 900 } });
+    const errs = []; p.on('pageerror', e => errs.push(String(e))); p.on('console', m => { if (m.type() === 'error' && !/font|ERR_/.test(m.text())) errs.push(m.text()); });
+    await p.goto(U); await p.waitForTimeout(500);
+    await p.click('#tcBubble'); await p.waitForTimeout(300);
+    ok(await p.locator('#tc').isVisible(), 'box opens');
+    ok(await p.locator('.tc-head .tools button:visible').count() === 2, 'header has two buttons only (⋯ and ×)');
+    ok(await p.locator('.tc-tabs:visible').count() === 0 || !(await p.locator('.tc-tabs').first().isVisible()), 'no tab bar');
+    ok(!(await p.locator('#tcSub').isVisible()), 'no business subtitle');
+    ok((await p.locator('[data-testid="ai-welcome"] .big').innerText()).includes('what do you want to know?'), 'one-line greeting');
+    ok(!(await p.locator('#tcWhat').isVisible()), 'explanation paragraph hidden by default');
+    ok(await p.locator('[data-starter]').count() === 4, 'four starters');
+    ok(!(await p.locator('#tcCtx').isVisible()), 'usage bar hidden by default');
+    const ta = await p.locator('#tcInput').boundingBox();
+    ok(ta && ta.height >= 60, `big composer (${ta && Math.round(ta.height)} px tall)`);
+    ok(await p.locator('#tcPlus').isVisible() && await p.locator('#tcSend').isVisible() && !(await p.locator('#tcCam').isVisible()), '+ and send inside the box, camera/file tucked away');
+    await p.screenshot({ path: `${SHOTS}/lucy-min-welcome-${W}.png` });
+    await p.click('[data-testid="ai-what"]'); await p.waitForTimeout(150);
+    ok(await p.locator('#tcWhat').isVisible(), '"What can Lucy do?" reveals the explanation');
+    await p.click('[data-testid="ai-what"]'); await p.waitForTimeout(150);
+    await p.click('#tcMore'); await p.waitForTimeout(150);
+    ok(await p.locator('#tcMenu').isVisible() && await p.locator('#tcMenu button').count() === 5, '⋯ opens the menu: New chat · Past chats · Help · What Lucy can do · Lucy’s setup');
+    await p.screenshot({ path: `${SHOTS}/lucy-min-menu-${W}.png` });
+    await p.click('[data-testid="tc-menu-help"]'); await p.waitForTimeout(250);
+    ok((await p.locator('#tcTitle').innerText()) === 'Help' && await p.locator('#tcBack').isVisible(), 'Help mode: title Help, back link');
+    await p.click('#tcBack'); await p.waitForTimeout(250);
+    ok((await p.locator('#tcTitle').innerText()) === 'Lucy' && await p.locator('[data-testid="ai-welcome"]').isVisible(), 'back to Lucy');
+    await p.click('#tcMore'); await p.click('[data-testid="tc-menu-history"]'); await p.waitForTimeout(200);
+    ok((await p.locator('#tcBody').innerText()).toLowerCase().includes('chats with lucy'), 'Past chats from the menu');
+    await p.click('#tcMore'); await p.click('[data-testid="tc-menu-new"]'); await p.waitForTimeout(200);
+    ok(await p.locator('[data-testid="ai-welcome"]').isVisible(), 'New chat from the menu');
+    await p.click('[data-starter="site"]'); await p.waitForTimeout(1000);
+    ok(await p.locator('[data-testid="ai-msg-user"]').count() === 1 && await p.locator('[data-testid="ai-msg-assistant"]').count() === 1, 'a starter sends and Lucy answers');
+    await p.fill('#tcInput', 'any new leads?'); await p.keyboard.press('Enter'); await p.waitForTimeout(1000);
+    ok(await p.locator('[data-testid="ai-msg-user"]').count() === 2, 'Enter sends');
+    await p.screenshot({ path: `${SHOTS}/lucy-min-chat-${W}.png` });
+    await p.click('#tcPlus'); await p.waitForTimeout(150);
+    ok(await p.locator('#tcAmenu').isVisible() && await p.locator('#tcCam').isVisible(), '+ opens Take a photo / Attach a photo');
+    await p.click('#tcFile'); await p.waitForTimeout(150);
+    ok(await p.locator('#tcAttach').isVisible() && !(await p.locator('#tcAmenu').isVisible()), 'attach chip shows, menu closes');
+    await p.click('#tcMore'); await p.click('[data-testid="tc-menu-setup"]'); await p.waitForTimeout(250);
+    ok(await p.locator('#pop').isVisible(), 'Lucy’s setup opens from the menu');
+    await p.keyboard.press('Escape'); await p.waitForTimeout(150);
+    await p.goto(U + '?usage=high'); await p.waitForTimeout(500); await p.click('#tcBubble'); await p.waitForTimeout(300);
+    ok(await p.locator('#tcCtx').isVisible() && (await p.locator('#tcCtxTxt').innerText()).includes('nearly used up'), 'usage line appears only when the allowance is nearly gone');
+    ok(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), 'no horizontal scroll');
+    ok(errs.length === 0, 'no console errors' + (errs.length ? ': ' + errs.join(' | ').slice(0, 300) : ''));
+    await p.close();
+  }
+  await b.close();
+  console.log(`\n${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0);
+})();
