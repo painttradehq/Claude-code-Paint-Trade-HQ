@@ -1,4 +1,4 @@
-# Start fresh — also clear the Library's prices and times (Round 67 follow-up, DRAFT, not sent)
+# Start fresh — also clear the Library's prices and times (Round 67 follow-up — SENT 10 Oct with the Add work follow-up)
 
 Round 67 follow-up, small, not a new round. The owner ran Start fresh on the preview: the Library cards kept their set prices and task times. Owner's decision (9 Oct): **the cards stay — name, description, photo, methods and all — but every price and time on them goes.**
 

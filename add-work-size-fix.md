@@ -1,4 +1,4 @@
-# Estimate builder — Add work: the picker's size and a cleaner layout (Round 68 follow-up, DRAFT, not sent)
+# Estimate builder — Add work: the picker's size and a cleaner layout (Round 68 follow-up — SENT 10 Oct with the Start fresh follow-up)
 
 Round 68 follow-up, not a new round; goes after Round 73 reports done, together with the Start fresh follow-up. The owner has uploaded estimate-builder-add-work-v2.html (the prototype) and add-work-v2-notes.md (the spec) — save both to memory/specs/estimates/. Walk the prototype at 1440 then 1024 first, following the path at the top of the spec. The spec is pasted below verbatim and is the source of truth. Owner rules: simple and practical; no duplication; every test id kept; nothing changes outside the sheet; the owner's tenant stays read-only (cancel out of his builder; no estimate saved).
 
