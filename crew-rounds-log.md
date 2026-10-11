@@ -33,3 +33,8 @@ Rules: `crew-app-handover.md` §1. Rounds are C1, C2, …; one round at a time a
 
 - Second workflow: 24 refuter verdicts on the 12 material corrections, 23 uphold. Refinements folded in: a third job-creation path (admin marks a quote accepted) can title a job with the client's full name and writes no `client_name`; the admin job page reads `client_snapshot.address` and only the pin moves after "Edit location"; the proposed nested areas payload is replaced by grouping the existing `flatten_estimate_lines()` rows (name, qty, unit, `sub`, product with colour; money keys dropped; optional-not-chosen rows dropped) — the one refuted item. `c2-jobs-notes.md` and `crew-recheck-11oct.md` updated; prototype unchanged (86/86).
 - Nothing sent to Emergent. No app code touched.
+
+## 11 Oct — correction: Done includes invoiced
+
+- Josh: "invoiced jobs leave the crew's lists — this should change to include invoiced ones." `c2-jobs-notes.md`: Done = `done` or `invoiced` again (pill "Done {date}", no mention of invoicing on the crew side), the routes no longer filter `invoiced`, verify item 1 and test case 9 updated. Nothing open on C2.
+- Nothing sent to Emergent. No app code touched.
