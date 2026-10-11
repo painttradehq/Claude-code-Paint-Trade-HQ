@@ -28,3 +28,8 @@ Rules: `crew-app-handover.md` §1. Rounds are C1, C2, …; one round at a time a
 
 - Josh: Site contact = site manager **yes**; unaccepted optional lines hidden **yes**; Done includes invoiced **no**. `c2-jobs-notes.md`: Done = `done` only, the list and detail routes exclude `invoiced` (404 on the detail), verify item 1 and test case 9 cover it; §9 closed — nothing open on C2.
 - Nothing sent to Emergent. No app code touched.
+
+## 11 Oct — refuters done
+
+- Second workflow: 24 refuter verdicts on the 12 material corrections, 23 uphold. Refinements folded in: a third job-creation path (admin marks a quote accepted) can title a job with the client's full name and writes no `client_name`; the admin job page reads `client_snapshot.address` and only the pin moves after "Edit location"; the proposed nested areas payload is replaced by grouping the existing `flatten_estimate_lines()` rows (name, qty, unit, `sub`, product with colour; money keys dropped; optional-not-chosen rows dropped) — the one refuted item. `c2-jobs-notes.md` and `crew-recheck-11oct.md` updated; prototype unchanged (86/86).
+- Nothing sent to Emergent. No app code touched.
