@@ -413,7 +413,7 @@ input{font-family:inherit}
   };
   const icon = { contract: 'i-sign', equipment: 'i-gear', report: 'i-chat', star: 'i-coach' };
   const currentJob = () => jobs.find(x => x.status === 'now') || null;
-  const subOf = (j) => [j.client, j.addr !== j.name ? j.addr : null].filter(Boolean).join(' · ');
+  const subOf = (j) => [j.client !== j.name ? j.client : null, j.addr !== j.name ? j.addr : null].filter(Boolean).join(' · ');
 
   // ---- hub rows ----
   const rowHtml = (r) => `
