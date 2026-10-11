@@ -2,7 +2,7 @@
 
 Prototype: **`c1-crew-shell.html`** (one prototype for C1 and C2; this file covers the C1 part, `c2-jobs-notes.md` the Jobs part). Open at **390 × 844** first: sign in with any email → Today → tap **Sign in** on the clock card → tap a message → **Jobs** → a job → back → **Inbox** › Mark all read → **Learn** → **Me** › Sign out. Deep links: `?screen=app&tab=inbox`, `?screen=app&state=in&notifs=0&jobs=0` (nothing unread, no jobs), `?screen=job&id=j2`, `?error=restricted`. Then 360 × 800. Playwright `tools/test_c1.js`: **82/82** at both sizes.
 
-Facts: `crew-recheck-11oct.md` (clone `dae9a2f`). Status: **proposal for Josh's review** after his C1 feedback ("Profile under Docs; jobs are missing"). Nothing goes to Emergent before "send".
+Facts: `crew-recheck-11oct.md` (clone `dae9a2f`). Status: **sent as Round C1 on 11 Oct** ("ok send to build"). The prototype also holds the C2 Jobs tab and job page; C1 builds the four-tab shell only.
 
 ## 1. What changed from v1 (Josh's review, 11 Oct)
 
@@ -90,4 +90,5 @@ Every existing crew screen stays reachable (eleven routes, checked by the test) 
 
 - Tabs **Today · Jobs · Inbox · Learn · Me**: **OK** (Josh).
 - C1 then C2, or one round: Josh is **not sure**. Recommendation: **two rounds, C2 sent the moment "Round C1 done" lands** (no admin round between, if Josh agrees). C1 is frontend-only and will test fast; C2 carries the first crew routes and their isolation tests, which deserve their own testing pass and their own What's new. One round would bundle ~20 verify items and a backend change into a single report.
-- Still open: greeting by first name (OK?); "My hours" under Me opening the existing time-clock screen until C3 (OK, or leave it out?).
+- Greeting by first name and "My hours" opening the existing time-clock screen until C3: **kept as written** (Josh sent the round on 11 Oct without changing them).
+- Sent to Emergent as Round C1 on 11 Oct (`roundC1-message.md`). C2 follows "Round C1 done".

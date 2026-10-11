@@ -38,3 +38,9 @@ Rules: `crew-app-handover.md` §1. Rounds are C1, C2, …; one round at a time a
 
 - Josh: "invoiced jobs leave the crew's lists — this should change to include invoiced ones." `c2-jobs-notes.md`: Done = `done` or `invoiced` again (pill "Done {date}", no mention of invoicing on the crew side), the routes no longer filter `invoiced`, verify item 1 and test case 9 updated. Nothing open on C2.
 - Nothing sent to Emergent. No app code touched.
+
+## 11 Oct — Round C1 SENT
+
+- Josh: "ok send to build." Checked the Emergent job first: paused / awaiting input, last message the Round 66 report — no admin round building. Sent **Round C1** (`roundC1-message.md`: seven round rules, then `c1-crew-shell-notes.md` §2–§6 verbatim) to job `b55b8df9-f0c5-41c7-80d1-f174b2874432`; queued (`db5mrkg714nc73fi2lpg`). Emergent is told to wait for Josh's uploads of `c1-crew-shell.html` + `c1-crew-shell-notes.md` ("here") and to build the four-tab shell only — the Jobs tab and job page in the prototype are C2.
+- The two open C1 defaults (greeting by first name; My hours → the existing time-clock screen until C3) went as written.
+- Next: Josh uploads the two files; Emergent builds and reports "Round C1 done"; then **C2** (`c2-jobs-notes.md`) goes, nothing between. The admin chat sends nothing while C1 builds (§1 rule 2).
