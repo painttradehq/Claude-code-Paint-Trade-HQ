@@ -16,3 +16,10 @@ Rules: `crew-app-handover.md` §1. Rounds are C1, C2, …; one round at a time a
 - **Prototype v2** `c1-crew-shell.html`: tabs **Today · Jobs · Inbox · Learn · Me**; Today = clock card + Today's job card + top three unread + daily report; Jobs = Now / Coming up / Done + a job screen (dates & crew, access note, the work per area incl. "Added work", paints & colours, files, photos, my reports, Directions + Daily report); Inbox = Message your employer + all notifications + Mark all read; Me = profile card, My documents, My equipment, My hours, Team events, Sign out. `tools/test_c1.js` **82/82** at 390 × 844 and 360 × 800.
 - Notes split: **`c1-crew-shell-notes.md`** (v2: the shell, four tabs in C1, Jobs tab inserted by C2; frontend-only) and **`c2-jobs-notes.md`** (Show/Decide/Never → data, the two crew routes with an allow-list payload, isolation tests, the optional per-job scope switch, verify list, What's new, four questions).
 - Nothing sent to Emergent. No app code touched.
+
+## 11 Oct — Josh's answers on the v2 proposal
+
+- Josh: "1. ok. 2. not sure. 3. name yes, phone (only site manager, if any). no crm notes. no paper. 4. correct. 5. always show to the assigned crew." → tabs stay; C1/C2 split: recommended two rounds back to back; Decide items settled (client name as the job title; a phone only for a site manager when the job has one; CRM notes and the quote's paper wording never); Portfolio = Jobs › Done per person; the quoted work always shows to assigned crew (no per-job switch).
+- Prototype: the job page gains a **Site manager** row (name, number, tel: link) when the job has one (Harrow); Nguyen has none. `tools/test_c1.js` extended.
+- Ran a read-only workflow over the clone (five lenses: client contacts and any "site manager" role, the estimate scope shape and every money field, isolation-test conventions, reports/photos/files/crew-name fields, an audit of every code claim in `c2-jobs-notes.md`) with two refuters per proposed correction; results folded into `c2-jobs-notes.md`.
+- Nothing sent to Emergent. No app code touched.

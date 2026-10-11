@@ -86,9 +86,8 @@ Every existing crew screen stays reachable (eleven routes, checked by the test) 
 **Title:** A new home screen for your crew
 **Body:** Your crew now opens on a Today screen with their time clock, your latest messages and a one-tap daily report. Tabs along the bottom — Today, Inbox, Learn and Me — replace the old tile grid, and the sign-in screen carries the Paint Trade HQ look. Everything they could do before is still there, one tap away. Their jobs are next. Nothing changes on your side.
 
-## 7. Open questions for Josh (one line each)
+## 7. Josh's answers (11 Oct) and what is still open
 
-1. Tabs **Today · Jobs · Inbox · Learn · Me** — keep, or rename any?
-2. C1 as four tabs then C2 adds Jobs (recommended), or C1 + C2 as one round?
-3. Greeting by first name — OK?
-4. "My hours" under Me opens the existing time-clock screen until C3 — OK, or leave it out until C3?
+- Tabs **Today · Jobs · Inbox · Learn · Me**: **OK** (Josh).
+- C1 then C2, or one round: Josh is **not sure**. Recommendation: **two rounds, C2 sent the moment "Round C1 done" lands** (no admin round between, if Josh agrees). C1 is frontend-only and will test fast; C2 carries the first crew routes and their isolation tests, which deserve their own testing pass and their own What's new. One round would bundle ~20 verify items and a backend change into a single report.
+- Still open: greeting by first name (OK?); "My hours" under Me opening the existing time-clock screen until C3 (OK, or leave it out?).

@@ -205,6 +205,7 @@ input{font-family:inherit}
     <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></symbol>
     <symbol id="i-people" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><circle cx="17" cy="9" r="3"/><path d="M16 14.5c3 0 5.5 2 5.5 5"/></symbol>
     <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></symbol>
     <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4z"/></symbol>
   </defs>
 </svg>
@@ -389,7 +390,7 @@ input{font-family:inherit}
       paints: [['#F3F1EA', 'Dulux Wash&Wear Low Sheen', 'Natural White · walls'], ['#FDFDFB', 'Dulux Ceiling White', 'White · ceilings'], ['#F7F7F4', 'Dulux Aquanamel Gloss', 'Vivid White · trim and doors']],
       files: [['Strata approval.pdf', 'PDF · 240 KB'], ['Colour schedule.jpg', 'Image · 1.1 MB']],
       photos: 5, reports: [['Fri 10 Oct', '7.5 h · Living room walls second coat, ceiling done', true], ['Thu 9 Oct', '8 h · Prep and first coat living room', true]] },
-    { id: 'j2', name: 'Harrow', addr: '2/88 Lygon St, Carlton', status: 'up', pill: 'Starts Mon 20 Oct', dates: 'Mon 20 Oct → Wed 29 Oct', crew: ['Mia'],
+    { id: 'j2', name: 'Harrow', addr: '2/88 Lygon St, Carlton', status: 'up', pill: 'Starts Mon 20 Oct', dates: 'Mon 20 Oct → Wed 29 Oct', crew: ['Mia'], site: { name: 'Priya Raman', phone: '0412 555 018' },
       access: 'Strata lets us in from 7:30 am. Lift key from the concierge.',
       work: [{ area: 'Whole apartment', meta: '2 coats', lines: [['Walls', 'Low sheen · 2 coats'], ['Ceilings', 'Flat · 1 coat'], ['Trim', 'Gloss · 2 coats']] }],
       paints: [['#EFE9DD', 'Dulux Wash&Wear Low Sheen', 'Lexicon Quarter · walls']], files: [], photos: 0, reports: [] },
@@ -515,6 +516,7 @@ input{font-family:inherit}
     $('#jobBody').innerHTML = `
       <div class="sect">Dates &amp; crew</div>
       <div class="card note" data-testid="crew-job-crew">${esc(j.dates)}<br><span style="color:var(--text-secondary)">${esc(j.crew.join(', '))}</span></div>
+      ${j.site ? `<div class="list" style="margin-top:8px"><a class="row" data-testid="crew-job-site-contact" href="tel:${j.site.phone.replace(/\s/g, '')}" style="text-decoration:none;color:inherit"><span class="ico"><svg><use href="#i-phone"/></svg></span><span class="row-t"><span class="row-title">${esc(j.site.name)}</span><span class="row-sub">Site manager · ${esc(j.site.phone)}</span></span><span class="pill soon">Call</span></a></div>` : ''}
       ${j.access ? `<div class="sect">Access &amp; notes</div><div class="card note access" data-testid="crew-job-notes"><b>From Josh:</b> ${esc(j.access)}</div>` : ''}
       <div class="sect">The work</div>
       <div class="list" data-testid="crew-job-work">${work}</div>
