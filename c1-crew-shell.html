@@ -378,24 +378,24 @@ input{font-family:inherit}
 
   // ---- mock data (fixed so the tests are deterministic) ----
   const jobs = [
-    { id: 'j1', name: 'Nguyen', addr: '14 Wattle St, Brunswick', status: 'now', pill: 'In progress', dates: 'Mon 6 Oct → Fri 17 Oct', crew: ['Mia', 'Tom'],
+    { id: 'j1', name: 'Wattle St repaint', client: 'Linh Nguyen', addr: '14 Wattle St, Brunswick', status: 'now', pill: 'In progress', dates: 'Mon 6 Oct → Fri 17 Oct', crew: ['Mia', 'Tom'],
       access: 'Key under the pot plant, alarm code 4471. Biscuit the dog stays in the laundry.',
       work: [
-        { area: 'Living room', meta: '2 coats', lines: [['Walls', 'Low sheen · 2 coats'], ['Ceiling', 'Flat · 1 coat'], ['Skirting & architraves', 'Gloss · 2 coats']] },
-        { area: 'Hallway', meta: '2 coats', lines: [['Walls', 'Low sheen · 2 coats'], ['Doors × 4', 'Gloss · 2 coats']] },
-        { area: 'Stairwell', meta: 'prep', lines: [['Walls', 'Patch & sand, then 2 coats'], ['Handrail', 'Sand back, 2 coats gloss']] },
-        { area: 'Laundry', meta: '1 coat', lines: [['Walls & ceiling', 'Low sheen · 1 coat']] },
-        { area: 'Front door', added: 'Added work · approved 9 Oct', lines: [['Front door, both sides', 'Sand back, undercoat, 2 coats gloss']] },
+        { area: 'Living room', meta: '5.1 × 4.2 m', lines: [['Walls · 48 m²', 'prep · 2 coats'], ['Ceiling · 21 m²', '1 coat'], ['Skirting & architraves · 19 lm', 'primer · 2 coats']] },
+        { area: 'Hallway', meta: '6 × 1.2 m', lines: [['Walls · 35 m²', '2 coats'], ['Doors × 4', 'primer · 2 coats']] },
+        { area: 'Stairwell', meta: '', lines: [['Patch & sand walls', 'repair'], ['Handrail · 8 lm', 'prep · primer · 2 coats']] },
+        { area: 'Laundry', meta: '2.4 × 1.8 m', lines: [['Walls & ceiling · 15 m²', '1 coat']] },
+        { area: 'Front door', added: 'Added work · approved 9 Oct', lines: [['Front door, both sides', 'prep · primer · 2 coats']] },
       ],
       paints: [['#F3F1EA', 'Dulux Wash&Wear Low Sheen', 'Natural White · walls'], ['#FDFDFB', 'Dulux Ceiling White', 'White · ceilings'], ['#F7F7F4', 'Dulux Aquanamel Gloss', 'Vivid White · trim and doors']],
       files: [['Strata approval.pdf', 'PDF · 240 KB'], ['Colour schedule.jpg', 'Image · 1.1 MB']],
       photos: 5, reports: [['Fri 10 Oct', '7.5 h · Living room walls second coat, ceiling done', true], ['Thu 9 Oct', '8 h · Prep and first coat living room', true]] },
-    { id: 'j2', name: 'Harrow', addr: '2/88 Lygon St, Carlton', status: 'up', pill: 'Starts Mon 20 Oct', dates: 'Mon 20 Oct → Wed 29 Oct', crew: ['Mia'], site: { name: 'Priya Raman', phone: '0412 555 018' },
+    { id: 'j2', name: '2/88 Lygon St, Carlton', client: 'Harrow Strata', addr: '2/88 Lygon St, Carlton', status: 'up', pill: 'Starts Mon 20 Oct', dates: 'Mon 20 Oct → Wed 29 Oct', crew: ['Mia'], site: { name: 'Priya Raman', phone: '0412 555 018' },
       access: 'Strata lets us in from 7:30 am. Lift key from the concierge.',
-      work: [{ area: 'Whole apartment', meta: '2 coats', lines: [['Walls', 'Low sheen · 2 coats'], ['Ceilings', 'Flat · 1 coat'], ['Trim', 'Gloss · 2 coats']] }],
+      work: [{ area: 'Whole apartment', meta: '', lines: [['Walls · 120 m²', '2 coats'], ['Ceilings · 62 m²', '1 coat'], ['Trim · 60 lm', 'primer · 2 coats']] }],
       paints: [['#EFE9DD', 'Dulux Wash&Wear Low Sheen', 'Lexicon Quarter · walls']], files: [], photos: 0, reports: [] },
-    { id: 'j3', name: 'Patel', addr: '5 Elm Grove, Coburg', status: 'done', pill: 'Done Fri 3 Oct', dates: 'Mon 29 Sep → Fri 3 Oct', crew: ['Mia', 'Tom', 'Lee'],
-      access: '', work: [{ area: 'Exterior', meta: '2 coats', lines: [['Weatherboards', 'Low sheen · 2 coats'], ['Eaves & fascia', 'Gloss · 2 coats']] }],
+    { id: 'j3', name: 'Patel exterior', client: 'Raj Patel', addr: '5 Elm Grove, Coburg', status: 'done', pill: 'Done Fri 3 Oct', dates: 'Mon 29 Sep → Fri 3 Oct', crew: ['Mia', 'Tom', 'Lee'],
+      access: '', work: [{ area: 'Exterior', meta: '', lines: [['Weatherboards · 140 m²', 'prep · 2 coats'], ['Eaves & fascia · 46 lm', 'primer · 2 coats']] }],
       paints: [['#DCD6CB', 'Dulux Weathershield Low Sheen', 'Tranquil Retreat · boards']], files: [['Site plan.pdf', 'PDF · 90 KB']], photos: 12, reports: [['Fri 3 Oct', '6 h · Final coat eaves, clean-up', true]] },
   ];
   if (q.get('jobs') === '0') jobs.length = 0;
@@ -413,6 +413,7 @@ input{font-family:inherit}
   };
   const icon = { contract: 'i-sign', equipment: 'i-gear', report: 'i-chat', star: 'i-coach' };
   const currentJob = () => jobs.find(x => x.status === 'now') || null;
+  const subOf = (j) => [j.client, j.addr !== j.name ? j.addr : null].filter(Boolean).join(' · ');
 
   // ---- hub rows ----
   const rowHtml = (r) => `
@@ -447,7 +448,7 @@ input{font-family:inherit}
       $('#clockStatus').textContent = 'Signed in';
       $('#clockBig').textContent = state.elapsed + ' on the clock';
       $('#clockLine').textContent = 'Since ' + state.since + ' today';
-      $('#clockJobText').innerHTML = 'Job: <b>' + esc(j ? `${j.name} · ${j.addr.split(',')[0]}` : 'General') + '</b>';
+      $('#clockJobText').innerHTML = 'Job: <b>' + esc(j ? j.name : 'General') + '</b>';
       $('#clockBtn').textContent = 'Sign out';
       $('#clockBtn').className = 'btn btn-outline';
     } else {
@@ -466,7 +467,7 @@ input{font-family:inherit}
     const others = j.crew.filter(n => n !== 'Mia');
     el.innerHTML = `
       <button class="card jobcard" data-testid="crew-today-jobcard" data-job="${j.id}">
-        <div class="jobcard-top"><div><div class="jobcard-name">${esc(j.name)}</div><div class="jobcard-addr">${esc(j.addr)}</div></div><span class="pill ${j.status === 'now' ? 'live' : 'soon'}">${esc(j.pill)}</span></div>
+        <div class="jobcard-top"><div><div class="jobcard-name">${esc(j.name)}</div><div class="jobcard-addr">${esc(subOf(j))}</div></div><span class="pill ${j.status === 'now' ? 'live' : 'soon'}">${esc(j.pill)}</span></div>
         <div class="jobcard-meta"><svg><use href="#i-people"/></svg><span>${others.length ? esc(others.join(', ')) + ' with you' : 'Just you on this job'}</span></div>
         ${j.access ? `<div class="jobcard-meta"><svg><use href="#i-alert"/></svg><span>${esc(j.access)}</span></div>` : ''}
         <div class="jobcard-acts"><span class="btn btn-outline btn-sm" data-testid="crew-today-directions">Directions</span><span class="btn btn-primary btn-sm">Open job</span></div>
@@ -498,7 +499,7 @@ input{font-family:inherit}
     $('#jobsList').innerHTML = rows.length ? rows.map(j => `
       <button class="jobrow" data-testid="crew-job-row" data-job="${j.id}">
         <div class="jobrow-top"><span class="jobrow-name">${esc(j.name)}</span><span class="pill ${j.status === 'now' ? 'live' : j.status === 'up' ? 'soon' : 'done'}">${esc(j.pill)}</span></div>
-        <div class="jobrow-addr">${esc(j.addr)}</div>
+        <div class="jobrow-addr">${esc(subOf(j))}</div>
         <div class="jobrow-meta">${esc(j.dates)} · ${j.crew.length} on the crew</div>
       </button>`).join('') : `<div class="empty" data-testid="crew-jobs-empty">${empty}</div>`;
   }
@@ -507,8 +508,8 @@ input{font-family:inherit}
   function openJob(id){
     const j = jobs.find(x => x.id === id); if (!j) return;
     $('#jobTitle').textContent = j.name;
-    $('#jobAddr').textContent = j.addr;
-    const work = j.work.map(a => `<div class="area ${a.added ? 'added' : ''}" ${a.added ? 'data-testid="crew-job-added-work"' : ''}><div class="area-name">${esc(a.area)}${a.added ? `<span class="pill added">${esc(a.added)}</span>` : `<span class="meta">${esc(a.meta)}</span>`}</div><ul class="area-lines">${a.lines.map(l => `<li>${esc(l[0])}<i>${esc(l[1])}</i></li>`).join('')}</ul></div>`).join('');
+    $('#jobAddr').textContent = subOf(j);
+    const work = j.work.map(a => `<div class="area ${a.added ? 'added' : ''}" ${a.added ? 'data-testid="crew-job-added-work"' : ''}><div class="area-name">${esc(a.area)}${a.added ? `<span class="pill added">${esc(a.added)}</span>` : (a.meta ? `<span class="meta">${esc(a.meta)}</span>` : '')}</div><ul class="area-lines">${a.lines.map(l => `<li>${esc(l[0])}<i>${esc(l[1])}</i></li>`).join('')}</ul></div>`).join('');
     const paints = j.paints.map(p => `<div class="row" style="min-height:60px"><span class="swatch" style="background:${p[0]}"></span><span class="row-t"><span class="row-title">${esc(p[2])}</span><span class="row-sub">${esc(p[1])}</span></span></div>`).join('');
     const files = j.files.length ? j.files.map(f => `<button class="row" data-testid="crew-job-file"><span class="ico"><svg><use href="#i-file"/></svg></span><span class="row-t"><span class="row-title">${esc(f[0])}</span><span class="row-sub">${esc(f[1])}</span></span><svg class="chev"><use href="#i-chev"/></svg></button>`).join('') : '<div class="empty">No files shared for this job.</div>';
     const photos = `<div class="grid" data-testid="crew-job-photos">${Array.from({ length: Math.min(j.photos, 5) }, (_, i) => `<div class="ph ${i % 2 ? 'after' : ''}"><span>${i % 2 ? 'After' : 'Before'}</span></div>`).join('')}<button class="ph add" data-testid="crew-job-photo-add">+ Add</button></div>`;
@@ -516,7 +517,7 @@ input{font-family:inherit}
     $('#jobBody').innerHTML = `
       <div class="sect">Dates &amp; crew</div>
       <div class="card note" data-testid="crew-job-crew">${esc(j.dates)}<br><span style="color:var(--text-secondary)">${esc(j.crew.join(', '))}</span></div>
-      ${j.site ? `<div class="list" style="margin-top:8px"><a class="row" data-testid="crew-job-site-contact" href="tel:${j.site.phone.replace(/\s/g, '')}" style="text-decoration:none;color:inherit"><span class="ico"><svg><use href="#i-phone"/></svg></span><span class="row-t"><span class="row-title">${esc(j.site.name)}</span><span class="row-sub">Site manager · ${esc(j.site.phone)}</span></span><span class="pill soon">Call</span></a></div>` : ''}
+      ${j.site ? `<div class="list" style="margin-top:8px"><a class="row" data-testid="crew-job-site-contact" href="tel:${j.site.phone.replace(/\s/g, '')}" style="text-decoration:none;color:inherit"><span class="ico"><svg><use href="#i-phone"/></svg></span><span class="row-t"><span class="row-title">${esc(j.site.name)}</span><span class="row-sub">Site contact · ${esc(j.site.phone)}</span></span><span class="pill soon">Call</span></a></div>` : ''}
       ${j.access ? `<div class="sect">Access &amp; notes</div><div class="card note access" data-testid="crew-job-notes"><b>From Josh:</b> ${esc(j.access)}</div>` : ''}
       <div class="sect">The work</div>
       <div class="list" data-testid="crew-job-work">${work}</div>

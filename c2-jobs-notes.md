@@ -1,70 +1,102 @@
-# C2 — Jobs: my jobs, the job page, the crew-only read route (proposal, not sent)
+# C2 — Jobs: my jobs, the job page, the crew-only read routes (proposal v2, not sent)
 
-Prototype: the **Jobs** tab and the **job screen** in `c1-crew-shell.html` (`?screen=app&tab=jobs`, `?screen=job&id=j1`, `?screen=job&id=j2` for a job with no files, `&jobs=0` for a crew member with no jobs). Built from handover **§6.9** (Show / Decide / Never) and the code facts in `crew-recheck-11oct.md` §5. Status: **proposal**; Josh's answers on the Decide items and the Portfolio question are still to come (they did not reach this chat). Nothing goes to Emergent before "send", and C2 goes only after "Round C1 done".
+Prototype: the **Jobs** tab and the **job screen** in `c1-crew-shell.html` (`?screen=app&tab=jobs`, `?screen=job&id=j1`, `?screen=job&id=j2` for a coming-up job with a site contact and no files, `&jobs=0` for a crew member with no jobs). Built from handover **§6.9** (Show / Decide / Never), Josh's answers of 11 Oct, and the code facts in `crew-recheck-11oct.md` §5 (re-read by five parallel readers on 11 Oct, corrections folded in). Status: **proposal**. Nothing goes to Emergent before "send"; C2 goes only after "Round C1 done".
 
-## 1. What exists today (short)
+## 1. Josh's answers (11 Oct) and what they settle
 
-- Crew can read **nothing** of a job except `GET /projects/{id}/photos` (assigned jobs only: photos, `photos_link`, `estimate_id`, and since Round 46 the `crew_visible` files). The crew photo screen then calls `GET /estimates/{id}`, which is admin-only → 403, so its title falls back to "Job photos".
-- The admin side already marks things for the crew: the estimate's **Crew notes** with the switch **"Visible to the crew"** (builder › Quote details, "Shown on the job in the crew app once this becomes a project"), **files** "Crew can see", **product colours** ("what the crew read to know what tin to open"), **photos** ("Crew see this grid in the employee app"), **assigned crew** (`assigned_employee_ids`).
-- Two shapes of crew notes exist: the builder saves one text + one switch; the project drawer's Notes tab saves a list of notes each with `crew_visible: false` and no way to flip it. Only the builder's notes can reach the crew today. (Admin-chat matter; C2 reads both shapes.)
+| § 6.9 item | Josh | In C2 |
+|---|---|---|
+| Client's name | **yes** | Shown as its own line under the job title (the title is the job's `name`, which is never the client's name, see §2). |
+| Client's phone | **only a site manager, if any** | The CRM already has a contact role **`site`, labelled "Site contact"** on every client. The job page shows that contact's name and mobile with a tel: link when one exists. The client's own phone is never read. Josh to confirm "site manager" = this role (or rename its label). |
+| Client's CRM notes | **no** | Never read: `customers.notes` and `customers.contacts[].notes`. |
+| The quote's "on paper" wording | **no** | Never read: `scope_summary`, line descriptions. |
+| Portfolio | **correct** | Jobs › **Done** is the crew member's portfolio: the finished jobs they were assigned to, each with its photos. Per person; no separate screen; the word "Portfolio" appears nowhere. |
+| Show the quoted work | **always, to the assigned crew** | No per-job switch. Scope, colours, files ("Crew can see" only) and photos show to every crew member assigned to the job. |
 
-## 2. The §6.9 lists mapped to data
+## 2. What exists today (from the code)
+
+- Crew can read **nothing** of a job except `GET /projects/{id}/photos` (assigned jobs only: `items`, `photos_link`, `estimate_id`, and since Round 46 `attachments` = the "Crew can see" files). The crew photo screen (`app/employee/project/[id].tsx`, 19 lines) then calls `GET /estimates/{id}` — admin-only, 403 swallowed — so its title falls back to "Job photos". No employee route returns `crew_notes` today; nothing the owner marks "Visible to the crew" reaches a phone yet.
+- **A job's `name` is never the client's name.** When a quote becomes a job, `name` = the quote's job tag, else "street, suburb", else "Estimate {number}" (`routes/projects.py:440–444`). The client's name is `client_snapshot.name` (and `project.client_name`); the client's phone is `client_snapshot.phone`.
+- **Address:** `projects.location_address` (fallback `client_snapshot.address`). Both are copied from the quote's `clientAddress`, not from its `jobAddressDetails`, so a job whose site differs from the client's address shows the client's address until the owner edits the job-site location on the admin page. (Admin-side matter; flagged for Josh.)
+- **Crew notes:** the builder's Quote details drawer saves `crew_notes` (one text) and `crew_visible` (one switch, "Visible to the crew"). The switch is persisted by the builder's PUT autosave; the drawer's PATCH drops it because `crew_visible` is not in the PATCH allow-list (`routes/estimates.py:417`). The project drawer's Notes tab writes a **list** shape (`[{id, text, crew_visible: false, …}]`) with no way to flip a note on. C2 reads both shapes. An empty string is "no note".
+- **Scope:** on a migrated estimate the work is `areas[]` (`id, name, width, length, height, notes, order`) plus `lines[]` joined on `line.area_id`, read after `migrate_estimate()` and `site_setup_on_read()` (`services/estimate_lines.py`). A line carries `name, qty / qty_auto, unit, kind (library | repair | custom | trade | equipment | material), category, coats / primer / prep (library lines only), notes, optional, colour, product_id, pack, photo_url`. There is no `finish` field; the admin's sub-label is `prep · primer · N coats`. Optional lines not in `accepted_options` were not sold.
+- **Paints and colours:** `project_materials` rows (`material_name, brand, size_label, colour, colour_code, quantity`; money fields `unit_cost, is_custom_price, line_cost, subtotal`). For a v2 quote these rows are **empty at creation** (`_copy_estimate_colours` reads only `estimate.materials` + `estimate.products`, never the lines' `product_id` / `colour`), so the route also derives products from `estimate.lines[]` where `product_id` is set (brand and name from `db.materials`, `pack` as the size, `colour`, the area names).
+- **Crew:** `projects.assigned_employee_ids` (absent, not `[]`, until the owner first saves the crew); names from `employees.name`; role = `role`, else `role_label`, else `position`, else "Painter".
+- **Variations:** `project.variations[]` `{id, title, description, price, timeframe, area, notes, lines [{name, category, unit, qty, rate, kind}], status, created_at, sent_at, responded_at, responded_by}`; `status` moves `draft → sent → approved | declined`.
+- **Daily reports:** `daily_reports` rows `{employee_id, project_id, submitted_at (naive UTC), hours_worked, tasks_completed (the whole WEATHER / TEAM / TASKS / CHECKLIST block), issues_notes, photos, admin_feedback, feedback_at, feedback_by, deleted_at}`; `parse_report(tasks_completed, issues_notes)['done']` gives the work lines; Replied = `admin_feedback` non-empty. **Crew-filed reports carry `project_id: null` today**: the crew form's job picker calls admin-only `GET /projects` (403 → empty list). So "My reports" on a job stays empty until C4 rewires the picker to the C2 list route.
+- **Files:** `crew_rows(project_id)` → `[{id, name, kind (pdf | img | doc), size, open_url}]`, newest first, max 50; `open_url` is a 10-minute signed link.
+- **Owner's first name:** `admin_settings.business_profile.owner_name` (what photo bylines use), else `admins.owner_name`.
+- **Statuses:** `quoted, in_progress, on_hold, done, invoiced`; dates `start_date, target_end_date, completed_date`.
+
+## 3. The §6.9 lists mapped to data
 
 | List | Item | Source | On the job page |
 |---|---|---|---|
-| Show | Job name, address, map link | `projects.name`, `client_snapshot.address`, `location_lat/lng` | Title + address line; **Directions** opens Google Maps with the address (same query as the admin page) |
+| Show | Job name | `projects.name` | Title (Fraunces 27) |
+| Show | Client's name | `client_snapshot.name` (fallback `client_name`; null on a manual job) | Line under the title: "{client} · {address}" (the address is dropped from this line when it already is the title) |
+| Show | Address, map link | `location_address` (fallback `client_snapshot.address`), `location_lat/lng` | Same line; **Directions** opens Google Maps with the address (same query as the admin page) |
 | Show | Start and finish dates | `start_date`, `target_end_date`, `completed_date`, `status` | "Dates & crew" card: "{start} → {target}"; done jobs "{start} → done {date}" |
-| Show | Scope per area | `estimate.areas[]` + its lines (`lineItems`/`lines`): name, quantity + unit, coats, the line note | "The work": one block per area, lines as "{name} · {finish} · {coats} coats"; **no price field is read** |
-| Show | Products and colours | `project_materials` rows: `material_name`, `brand`, `size_label`, `colour`, `quantity` | "Paints & colours": swatch (named colour → the swatch stays neutral grey when no hex is known), colour · where, product |
-| Show | Site and access notes | `estimate.crew_notes` when `crew_visible !== false` (string), plus list-shape notes with `crew_visible === true` | "Access & notes" card, "From {owner first name}:", amber left rule |
+| Show | Who else is on the job | `assigned_employee_ids` → `employees.name` | Second line of "Dates & crew"; Today's card "Tom with you" / "Just you on this job" |
+| Show | Site contact (name, mobile) | the job's `customer_id` → `customers.contacts[]` where `role == "site"` → `{name, phone}` | One row "Site contact · {mobile}" with a tel: link, only when such a contact exists; nothing else from the contact is read |
+| Show | Site and access notes | `estimate.crew_notes` when `crew_visible !== false` and non-empty (string shape), plus list-shape notes with `crew_visible === true` | "Access & notes" card, "From {owner first name}:", amber left rule; absent when there is nothing to show |
+| Show | Scope per area | `areas[]` + `lines[]` (above), optional lines only when accepted | "The work": one block per area (name, dims when measured), lines "{name} · {qty} {unit}" with the sub-label `prep · primer · N coats` for library lines, the kind for repair/custom lines; **no money field is read** |
+| Show | Products and colours | `project_materials` rows + products derived from `lines[].product_id` | "Paints & colours": swatch from `colour_code` (neutral grey when none), "{colour} · {where}", product and brand |
 | Show | Job photos | existing `GET /projects/{id}/photos` + `ProjectPhotos` with the `crew` prop | "Photos · N" grid + Add (the Round 14 crew view, reused as a section) |
-| Show | Daily reports for the job | `daily_reports` where `employee_id` = me and `project_id` = this job | "My reports": date, hours, work line, **Replied** pill when feedback exists |
-| Show | Approved variations as "added work" | `project.variations[]` with `status == "approved"`: `title`, `description`, `area`, `timeframe`, `responded_at`, `lines[] {name, qty, unit}`; never `price` or a line's `rate` | Inside "The work" as extra blocks titled with the variation's `title` and the pill "Added work · approved {responded_at as d Mon}" |
-| Show | Who else is on the job | `assigned_employee_ids` → names | "Dates & crew" card second line; Today's card "Tom with you" / "Just you on this job" |
-| Decide | Client's name and phone | `client_snapshot.name`, `.phone` | Prototype: the job is **titled with the client surname** (that is what `projects.name` holds for quoted jobs); **no phone**. Josh decides. |
-| Decide | Client's CRM notes | customer record | Prototype: **not shown**. Josh decides. |
-| Decide | The estimate's "on paper" wording | `scope_summary`, line descriptions | Prototype: **not shown**; the per-area lines are clearer on a phone. Josh decides. |
-| Never | Prices, margins, discounts, payment status, invoices, client email and message history, Lucy | — | The route builds its payload from an **allow-list**; no money field is ever read. |
+| Show | Daily reports for the job | `daily_reports` where `employee_id` = me, `project_id` = this job, `deleted_at` null; newest first | "My reports": date (`submitted_at` in the business's timezone), hours (`hours_worked`, "No hours" when null), the parsed work lines, **Replied** pill when `admin_feedback` is set |
+| Show | Approved variations as "added work" | `variations[]` with `status == "approved"`: `title, description, area, timeframe, responded_at, lines [{name, qty, unit}]` | Extra blocks inside "The work", titled with the variation's `title`, pill "Added work · approved {d Mon}" |
+| Never | Prices, margins, discounts, payment status, invoices, the client's own phone, client email and message history, CRM notes, the quote's paper wording, Lucy | — | The route builds its payload from an **allow-list** (§5); no money field, no `client_snapshot.phone`, no `notes` of a customer or contact is ever read |
 
-**Portfolio** (§6.9): the prototype treats **Jobs › Done** as the crew member's own portfolio: the finished jobs they were assigned to, each with its photos. Per person, no separate screen. Josh to confirm, and whether the name "Portfolio" should appear anywhere.
+## 4. What a crew member sees after C2
 
-## 3. What a crew member sees after C2
+**Jobs** tab: segmented **Now · Coming up · Done**. Rows: job name, status pill ("In progress" green; "On hold" amber; "Starts {Mon 20 Oct}" purple; "Done {Fri 3 Oct}" grey), "{client} · {address}", "{dates} · {n} on the crew". Buckets: Now = `in_progress` or `on_hold`; Coming up = `quoted`; Done = `done` or `invoiced`. Sort: Now and Coming up by `start_date` ascending (no date last); Done by `completed_date` descending. Empty lines: "No job on the go right now." / "Nothing booked yet." / "No finished jobs yet."
 
-**Jobs** tab: segmented **Now · Coming up · Done**. Rows: name, status pill ("In progress" green; "On hold" amber; "Starts {Mon 20 Oct}" purple; "Done {Fri 3 Oct}" grey), address, "{dates} · {n} on the crew". Buckets: Now = `in_progress` or `on_hold`; Coming up = `quoted`; Done = `done` or `invoiced`. Sort: Now and Coming up by `start_date` ascending (no date last); Done by `completed_date` descending. Empty lines: "No job on the go right now." / "Nothing booked yet." / "No finished jobs yet."
+**Job screen** (stack screen at `/employee/project/{id}`, replaces the 19-line photos page): back "Jobs", title, client · address line, buttons **Directions** and **Daily report** (opens `/employee/daily-report?project={id}` so C4 can preselect the job); then Dates & crew, Site contact (only when one exists), Access & notes (only when there is a visible note), The work, Paints & colours, Files (rows open the signed `open_url`; the page re-fetches the job before opening a row older than ten minutes; empty: "No files shared for this job."), Photos · N (grid + Add), My reports (empty: "No reports for this job yet."). Nothing on the page shows a dollar sign.
 
-**Job screen** (stack screen, `/employee/project/{id}`, replaces the 19-line photos page): back "Jobs", title, address, buttons **Directions** and **Daily report** (opens `/employee/daily-report?project={id}` so C4 can preselect the job); then Dates & crew, Access & notes (only when there is a visible note), The work, Paints & colours, Files (rows open the signed `open_url`; empty: "No files shared for this job."), Photos · N (grid + Add), My reports (empty: "No reports for this job yet."). Nothing on the page shows a dollar sign.
+**Today** gains the **Today's job** card: the first Now job by `start_date` (name, client · address, pill, who else is on it, the access note on one line, **Directions**, **Open job**); with more than one Now job a last line "and {n} more on the go" opens the Jobs tab; none: "No jobs assigned to you yet." The clock card's job line stays `project_name` until C3.
 
-**Today** gains the **Today's job** card: the first Now job by `start_date` (name, address, pill, "Tom with you", the access note on one line, **Directions**, **Open job**); with more than one Now job a last line "and {n} more on the go" opens the Jobs tab; none: "No jobs assigned to you yet." The clock card's job line stays `project_name` until C3.
+## 5. Backend (the first crew routes of the crew app)
 
-## 4. Backend (the only new routes of the crew app so far)
+House convention for crew reads is `<resource>/mine` or `my-*` (`/employee-contracts/mine`, `/equipment/my-items`, `/daily-reports/my-reports`, `/timeclock/my-records`, `/validations/my`), so:
 
-- `GET /employee/projects` — employee JWT (`get_current_employee`); `db.projects.find({owner_admin_id: emp.owner_admin_id, assigned_employee_ids: emp.id})`; returns `[{id, name, address, status, start_date, target_end_date, completed_date, crew_count}]`.
-- `GET /employee/projects/{id}` — same filter, 404 otherwise; returns **only**: `id, name, address, location {lat, lng}, status, start_date, target_end_date, completed_date, owner_first_name, crew [{id, name, role}], notes [{text, created_at}], areas [{name, lines [{name, quantity, unit, coats, note}]}], added_work [{title, description, area, timeframe, approved_at, lines [{name, qty, unit}]}], materials [{name, brand, size_label, colour, quantity}], files [{id, name, kind, size, open_url}] (the Round 46 `crew_rows`), photos_link, my_reports [{id, date, hours_worked, work_completed, has_feedback}]`. Built field by field from the allow-list above; the estimate document is never passed through.
-- Both routes in `routes/projects.py`, employee dependency, business check first (`owner_admin_id`), assignment check second.
-- **Isolation tests** (`tests/test_tenant_isolation.py` extended, `TS_` rows only, torn down): an employee of TS_ business B gets `[]` from the list and 404 on A's job; an employee of A **not assigned** to the job gets 404; an admin JWT gets 403; the detail payload contains none of `price, total, subtotal, tax, discount, cost_price, sell_price, unit_cost, payment, invoice, email, phone` as keys at any depth (asserted by walking the JSON).
-- The crew photo screen's `GET /estimates/{id}` call goes (it was a 403).
+- **`GET /projects/mine`** — `current_employee: dict = Depends(get_current_employee)`; filter `{"owner_admin_id": current_employee["owner_admin_id"], "assigned_employee_ids": current_employee["id"]}` (the dependency already carries `owner_admin_id`; no second employee lookup). Returns `[{id, name, client_name, address, status, start_date, target_end_date, completed_date, crew_count}]`.
+- **`GET /projects/mine/{project_id}`** — same filter plus `_id`; 404 otherwise. Returns **only**: `id, name, client_name, address, location {lat, lng}, status, start_date, target_end_date, completed_date, owner_first_name, crew [{id, name, role}], site_contact {name, phone} | null, notes [{text, created_at}], areas [{id, name, dims, note, lines [{id, name, qty, unit, kind, coats, primer, prep, note, optional, colour, product {brand, name, pack} | null, photo_url}]}], added_work [{title, description, area, timeframe, approved_at, lines [{name, qty, unit}]}], materials [{name, brand, size_label, colour, colour_code, quantity, source: "job" | "quote"}], files [{id, name, kind, size, open_url}], photos_link, my_reports [{id, date, hours_worked, work_lines, has_feedback}]`. Built field by field; the estimate and project documents are never passed through. `qty` = `line_qty(line, area)`; `unit` = `unit_label(unit)`; `approved_at` = `responded_at`; `date` = `submitted_at` via `tz_for(owner_admin_id)`; `work_lines` = `parse_report(...)['done']`; `has_feedback` = `bool(admin_feedback)`; `photos_link` = the project's, else the estimate's; `site_contact` from a tenant-scoped `customers` read (`{"_id": customer_id, "owner_admin_id": …}`) after the assignment check, `null` when the job has no customer, the customer has no contacts, or none has `role == "site"`.
+- **Both routes are declared in `routes/projects.py` above `@router.get("/projects/{project_id}")` (line 697)**, as `/projects/board` and `/projects/stats/yearly` are, or the admin route swallows "mine" and returns 403.
+- The crew photo screen's `GET /estimates/{id}` call goes with the old page.
 
-## 5. Admin-side change Josh sends with this round (one line, admin files)
+**Isolation tests** — new `backend/tests/test_c2_crew_jobs.py` in the Round 43 fixture style (`admin_a, admin_b, crew_a, crew_a_new, crew_b, seed`; `TS_` rows only, torn down; random order safe). A module fixture saves `prev = admin_a.get(f"/projects/{seed['project_a']}").json().get("assigned_employee_ids")`, sets the crew to `[crew_a.id]` via `PUT /projects/{id}/crew`, yields, restores `prev` (the `test_r46_attachments.py` pattern). Cases:
+1. `crew_a.get("/projects/mine")` lists `project_a`; the detail returns 200 with the keys above.
+2. `crew_b.get("/projects/mine").json() == []`; `crew_b.get(f"/projects/mine/{project_a}").status_code == 404`.
+3. `crew_a_new` (same business, not assigned) → 404 on the detail, and the list does not contain `project_a`.
+4. `admin_a` and `admin_b` → 403 on both routes (`get_current_employee`).
+5. Walk the detail JSON: none of `price, total, subtotal, tax, discount, cost_price, sell_price, unit_cost, rate, payment, invoice, email, notes, client_snapshot` appear as keys at any depth; `phone` appears at most once, at `site_contact.phone`.
+6. With a TS_ customer carrying contacts `[{role: "site", name, phone}, {role: "accounts", …}]`, `site_contact` equals the site row's name and phone; with no `site` row it is `null`.
+7. A TS_ estimate with `crew_visible: false` → `notes == []`; flipped on → the text appears.
+8. An approved TS_ variation appears in `added_work`; a draft one does not.
 
-- The estimate's "Visible to the crew" switch keeps its meaning (crew notes). **No new switch**: the scope, colours, files and photos are shown to assigned crew by the rules above (files only when "Crew can see"). If Josh wants a per-job "Show the quoted work to the crew" switch, that is a `projects.crew_sees_scope` boolean, a checkbox in the project page's Crew card, and the route hides `areas` + `added_work` when it is false — say so and it goes into the spec.
+**Backend changes:** two read routes, one test file. **Env changes:** none. **Deleted files:** none (the photo page is rewritten in place).
 
-## 6. Verify (testing agent, 390 then 360, TS_ tenant)
+## 6. Admin-side facts Josh should know (no admin change needed for C2)
 
-1. Jobs: a TS_ crew member assigned to three jobs (in progress, quoted with a start date, done) sees them in the right segments with the right pills; an unassigned fourth job never appears.
-2. Job page: title/address from the project; Directions opens Maps; Dates & crew names the other assigned crew; the access note shows only when the estimate's switch is on and vanishes when the admin turns it off; areas and lines match the estimate's areas, no `$` anywhere on the page; colours match the project's Products rows; a file marked "Crew can see" opens, one not marked is absent; photos grid adds a photo (as Round 14); My reports lists this crew member's reports for this job only, Replied where feedback exists.
-3. Added work: an approved variation shows as an extra block with its pill; a draft or declined one does not.
+- No new field for the site manager: the CRM contact role **`site` ("Site contact")** already exists on every client (`components/crm/v2/Contacts.tsx`, `routes/customers.py:82–83`). Contacts left as migrated "Name — 04xx" rows have no role until tidied and will not show to the crew. Optional one-line hint in the contact editor's Role field, if Josh wants it: "Site contact — their name and mobile show on the job for the assigned crew." (Admin chat.)
+- The builder's "Visible to the crew" switch is saved by the PUT autosave, not by the PATCH (`crew_visible` is missing from the allow-list at `routes/estimates.py:417`); the project drawer's Notes tab can never make a note crew-visible. (Admin chat.)
+- A job's address comes from the client's address, not the quote's job address (§2). (Admin chat.)
+
+## 7. Verify (testing agent, 390 then 360, TS_ tenant)
+
+1. Jobs: a TS_ crew member assigned to three jobs (in progress, quoted with a start date, done) sees them in the right segments with the right pills, client · address lines and crew counts; an unassigned fourth job never appears.
+2. Job page: title = the job's name; client · address line; Directions opens Maps; Dates & crew names the other assigned crew; Site contact row shows for a client with a `site` contact and is absent otherwise; the access note shows only when the quote's switch is on and vanishes when it is off; areas and lines match the quote's areas (qty, unit, `prep · primer · N coats`), no `$` anywhere on the page; colours match the project's Products rows and the quote's product lines; a file marked "Crew can see" opens, one not marked is absent; the photos grid adds a photo (as Round 14); My reports lists this crew member's reports for this job only, Replied where feedback exists.
+3. Added work: an approved variation shows as an extra block with its title and pill; a draft or declined one does not.
 4. Today's job card: the in-progress job; Open job → the page; "and 1 more on the go" with two Now jobs; "No jobs assigned to you yet." with none.
-5. Isolation tests pass; suite green before and after; TS_ torn down; the owner's tenant read-only.
+5. `test_c2_crew_jobs.py` passes; suite green before and after; TS_ torn down; `project_a`'s crew restored; the owner's tenant read-only.
 6. 390 and 360: no horizontal scroll, no console errors, `tsc` clean, `app/admin/*` diff empty.
 
-## 7. What's new draft (owner-facing, Draft only)
+## 8. What's new draft (owner-facing, Draft only)
 
 **Title:** Your crew can see their jobs
-**Body:** Each crew member now has a Jobs tab with the jobs you assign them: the address with directions, the dates, who else is on the job, the work per area as it was quoted, the paints and colours, the files you marked "Crew can see", the photos, and their own daily reports. Your crew notes from the quote show when "Visible to the crew" is on. Prices never leave the office. Assign crew on the job page as you do now.
+**Body:** Each crew member now has a Jobs tab with the jobs you assign them: the job and client, the address with directions, the dates, who else is on the job, the site contact's number when the client has one, the work per area as it was quoted, the paints and colours, the files you marked "Crew can see", the photos, and their own daily reports. Your crew notes from the quote show when "Visible to the crew" is on. Prices never leave the office. Assign crew on the job page as you do now.
 
-## 8. Open questions for Josh (one line each)
+## 9. Still open for Josh (one line each)
 
-1. Decide items: client name as the job title — yes? Client phone — no? CRM notes — no? "On paper" wording — no?
-2. Portfolio = Jobs › Done, per person — yes? Any place the word "Portfolio" should appear?
-3. A per-job "Show the quoted work to the crew" switch (§5) — wanted, or always show to assigned crew?
-4. Should "Done" also include invoiced jobs (yes in the prototype)?
+1. "Site manager" = the CRM role labelled **Site contact** — confirm, or rename the label.
+2. Optional lines the client did not accept are left out of "The work" — confirm.
+3. "Done" includes invoiced jobs — confirm (the prototype does).

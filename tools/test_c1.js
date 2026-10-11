@@ -46,7 +46,7 @@ async function run(b, W, H, tag) {
   ok('notification rows are at least 44 px tall' + full, (await box(T('crew-notif-row'))).height >= 44);
   await p.screenshot({ path: OUT + `c1-today-out-${tag}.png` });
   await p.click(T('crew-today-clock-btn')); await p.waitForTimeout(150);
-  ok('clock card: signed in shows time on the clock, since, the job, Sign out' + full, /Signed in/.test(await txt('#clockStatus')) && /2 h 35 m on the clock/.test(await txt('#clockBig')) && /Since 7:04 am today/.test(await txt('#clockLine')) && /Job: Nguyen · 14 Wattle St/.test(await txt(T('crew-today-job'))) && (await txt(T('crew-today-clock-btn'))) === 'Sign out');
+  ok('clock card: signed in shows time on the clock, since, the job, Sign out' + full, /Signed in/.test(await txt('#clockStatus')) && /2 h 35 m on the clock/.test(await txt('#clockBig')) && /Since 7:04 am today/.test(await txt('#clockLine')) && /Job: Wattle St repaint/.test(await txt(T('crew-today-job'))) && (await txt(T('crew-today-clock-btn'))) === 'Sign out');
   await p.screenshot({ path: OUT + `c1-today-in-${tag}.png` });
   await p.locator('#notifList ' + T('crew-notif-row')).first().click(); await p.waitForTimeout(150);
   ok('tapping a notification marks it read and records its link' + full, (await txt('#notifHead')) === 'Unread · 2' && (await txt(T('crew-tab-inbox-badge'))) === '2' && (await go()) === '/employee/contracts');
@@ -66,8 +66,8 @@ async function run(b, W, H, tag) {
   await p.locator(T('crew-job-row')).first().click(); await p.waitForTimeout(200);
 
   // ---- Job screen ----
-  ok('job screen opens as a stack screen: no tab bar, back to Jobs, name + address, Directions + Daily report' + full, await p.locator(T('crew-job')).isVisible() && !(await p.locator(T('crew-tabbar')).isVisible()) && (await txt('#jobTitle')) === 'Nguyen' && (await txt('#jobAddr')) === '14 Wattle St, Brunswick' && await p.locator(T('crew-job-directions')).isVisible() && await p.locator(T('crew-job-report-btn')).isVisible() && (await go()) === '/employee/project/j1');
-  ok('job: no site-manager row on a job without one' + full, (await p.locator(T('crew-job-site-contact')).count()) === 0);
+  ok('job screen opens as a stack screen: no tab bar, back to Jobs, name + address, Directions + Daily report' + full, await p.locator(T('crew-job')).isVisible() && !(await p.locator(T('crew-tabbar')).isVisible()) && (await txt('#jobTitle')) === 'Wattle St repaint' && (await txt('#jobAddr')) === 'Linh Nguyen · 14 Wattle St, Brunswick' && await p.locator(T('crew-job-directions')).isVisible() && await p.locator(T('crew-job-report-btn')).isVisible() && (await go()) === '/employee/project/j1');
+  ok('job: no site-contact row on a job without one' + full, (await p.locator(T('crew-job-site-contact')).count()) === 0);
   ok('job: dates & crew, access note from the owner' + full, /Mon 6 Oct → Fri 17 Oct/.test(await txt(T('crew-job-crew'))) && /Mia, Tom/.test(await txt(T('crew-job-crew'))) && /From Josh:/.test(await txt(T('crew-job-notes'))) && /alarm code 4471/.test(await txt(T('crew-job-notes'))));
   ok('job: the work = areas with lines and coats, added work marked, no prices anywhere' + full, (await p.locator(T('crew-job-work') + ' .area').count()) === 5 && (await p.locator(T('crew-job-added-work')).count()) === 1 && /Added work · approved 9 Oct/.test(await txt(T('crew-job-added-work'))) && /Skirting & architraves/.test(await txt(T('crew-job-work'))) && !/\$/.test(await txt('#jobBody')));
   ok('job: paints & colours with swatches' + full, (await p.locator(T('crew-job-paints') + ' .swatch').count()) === 3 && /Natural White · walls/.test(await txt(T('crew-job-paints'))));
@@ -81,7 +81,7 @@ async function run(b, W, H, tag) {
   await p.click(T('crew-job-back')); await p.waitForTimeout(150);
   ok('back returns to the Jobs tab' + full, await p.locator(T('crew-pane-jobs')).isVisible() && await p.locator(T('crew-tabbar')).isVisible());
   await p.click(T('crew-tab-today')); await p.waitForTimeout(100); await p.click(T('crew-today-jobcard')); await p.waitForTimeout(150);
-  ok("Today's job card opens the same job screen" + full, await p.locator(T('crew-job')).isVisible() && (await txt('#jobTitle')) === 'Nguyen');
+  ok("Today's job card opens the same job screen" + full, await p.locator(T('crew-job')).isVisible() && (await txt('#jobTitle')) === 'Wattle St repaint');
   await p.click(T('crew-job-back')); await p.waitForTimeout(100);
 
   // ---- Inbox ----
@@ -111,8 +111,8 @@ async function run(b, W, H, tag) {
   ok('empty states: no jobs → "No jobs assigned to you yet."; nothing unread → "You\'re up to date."; General on the clock; no badge' + full, await p.locator(T('crew-today-nojob')).isVisible() && await p.locator(T('crew-today-notifs-empty')).isVisible() && /Job: General/.test(await txt(T('crew-today-job'))) && !(await p.locator(T('crew-tab-inbox-badge')).isVisible()));
   await p.screenshot({ path: OUT + `c1-today-empty-${tag}.png` });
   await p.goto(U + '?screen=job&id=j2'); await p.waitForTimeout(300);
-  ok('deep link: site manager row with a tel: link when the job has one' + full, (await txt(T('crew-job-site-contact'))).includes('Priya Raman') && /Site manager · 0412 555 018/.test(await txt(T('crew-job-site-contact'))) && (await p.locator(T('crew-job-site-contact')).getAttribute('href')) === 'tel:0412555018' && (await box(T('crew-job-site-contact'))).height >= 44);
-  ok('deep link: a coming-up job with no files shows "No files shared for this job." and no reports' + full, (await txt('#jobTitle')) === 'Harrow' && /No files shared for this job/.test(await txt(T('crew-job-files'))) && /No reports for this job yet/.test(await txt(T('crew-job-reports'))));
+  ok('deep link: site-contact row with a tel: link when the job has one' + full, (await txt(T('crew-job-site-contact'))).includes('Priya Raman') && /Site contact · 0412 555 018/.test(await txt(T('crew-job-site-contact'))) && (await p.locator(T('crew-job-site-contact')).getAttribute('href')) === 'tel:0412555018' && (await box(T('crew-job-site-contact'))).height >= 44);
+  ok('deep link: a coming-up job with no files shows "No files shared for this job." and no reports' + full, (await txt('#jobTitle')) === '2/88 Lygon St, Carlton' && (await txt('#jobAddr')) === 'Harrow Strata' && /No files shared for this job/.test(await txt(T('crew-job-files'))) && /No reports for this job yet/.test(await txt(T('crew-job-reports'))));
   await p.goto(U + '?error=restricted'); await p.waitForTimeout(200);
   ok('deep link: restricted error on login' + full, await p.locator(T('employee-login-error')).isVisible());
 
