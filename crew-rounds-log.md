@@ -1,0 +1,10 @@
+# Crew app chat — running log
+
+Rules: `crew-app-handover.md` §1. Rounds are C1, C2, …; one round at a time across both chats; nothing goes to Emergent without Josh's "send". This chat never touches `app/admin/*`; the admin chat never touches `app/employee/*`. Branch for this chat's files: `claude/zealous-gauss-wx3xn1`.
+
+## 11 Oct — start, re-check, C1 proposal
+
+- Josh pressed Save to GitHub. Cloned `painttradehq/the-newest-update-of-pthq` at `dae9a2f` (11 Oct, Round 73 §8 answers). The repo is public at the time of the clone; Josh makes it private afterwards — a later session needs GitHub access connected to read it again. Nothing is pushed to it from here.
+- Re-check of handover §2–§4 → **`crew-recheck-11oct.md`**. Short version: no crew file changed since Round 64 (only the shared `BrandLogo.tsx`, so the crew login and dashboard already show the purple tile). Corrections: the dashboard also renders a 468-line `SignInOutWidget` (clock slide-in, browser GPS, no project) the pack missed; `react-native-webview` is already installed; the `localStorage` guard in `utils/colors.ts` already exists; the web 401 redirect sends crew to `/admin/login` (confirmed bug); onboarding step 5 shows a hard-coded Sano employment agreement with a typed signature; a stray `mobile/` Emergent scaffold (17 Sept, not the crew app) sits in the repo; jobs already have `assigned_employee_ids` but no crew-side read; the "Powered by OpenAI" pill is still on the landing page; login test ids are `emp-login-*`.
+- **C1 prototype** `c1-crew-shell.html` (new phone-frame base, no admin page patched), Playwright `tools/test_c1.js` **52/52** at 390 × 844 and 360 × 800: sign-in (brand restyle, Show/Hide, inline errors incl. the 403 text), Today (clock card signed out / in, unread messages with badge, daily-report row), hub tabs Jobs / Docs / Learn / More linking every existing crew screen, Sign out. Proposal and build notes in **`c1-crew-shell-notes.md`** (frontend-only round: no backend change, no new route; plus the 401 fix and the pill removal in shared files). Four questions for Josh at the end of the notes.
+- Nothing sent to Emergent. No app code touched.

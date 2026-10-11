@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Crew — Paint Trade HQ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter:wght@400..700&display=swap');
+:root{
+  --accent:#4B3E86; --accent-hover:#5C4C9E; --accent-bg:#F1EEFA; --accent-ink:#34295E;
+  --success:#1C8A4B; --success-bg:#E7F6ED; --warning:#B45309; --warning-bg:#FCF0E1; --danger:#C6382E; --danger-bg:#FBEAEA;
+  --bg:#FAF9F6; --surface:#FFFFFF; --surface-sunken:#F4F2EE; --border:#E7E3DA; --border-strong:#D8D3C7;
+  --text-primary:#1E1C1A; --text-secondary:#6B675F; --text-muted:#9B968A;
+  --font-display:'Fraunces',Georgia,'Times New Roman',serif;
+  --font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --radius-sm:10px; --radius-md:14px; --radius-lg:18px;
+  --shadow-card:0 1px 2px rgba(30,28,26,.04),0 1px 8px rgba(30,28,26,.03);
+  --tabbar:64px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%;background:var(--bg)}
+body{color:var(--text-primary);font-family:var(--font-body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit;padding:0}
+input{font-family:inherit}
+.phone{position:relative;max-width:430px;margin:0 auto;height:100dvh;min-height:100vh;display:flex;flex-direction:column;background:var(--bg);overflow:hidden}
+.hide{display:none !important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ============ SIGN IN ============ */
+#s-login{flex:1;display:flex;flex-direction:column;padding:max(20px,env(safe-area-inset-top)) 20px 24px;overflow-y:auto}
+.login-top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 0 12px}
+.mark{width:84px;height:84px;border-radius:24px;background:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(75,62,134,.22)}
+.mark svg{width:54px;height:54px}
+.login-name{font-family:var(--font-display);font-weight:600;font-size:28px;letter-spacing:-.01em;margin:18px 0 0}
+.login-sub{font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-top:6px}
+.login-hello{font-size:15px;color:var(--text-secondary);margin-top:10px}
+.form{display:flex;flex-direction:column;gap:12px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:600;color:var(--text-secondary)}
+.field input{height:52px;border:1px solid var(--border-strong);border-radius:var(--radius-md);background:var(--surface);padding:0 16px;font-size:17px;color:var(--text-primary);outline:none;width:100%}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.pw{position:relative}
+.pw input{padding-right:70px}
+.pw button{position:absolute;right:6px;top:6px;height:40px;padding:0 12px;border-radius:8px;font-size:13px;font-weight:600;color:var(--accent)}
+.btn{height:54px;border-radius:var(--radius-md);font-size:17px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:active{background:var(--accent-hover)}
+.btn-outline{background:var(--surface);color:var(--text-primary);border:1px solid var(--border-strong)}
+.btn-outline:active{background:var(--surface-sunken)}
+.error{display:flex;gap:10px;align-items:flex-start;background:var(--danger-bg);color:var(--danger);border-radius:var(--radius-sm);padding:12px 14px;font-size:14px;font-weight:500}
+.error svg{width:18px;height:18px;flex-shrink:0;margin-top:1px}
+.login-foot{text-align:center;font-size:13.5px;color:var(--text-muted);margin-top:20px;line-height:1.5}
+.login-links{display:flex;justify-content:center;gap:18px;margin-top:10px;font-size:13px}
+.login-links a{color:var(--text-secondary);text-decoration:underline;text-underline-offset:3px}
+
+/* ============ APP SHELL ============ */
+#s-app{flex:1;display:flex;flex-direction:column;min-height:0}
+.pane{flex:1;display:none;flex-direction:column;min-height:0}
+.pane.on{display:flex}
+.hdr{padding:max(16px,env(safe-area-inset-top)) 20px 12px}
+.hdr-kicker{font-size:13px;color:var(--text-secondary);font-weight:500}
+.hdr h1{font-family:var(--font-display);font-weight:600;font-size:30px;letter-spacing:-.01em;margin:2px 0 0;line-height:1.15}
+.hdr h1:first-child{margin-top:10px}
+.body{flex:1;overflow-y:auto;padding:4px 16px calc(var(--tabbar) + env(safe-area-inset-bottom) + 20px)}
+.sect{font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin:18px 4px 8px}
+.sect:first-child{margin-top:8px}
+.sect-row{display:flex;align-items:baseline;justify-content:space-between;margin:18px 4px 8px}
+.sect-row .sect{margin:0}
+.sect-row a{font-size:13.5px;font-weight:600;color:var(--accent)}
+
+/* clock card */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-card)}
+.clock{padding:18px 18px 16px}
+.clock-top{display:flex;align-items:center;gap:10px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--text-muted)}
+.clock.in .dot{background:var(--success);box-shadow:0 0 0 4px var(--success-bg)}
+.clock-status{font-size:14px;font-weight:600;color:var(--text-secondary)}
+.clock.in .clock-status{color:var(--success)}
+.clock-big{font-family:var(--font-display);font-weight:600;font-size:34px;letter-spacing:-.01em;margin:10px 0 2px;line-height:1.1}
+.clock-line{font-size:14.5px;color:var(--text-secondary)}
+.clock-job{display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 12px;background:var(--surface-sunken);border-radius:var(--radius-sm);font-size:14.5px}
+.clock-job svg{width:18px;height:18px;color:var(--text-secondary);flex-shrink:0}
+.clock-job b{font-weight:600}
+.clock .btn{margin-top:14px}
+
+/* rows */
+.list{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);overflow:hidden}
+.row{display:flex;align-items:center;gap:14px;padding:14px 16px;min-height:64px;width:100%;text-align:left;border-top:1px solid var(--border);position:relative}
+.row:first-child{border-top:0}
+.row:active{background:var(--surface-sunken)}
+.ico{width:40px;height:40px;border-radius:12px;background:var(--accent-bg);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ico svg{width:20px;height:20px}
+.ico.warn{background:var(--warning-bg);color:var(--warning)}
+.ico.ok{background:var(--success-bg);color:var(--success)}
+.row-t{flex:1;min-width:0;display:flex;flex-direction:column}
+.row-title,.row-sub{display:block}
+.row-title{font-size:15.5px;font-weight:600;line-height:1.3}
+.row-sub{font-size:13.5px;color:var(--text-secondary);margin-top:2px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-sub.wrap{white-space:normal}
+.chev{width:18px;height:18px;color:var(--text-muted);flex-shrink:0}
+.count{min-width:22px;height:22px;border-radius:11px;background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 7px}
+.unread-dot{position:absolute;left:6px;top:50%;width:7px;height:7px;margin-top:-3px;border-radius:50%;background:var(--accent)}
+.row.read .unread-dot{display:none}
+.row.read .row-title{font-weight:500;color:var(--text-secondary)}
+.when{font-size:12.5px;color:var(--text-muted);white-space:nowrap}
+.empty{padding:22px 16px;text-align:center;color:var(--text-secondary);font-size:14.5px}
+
+/* me card */
+.me{display:flex;align-items:center;gap:14px;padding:16px}
+.avatar{width:48px;height:48px;border-radius:50%;background:var(--accent-bg);color:var(--accent-ink);font-family:var(--font-display);font-weight:600;font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.me-name{font-size:16px;font-weight:600}
+.me-biz{font-size:13.5px;color:var(--text-secondary);margin-top:1px}
+.signout{color:var(--danger)}
+.signout .ico{background:var(--danger-bg);color:var(--danger)}
+.foot-note{text-align:center;font-size:12.5px;color:var(--text-muted);margin:18px 0 0}
+
+/* tab bar */
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:calc(var(--tabbar) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:var(--surface);border-top:1px solid var(--border);display:flex}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11.5px;font-weight:600;color:var(--text-muted);position:relative;min-height:var(--tabbar)}
+.tab .tico{width:48px;height:28px;border-radius:14px;display:flex;align-items:center;justify-content:center;transition:background .12s}
+.tab svg{width:22px;height:22px}
+.tab.on{color:var(--accent-ink)}
+.tab.on .tico{background:var(--accent-bg);color:var(--accent)}
+.tab .badge{position:absolute;top:8px;left:50%;margin-left:6px;min-width:17px;height:17px;border-radius:9px;background:var(--danger);color:#fff;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px;border:2px solid var(--surface)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <path id="pmark" fill-rule="evenodd" d="M21 14h21a13 13 0 0 1 0 26H31v20H21z M31 22h10a5 5 0 0 1 0 10H31z"/>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-today" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-jobs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M10 20v-6h4v6"/></symbol>
+    <symbol id="i-docs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></symbol>
+    <symbol id="i-learn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8l10-4 10 4-10 4z"/><path d="M6 10v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/><path d="M22 8v6"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="19" cy="12" r="2.2"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="i-report" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v16H5z"/><path d="M9 9h6M9 13h6M9 17h3"/></symbol>
+    <symbol id="i-sign" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17c3-5 5-6 6-4s1 5 3 3 3-6 5-4 2 3 4 3"/><path d="M3 21h18"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.2 5.2L3 18v3h3l6.5-6.5a4 4 0 0 0 5.2-5.2L15 12l-3-3z"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/></symbol>
+    <symbol id="i-coach" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 15.6 7.1 18.2l.9-5.5-4-3.9L9.5 8z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></symbol>
+    <symbol id="i-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4H5v16h5"/><path d="M14 8l5 4-5 4M19 12H9"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></symbol>
+  </defs>
+</svg>
+
+<div class="phone" id="phone">
+
+  <!-- ================= SIGN IN ================= -->
+  <section id="s-login" data-testid="crew-login">
+    <div class="login-top">
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="8 2 56 62"><g transform="skewX(-9) translate(7 0)"><g fill="#C9C2E8" stroke="#C9C2E8" stroke-width=".4" stroke-linejoin="round"><use href="#pmark" transform="translate(-6 -6)"/><use href="#pmark" transform="translate(-5.4 -5.4)"/><use href="#pmark" transform="translate(-4.8 -4.8)"/><use href="#pmark" transform="translate(-4.2 -4.2)"/><use href="#pmark" transform="translate(-3.6 -3.6)"/><use href="#pmark" transform="translate(-3 -3)"/><use href="#pmark" transform="translate(-2.4 -2.4)"/><use href="#pmark" transform="translate(-1.8 -1.8)"/><use href="#pmark" transform="translate(-1.2 -1.2)"/><use href="#pmark" transform="translate(-.6 -.6)"/></g><use href="#pmark" fill="#FFFFFF"/></g></svg>
+      </div>
+      <div class="login-name" data-testid="crew-login-name">Paint Trade HQ</div>
+      <div class="login-sub">Crew</div>
+      <div class="login-hello">Sign in to clock on, read your messages and send your report.</div>
+    </div>
+    <form class="form" id="loginForm" novalidate>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" data-testid="employee-login-email" type="email" inputmode="email" autocomplete="username" autocapitalize="none" placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="pw">
+          <input id="password" data-testid="employee-login-password" type="password" autocomplete="current-password" placeholder="Your password">
+          <button type="button" id="pwToggle" data-testid="employee-login-show" aria-label="Show password">Show</button>
+        </div>
+      </div>
+      <div class="error hide" id="loginError" data-testid="employee-login-error" role="alert">
+        <svg><use href="#i-alert"/></svg><span id="loginErrorText"></span>
+      </div>
+      <button class="btn btn-primary" type="submit" data-testid="employee-login-submit">Sign in</button>
+    </form>
+    <div class="login-foot">Joining a crew? Scan the QR code your employer gave you.</div>
+    <div class="login-links"><a href="#" data-testid="crew-login-privacy">Privacy</a><a href="#" data-testid="crew-login-terms">Terms</a></div>
+  </section>
+
+  <!-- ================= APP ================= -->
+  <section id="s-app" class="hide" data-testid="crew-shell">
+
+    <!-- TODAY -->
+    <div class="pane" id="t-today" data-testid="crew-pane-today">
+      <div class="hdr">
+        <div class="hdr-kicker" id="todayDate">Saturday 11 October</div>
+        <h1 id="todayHello">Morning, Mia</h1>
+      </div>
+      <div class="body">
+        <div class="sect">Time clock</div>
+        <div class="card clock" id="clock" data-testid="crew-today-clock">
+          <div class="clock-top"><span class="dot"></span><span class="clock-status" id="clockStatus">Signed out</span></div>
+          <div class="clock-big" id="clockBig">Not on the clock</div>
+          <div class="clock-line" id="clockLine">Last signed out 5:12 pm yesterday</div>
+          <div class="clock-job" id="clockJob" data-testid="crew-today-job"><svg><use href="#i-pin"/></svg><span id="clockJobText">No job yet</span></div>
+          <button class="btn btn-primary" id="clockBtn" data-testid="crew-today-clock-btn">Sign in</button>
+        </div>
+
+        <div class="sect-row"><div class="sect" id="notifHead">Unread · 3</div><a href="#" data-testid="crew-today-notifs-all" id="notifAll">See all</a></div>
+        <div class="list" id="notifList" data-testid="crew-today-notifs"></div>
+
+        <div class="sect">End of day</div>
+        <div class="list">
+          <button class="row" data-testid="crew-today-report" data-go="/employee/daily-report">
+            <span class="ico"><svg><use href="#i-report"/></svg></span>
+            <span class="row-t"><span class="row-title">Daily report</span><span class="row-sub">Send today's report and photos</span></span>
+            <svg class="chev"><use href="#i-chev"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- JOBS -->
+    <div class="pane" id="t-jobs" data-testid="crew-pane-jobs">
+      <div class="hdr"><h1>Jobs</h1></div>
+      <div class="body">
+        <div class="list" id="jobsList"></div>
+      </div>
+    </div>
+
+    <!-- DOCS -->
+    <div class="pane" id="t-docs" data-testid="crew-pane-docs">
+      <div class="hdr"><h1>Docs</h1></div>
+      <div class="body">
+        <div class="list" id="docsList"></div>
+      </div>
+    </div>
+
+    <!-- LEARN -->
+    <div class="pane" id="t-learn" data-testid="crew-pane-learn">
+      <div class="hdr"><h1>Learn</h1></div>
+      <div class="body">
+        <div class="list" id="learnList"></div>
+      </div>
+    </div>
+
+    <!-- MORE -->
+    <div class="pane" id="t-more" data-testid="crew-pane-more">
+      <div class="hdr"><h1>More</h1></div>
+      <div class="body">
+        <div class="card me" data-testid="crew-more-me">
+          <div class="avatar">M</div>
+          <div><div class="me-name">Mia Nguyen</div><div class="me-biz">Painter</div></div>
+        </div>
+        <div class="sect">Team</div>
+        <div class="list" id="moreList"></div>
+        <div class="sect">Account</div>
+        <div class="list">
+          <button class="row signout" data-testid="crew-more-signout" id="signOut">
+            <span class="ico"><svg><use href="#i-out"/></svg></span>
+            <span class="row-t"><span class="row-title">Sign out</span></span>
+          </button>
+        </div>
+        <div class="foot-note">Paint Trade HQ Crew · <a href="#" style="color:inherit;text-decoration:underline">Privacy</a> · <a href="#" style="color:inherit;text-decoration:underline">Terms</a></div>
+      </div>
+    </div>
+
+    <!-- TAB BAR -->
+    <nav class="tabbar" data-testid="crew-tabbar" aria-label="Main">
+      <button class="tab on" data-tab="today" data-testid="crew-tab-today"><span class="tico"><svg><use href="#i-today"/></svg></span>Today<span class="badge hide" id="tabBadge" data-testid="crew-tab-today-badge">3</span></button>
+      <button class="tab" data-tab="jobs" data-testid="crew-tab-jobs"><span class="tico"><svg><use href="#i-jobs"/></svg></span>Jobs</button>
+      <button class="tab" data-tab="docs" data-testid="crew-tab-docs"><span class="tico"><svg><use href="#i-docs"/></svg></span>Docs</button>
+      <button class="tab" data-tab="learn" data-testid="crew-tab-learn"><span class="tico"><svg><use href="#i-learn"/></svg></span>Learn</button>
+      <button class="tab" data-tab="more" data-testid="crew-tab-more"><span class="tico"><svg><use href="#i-more"/></svg></span>More</button>
+    </nav>
+  </section>
+</div>
+
+<script>
+(function(){
+  const $ = (s, r) => (r || document).querySelector(s);
+  const q = new URLSearchParams(location.search);
+  const RESTRICTED = 'Account access temporarily restricted. Please contact admin.';
+
+  // ---- mock state (fixed clock so tests are deterministic) ----
+  const state = {
+    signedIn: q.get('state') === 'in',
+    job: 'General',
+    since: '7:04 am',
+    elapsed: '2 h 35 m',
+    notifs: q.get('notifs') === '0' ? [] : [
+      { id: 'n1', kind: 'contract',  title: 'Your contract is ready to sign', sub: 'Employment agreement · from Josh', when: '8:12 am', link: '/employee/contracts', read: false },
+      { id: 'n2', kind: 'equipment', title: 'Equipment request approved',     sub: 'Extension pole · pick up at the shed', when: 'Yesterday', link: '/employee/request-equipment', read: false },
+      { id: 'n3', kind: 'report',    title: 'Josh replied to your daily report', sub: '"Great finish on the hallway, thanks."', when: 'Yesterday', link: '/employee/daily-report?report=r1', read: false },
+    ],
+  };
+  const icon = { contract: 'i-sign', equipment: 'i-gear', report: 'i-chat' };
+
+  // ---- rows for the hub tabs (each opens an existing screen) ----
+  const rowHtml = (r) => `
+    <button class="row" data-testid="${r.tid}" data-go="${r.go}">
+      <span class="ico"><svg><use href="#${r.icon}"/></svg></span>
+      <span class="row-t"><span class="row-title">${r.title}</span><span class="row-sub">${r.sub}</span></span>
+      ${r.count ? `<span class="count">${r.count}</span>` : ''}
+      <svg class="chev"><use href="#i-chev"/></svg>
+    </button>`;
+  const hubs = {
+    jobsList: [
+      { tid: 'crew-jobs-report', go: '/employee/daily-report', icon: 'i-report', title: 'Daily report', sub: "Today's report, and the ones you've sent" },
+      { tid: 'crew-jobs-clock',  go: '/employee/time-clock',   icon: 'i-clock',  title: 'Time clock',   sub: 'Sign in, sign out and your last 10 sessions' },
+    ],
+    docsList: [
+      { tid: 'crew-docs-contracts', go: '/employee/contracts',          icon: 'i-sign', title: 'Contracts', sub: 'Documents from your employer to read and sign', count: 1 },
+      { tid: 'crew-docs-profile',   go: '/employee/profile',            icon: 'i-user', title: 'Profile',   sub: 'Your details, documents and photo' },
+      { tid: 'crew-docs-equipment', go: '/employee/request-equipment',  icon: 'i-gear', title: 'Equipment', sub: 'Your gear and your requests' },
+    ],
+    learnList: [
+      { tid: 'crew-learn-training',    go: '/employee/training',       icon: 'i-play',  title: 'Training',  sub: 'Videos, required ones first, and your progress' },
+      { tid: 'crew-learn-coaching',    go: '/employee/strike-system',  icon: 'i-coach', title: 'Coaching',  sub: 'Notes from your employer and what good looks like' },
+      { tid: 'crew-learn-validations', go: '/employee/my-validations', icon: 'i-check', title: 'How I\'m going', sub: 'Performance notes your employer recorded' },
+    ],
+    moreList: [
+      { tid: 'crew-more-events',   go: '/employee/team-events',   icon: 'i-cal',  title: 'Team events',   sub: 'Upcoming events and your RSVPs' },
+      { tid: 'crew-more-feedback', go: '/employee/feedback',      icon: 'i-chat', title: 'Feedback',      sub: 'Send a note to your employer and see replies' },
+      { tid: 'crew-more-notifs',   go: '/employee/notifications', icon: 'i-bell', title: 'Notifications', sub: 'Everything, read and unread' },
+    ],
+  };
+  Object.keys(hubs).forEach(id => { $('#' + id).innerHTML = hubs[id].map(rowHtml).join(''); });
+
+  // ---- render ----
+  function renderClock(){
+    const c = $('#clock');
+    c.classList.toggle('in', state.signedIn);
+    if (state.signedIn) {
+      $('#clockStatus').textContent = 'Signed in';
+      $('#clockBig').textContent = state.elapsed + ' on the clock';
+      $('#clockLine').textContent = 'Since ' + state.since + ' today';
+      $('#clockJobText').innerHTML = 'Job: <b>' + state.job + '</b>';
+      $('#clockBtn').textContent = 'Sign out';
+      $('#clockBtn').className = 'btn btn-outline';
+    } else {
+      $('#clockStatus').textContent = 'Signed out';
+      $('#clockBig').textContent = 'Not on the clock';
+      $('#clockLine').textContent = 'Last signed out 5:12 pm yesterday';
+      $('#clockJobText').textContent = 'No job yet';
+      $('#clockBtn').textContent = 'Sign in';
+      $('#clockBtn').className = 'btn btn-primary';
+    }
+  }
+  function renderNotifs(){
+    const unread = state.notifs.filter(n => !n.read);
+    $('#notifHead').textContent = unread.length ? 'Unread · ' + unread.length : 'Messages';
+    const badge = $('#tabBadge');
+    badge.textContent = unread.length;
+    badge.classList.toggle('hide', unread.length === 0);
+    const list = $('#notifList');
+    if (!state.notifs.length) { list.innerHTML = '<div class="empty" data-testid="crew-today-notifs-empty">You\'re up to date.</div>'; return; }
+    list.innerHTML = state.notifs.map(n => `
+      <button class="row ${n.read ? 'read' : ''}" data-testid="crew-notif-row" data-id="${n.id}" data-go="${n.link}">
+        <span class="unread-dot"></span>
+        <span class="ico ${n.kind === 'equipment' ? 'ok' : ''}"><svg><use href="#${icon[n.kind]}"/></svg></span>
+        <span class="row-t"><span class="row-title">${n.title}</span><span class="row-sub">${n.sub}</span></span>
+        <span class="when">${n.when}</span>
+      </button>`).join('');
+  }
+
+  // ---- navigation ----
+  function showTab(name){
+    document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === 't-' + name));
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.tab === name));
+    document.querySelectorAll('.pane.on .body').forEach(b => b.scrollTop = 0);
+  }
+  function showApp(tab){
+    $('#s-login').classList.add('hide'); $('#s-app').classList.remove('hide');
+    renderClock(); renderNotifs(); showTab(tab || 'today');
+  }
+  function showLogin(){
+    $('#s-app').classList.add('hide'); $('#s-login').classList.remove('hide');
+    $('#password').value = '';
+  }
+
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab)));
+  $('#clockBtn').addEventListener('click', () => { state.signedIn = !state.signedIn; renderClock(); });
+  document.body.addEventListener('click', (e) => {
+    const row = e.target.closest('[data-go]');
+    if (!row) return;
+    if (row.dataset.id) { const n = state.notifs.find(x => x.id === row.dataset.id); if (n) { n.read = true; renderNotifs(); } }
+    document.body.dataset.lastGo = row.dataset.go; // prototype: records the route the real app would push
+  });
+  $('#notifAll').addEventListener('click', (e) => { e.preventDefault(); document.body.dataset.lastGo = '/employee/notifications'; });
+  $('#signOut').addEventListener('click', showLogin);
+  $('#pwToggle').addEventListener('click', () => {
+    const p = $('#password'), show = p.type === 'password';
+    p.type = show ? 'text' : 'password'; $('#pwToggle').textContent = show ? 'Hide' : 'Show';
+  });
+  $('#loginForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = $('#email').value.trim(), pw = $('#password').value;
+    const err = $('#loginError');
+    if (!email || !pw) { $('#loginErrorText').textContent = 'Enter your email and password.'; err.classList.remove('hide'); return; }
+    if (/restricted/i.test(email)) { $('#loginErrorText').textContent = RESTRICTED; err.classList.remove('hide'); return; }
+    err.classList.add('hide'); showApp('today');
+  });
+
+  // ---- deep links for review / tests ----
+  if (q.get('error') === 'restricted') { $('#loginErrorText').textContent = RESTRICTED; $('#loginError').classList.remove('hide'); }
+  if (q.get('screen') === 'app') showApp(q.get('tab') || 'today'); else showLogin();
+})();
+</script>
+</body>
+</html>
