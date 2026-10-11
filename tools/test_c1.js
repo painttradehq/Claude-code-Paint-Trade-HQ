@@ -1,4 +1,4 @@
-// C1 crew shell prototype — Playwright checks at 390 × 844 (iPhone-class) then 360 × 800 (Android-class).
+// C1 crew shell prototype (v2: Today · Jobs · Inbox · Learn · Me + Job screen) — Playwright checks at 390 × 844 then 360 × 800.
 // Run: NODE_PATH=$(npm root -g) node tools/test_c1.js [shots-dir]
 const { chromium } = require('playwright');
 const T = (id) => `[data-testid="${id}"]`;
@@ -14,6 +14,7 @@ async function run(b, W, H, tag) {
   const txt = async (sel) => (await p.locator(sel).first().textContent() || '').trim();
   const noHScroll = () => p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth && document.body.scrollWidth <= window.innerWidth);
   const box = (sel) => p.locator(sel).first().boundingBox();
+  const go = () => p.evaluate(() => document.body.dataset.lastGo);
   const full = ` [${tag}]`;
 
   // ---- sign in ----
@@ -37,48 +38,79 @@ async function run(b, W, H, tag) {
   // ---- Today ----
   ok('sign in lands on Today with the tab bar' + full, await p.locator(T('crew-pane-today')).isVisible() && await p.locator(T('crew-tabbar')).isVisible() && (await p.locator(T('crew-tab-today')).getAttribute('class')).includes('on'));
   const tb = await box(T('crew-tabbar'));
-  ok('tab bar sits on the bottom edge, five tabs' + full, Math.abs(tb.y + tb.height - H) < 1 && (await p.locator('.tab').count()) === 5);
-  const tabB = await box(T('crew-tab-jobs'));
-  ok('tabs are at least 44 px tall' + full, tabB.height >= 44);
+  ok('tab bar on the bottom edge: Today · Jobs · Inbox · Learn · Me' + full, Math.abs(tb.y + tb.height - H) < 1 && (await p.evaluate(() => [...document.querySelectorAll('.tab')].map(t => t.textContent.replace(/\d/g, '').trim()).join(' '))) === 'Today Jobs Inbox Learn Me');
+  ok('tabs are at least 44 px tall' + full, (await box(T('crew-tab-jobs'))).height >= 44);
   ok('clock card: signed out state' + full, /Signed out/.test(await txt('#clockStatus')) && /Not on the clock/.test(await txt('#clockBig')) && (await txt(T('crew-today-job'))) === 'No job yet' && (await txt(T('crew-today-clock-btn'))) === 'Sign in');
-  ok('unread: heading count, three rows, badge on the Today tab' + full, (await txt('#notifHead')) === 'Unread · 3' && (await p.locator(T('crew-notif-row')).count()) === 3 && (await txt(T('crew-tab-today-badge'))) === '3');
-  const rowB = await box(T('crew-notif-row'));
-  ok('notification rows are at least 44 px tall' + full, rowB.height >= 44);
+  ok("today's job card: the in-progress job, address, who else is on it, access line" + full, /Nguyen/.test(await txt(T('crew-today-jobcard'))) && /14 Wattle St, Brunswick/.test(await txt(T('crew-today-jobcard'))) && /Tom with you/.test(await txt(T('crew-today-jobcard'))) && /Key under the pot plant/.test(await txt(T('crew-today-jobcard'))));
+  ok('unread: heading count, three rows on Today, badge on the Inbox tab' + full, (await txt('#notifHead')) === 'Unread · 3' && (await p.locator('#notifList ' + T('crew-notif-row')).count()) === 3 && (await txt(T('crew-tab-inbox-badge'))) === '3');
+  ok('notification rows are at least 44 px tall' + full, (await box(T('crew-notif-row'))).height >= 44);
   await p.screenshot({ path: OUT + `c1-today-out-${tag}.png` });
   await p.click(T('crew-today-clock-btn')); await p.waitForTimeout(150);
-  ok('clock card: signed in state shows time on the clock, since, job, Sign out' + full, /Signed in/.test(await txt('#clockStatus')) && /2 h 35 m on the clock/.test(await txt('#clockBig')) && /Since 7:04 am today/.test(await txt('#clockLine')) && /Job: General/.test(await txt(T('crew-today-job'))) && (await txt(T('crew-today-clock-btn'))) === 'Sign out');
+  ok('clock card: signed in shows time on the clock, since, the job, Sign out' + full, /Signed in/.test(await txt('#clockStatus')) && /2 h 35 m on the clock/.test(await txt('#clockBig')) && /Since 7:04 am today/.test(await txt('#clockLine')) && /Job: Nguyen · 14 Wattle St/.test(await txt(T('crew-today-job'))) && (await txt(T('crew-today-clock-btn'))) === 'Sign out');
   await p.screenshot({ path: OUT + `c1-today-in-${tag}.png` });
-  await p.locator(T('crew-notif-row')).first().click(); await p.waitForTimeout(150);
-  ok('tapping a notification marks it read and records its link' + full, (await txt('#notifHead')) === 'Unread · 2' && (await txt(T('crew-tab-today-badge'))) === '2' && (await p.locator(T('crew-notif-row') + '.read').count()) === 1 && (await p.evaluate(() => document.body.dataset.lastGo)) === '/employee/contracts');
-  ok('Daily report shortcut opens the existing screen' + full, (await p.locator(T('crew-today-report')).getAttribute('data-go')) === '/employee/daily-report');
+  await p.locator('#notifList ' + T('crew-notif-row')).first().click(); await p.waitForTimeout(150);
+  ok('tapping a notification marks it read and records its link' + full, (await txt('#notifHead')) === 'Unread · 2' && (await txt(T('crew-tab-inbox-badge'))) === '2' && (await go()) === '/employee/contracts');
+  ok('Daily report row opens the existing screen' + full, (await p.locator(T('crew-today-report')).getAttribute('data-go')) === '/employee/daily-report');
   ok('Today: content ends above the tab bar' + full, await p.evaluate(() => { const b = document.querySelector('#t-today .body'); b.scrollTop = b.scrollHeight; const last = b.lastElementChild.getBoundingClientRect().bottom; const tab = document.querySelector('.tabbar').getBoundingClientRect().top; return last <= tab; }));
   ok('no horizontal scroll' + full, await noHScroll());
 
-  // ---- hub tabs ----
+  // ---- Jobs ----
   await p.click(T('crew-tab-jobs')); await p.waitForTimeout(120);
-  ok('Jobs: two rows (Daily report, Time clock)' + full, await p.locator(T('crew-pane-jobs')).isVisible() && (await p.locator('#jobsList .row').count()) === 2 && (await p.locator(T('crew-jobs-clock')).getAttribute('data-go')) === '/employee/time-clock');
+  ok('Jobs: Now shows the one in-progress job with pill, address, dates, crew count' + full, (await p.locator(T('crew-job-row')).count()) === 1 && /In progress/.test(await txt(T('crew-job-row'))) && /3 on the crew|2 on the crew/.test(await txt(T('crew-job-row'))));
   await p.screenshot({ path: OUT + `c1-jobs-${tag}.png` });
-  await p.click(T('crew-tab-docs')); await p.waitForTimeout(120);
-  ok('Docs: Contracts (1 to sign), Profile, Equipment' + full, (await p.locator('#docsList .row').count()) === 3 && (await txt(T('crew-docs-contracts') + ' .count')) === '1' && (await p.locator(T('crew-docs-equipment')).getAttribute('data-go')) === '/employee/request-equipment');
-  await p.screenshot({ path: OUT + `c1-docs-${tag}.png` });
+  await p.click(T('crew-jobs-seg-up')); await p.waitForTimeout(100);
+  ok('Jobs: Coming up shows Harrow with its start date' + full, (await p.locator(T('crew-job-row')).count()) === 1 && /Harrow/.test(await txt(T('crew-job-row'))) && /Starts Mon 20 Oct/.test(await txt(T('crew-job-row'))));
+  await p.click(T('crew-jobs-seg-done')); await p.waitForTimeout(100);
+  ok('Jobs: Done shows Patel' + full, /Patel/.test(await txt(T('crew-job-row'))));
+  await p.click(T('crew-jobs-seg-now')); await p.waitForTimeout(100);
+  await p.locator(T('crew-job-row')).first().click(); await p.waitForTimeout(200);
+
+  // ---- Job screen ----
+  ok('job screen opens as a stack screen: no tab bar, back to Jobs, name + address, Directions + Daily report' + full, await p.locator(T('crew-job')).isVisible() && !(await p.locator(T('crew-tabbar')).isVisible()) && (await txt('#jobTitle')) === 'Nguyen' && (await txt('#jobAddr')) === '14 Wattle St, Brunswick' && await p.locator(T('crew-job-directions')).isVisible() && await p.locator(T('crew-job-report-btn')).isVisible() && (await go()) === '/employee/project/j1');
+  ok('job: dates & crew, access note from the owner' + full, /Mon 6 Oct → Fri 17 Oct/.test(await txt(T('crew-job-crew'))) && /Mia, Tom/.test(await txt(T('crew-job-crew'))) && /From Josh:/.test(await txt(T('crew-job-notes'))) && /alarm code 4471/.test(await txt(T('crew-job-notes'))));
+  ok('job: the work = areas with lines and coats, added work marked, no prices anywhere' + full, (await p.locator(T('crew-job-work') + ' .area').count()) === 5 && (await p.locator(T('crew-job-added-work')).count()) === 1 && /Added work · approved 9 Oct/.test(await txt(T('crew-job-added-work'))) && /Skirting & architraves/.test(await txt(T('crew-job-work'))) && !/\$/.test(await txt('#jobBody')));
+  ok('job: paints & colours with swatches' + full, (await p.locator(T('crew-job-paints') + ' .swatch').count()) === 3 && /Natural White · walls/.test(await txt(T('crew-job-paints'))));
+  ok('job: files the owner marked crew-visible' + full, (await p.locator(T('crew-job-file')).count()) === 2 && /Strata approval\.pdf/.test(await txt(T('crew-job-files'))));
+  ok('job: photo grid with Add, my reports with Replied' + full, (await p.locator(T('crew-job-photos') + ' .ph').count()) === 6 && await p.locator(T('crew-job-photo-add')).isVisible() && /Replied/.test(await txt(T('crew-job-reports'))));
+  ok('job: back row ≥ 44 px; no horizontal scroll' + full, (await box(T('crew-job-back'))).height >= 44 && await noHScroll());
+  await p.screenshot({ path: OUT + `c1-job-${tag}.png` });
+  await p.evaluate(() => { document.getElementById('jobBody').scrollTop = 99999; }); await p.waitForTimeout(100);
+  await p.screenshot({ path: OUT + `c1-job-bottom-${tag}.png` });
+  await p.click(T('crew-job-report-btn')); ok('job: Daily report button opens the report screen' + full, (await go()) === '/employee/daily-report');
+  await p.click(T('crew-job-back')); await p.waitForTimeout(150);
+  ok('back returns to the Jobs tab' + full, await p.locator(T('crew-pane-jobs')).isVisible() && await p.locator(T('crew-tabbar')).isVisible());
+  await p.click(T('crew-tab-today')); await p.waitForTimeout(100); await p.click(T('crew-today-jobcard')); await p.waitForTimeout(150);
+  ok("Today's job card opens the same job screen" + full, await p.locator(T('crew-job')).isVisible() && (await txt('#jobTitle')) === 'Nguyen');
+  await p.click(T('crew-job-back')); await p.waitForTimeout(100);
+
+  // ---- Inbox ----
+  await p.click(T('crew-tab-inbox')); await p.waitForTimeout(120);
+  ok('Inbox: Message Josh row, all five messages, unread first with dots, Mark all read' + full, await p.locator(T('crew-inbox-message')).isVisible() && (await p.locator('#inboxList ' + T('crew-notif-row')).count()) === 5 && (await p.locator('#inboxList .row.read').count()) === 3 && await p.locator(T('crew-inbox-readall')).isVisible());
+  await p.screenshot({ path: OUT + `c1-inbox-${tag}.png` });
+  await p.click(T('crew-inbox-readall')); await p.waitForTimeout(100);
+  ok('Mark all read clears the badge and hides the link' + full, !(await p.locator(T('crew-tab-inbox-badge')).isVisible()) && !(await p.locator(T('crew-inbox-readall')).isVisible()) && (await p.locator('#inboxList .row.read').count()) === 5);
+
+  // ---- Learn / Me ----
   await p.click(T('crew-tab-learn')); await p.waitForTimeout(120);
-  ok('Learn: Training, Coaching (route strike-system), How I\'m going' + full, (await p.locator('#learnList .row').count()) === 3 && (await p.locator(T('crew-learn-coaching')).getAttribute('data-go')) === '/employee/strike-system' && !/strike/i.test(await txt('#t-learn')));
+  ok('Learn: Training, Coaching (route strike-system), How I\'m going; never the word strike' + full, (await p.locator('#learnList .row').count()) === 3 && (await p.locator(T('crew-learn-coaching')).getAttribute('data-go')) === '/employee/strike-system' && !/strike/i.test(await txt('#t-learn')));
   await p.screenshot({ path: OUT + `c1-learn-${tag}.png` });
-  await p.click(T('crew-tab-more')); await p.waitForTimeout(120);
-  ok('More: me card, Team events, Feedback, Notifications, Sign out' + full, await p.locator(T('crew-more-me')).isVisible() && (await p.locator('#moreList .row').count()) === 3 && await p.locator(T('crew-more-signout')).isVisible());
-  ok('every crew screen is reachable from the shell' + full, await p.evaluate(() => {
+  await p.click(T('crew-tab-me')); await p.waitForTimeout(120);
+  ok('Me: profile row, My documents (1), My equipment, My hours, Team events, Sign out' + full, await p.locator(T('crew-me-profile')).isVisible() && (await txt(T('crew-me-contracts') + ' .count')) === '1' && (await p.locator('#meList .row').count()) === 3 && (await p.locator('#teamList .row').count()) === 1 && await p.locator(T('crew-me-signout')).isVisible());
+  ok('every existing crew screen is reachable from the shell' + full, await p.evaluate(() => {
     const want = ['/employee/time-clock','/employee/daily-report','/employee/team-events','/employee/training','/employee/contracts','/employee/request-equipment','/employee/notifications','/employee/profile','/employee/feedback','/employee/my-validations','/employee/strike-system'];
     const have = new Set([...document.querySelectorAll('[data-go]')].map(e => e.dataset.go));
     return want.every(w => have.has(w));
   }));
-  await p.screenshot({ path: OUT + `c1-more-${tag}.png` });
-  await p.click(T('crew-more-signout')); await p.waitForTimeout(200);
+  await p.screenshot({ path: OUT + `c1-me-${tag}.png` });
+  await p.click(T('crew-me-signout')); await p.waitForTimeout(200);
   ok('Sign out returns to the sign-in screen with the password cleared' + full, await p.locator(T('crew-login')).isVisible() && (await p.locator(T('employee-login-password')).inputValue()) === '');
 
-  // ---- deep links ----
-  await p.goto(U + '?screen=app&tab=today&state=in&notifs=0'); await p.waitForTimeout(300);
-  ok('deep link: signed in, no unread → "Messages" + "You\'re up to date.", no badge' + full, (await txt('#notifHead')) === 'Messages' && await p.locator(T('crew-today-notifs-empty')).isVisible() && !(await p.locator(T('crew-tab-today-badge')).isVisible()));
+  // ---- deep links / empty states ----
+  await p.goto(U + '?screen=app&tab=today&state=in&notifs=0&jobs=0'); await p.waitForTimeout(300);
+  ok('empty states: no jobs → "No jobs assigned to you yet."; nothing unread → "You\'re up to date."; General on the clock; no badge' + full, await p.locator(T('crew-today-nojob')).isVisible() && await p.locator(T('crew-today-notifs-empty')).isVisible() && /Job: General/.test(await txt(T('crew-today-job'))) && !(await p.locator(T('crew-tab-inbox-badge')).isVisible()));
   await p.screenshot({ path: OUT + `c1-today-empty-${tag}.png` });
+  await p.goto(U + '?screen=job&id=j2'); await p.waitForTimeout(300);
+  ok('deep link: a coming-up job with no files shows "No files shared for this job." and no reports' + full, (await txt('#jobTitle')) === 'Harrow' && /No files shared for this job/.test(await txt(T('crew-job-files'))) && /No reports for this job yet/.test(await txt(T('crew-job-reports'))));
   await p.goto(U + '?error=restricted'); await p.waitForTimeout(200);
   ok('deep link: restricted error on login' + full, await p.locator(T('employee-login-error')).isVisible());
 

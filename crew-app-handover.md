@@ -163,6 +163,12 @@ Each has a recommendation so the new chat can move; Josh overrides any of them i
 6. **Language.** English only, or a second language for the crew screens? (Affects every string from C1.)
 7. **Tablets.** Phone only for the design rounds (recommended), or also 768 px.
 8. **Pay and hours.** Should crew see their own timesheet totals on the phone (the admin Timesheets "My hours" tab exists for admins only today)? Not in any spec; yes/no.
+9. **The job view (added 11 Oct after Josh reviewed C1).** This is the heart of the crew's day and the first version of this pack only gave it one line under C4. Crew cannot see any job today: there is no crew-side read of projects or estimates, only the admin-side `assigned_employee_ids` on a job (Round 40). The crew chat needs Josh's answer to **what a crew member may see of a job they are assigned to**, before it designs the Jobs tab. The business holds all of this already; the question is only what to show. Suggested split, for Josh to edit:
+   - **Show:** the job name and address with a map link; start and finish dates; the scope per area as the estimate describes it (the areas, the work lines with their quantities and coats, the products and colours chosen); site and access notes the owner writes for the crew; the job photos (before/after, pin notes, the crew can add); the daily reports for that job; approved variations as "added work"; who else is on the job.
+   - **Decide:** the client's name and phone (useful on site, personal data), the client's notes from the CRM, the estimate's "on paper" wording.
+   - **Never:** prices, margins, discounts, payment status, invoices, the client's email and message history, Lucy.
+   Also a **"Portfolio"**: a crew member's own list of the jobs they worked on, with the photos, is what the current `app.json` photo-permission text already promises ("Attach job photos to your project portfolio"). Josh to say whether that is wanted and whether it is per person or per business.
+   **Build order change:** the job view is round **C2**, straight after the shell; the time clock moves to **C3** and reuses the job list for its picker; the daily report becomes **C4**. Backend for the job round: a crew-only read route (employee JWT, jobs of the crew member's business where `assigned_employee_ids` contains them) that returns only the fields in the "Show" list and the "Decide" items Josh approves, with an isolation test that a crew member of another business gets nothing.
 
 ---
 
@@ -173,9 +179,9 @@ Each round: phone-frame prototype (390 × 844, also checked at 360 × 800) → J
 | Round | Scope | Notes |
 |---|---|---|
 | **C1** | Crew shell: sign-in, bottom tabs (or the chosen navigation), Today screen (clock status, today's job, unread notifications), brand restyle of these screens, remove the "Powered by OpenAI" pill if still there, `localStorage` guard | Sets the pattern every later round reuses |
-| **C2** | Time clock: job picker → `project_id`, `expo-location`, off-site warning in the response shown to the crew, no nominatim, location wording | Makes the admin geofence flag real |
-| **C3** | Daily report (crew form) with photos and the owner's feedback thread | Parked since Round 19 |
-| **C4** | Jobs: today's and upcoming assigned jobs, job photos (`project/[id]` reused), site notes the owner shares | First screen that reads project data; isolation tests |
+| **C2** | **Jobs** (moved up 11 Oct, see §6.9): my jobs list (today, upcoming, done), the job page with the "Show" list, photos (`project/[id]` reused), the crew-only read route with its isolation test | The heart of the crew's day; everything else hangs off the job |
+| **C3** | Time clock: job picker from the C2 list → `project_id`, `expo-location`, off-site warning shown to the crew, no nominatim, location wording | Makes the admin geofence flag real |
+| **C4** | Daily report (crew form) with photos and the owner's feedback thread, opened from the job | Parked since Round 19 |
 | **C5** | Documents: onboarding (Terms/Privacy tick, pickers), profile, contracts (native PDF share) | Legal items from §4.6 |
 | **C6** | Learn and gear: training (watched state on native), coaching restyle, equipment with "problem with this item" + damage photo | Equipment spec §6 debt |
 | **C7** | Notifications and push: token route, `expo-notifications`, the three existing triggers, web push for the installed PWA if (a) was chosen | Backend helper shared by all three |

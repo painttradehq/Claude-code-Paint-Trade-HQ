@@ -24,7 +24,6 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 input{font-family:inherit}
 .phone{position:relative;max-width:430px;margin:0 auto;height:100dvh;min-height:100vh;display:flex;flex-direction:column;background:var(--bg);overflow:hidden}
 .hide{display:none !important}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
 /* ============ SIGN IN ============ */
 #s-login{flex:1;display:flex;flex-direction:column;padding:max(20px,env(safe-area-inset-top)) 20px 24px;overflow-y:auto}
@@ -47,6 +46,7 @@ input{font-family:inherit}
 .btn-primary:active{background:var(--accent-hover)}
 .btn-outline{background:var(--surface);color:var(--text-primary);border:1px solid var(--border-strong)}
 .btn-outline:active{background:var(--surface-sunken)}
+.btn-sm{height:44px;font-size:15px;border-radius:12px}
 .error{display:flex;gap:10px;align-items:flex-start;background:var(--danger-bg);color:var(--danger);border-radius:var(--radius-sm);padding:12px 14px;font-size:14px;font-weight:500}
 .error svg{width:18px;height:18px;flex-shrink:0;margin-top:1px}
 .login-foot{text-align:center;font-size:13.5px;color:var(--text-muted);margin-top:20px;line-height:1.5}
@@ -61,15 +61,44 @@ input{font-family:inherit}
 .hdr-kicker{font-size:13px;color:var(--text-secondary);font-weight:500}
 .hdr h1{font-family:var(--font-display);font-weight:600;font-size:30px;letter-spacing:-.01em;margin:2px 0 0;line-height:1.15}
 .hdr h1:first-child{margin-top:10px}
+.hdr-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.hdr-row h1{margin-top:10px}
+.hdr-row a{font-size:13.5px;font-weight:600;color:var(--accent);padding-bottom:6px}
 .body{flex:1;overflow-y:auto;padding:4px 16px calc(var(--tabbar) + env(safe-area-inset-bottom) + 20px)}
+.body.nobar{padding-bottom:calc(env(safe-area-inset-bottom) + 24px)}
 .sect{font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin:18px 4px 8px}
 .sect:first-child{margin-top:8px}
 .sect-row{display:flex;align-items:baseline;justify-content:space-between;margin:18px 4px 8px}
 .sect-row .sect{margin:0}
 .sect-row a{font-size:13.5px;font-weight:600;color:var(--accent)}
 
-/* clock card */
+/* cards & rows */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-card)}
+.list{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);overflow:hidden}
+.row{display:flex;align-items:center;gap:14px;padding:14px 16px;min-height:64px;width:100%;text-align:left;border-top:1px solid var(--border);position:relative}
+.row:first-child{border-top:0}
+.row:active{background:var(--surface-sunken)}
+.ico{width:40px;height:40px;border-radius:12px;background:var(--accent-bg);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ico svg{width:20px;height:20px}
+.ico.warn{background:var(--warning-bg);color:var(--warning)}
+.ico.ok{background:var(--success-bg);color:var(--success)}
+.row-t{flex:1;min-width:0;display:flex;flex-direction:column}
+.row-title{font-size:15.5px;font-weight:600;line-height:1.3;display:block}
+.row-sub{font-size:13.5px;color:var(--text-secondary);margin-top:2px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.chev{width:18px;height:18px;color:var(--text-muted);flex-shrink:0}
+.count{min-width:22px;height:22px;border-radius:11px;background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 7px}
+.unread-dot{position:absolute;left:6px;top:50%;width:7px;height:7px;margin-top:-3px;border-radius:50%;background:var(--accent)}
+.row.read .unread-dot{display:none}
+.row.read .row-title{font-weight:500;color:var(--text-secondary)}
+.when{font-size:12.5px;color:var(--text-muted);white-space:nowrap}
+.empty{padding:22px 16px;text-align:center;color:var(--text-secondary);font-size:14.5px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;border-radius:999px;padding:3px 9px;background:var(--surface-sunken);color:var(--text-secondary);white-space:nowrap}
+.pill.live{background:var(--success-bg);color:var(--success)}
+.pill.soon{background:var(--accent-bg);color:var(--accent-ink)}
+.pill.done{background:var(--surface-sunken);color:var(--text-muted)}
+.pill.added{background:var(--warning-bg);color:var(--warning)}
+
+/* clock card */
 .clock{padding:18px 18px 16px}
 .clock-top{display:flex;align-items:center;gap:10px}
 .dot{width:10px;height:10px;border-radius:50%;background:var(--text-muted)}
@@ -83,36 +112,63 @@ input{font-family:inherit}
 .clock-job b{font-weight:600}
 .clock .btn{margin-top:14px}
 
-/* rows */
-.list{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);overflow:hidden}
-.row{display:flex;align-items:center;gap:14px;padding:14px 16px;min-height:64px;width:100%;text-align:left;border-top:1px solid var(--border);position:relative}
-.row:first-child{border-top:0}
-.row:active{background:var(--surface-sunken)}
-.ico{width:40px;height:40px;border-radius:12px;background:var(--accent-bg);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.ico svg{width:20px;height:20px}
-.ico.warn{background:var(--warning-bg);color:var(--warning)}
-.ico.ok{background:var(--success-bg);color:var(--success)}
-.row-t{flex:1;min-width:0;display:flex;flex-direction:column}
-.row-title,.row-sub{display:block}
-.row-title{font-size:15.5px;font-weight:600;line-height:1.3}
-.row-sub{font-size:13.5px;color:var(--text-secondary);margin-top:2px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.row-sub.wrap{white-space:normal}
-.chev{width:18px;height:18px;color:var(--text-muted);flex-shrink:0}
-.count{min-width:22px;height:22px;border-radius:11px;background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 7px}
-.unread-dot{position:absolute;left:6px;top:50%;width:7px;height:7px;margin-top:-3px;border-radius:50%;background:var(--accent)}
-.row.read .unread-dot{display:none}
-.row.read .row-title{font-weight:500;color:var(--text-secondary)}
-.when{font-size:12.5px;color:var(--text-muted);white-space:nowrap}
-.empty{padding:22px 16px;text-align:center;color:var(--text-secondary);font-size:14.5px}
+/* today's job card */
+.jobcard{padding:16px 18px;width:100%;text-align:left}
+.jobcard-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.jobcard-name{font-family:var(--font-display);font-weight:600;font-size:21px;line-height:1.2}
+.jobcard-addr{font-size:14.5px;color:var(--text-secondary);margin-top:3px}
+.jobcard-meta{font-size:13.5px;color:var(--text-secondary);margin-top:10px;display:flex;gap:6px;align-items:center;min-width:0}
+.jobcard-meta svg{width:16px;height:16px;color:var(--text-muted);flex-shrink:0}
+.jobcard-meta span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.jobcard-acts{display:flex;gap:10px;margin-top:14px}
+.jobcard-acts .btn{flex:1}
+
+/* jobs list */
+.seg{display:flex;background:var(--surface-sunken);border-radius:12px;padding:3px;margin:8px 0 14px}
+.seg button{flex:1;height:38px;border-radius:9px;font-size:14px;font-weight:600;color:var(--text-secondary)}
+.seg button.on{background:var(--surface);color:var(--text-primary);box-shadow:var(--shadow-card)}
+.jobrow{display:flex;flex-direction:column;gap:4px;padding:16px 18px;width:100%;text-align:left;border-top:1px solid var(--border);min-height:64px}
+.jobrow:first-child{border-top:0}
+.jobrow:active{background:var(--surface-sunken)}
+.jobrow-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.jobrow-name{font-size:16.5px;font-weight:600}
+.jobrow-addr{font-size:14px;color:var(--text-secondary)}
+.jobrow-meta{font-size:13px;color:var(--text-muted);margin-top:4px}
+
+/* job screen */
+.jobhdr{padding:max(12px,env(safe-area-inset-top)) 16px 12px;display:flex;flex-direction:column;gap:8px}
+.back{display:inline-flex;align-items:center;gap:4px;height:44px;font-size:15px;font-weight:600;color:var(--accent);padding-right:10px}
+.back svg{width:20px;height:20px}
+.job-title{font-family:var(--font-display);font-weight:600;font-size:27px;line-height:1.15;letter-spacing:-.01em}
+.job-addr{font-size:15px;color:var(--text-secondary)}
+.job-acts{display:flex;gap:10px;margin-top:6px}
+.job-acts .btn{flex:1}
+.note{padding:14px 16px;font-size:15px;line-height:1.5}
+.note.access{border-left:4px solid var(--warning);background:var(--warning-bg);border-color:var(--warning-bg);color:#5A2E0B}
+.note.access b{color:var(--warning)}
+.area{padding:12px 16px;border-top:1px solid var(--border)}
+.area:first-child{border-top:0}
+.area-name{font-size:15.5px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.area-name span.meta{font-size:12.5px;color:var(--text-muted);font-weight:500}
+.area-lines{margin:6px 0 0;padding:0;list-style:none;font-size:14px;color:var(--text-secondary);display:flex;flex-direction:column;gap:3px}
+.area-lines li{display:flex;justify-content:space-between;gap:10px}
+.area-lines li i{font-style:normal;color:var(--text-muted);white-space:nowrap}
+.swatch{width:40px;height:40px;border-radius:12px;border:1px solid var(--border-strong);flex-shrink:0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:12px}
+.ph{aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#D8D3C7,#B9B2A3);position:relative;overflow:hidden}
+.ph.after{background:linear-gradient(135deg,#C9C2E8,#9B90CF)}
+.ph span{position:absolute;left:6px;bottom:6px;font-size:10.5px;font-weight:700;color:#fff;background:rgba(30,28,26,.55);border-radius:6px;padding:2px 6px}
+.ph.add{background:var(--surface-sunken);border:1px dashed var(--border-strong);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:13px;font-weight:600}
 
 /* me card */
-.me{display:flex;align-items:center;gap:14px;padding:16px}
+.me{display:flex;align-items:center;gap:14px;padding:16px;width:100%;text-align:left}
 .avatar{width:48px;height:48px;border-radius:50%;background:var(--accent-bg);color:var(--accent-ink);font-family:var(--font-display);font-weight:600;font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .me-name{font-size:16px;font-weight:600}
 .me-biz{font-size:13.5px;color:var(--text-secondary);margin-top:1px}
 .signout{color:var(--danger)}
 .signout .ico{background:var(--danger-bg);color:var(--danger)}
 .foot-note{text-align:center;font-size:12.5px;color:var(--text-muted);margin:18px 0 0}
+.foot-note a{color:inherit;text-decoration:underline}
 
 /* tab bar */
 .tabbar{position:absolute;left:0;right:0;bottom:0;height:calc(var(--tabbar) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:var(--surface);border-top:1px solid var(--border);display:flex}
@@ -128,26 +184,28 @@ input{font-family:inherit}
 <svg width="0" height="0" style="position:absolute">
   <defs>
     <path id="pmark" fill-rule="evenodd" d="M21 14h21a13 13 0 0 1 0 26H31v20H21z M31 22h10a5 5 0 0 1 0 10H31z"/>
-    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
     <symbol id="i-today" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
     <symbol id="i-jobs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M10 20v-6h4v6"/></symbol>
-    <symbol id="i-docs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l2.5-8h13L21 13v6H3z"/><path d="M3 13h5l1.5 3h5L16 13h5"/></symbol>
     <symbol id="i-learn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8l10-4 10 4-10 4z"/><path d="M6 10v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/><path d="M22 8v6"/></symbol>
-    <symbol id="i-more" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="19" cy="12" r="2.2"/></symbol>
+    <symbol id="i-me" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></symbol>
     <symbol id="i-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></symbol>
     <symbol id="i-report" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v16H5z"/><path d="M9 9h6M9 13h6M9 17h3"/></symbol>
     <symbol id="i-sign" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17c3-5 5-6 6-4s1 5 3 3 3-6 5-4 2 3 4 3"/><path d="M3 21h18"/></symbol>
     <symbol id="i-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.2 5.2L3 18v3h3l6.5-6.5a4 4 0 0 0 5.2-5.2L15 12l-3-3z"/></symbol>
     <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></symbol>
-    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></symbol>
     <symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/></symbol>
     <symbol id="i-coach" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 15.6 7.1 18.2l.9-5.5-4-3.9L9.5 8z"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></symbol>
     <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
-    <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></symbol>
     <symbol id="i-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4H5v16h5"/><path d="M14 8l5 4-5 4M19 12H9"/></symbol>
     <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2"/></symbol>
     <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></symbol>
+    <symbol id="i-people" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><circle cx="17" cy="9" r="3"/><path d="M16 14.5c3 0 5.5 2 5.5 5"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4z"/></symbol>
   </defs>
 </svg>
 
@@ -161,7 +219,7 @@ input{font-family:inherit}
       </div>
       <div class="login-name" data-testid="crew-login-name">Paint Trade HQ</div>
       <div class="login-sub">Crew</div>
-      <div class="login-hello">Sign in to clock on, read your messages and send your report.</div>
+      <div class="login-hello">Sign in to clock on, see your jobs and send your report.</div>
     </div>
     <form class="form" id="loginForm" novalidate>
       <div class="field">
@@ -203,7 +261,10 @@ input{font-family:inherit}
           <button class="btn btn-primary" id="clockBtn" data-testid="crew-today-clock-btn">Sign in</button>
         </div>
 
-        <div class="sect-row"><div class="sect" id="notifHead">Unread · 3</div><a href="#" data-testid="crew-today-notifs-all" id="notifAll">See all</a></div>
+        <div class="sect">Today's job</div>
+        <div id="todayJob"></div>
+
+        <div class="sect-row"><div class="sect" id="notifHead">Unread · 3</div><a href="#" data-testid="crew-today-notifs-all" id="notifAll">Inbox</a></div>
         <div class="list" id="notifList" data-testid="crew-today-notifs"></div>
 
         <div class="sect">End of day</div>
@@ -221,15 +282,28 @@ input{font-family:inherit}
     <div class="pane" id="t-jobs" data-testid="crew-pane-jobs">
       <div class="hdr"><h1>Jobs</h1></div>
       <div class="body">
-        <div class="list" id="jobsList"></div>
+        <div class="seg" id="jobsSeg">
+          <button class="on" data-seg="now" data-testid="crew-jobs-seg-now">Now</button>
+          <button data-seg="up" data-testid="crew-jobs-seg-up">Coming up</button>
+          <button data-seg="done" data-testid="crew-jobs-seg-done">Done</button>
+        </div>
+        <div class="list" id="jobsList" data-testid="crew-jobs-list"></div>
       </div>
     </div>
 
-    <!-- DOCS -->
-    <div class="pane" id="t-docs" data-testid="crew-pane-docs">
-      <div class="hdr"><h1>Docs</h1></div>
+    <!-- INBOX -->
+    <div class="pane" id="t-inbox" data-testid="crew-pane-inbox">
+      <div class="hdr"><div class="hdr-row"><h1>Inbox</h1><a href="#" id="readAll" data-testid="crew-inbox-readall">Mark all read</a></div></div>
       <div class="body">
-        <div class="list" id="docsList"></div>
+        <div class="list">
+          <button class="row" data-testid="crew-inbox-message" data-go="/employee/feedback">
+            <span class="ico"><svg><use href="#i-send"/></svg></span>
+            <span class="row-t"><span class="row-title">Message your employer</span><span class="row-sub">Send a note to your employer and read the replies</span></span>
+            <svg class="chev"><use href="#i-chev"/></svg>
+          </button>
+        </div>
+        <div class="sect" id="inboxHead">Messages</div>
+        <div class="list" id="inboxList" data-testid="crew-inbox-list"></div>
       </div>
     </div>
 
@@ -241,35 +315,56 @@ input{font-family:inherit}
       </div>
     </div>
 
-    <!-- MORE -->
-    <div class="pane" id="t-more" data-testid="crew-pane-more">
-      <div class="hdr"><h1>More</h1></div>
+    <!-- ME -->
+    <div class="pane" id="t-me" data-testid="crew-pane-me">
+      <div class="hdr"><h1>Me</h1></div>
       <div class="body">
-        <div class="card me" data-testid="crew-more-me">
-          <div class="avatar">M</div>
-          <div><div class="me-name">Mia Nguyen</div><div class="me-biz">Painter</div></div>
+        <div class="card">
+          <button class="me" data-testid="crew-me-profile" data-go="/employee/profile">
+            <div class="avatar">M</div>
+            <div style="flex:1;min-width:0"><div class="me-name">Mia Nguyen</div><div class="me-biz">Painter · Your details, documents and photo</div></div>
+            <svg class="chev"><use href="#i-chev"/></svg>
+          </button>
         </div>
+        <div class="sect">Mine</div>
+        <div class="list" id="meList"></div>
         <div class="sect">Team</div>
-        <div class="list" id="moreList"></div>
+        <div class="list" id="teamList"></div>
         <div class="sect">Account</div>
         <div class="list">
-          <button class="row signout" data-testid="crew-more-signout" id="signOut">
+          <button class="row signout" data-testid="crew-me-signout" id="signOut">
             <span class="ico"><svg><use href="#i-out"/></svg></span>
             <span class="row-t"><span class="row-title">Sign out</span></span>
           </button>
         </div>
-        <div class="foot-note">Paint Trade HQ Crew · <a href="#" style="color:inherit;text-decoration:underline">Privacy</a> · <a href="#" style="color:inherit;text-decoration:underline">Terms</a></div>
+        <div class="foot-note">Paint Trade HQ Crew · <a href="#">Privacy</a> · <a href="#">Terms</a></div>
       </div>
     </div>
 
     <!-- TAB BAR -->
     <nav class="tabbar" data-testid="crew-tabbar" aria-label="Main">
-      <button class="tab on" data-tab="today" data-testid="crew-tab-today"><span class="tico"><svg><use href="#i-today"/></svg></span>Today<span class="badge hide" id="tabBadge" data-testid="crew-tab-today-badge">3</span></button>
+      <button class="tab on" data-tab="today" data-testid="crew-tab-today"><span class="tico"><svg><use href="#i-today"/></svg></span>Today</button>
       <button class="tab" data-tab="jobs" data-testid="crew-tab-jobs"><span class="tico"><svg><use href="#i-jobs"/></svg></span>Jobs</button>
-      <button class="tab" data-tab="docs" data-testid="crew-tab-docs"><span class="tico"><svg><use href="#i-docs"/></svg></span>Docs</button>
+      <button class="tab" data-tab="inbox" data-testid="crew-tab-inbox"><span class="tico"><svg><use href="#i-inbox"/></svg></span>Inbox<span class="badge hide" id="tabBadge" data-testid="crew-tab-inbox-badge">3</span></button>
       <button class="tab" data-tab="learn" data-testid="crew-tab-learn"><span class="tico"><svg><use href="#i-learn"/></svg></span>Learn</button>
-      <button class="tab" data-tab="more" data-testid="crew-tab-more"><span class="tico"><svg><use href="#i-more"/></svg></span>More</button>
+      <button class="tab" data-tab="me" data-testid="crew-tab-me"><span class="tico"><svg><use href="#i-me"/></svg></span>Me</button>
     </nav>
+  </section>
+
+  <!-- ================= JOB (stack screen, no tab bar) ================= -->
+  <section id="s-job" class="hide" data-testid="crew-job" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <button class="back" id="jobBack" data-testid="crew-job-back"><svg><use href="#i-back"/></svg>Jobs</button>
+      <div>
+        <div class="job-title" id="jobTitle"></div>
+        <div class="job-addr" id="jobAddr"></div>
+      </div>
+      <div class="job-acts">
+        <button class="btn btn-outline btn-sm" data-testid="crew-job-directions" id="jobDirections">Directions</button>
+        <button class="btn btn-primary btn-sm" data-testid="crew-job-report-btn" id="jobReport">Daily report</button>
+      </div>
+    </div>
+    <div class="body nobar" id="jobBody"></div>
   </section>
 </div>
 
@@ -278,22 +373,47 @@ input{font-family:inherit}
   const $ = (s, r) => (r || document).querySelector(s);
   const q = new URLSearchParams(location.search);
   const RESTRICTED = 'Account access temporarily restricted. Please contact admin.';
+  const esc = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 
-  // ---- mock state (fixed clock so tests are deterministic) ----
+  // ---- mock data (fixed so the tests are deterministic) ----
+  const jobs = [
+    { id: 'j1', name: 'Nguyen', addr: '14 Wattle St, Brunswick', status: 'now', pill: 'In progress', dates: 'Mon 6 Oct → Fri 17 Oct', crew: ['Mia', 'Tom'],
+      access: 'Key under the pot plant, alarm code 4471. Biscuit the dog stays in the laundry.',
+      work: [
+        { area: 'Living room', meta: '2 coats', lines: [['Walls', 'Low sheen · 2 coats'], ['Ceiling', 'Flat · 1 coat'], ['Skirting & architraves', 'Gloss · 2 coats']] },
+        { area: 'Hallway', meta: '2 coats', lines: [['Walls', 'Low sheen · 2 coats'], ['Doors × 4', 'Gloss · 2 coats']] },
+        { area: 'Stairwell', meta: 'prep', lines: [['Walls', 'Patch & sand, then 2 coats'], ['Handrail', 'Sand back, 2 coats gloss']] },
+        { area: 'Laundry', meta: '1 coat', lines: [['Walls & ceiling', 'Low sheen · 1 coat']] },
+        { area: 'Front door', added: 'Added work · approved 9 Oct', lines: [['Front door, both sides', 'Sand back, undercoat, 2 coats gloss']] },
+      ],
+      paints: [['#F3F1EA', 'Dulux Wash&Wear Low Sheen', 'Natural White · walls'], ['#FDFDFB', 'Dulux Ceiling White', 'White · ceilings'], ['#F7F7F4', 'Dulux Aquanamel Gloss', 'Vivid White · trim and doors']],
+      files: [['Strata approval.pdf', 'PDF · 240 KB'], ['Colour schedule.jpg', 'Image · 1.1 MB']],
+      photos: 5, reports: [['Fri 10 Oct', '7.5 h · Living room walls second coat, ceiling done', true], ['Thu 9 Oct', '8 h · Prep and first coat living room', true]] },
+    { id: 'j2', name: 'Harrow', addr: '2/88 Lygon St, Carlton', status: 'up', pill: 'Starts Mon 20 Oct', dates: 'Mon 20 Oct → Wed 29 Oct', crew: ['Mia'],
+      access: 'Strata lets us in from 7:30 am. Lift key from the concierge.',
+      work: [{ area: 'Whole apartment', meta: '2 coats', lines: [['Walls', 'Low sheen · 2 coats'], ['Ceilings', 'Flat · 1 coat'], ['Trim', 'Gloss · 2 coats']] }],
+      paints: [['#EFE9DD', 'Dulux Wash&Wear Low Sheen', 'Lexicon Quarter · walls']], files: [], photos: 0, reports: [] },
+    { id: 'j3', name: 'Patel', addr: '5 Elm Grove, Coburg', status: 'done', pill: 'Done Fri 3 Oct', dates: 'Mon 29 Sep → Fri 3 Oct', crew: ['Mia', 'Tom', 'Lee'],
+      access: '', work: [{ area: 'Exterior', meta: '2 coats', lines: [['Weatherboards', 'Low sheen · 2 coats'], ['Eaves & fascia', 'Gloss · 2 coats']] }],
+      paints: [['#DCD6CB', 'Dulux Weathershield Low Sheen', 'Tranquil Retreat · boards']], files: [['Site plan.pdf', 'PDF · 90 KB']], photos: 12, reports: [['Fri 3 Oct', '6 h · Final coat eaves, clean-up', true]] },
+  ];
+  if (q.get('jobs') === '0') jobs.length = 0;
   const state = {
     signedIn: q.get('state') === 'in',
-    job: 'General',
-    since: '7:04 am',
-    elapsed: '2 h 35 m',
+    since: '7:04 am', elapsed: '2 h 35 m',
+    seg: 'now',
     notifs: q.get('notifs') === '0' ? [] : [
-      { id: 'n1', kind: 'contract',  title: 'Your contract is ready to sign', sub: 'Employment agreement · from Josh', when: '8:12 am', link: '/employee/contracts', read: false },
-      { id: 'n2', kind: 'equipment', title: 'Equipment request approved',     sub: 'Extension pole · pick up at the shed', when: 'Yesterday', link: '/employee/request-equipment', read: false },
+      { id: 'n1', kind: 'contract',  title: 'Your contract is ready to sign',   sub: 'Employment agreement · from Josh',      when: '8:12 am',   link: '/employee/contracts', read: false },
+      { id: 'n2', kind: 'equipment', title: 'Equipment request approved',       sub: 'Extension pole · pick up at the shed',  when: 'Yesterday', link: '/employee/request-equipment', read: false },
       { id: 'n3', kind: 'report',    title: 'Josh replied to your daily report', sub: '"Great finish on the hallway, thanks."', when: 'Yesterday', link: '/employee/daily-report?report=r1', read: false },
+      { id: 'n4', kind: 'star',      title: 'Nice one',                         sub: 'The Patel client left a 5-star review and named you', when: 'Tue', link: '', read: true },
+      { id: 'n5', kind: 'contract',  title: 'Josh countersigned your contract', sub: 'Employment agreement · signed copy emailed', when: '30 Sep', link: '/employee/contracts', read: true },
     ],
   };
-  const icon = { contract: 'i-sign', equipment: 'i-gear', report: 'i-chat' };
+  const icon = { contract: 'i-sign', equipment: 'i-gear', report: 'i-chat', star: 'i-coach' };
+  const currentJob = () => jobs.find(x => x.status === 'now') || null;
 
-  // ---- rows for the hub tabs (each opens an existing screen) ----
+  // ---- hub rows ----
   const rowHtml = (r) => `
     <button class="row" data-testid="${r.tid}" data-go="${r.go}">
       <span class="ico"><svg><use href="#${r.icon}"/></svg></span>
@@ -302,37 +422,31 @@ input{font-family:inherit}
       <svg class="chev"><use href="#i-chev"/></svg>
     </button>`;
   const hubs = {
-    jobsList: [
-      { tid: 'crew-jobs-report', go: '/employee/daily-report', icon: 'i-report', title: 'Daily report', sub: "Today's report, and the ones you've sent" },
-      { tid: 'crew-jobs-clock',  go: '/employee/time-clock',   icon: 'i-clock',  title: 'Time clock',   sub: 'Sign in, sign out and your last 10 sessions' },
-    ],
-    docsList: [
-      { tid: 'crew-docs-contracts', go: '/employee/contracts',          icon: 'i-sign', title: 'Contracts', sub: 'Documents from your employer to read and sign', count: 1 },
-      { tid: 'crew-docs-profile',   go: '/employee/profile',            icon: 'i-user', title: 'Profile',   sub: 'Your details, documents and photo' },
-      { tid: 'crew-docs-equipment', go: '/employee/request-equipment',  icon: 'i-gear', title: 'Equipment', sub: 'Your gear and your requests' },
-    ],
     learnList: [
-      { tid: 'crew-learn-training',    go: '/employee/training',       icon: 'i-play',  title: 'Training',  sub: 'Videos, required ones first, and your progress' },
-      { tid: 'crew-learn-coaching',    go: '/employee/strike-system',  icon: 'i-coach', title: 'Coaching',  sub: 'Notes from your employer and what good looks like' },
+      { tid: 'crew-learn-training',    go: '/employee/training',       icon: 'i-play',  title: 'Training',       sub: 'Videos, required ones first, and your progress' },
+      { tid: 'crew-learn-coaching',    go: '/employee/strike-system',  icon: 'i-coach', title: 'Coaching',       sub: 'Notes from your employer and what good looks like' },
       { tid: 'crew-learn-validations', go: '/employee/my-validations', icon: 'i-check', title: 'How I\'m going', sub: 'Performance notes your employer recorded' },
     ],
-    moreList: [
-      { tid: 'crew-more-events',   go: '/employee/team-events',   icon: 'i-cal',  title: 'Team events',   sub: 'Upcoming events and your RSVPs' },
-      { tid: 'crew-more-feedback', go: '/employee/feedback',      icon: 'i-chat', title: 'Feedback',      sub: 'Send a note to your employer and see replies' },
-      { tid: 'crew-more-notifs',   go: '/employee/notifications', icon: 'i-bell', title: 'Notifications', sub: 'Everything, read and unread' },
+    meList: [
+      { tid: 'crew-me-contracts', go: '/employee/contracts',         icon: 'i-sign',  title: 'My documents', sub: 'Contracts and policies to read and sign', count: 1 },
+      { tid: 'crew-me-equipment', go: '/employee/request-equipment', icon: 'i-gear',  title: 'My equipment', sub: 'Your gear, and requests for more' },
+      { tid: 'crew-me-hours',     go: '/employee/time-clock',        icon: 'i-clock', title: 'My hours',     sub: 'Your last 10 sign-ins' },
+    ],
+    teamList: [
+      { tid: 'crew-me-events', go: '/employee/team-events', icon: 'i-cal', title: 'Team events', sub: 'Upcoming events and your RSVPs' },
     ],
   };
   Object.keys(hubs).forEach(id => { $('#' + id).innerHTML = hubs[id].map(rowHtml).join(''); });
 
-  // ---- render ----
+  // ---- render: Today ----
   function renderClock(){
-    const c = $('#clock');
+    const c = $('#clock'); const j = currentJob();
     c.classList.toggle('in', state.signedIn);
     if (state.signedIn) {
       $('#clockStatus').textContent = 'Signed in';
       $('#clockBig').textContent = state.elapsed + ' on the clock';
       $('#clockLine').textContent = 'Since ' + state.since + ' today';
-      $('#clockJobText').innerHTML = 'Job: <b>' + state.job + '</b>';
+      $('#clockJobText').innerHTML = 'Job: <b>' + esc(j ? `${j.name} · ${j.addr.split(',')[0]}` : 'General') + '</b>';
       $('#clockBtn').textContent = 'Sign out';
       $('#clockBtn').className = 'btn btn-outline';
     } else {
@@ -344,22 +458,78 @@ input{font-family:inherit}
       $('#clockBtn').className = 'btn btn-primary';
     }
   }
-  function renderNotifs(){
-    const unread = state.notifs.filter(n => !n.read);
-    $('#notifHead').textContent = unread.length ? 'Unread · ' + unread.length : 'Messages';
-    const badge = $('#tabBadge');
-    badge.textContent = unread.length;
-    badge.classList.toggle('hide', unread.length === 0);
-    const list = $('#notifList');
-    if (!state.notifs.length) { list.innerHTML = '<div class="empty" data-testid="crew-today-notifs-empty">You\'re up to date.</div>'; return; }
-    list.innerHTML = state.notifs.map(n => `
-      <button class="row ${n.read ? 'read' : ''}" data-testid="crew-notif-row" data-id="${n.id}" data-go="${n.link}">
+  function renderTodayJob(){
+    const j = currentJob() || jobs.find(x => x.status === 'up');
+    const el = $('#todayJob');
+    if (!j) { el.innerHTML = '<div class="card"><div class="empty" data-testid="crew-today-nojob">No jobs assigned to you yet.</div></div>'; return; }
+    const others = j.crew.filter(n => n !== 'Mia');
+    el.innerHTML = `
+      <button class="card jobcard" data-testid="crew-today-jobcard" data-job="${j.id}">
+        <div class="jobcard-top"><div><div class="jobcard-name">${esc(j.name)}</div><div class="jobcard-addr">${esc(j.addr)}</div></div><span class="pill ${j.status === 'now' ? 'live' : 'soon'}">${esc(j.pill)}</span></div>
+        <div class="jobcard-meta"><svg><use href="#i-people"/></svg><span>${others.length ? esc(others.join(', ')) + ' with you' : 'Just you on this job'}</span></div>
+        ${j.access ? `<div class="jobcard-meta"><svg><use href="#i-alert"/></svg><span>${esc(j.access)}</span></div>` : ''}
+        <div class="jobcard-acts"><span class="btn btn-outline btn-sm" data-testid="crew-today-directions">Directions</span><span class="btn btn-primary btn-sm">Open job</span></div>
+      </button>`;
+  }
+  const notifRow = (n) => `
+      <button class="row ${n.read ? 'read' : ''}" data-testid="crew-notif-row" data-id="${n.id}" data-go="${n.link || '/employee/notifications'}">
         <span class="unread-dot"></span>
         <span class="ico ${n.kind === 'equipment' ? 'ok' : ''}"><svg><use href="#${icon[n.kind]}"/></svg></span>
-        <span class="row-t"><span class="row-title">${n.title}</span><span class="row-sub">${n.sub}</span></span>
+        <span class="row-t"><span class="row-title">${esc(n.title)}</span><span class="row-sub">${esc(n.sub)}</span></span>
         <span class="when">${n.when}</span>
-      </button>`).join('');
+      </button>`;
+  function renderNotifs(){
+    const unread = state.notifs.filter(n => !n.read);
+    $('#notifHead').textContent = unread.length ? 'Unread · ' + unread.length : 'Inbox';
+    const badge = $('#tabBadge'); badge.textContent = unread.length; badge.classList.toggle('hide', unread.length === 0);
+    const top = unread.slice(0, 3);
+    $('#notifList').innerHTML = top.length ? top.map(notifRow).join('') : '<div class="empty" data-testid="crew-today-notifs-empty">You\'re up to date.</div>';
+    $('#inboxHead').textContent = unread.length ? `Messages · ${unread.length} unread` : 'Messages';
+    $('#inboxList').innerHTML = state.notifs.length ? state.notifs.map(notifRow).join('') : '<div class="empty" data-testid="crew-inbox-empty">Nothing here yet. Messages from your employer land here.</div>';
+    $('#readAll').classList.toggle('hide', unread.length === 0);
   }
+
+  // ---- render: Jobs ----
+  function renderJobs(){
+    document.querySelectorAll('#jobsSeg button').forEach(b => b.classList.toggle('on', b.dataset.seg === state.seg));
+    const rows = jobs.filter(j => j.status === state.seg);
+    const empty = { now: 'No job on the go right now.', up: 'Nothing booked yet.', done: 'No finished jobs yet.' }[state.seg];
+    $('#jobsList').innerHTML = rows.length ? rows.map(j => `
+      <button class="jobrow" data-testid="crew-job-row" data-job="${j.id}">
+        <div class="jobrow-top"><span class="jobrow-name">${esc(j.name)}</span><span class="pill ${j.status === 'now' ? 'live' : j.status === 'up' ? 'soon' : 'done'}">${esc(j.pill)}</span></div>
+        <div class="jobrow-addr">${esc(j.addr)}</div>
+        <div class="jobrow-meta">${esc(j.dates)} · ${j.crew.length} on the crew</div>
+      </button>`).join('') : `<div class="empty" data-testid="crew-jobs-empty">${empty}</div>`;
+  }
+
+  // ---- render: Job screen ----
+  function openJob(id){
+    const j = jobs.find(x => x.id === id); if (!j) return;
+    $('#jobTitle').textContent = j.name;
+    $('#jobAddr').textContent = j.addr;
+    const work = j.work.map(a => `<div class="area ${a.added ? 'added' : ''}" ${a.added ? 'data-testid="crew-job-added-work"' : ''}><div class="area-name">${esc(a.area)}${a.added ? `<span class="pill added">${esc(a.added)}</span>` : `<span class="meta">${esc(a.meta)}</span>`}</div><ul class="area-lines">${a.lines.map(l => `<li>${esc(l[0])}<i>${esc(l[1])}</i></li>`).join('')}</ul></div>`).join('');
+    const paints = j.paints.map(p => `<div class="row" style="min-height:60px"><span class="swatch" style="background:${p[0]}"></span><span class="row-t"><span class="row-title">${esc(p[2])}</span><span class="row-sub">${esc(p[1])}</span></span></div>`).join('');
+    const files = j.files.length ? j.files.map(f => `<button class="row" data-testid="crew-job-file"><span class="ico"><svg><use href="#i-file"/></svg></span><span class="row-t"><span class="row-title">${esc(f[0])}</span><span class="row-sub">${esc(f[1])}</span></span><svg class="chev"><use href="#i-chev"/></svg></button>`).join('') : '<div class="empty">No files shared for this job.</div>';
+    const photos = `<div class="grid" data-testid="crew-job-photos">${Array.from({ length: Math.min(j.photos, 5) }, (_, i) => `<div class="ph ${i % 2 ? 'after' : ''}"><span>${i % 2 ? 'After' : 'Before'}</span></div>`).join('')}<button class="ph add" data-testid="crew-job-photo-add">+ Add</button></div>`;
+    const reports = j.reports.length ? j.reports.map(r => `<div class="row" style="min-height:60px"><span class="ico ${r[2] ? 'ok' : ''}"><svg><use href="#i-report"/></svg></span><span class="row-t"><span class="row-title">${esc(r[0])}</span><span class="row-sub">${esc(r[1])}</span></span>${r[2] ? '<span class="pill done">Replied</span>' : ''}</div>`).join('') : '<div class="empty">No reports for this job yet.</div>';
+    $('#jobBody').innerHTML = `
+      <div class="sect">Dates &amp; crew</div>
+      <div class="card note" data-testid="crew-job-crew">${esc(j.dates)}<br><span style="color:var(--text-secondary)">${esc(j.crew.join(', '))}</span></div>
+      ${j.access ? `<div class="sect">Access &amp; notes</div><div class="card note access" data-testid="crew-job-notes"><b>From Josh:</b> ${esc(j.access)}</div>` : ''}
+      <div class="sect">The work</div>
+      <div class="list" data-testid="crew-job-work">${work}</div>
+      <div class="sect">Paints &amp; colours</div>
+      <div class="list" data-testid="crew-job-paints">${paints}</div>
+      <div class="sect">Files</div>
+      <div class="list" data-testid="crew-job-files">${files}</div>
+      <div class="sect">Photos · ${j.photos}</div>
+      <div class="list">${photos}</div>
+      <div class="sect">My reports</div>
+      <div class="list" data-testid="crew-job-reports">${reports}</div>`;
+    $('#s-app').classList.add('hide'); $('#s-job').classList.remove('hide'); $('#jobBody').scrollTop = 0;
+    document.body.dataset.lastGo = '/employee/project/' + id;
+  }
+  function closeJob(){ $('#s-job').classList.add('hide'); $('#s-app').classList.remove('hide'); }
 
   // ---- navigation ----
   function showTab(name){
@@ -368,23 +538,30 @@ input{font-family:inherit}
     document.querySelectorAll('.pane.on .body').forEach(b => b.scrollTop = 0);
   }
   function showApp(tab){
-    $('#s-login').classList.add('hide'); $('#s-app').classList.remove('hide');
-    renderClock(); renderNotifs(); showTab(tab || 'today');
+    $('#s-login').classList.add('hide'); $('#s-job').classList.add('hide'); $('#s-app').classList.remove('hide');
+    renderClock(); renderTodayJob(); renderNotifs(); renderJobs(); showTab(tab || 'today');
   }
   function showLogin(){
-    $('#s-app').classList.add('hide'); $('#s-login').classList.remove('hide');
+    $('#s-app').classList.add('hide'); $('#s-job').classList.add('hide'); $('#s-login').classList.remove('hide');
     $('#password').value = '';
   }
 
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab)));
+  document.querySelectorAll('#jobsSeg button').forEach(b => b.addEventListener('click', () => { state.seg = b.dataset.seg; renderJobs(); }));
   $('#clockBtn').addEventListener('click', () => { state.signedIn = !state.signedIn; renderClock(); });
+  $('#jobBack').addEventListener('click', closeJob);
+  $('#jobReport').addEventListener('click', () => { document.body.dataset.lastGo = '/employee/daily-report'; });
+  $('#jobDirections').addEventListener('click', () => { document.body.dataset.lastGo = 'maps'; });
   document.body.addEventListener('click', (e) => {
+    const jb = e.target.closest('[data-job]');
+    if (jb) { openJob(jb.dataset.job); return; }
     const row = e.target.closest('[data-go]');
     if (!row) return;
     if (row.dataset.id) { const n = state.notifs.find(x => x.id === row.dataset.id); if (n) { n.read = true; renderNotifs(); } }
     document.body.dataset.lastGo = row.dataset.go; // prototype: records the route the real app would push
   });
-  $('#notifAll').addEventListener('click', (e) => { e.preventDefault(); document.body.dataset.lastGo = '/employee/notifications'; });
+  $('#notifAll').addEventListener('click', (e) => { e.preventDefault(); showTab('inbox'); });
+  $('#readAll').addEventListener('click', (e) => { e.preventDefault(); state.notifs.forEach(n => n.read = true); renderNotifs(); });
   $('#signOut').addEventListener('click', showLogin);
   $('#pwToggle').addEventListener('click', () => {
     const p = $('#password'), show = p.type === 'password';
@@ -401,7 +578,8 @@ input{font-family:inherit}
 
   // ---- deep links for review / tests ----
   if (q.get('error') === 'restricted') { $('#loginErrorText').textContent = RESTRICTED; $('#loginError').classList.remove('hide'); }
-  if (q.get('screen') === 'app') showApp(q.get('tab') || 'today'); else showLogin();
+  if (q.get('screen') === 'job') { showApp('jobs'); openJob(q.get('id') || 'j1'); }
+  else if (q.get('screen') === 'app') showApp(q.get('tab') || 'today'); else showLogin();
 })();
 </script>
 </body>
