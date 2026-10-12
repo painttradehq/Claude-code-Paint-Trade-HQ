@@ -49,6 +49,18 @@ Full separation: the crew app becomes its own Expo project talking to the same A
 
 This gives Josh what he asked for: two different front doors, and a crew app that installs and later ships as its own app, while the two keep sharing one backend, one design system and one codebase.
 
+## 2a. Josh's pick (12 Oct)
+
+"Instead of separating devices, two links: `painttradehq.co/crew` and `painttradehq.co/admin`, each with its own login page." That is option **B′**, with these implementation details:
+
+- `/crew` is the crew **front door**: it opens the crew sign-in (`/employee/login`) and is what the QR poster, the "Add to Home Screen" instructions and the cross-link on the admin sign-in use. The crew screens **stay at `/employee/*`** for now (notification `link` fields, contract emails and printed QR codes already point there); renaming them to `/crew/*` with redirects is a later, quiet round.
+- `/admin` is the admin front door (exists). `/` opens the admin sign-in for signed-out visitors on **every device**; signed-in users go to their own dashboard by role, as today.
+- **Remove the device rule**: `utils/device.ts` `isPhone()` and its uses in `app/_layout.tsx`, `index.tsx`, the crew `(tabs)/_layout.tsx`, `employee/login.tsx`, `employee/onboarding.tsx`. The admin app stays reachable on a phone.
+- Two manifests: the existing admin one gets `scope: /admin/` (its `id`/`start_url` are already `/admin/dashboard`); a crew one (`name "Paint Trade HQ Crew"`, `short_name "PTHQ Crew"`, `start_url /employee/dashboard`, `scope /employee/`, the tile icon, theme `#4B3E86`) linked from the crew pages only.
+- Cross-links: admin sign-in footer "Crew member? Sign in at /crew"; crew sign-in footer "Business owner? Sign in at /admin".
+- Domain: paths are identical on `.com.au` (primary) and `.co` (forwarded with the path kept) and on the preview link today. No DNS work for this step; option B's hostnames can still come later if wanted.
+- Owner: crew-chat follow-up before C3 (it owns the entry files since C1); the admin chat checks `index.tsx`, the admin sign-in page footer and the admin manifest change before "send".
+
 ## 3. What Josh decides (one line each)
 
 1. Which option: B′ now then B (recommended), B straight away, or C.
