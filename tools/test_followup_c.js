@@ -23,6 +23,22 @@ require('fs').mkdirSync(OUT, { recursive: true });
       ok(`crew sign-in: no horizontal scroll [${tag}]`, await noH());
       await p.screenshot({ path: OUT + `fc-crew-${tag}.png` });
     }
+    if (!mobile) {
+      // wide window: the crew pages are one centred column, max 430 px, tab bar and sheet inside it
+      await p.goto(CREW + '?screen=app&tab=today&state=in'); await p.waitForTimeout(300);
+      const col = await box('#phone'), bar = await box(T('crew-tabbar'));
+      ok(`crew shell at ${W}: one centred column 430 px wide, full height, tab bar inside the column [${tag}]`, Math.round(col.width) === 430 && Math.abs(col.x - (W - 430) / 2) < 1 && Math.round(col.height) === H && bar.x >= col.x && bar.x + bar.width <= col.x + col.width && bar.width >= 426 && Math.abs(bar.y + bar.height - H) < 1);
+      ok(`crew shell at ${W}: hairline edges on the column, page background outside [${tag}]`, await p.evaluate(() => { const cs = getComputedStyle(document.getElementById('phone')); return cs.borderLeftWidth === '1px' && cs.borderRightWidth === '1px' && getComputedStyle(document.body).backgroundColor === 'rgb(250, 249, 246)'; }));
+      await p.screenshot({ path: OUT + `fc-crew-wide-${tag}.png` });
+      await p.goto(CREW + '?screen=app&tab=today&picker=1'); await p.waitForTimeout(300);
+      const sh = await box('.sheet');
+      ok(`crew shell at ${W}: the job sheet stays inside the column [${tag}]`, sh.x >= col.x - 1 && sh.x + sh.width <= col.x + col.width + 1);
+      await p.screenshot({ path: OUT + `fc-crew-wide-sheet-${tag}.png` });
+      await p.goto(CREW); await p.waitForTimeout(300);
+      const lg = await box(T('crew-login'));
+      ok(`crew sign-in at ${W}: the same column, cross-link present [${tag}]`, lg.width >= 426 && lg.width <= 430 && Math.abs(lg.x - (W - 430) / 2) < 2 && await p.locator(T('crew-login-admin-link')).isVisible());
+      await p.screenshot({ path: OUT + `fc-crew-login-wide-${tag}.png` });
+    }
     await p.goto(ADMIN); await p.waitForTimeout(300);
     const a = p.locator(T('login-crew-link'));
     ok(`admin sign-in: "Crew member? Sign in at /crew" under "New here?", links to /crew [${tag}]`, await a.isVisible() && (await a.getAttribute('href')) === '/crew' && (await txt(T('login-crew-link'))) === 'Sign in at /crew' && (await box(T('login-crew-link'))).y > (await box(T('login-signup-link'))).y);
