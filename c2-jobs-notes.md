@@ -46,6 +46,14 @@ Prototype: the **Jobs** tab and the **job screen** in `c1-crew-shell.html` (`?sc
 | Show | Approved variations as "added work" | `variations[]` with `status == "approved"`: `title, description, area, timeframe, responded_at, lines [{name, qty, unit}]` | Extra blocks inside "The work", titled with the variation's `title`, pill "Added work · approved {d Mon}" |
 | Never | Prices, margins, discounts, payment status, invoices, the client's own phone, client email and message history, CRM notes, the quote's paper wording, Lucy | — | The route builds its payload from an **allow-list** (§5); no money field, no `client_snapshot.phone`, no `notes` of a customer or contact is ever read |
 
+## 3b. What C1 left behind that C2 builds on (from the Round C1 report, 12 Oct)
+
+- The tab bar, the Inbox badge store, `Row` / `Sect` / `List` / `TabHeader` and the time formatters are named exports of `app/employee/(tabs)/_layout.tsx`. C2 may import from there, or move them to a new crew-only folder `components/crew/` (nothing else lives there) and re-point the C1 imports.
+- Device rule (follow-up A): `utils/device.ts` `isPhone()`; the `(tabs)` layout, `login.tsx` and `onboarding.tsx` render nothing and redirect a non-phone to `/admin/login`. The new Jobs tab inherits the guard from the group; the job screen `project/[id].tsx` sits outside the group and **gets the same guard** (first line of the component, as in `login.tsx`).
+- Test crew: `crew.alpha.one@ts-pthq.example` (TS_ Alpha). `crew.alpha.two` is the red-flagged one.
+- The old `dashboard.tsx` is gone; Today is `app/employee/(tabs)/dashboard.tsx`. The Today's-job card goes under the time-clock card there.
+- `notifications.tsx` is a redirect to `/employee/inbox`.
+
 ## 4. What a crew member sees after C2
 
 **Jobs** tab: segmented **Now · Coming up · Done**. Rows: job name, status pill ("In progress" green; "On hold" amber; "Starts {Mon 20 Oct}" purple; "Done {Fri 3 Oct}" grey), "{client} · {address}", "{dates} · {n} on the crew". Buckets: Now = `in_progress` or `on_hold`; Coming up = `quoted`; Done = `done` or `invoiced` (both carry the pill "Done {completed_date}"; nothing on the crew side says invoiced). Sort: Now and Coming up by `start_date` ascending (no date last); Done by `completed_date` descending. Empty lines: "No job on the go right now." / "Nothing booked yet." / "No finished jobs yet."
