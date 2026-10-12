@@ -52,6 +52,7 @@ input{font-family:inherit}
 .login-foot{text-align:center;font-size:13.5px;color:var(--text-muted);margin-top:20px;line-height:1.5}
 .login-links{display:flex;justify-content:center;gap:18px;margin-top:10px;font-size:13px}
 .login-links a{color:var(--text-secondary);text-decoration:underline;text-underline-offset:3px}
+.login-foot-link{color:var(--accent);font-weight:600;text-decoration:underline;text-underline-offset:3px;display:inline-block;padding:4px 0}
 
 /* ============ APP SHELL ============ */
 #s-app{flex:1;display:flex;flex-direction:column;min-height:0}
@@ -139,6 +140,18 @@ input{font-family:inherit}
 .sess-sub{font-size:13.5px;color:var(--text-secondary);margin-top:2px}
 .sess-h{font-size:15px;font-weight:600;white-space:nowrap}
 .pill.off{background:var(--warning-bg);color:var(--warning)}
+.wknav{display:flex;align-items:center;justify-content:space-between;margin:4px 0 12px}
+.wknav button{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.wknav button[disabled]{color:var(--border-strong);cursor:default}
+.wknav button svg{width:22px;height:22px}
+.wknav-t{text-align:center}
+.wknav-t b{font-size:15.5px;font-weight:600;display:block}
+.wknav-t span{font-size:12.5px;color:var(--text-muted)}
+.wk{padding:16px 18px}
+.wk-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.wk-big{font-family:var(--font-display);font-weight:600;font-size:34px;letter-spacing:-.01em;line-height:1.1}
+.wk-line{font-size:14.5px;color:var(--text-secondary);margin-top:6px}
+.day .ot{color:var(--warning)}
 
 /* today's job card */
 .jobcard{padding:16px 18px;width:100%;text-align:left}
@@ -268,6 +281,7 @@ input{font-family:inherit}
       <button class="btn btn-primary" type="submit" data-testid="employee-login-submit">Sign in</button>
     </form>
     <div class="login-foot">Joining a crew? Scan the QR code your employer gave you.</div>
+    <div class="login-foot" style="margin-top:8px">Business owner? <a href="/admin" data-testid="crew-login-admin-link" class="login-foot-link">Sign in at /admin</a></div>
     <div class="login-links"><a href="#" data-testid="crew-login-privacy">Privacy</a><a href="#" data-testid="crew-login-terms">Terms</a></div>
   </section>
 
@@ -405,7 +419,18 @@ input{font-family:inherit}
       <button class="back" id="hoursBack" data-testid="crew-hours-back"><svg><use href="#i-back"/></svg>Me</button>
       <div class="job-title">My hours</div>
     </div>
-    <div class="body nobar" id="hoursBody"></div>
+    <div class="body nobar" id="hoursScroll">
+      <div class="wknav">
+        <button id="wkPrev" data-testid="crew-hours-prev" aria-label="Previous week"><svg><use href="#i-back"/></svg></button>
+        <div class="wknav-t"><b id="wkTitle"></b><span id="wkSub"></span></div>
+        <button id="wkNext" data-testid="crew-hours-next" aria-label="Next week"><svg><use href="#i-chev"/></svg></button>
+      </div>
+      <div class="card wk" data-testid="crew-hours-week">
+        <div class="wk-top"><div class="wk-big" id="wkBig"></div><span class="pill hide" id="wkPill" data-testid="crew-hours-week-pill"></span></div>
+        <div class="wk-line" id="wkLine"></div>
+      </div>
+      <div id="hoursBody"></div>
+    </div>
   </section>
 
   <!-- ================= JOB PICKER (sheet over Today) ================= -->
@@ -467,16 +492,26 @@ input{font-family:inherit}
     ],
   };
   const icon = { contract: 'i-sign', equipment: 'i-gear', report: 'i-chat', star: 'i-coach' };
-  // GET /timeclock/my-records rows, newest first, grouped by the day of sign-in (device time)
-  const sessions = q.get('hours') === '0' ? [] : [
-    { day: 'Fri 10 Oct', in: '7:02 am', out: '2:52 pm', job: 'Wattle St repaint', h: '7 h 50 m' },
-    { day: 'Thu 9 Oct',  in: '6:58 am', out: '3:13 pm', job: 'Wattle St repaint', h: '8 h 15 m', off: '820 m off site' },
-    { day: 'Wed 8 Oct',  in: '7:00 am', out: '2:30 pm', job: 'Wattle St repaint', h: '7 h 30 m', note: 'Edited by Josh · Forgot to sign out, left at 2:30' },
-    { day: 'Tue 7 Oct',  in: '7:00 am', out: '6:00 pm', job: 'General',          h: '9 h 00 m', note: 'Closed automatically at 6:00 pm' },
-    { day: 'Fri 3 Oct',  in: '6:55 am', out: '1:00 pm', job: 'Patel exterior',   h: '6 h 05 m' },
-    { day: 'Thu 2 Oct',  in: '7:10 am', out: '11:40 am', job: 'Patel exterior',  h: '4 h 30 m' },
-    { day: 'Thu 2 Oct',  in: '12:30 pm', out: '3:45 pm', job: 'Patel exterior',  h: '3 h 15 m', note: 'Added by Josh · Phone was flat' },
+  // GET /timeclock/my-hours?week_start= — the viewer's own week, the owner's timesheet maths (rounded to 15 min here, overtime after 8 h/day · 38 h/week)
+  const weeks = [
+    { start: 'Mon 6 Oct', end: 'Sun 12 Oct', current: true, locked: false, approved: false, total: '43 h 00 m', regular: '34 h 15 m', overtime: '8 h 45 m',
+      days: q.get('hours') === '0' ? [] : [
+        { day: 'Mon 6 Oct', hours: '8 h 30 m', ot: '0 h 30 m', sessions: [{ in: '7:00 am', out: '3:30 pm', job: 'Wattle St repaint', h: '8 h 30 m' }] },
+        { day: 'Tue 7 Oct', hours: '11 h 00 m', ot: '3 h 00 m', sessions: [{ in: '7:00 am', out: '6:00 pm', job: 'General', h: '11 h 00 m', note: 'Closed automatically at 6:00 pm' }] },
+        { day: 'Wed 8 Oct', hours: '7 h 30 m', ot: '', sessions: [{ in: '7:00 am', out: '2:30 pm', job: 'Wattle St repaint', h: '7 h 30 m', note: 'Edited by Josh · Forgot to sign out, left at 2:30' }] },
+        { day: 'Thu 9 Oct', hours: '8 h 15 m', ot: '0 h 15 m', sessions: [{ in: '6:58 am', out: '3:13 pm', job: 'Wattle St repaint', h: '8 h 15 m', off: '820 m off site' }] },
+        { day: 'Fri 10 Oct', hours: '7 h 45 m', ot: '5 h 00 m', sessions: [{ in: '7:02 am', out: '2:52 pm', job: 'Wattle St repaint', h: '7 h 45 m' }] },
+      ] },
+    { start: 'Mon 29 Sep', end: 'Sun 5 Oct', current: false, locked: true, approved: true, total: '37 h 45 m', regular: '37 h 45 m', overtime: '0 h 00 m',
+      days: [
+        { day: 'Mon 29 Sep', hours: '8 h 00 m', ot: '', sessions: [{ in: '7:00 am', out: '3:00 pm', job: 'Patel exterior', h: '8 h 00 m' }] },
+        { day: 'Tue 30 Sep', hours: '8 h 00 m', ot: '', sessions: [{ in: '7:00 am', out: '3:00 pm', job: 'Patel exterior', h: '8 h 00 m' }] },
+        { day: 'Wed 1 Oct', hours: '8 h 00 m', ot: '', sessions: [{ in: '7:00 am', out: '3:00 pm', job: 'Patel exterior', h: '8 h 00 m' }] },
+        { day: 'Thu 2 Oct', hours: '7 h 45 m', ot: '', sessions: [{ in: '7:10 am', out: '11:40 am', job: 'Patel exterior', h: '4 h 30 m' }, { in: '12:30 pm', out: '3:45 pm', job: 'Patel exterior', h: '3 h 15 m', note: 'Added by Josh · Phone was flat' }] },
+        { day: 'Fri 3 Oct', hours: '6 h 00 m', ot: '', sessions: [{ in: '6:55 am', out: '1:00 pm', job: 'Patel exterior', h: '6 h 00 m' }] },
+      ] },
   ];
+  let wk = q.get('week') === 'prev' ? 1 : 0;
   const currentJob = () => jobs.find(x => x.status === 'now') || null;
   const subOf = (j) => [j.client !== j.name ? j.client : null, j.addr !== j.name ? j.addr : null].filter(Boolean).join(' · ');
 
@@ -562,21 +597,27 @@ input{font-family:inherit}
   }
   // ---- My hours ----
   function renderHours(){
-    const open = state.signedIn ? [{ day: 'Today', in: state.since, out: null, job: jobName(state.job), h: state.elapsed, off: state.offsite ? '820 m off site' : null }] : [];
-    const all = open.concat(sessions);
-    if (!all.length) { $('#hoursBody').innerHTML = '<div class="card"><div class="empty" data-testid="crew-hours-empty">No sign-ins yet. Your hours show here after your first sign-in.</div></div>'; return; }
-    const days = []; all.forEach(x => { let d = days.find(y => y.day === x.day); if (!d) { d = { day: x.day, rows: [] }; days.push(d); } d.rows.push(x); });
-    const sum = (rows) => { const m = rows.reduce((t, r) => { const mm = /(\d+) h (\d+) m/.exec(r.h); return t + (mm ? +mm[1] * 60 + +mm[2] : 0); }, 0); return Math.floor(m / 60) + ' h ' + String(m % 60).padStart(2, '0') + ' m'; };
+    const w = weeks[wk];
+    $('#wkTitle').textContent = 'Week of ' + w.start;
+    $('#wkSub').textContent = w.current ? 'This week · ' + w.start + ' – ' + w.end : w.start + ' – ' + w.end;
+    $('#wkPrev').disabled = wk >= weeks.length - 1; $('#wkNext').disabled = wk === 0;
+    const open = (w.current && state.signedIn) ? [{ day: 'Sat 11 Oct', hours: '0 h 00 m', ot: '', sessions: [{ in: state.since, out: null, job: jobName(state.job), h: '', off: state.offsite ? '820 m off site' : null }] }] : [];
+    const days = w.days.concat(open);
+    $('#wkBig').textContent = w.total;
+    $('#wkLine').textContent = w.regular + ' regular · ' + w.overtime + ' overtime';
+    const pill = $('#wkPill'); pill.classList.toggle('hide', !(w.locked || w.approved));
+    pill.textContent = w.locked ? 'Locked' : 'Approved'; pill.className = 'pill ' + (w.locked ? 'done' : 'live') + (w.locked || w.approved ? '' : ' hide');
+    if (!days.length) { $('#hoursBody').innerHTML = '<div class="card" style="margin-top:14px"><div class="empty" data-testid="crew-hours-empty">' + (w.current ? 'No hours this week yet.' : 'No hours this week.') + '</div></div>'; return; }
     $('#hoursBody').innerHTML = days.map(d => `
-      <div class="day" data-testid="crew-hours-day"><b>${esc(d.day)}</b><span>${sum(d.rows)}</span></div>
-      <div class="list">${d.rows.map(r => `
+      <div class="day" data-testid="crew-hours-day"><b>${esc(d.day)}</b><span>${esc(d.hours)}${d.ot ? ` · <span class="ot">${esc(d.ot)} overtime</span>` : ''}</span></div>
+      <div class="list">${d.sessions.map(r => `
         <div class="sess" data-testid="crew-hours-session">
           <div class="sess-t"><div class="sess-time">${esc(r.in)} – ${r.out ? esc(r.out) : 'now'}${r.out ? '' : '<span class="pill live">On the clock</span>'}${r.off ? `<span class="pill off">${esc(r.off)}</span>` : ''}</div><div class="sess-sub">${esc(r.job)}${r.note ? ' · ' + esc(r.note) : ''}</div></div>
-          <div class="sess-h">${esc(r.h)}</div>
+          ${r.h ? `<div class="sess-h">${esc(r.h)}</div>` : ''}
         </div>`).join('')}</div>`).join('') +
-      '<div class="foot-note" data-testid="crew-hours-foot">Hours here are as you clocked them. Pay comes from your employer\'s timesheet.</div>';
+      '<div class="foot-note" data-testid="crew-hours-foot">Rounded to the nearest 15 min. Overtime after 8 h a day or 38 h a week.</div>';
   }
-  function openHours(){ renderHours(); $('#s-app').classList.add('hide'); $('#s-hours').classList.remove('hide'); $('#hoursBody').scrollTop = 0; document.body.dataset.lastGo = '/employee/time-clock'; }
+  function openHours(){ renderHours(); $('#s-app').classList.add('hide'); $('#s-hours').classList.remove('hide'); $('#hoursScroll').scrollTop = 0; document.body.dataset.lastGo = '/employee/time-clock'; }
   function closeHours(){ $('#s-hours').classList.add('hide'); $('#s-app').classList.remove('hide'); showTab('me'); }
   function renderTodayJob(){
     const j = currentJob() || jobs.find(x => x.status === 'up');
@@ -673,6 +714,8 @@ input{font-family:inherit}
   $('#pickerCancel').addEventListener('click', closePicker);
   $('#picker').addEventListener('click', (e) => { if (e.target === $('#picker')) closePicker(); });
   $('#hoursBack').addEventListener('click', closeHours);
+  $('#wkPrev').addEventListener('click', () => { if (wk < weeks.length - 1) { wk++; renderHours(); $('#hoursScroll').scrollTop = 0; } });
+  $('#wkNext').addEventListener('click', () => { if (wk > 0) { wk--; renderHours(); $('#hoursScroll').scrollTop = 0; } });
   $('#jobBack').addEventListener('click', closeJob);
   $('#jobReport').addEventListener('click', () => { document.body.dataset.lastGo = '/employee/daily-report'; });
   $('#jobDirections').addEventListener('click', () => { document.body.dataset.lastGo = 'maps'; });

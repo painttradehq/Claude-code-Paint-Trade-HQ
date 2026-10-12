@@ -117,14 +117,20 @@ async function run(b, W, H, tag) {
   ok('Me: profile row, My documents (1), My equipment, My hours, Team events, Sign out' + full, await p.locator(T('crew-me-profile')).isVisible() && (await txt(T('crew-me-contracts') + ' .count')) === '1' && (await p.locator('#meList .row').count()) === 3 && (await p.locator('#teamList .row').count()) === 1 && await p.locator(T('crew-me-signout')).isVisible());
   // ---- C3: My hours ----
   await p.click(T('crew-me-hours')); await p.waitForTimeout(150);
-  ok('My hours opens as a stack screen: back to Me, days newest first, the open session on top' + full, await p.locator(T('crew-hours')).isVisible() && !(await p.locator(T('crew-tabbar')).isVisible()) && (await go()) === '/employee/time-clock' && (await p.locator(T('crew-hours-day')).count()) === 7 && (await txt(T('crew-hours-day'))) === 'Today0 h 00 m' && /On the clock/.test(await txt(T('crew-hours-session'))) && /7:04 am – now/.test(await txt(T('crew-hours-session'))));
-  ok('My hours: a day sums its sessions; off-site, edited, auto-closed and added sessions say so' + full, await p.evaluate(() => {
+  ok('My hours opens as a stack screen: back to Me, this pay week, the week card with regular and overtime, no pill' + full, await p.locator(T('crew-hours')).isVisible() && !(await p.locator(T('crew-tabbar')).isVisible()) && (await go()) === '/employee/time-clock' && (await txt('#wkTitle')) === 'Week of Mon 6 Oct' && (await txt('#wkSub')) === 'This week · Mon 6 Oct – Sun 12 Oct' && (await txt('#wkBig')) === '43 h 00 m' && (await txt('#wkLine')) === '34 h 15 m regular · 8 h 45 m overtime' && !(await p.locator(T('crew-hours-week-pill')).isVisible()) && await p.locator(T('crew-hours-next')).isDisabled() && !(await p.locator(T('crew-hours-prev')).isDisabled()));
+  ok('My hours: days in week order, the open session last with On the clock and no hours; day overtime; session marks' + full, await p.evaluate(() => {
     const days = [...document.querySelectorAll('[data-testid="crew-hours-day"]')].map(d => d.textContent);
     const sess = [...document.querySelectorAll('[data-testid="crew-hours-session"]')].map(d => d.textContent);
-    return days[1] === 'Fri 10 Oct7 h 50 m' && days[6] === 'Thu 2 Oct7 h 45 m' && sess.some(t => /820 m off site/.test(t)) && sess.some(t => /Edited by Josh · Forgot to sign out, left at 2:30/.test(t)) && sess.some(t => /Closed automatically at 6:00 pm/.test(t)) && sess.some(t => /Added by Josh · Phone was flat/.test(t)) && sess.filter(t => /Patel exterior/.test(t)).length === 3;
-  }) && (await txt(T('crew-hours-foot'))) === "Hours here are as you clocked them. Pay comes from your employer's timesheet.");
-  ok('My hours: back row ≥ 44 px, no horizontal scroll' + full, (await box(T('crew-hours-back'))).height >= 44 && await noHScroll());
+    const last = document.querySelectorAll('[data-testid="crew-hours-session"]'); const lastS = last[last.length - 1];
+    return days.length === 6 && days[0] === 'Mon 6 Oct8 h 30 m · 0 h 30 m overtime' && days[1] === 'Tue 7 Oct11 h 00 m · 3 h 00 m overtime' && days[2] === 'Wed 8 Oct7 h 30 m' && days[4] === 'Fri 10 Oct7 h 45 m · 5 h 00 m overtime' && days[5] === 'Sat 11 Oct0 h 00 m' && /7:04 am – now/.test(lastS.textContent) && /On the clock/.test(lastS.textContent) && !lastS.querySelector('.sess-h') && sess.some(t => /820 m off site/.test(t)) && sess.some(t => /Edited by Josh · Forgot to sign out, left at 2:30/.test(t)) && sess.some(t => /Closed automatically at 6:00 pm/.test(t));
+  }) && (await txt(T('crew-hours-foot'))) === 'Rounded to the nearest 15 min. Overtime after 8 h a day or 38 h a week.');
+  ok('My hours: back row and week arrows ≥ 44 px, no horizontal scroll' + full, (await box(T('crew-hours-back'))).height >= 44 && (await box(T('crew-hours-prev'))).height >= 44 && await noHScroll());
   await p.screenshot({ path: OUT + `c3-hours-${tag}.png` });
+  await p.click(T('crew-hours-prev')); await p.waitForTimeout(120);
+  ok('previous week: Locked pill, its totals, five days, the admin-added session, no earlier week' + full, (await txt('#wkTitle')) === 'Week of Mon 29 Sep' && (await txt(T('crew-hours-week-pill'))) === 'Locked' && (await txt('#wkBig')) === '37 h 45 m' && (await txt('#wkLine')) === '37 h 45 m regular · 0 h 00 m overtime' && (await p.locator(T('crew-hours-day')).count()) === 5 && (await p.locator(T('crew-hours-session')).count()) === 6 && /Added by Josh · Phone was flat/.test(await p.locator(T('crew-hours-session')).nth(4).textContent()) && await p.locator(T('crew-hours-prev')).isDisabled() && !(await p.locator(T('crew-hours-next')).isDisabled()));
+  await p.screenshot({ path: OUT + `c3-hours-prev-${tag}.png` });
+  await p.click(T('crew-hours-next')); await p.waitForTimeout(120);
+  ok('next returns to this week' + full, (await txt('#wkTitle')) === 'Week of Mon 6 Oct' && (await p.locator(T('crew-hours-day')).count()) === 6);
   await p.click(T('crew-hours-back')); await p.waitForTimeout(120);
   ok('back returns to Me' + full, await p.locator(T('crew-pane-me')).isVisible() && await p.locator(T('crew-tabbar')).isVisible());
   ok('every existing crew screen is reachable from the shell' + full, await p.evaluate(() => {
@@ -162,9 +168,11 @@ async function run(b, W, H, tag) {
   await p.waitForTimeout(700);
   ok('…signed in to General' + full, /Signed in/.test(await txt('#clockStatus')) && /Job: General/.test(await txt(T('crew-today-job'))));
   await p.goto(U + '?screen=hours&hours=0'); await p.waitForTimeout(300);
-  ok('My hours empty state' + full, await p.locator(T('crew-hours-empty')).isVisible() && /No sign-ins yet/.test(await txt(T('crew-hours-empty'))));
+  ok('My hours empty week: "No hours this week yet."' + full, await p.locator(T('crew-hours-empty')).isVisible() && (await txt(T('crew-hours-empty'))) === 'No hours this week yet.');
   await p.goto(U + '?screen=hours'); await p.waitForTimeout(300);
-  ok('My hours while signed out: no Today group, six days' + full, (await p.locator(T('crew-hours-day')).count()) === 6 && (await txt(T('crew-hours-day'))) === 'Fri 10 Oct7 h 50 m');
+  ok('My hours while signed out: five days, no open session' + full, (await p.locator(T('crew-hours-day')).count()) === 5 && !/On the clock/.test(await txt('#hoursBody')));
+  await p.goto(U + '?screen=hours&week=prev'); await p.waitForTimeout(300);
+  ok('deep link: the locked previous week' + full, (await txt(T('crew-hours-week-pill'))) === 'Locked' && (await txt('#wkSub')) === 'Mon 29 Sep – Sun 5 Oct');
   await p.goto(U + '?screen=app&tab=today&picker=1'); await p.waitForTimeout(300);
   ok('deep link: the job sheet open over Today' + full, await p.locator(T('crew-clock-picker')).isVisible() && (await p.locator(T('crew-clock-pick')).count()) === 3);
 

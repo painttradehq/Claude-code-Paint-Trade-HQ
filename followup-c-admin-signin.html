@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Admin sign-in — Paint Trade HQ (follow-up C footer)</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter:wght@400..700&display=swap');
+:root{--accent:#4B3E86;--accent-ink:#34295E;--accent-bg:#F1EEFA;--bg:#FAF9F6;--surface:#FFFFFF;--border:#E7E3DA;--border-strong:#D8D3C7;--text-primary:#1E1C1A;--text-secondary:#6B675F;--text-muted:#9B968A;--danger:#C6382E;--danger-bg:#FBEAEA;
+  --font-display:'Fraunces',Georgia,serif;--font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text-primary);font-family:var(--font-body);font-size:14px;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+.row{display:flex;min-height:100dvh}
+/* hero (≥ 620 px, as the app's HERO_BREAKPOINT) */
+.hero{display:none;flex:55;background:var(--accent-ink);padding:56px;justify-content:center;flex-direction:column;position:relative;overflow:hidden;color:#fff}
+@media (min-width:620px){.hero{display:flex}}
+@media (max-width:899px){.hero{padding:40px 32px}}
+.hero-brand{display:flex;align-items:center;gap:12px;margin-bottom:48px;font-family:var(--font-display);font-weight:600;font-size:17px}
+.mark{width:38px;height:38px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center}
+.mark svg{width:24px;height:24px}
+.hero h1{font-family:var(--font-display);font-weight:600;font-size:42px;line-height:48px;max-width:560px;margin:0 0 18px}
+@media (max-width:899px){.hero h1{font-size:30px;line-height:36px}}
+.hero p{color:rgba(255,255,255,.72);font-size:15px;line-height:24px;max-width:480px;margin:0 0 34px}
+.feat{display:flex;align-items:center;gap:12px;margin-bottom:14px;font-size:13.5px;font-weight:500;color:rgba(255,255,255,.88)}
+.feat i{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);display:inline-block;flex-shrink:0}
+.hero-foot{position:absolute;left:56px;bottom:28px;color:rgba(255,255,255,.4);font-size:12px}
+@media (max-width:899px){.hero-foot{left:32px}}
+.hero-foot a{color:rgba(255,255,255,.7)}
+/* panel + card */
+.panel{flex:45;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:32px;min-width:0}
+.card{width:100%;max-width:380px;border-radius:16px;padding:34px;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.7);box-shadow:0 10px 34px rgba(30,28,26,.12);backdrop-filter:blur(12px)}
+.card h2{font-family:var(--font-display);font-weight:600;font-size:23px;margin:0 0 4px}
+.sub{font-size:13px;color:var(--text-muted);margin-bottom:24px}
+.field{margin-bottom:16px}
+label{display:block;font-size:11px;letter-spacing:.4px;text-transform:uppercase;font-weight:600;color:var(--text-secondary);margin-bottom:7px}
+input{width:100%;height:44px;border-radius:9px;padding:0 13px;font:inherit;font-size:14px;color:var(--text-primary);background:rgba(255,255,255,.65);border:1px solid rgba(120,112,150,.35);outline:none}
+.forgot{display:block;text-align:right;color:var(--accent);font-weight:500;font-size:12.5px;padding:4px 0;margin-bottom:12px;text-decoration:none}
+.btn{width:100%;height:44px;border-radius:9px;background:var(--accent);color:#fff;font-weight:600;font-size:14px;margin:6px 0 12px}
+.line{text-align:center;font-size:13.5px;color:var(--text-secondary);margin-top:2px}
+.line a{color:var(--accent);font-weight:600;text-decoration:underline;text-underline-offset:2px;display:inline-block;padding:4px 0}
+.line + .line{margin-top:6px}
+</style>
+</head>
+<body>
+<div class="row">
+  <section class="hero" data-testid="admin-login-hero">
+    <div class="hero-brand"><span class="mark"><svg viewBox="8 2 56 62"><path fill="#fff" fill-rule="evenodd" transform="skewX(-9) translate(7 0)" d="M21 14h21a13 13 0 0 1 0 26H31v20H21z M31 22h10a5 5 0 0 1 0 10H31z"/></svg></span>Paint Trade HQ</div>
+    <h1>Run your painting business from one place.</h1>
+    <p>Built around the real flow of a paint job — quote, schedule, track, invoice and more.</p>
+    <div class="feat"><i></i>Fast, accurate estimating</div>
+    <div class="feat"><i></i>Invoicing and a live project tracker that follow the quote</div>
+    <div class="feat"><i></i>CRM and employee management</div>
+    <div class="feat"><i></i>Product library and calendar</div>
+    <div class="feat"><i></i>An AI assistant powered by Anthropic</div>
+    <div class="hero-foot">Software that works the way painters do · Built in Australia · <a href="#">Terms of Service</a> · <a href="#">Privacy Policy</a></div>
+  </section>
+  <section class="panel">
+    <form class="card" data-testid="admin-login-card" onsubmit="return false">
+      <h2>Welcome back</h2>
+      <div class="sub">Sign in to your admin dashboard</div>
+      <div class="field"><label for="u">Username</label><input id="u" data-testid="login-username" placeholder="Enter your username" autocapitalize="none"></div>
+      <div class="field"><label for="p">Password</label><input id="p" data-testid="login-password" type="password" placeholder="Enter your password"></div>
+      <a class="forgot" href="#" data-testid="login-forgot">Forgot password?</a>
+      <button class="btn" type="submit" data-testid="login-submit">Login</button>
+      <div class="line">New here? <a href="#" data-testid="login-signup-link">Create an account</a></div>
+      <div class="line">Crew member? <a href="/crew" data-testid="login-crew-link">Sign in at /crew</a></div>
+    </form>
+  </section>
+</div>
+</body>
+</html>
