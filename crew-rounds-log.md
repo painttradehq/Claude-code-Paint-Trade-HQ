@@ -69,3 +69,9 @@ Rules: `crew-app-handover.md` §1. Rounds are C1, C2, …; one round at a time a
 ## 12 Oct — Emergent's plan check answered
 
 - Before starting, Emergent asked (a) B then C2 as written or (b) B only. Answered **1a** (housekeeping inside the round, §1 rule 1). Also seen in the job: a stray "ignor" from Josh at 09:31 that Emergent acknowledged with no change.
+
+## 12 Oct — follow-up B done · Round C2 done
+
+- **Follow-up B done**: root `app/_layout.tsx` guard (web, non-phone on any `/employee/*` → `window.location.replace('/admin/login')`, since the router has no mounted Stack at that point); testing agent iteration 134; appended to the C1 report.
+- **Round C2 done** (`roundC2-report.md` here; `memory/reports/roundC2-jobs-report.md` on the job): testing agent iteration 135 with an iPhone UA at 390 then 360 on TS_ Alpha; all six verify items agent-tested except three parts without test data or outside the round's files (the builder drawer's own switch flip — checked by DB flip + backend test; the colour merge with real colour rows — route-level only; adding a photo — Round 14 component unchanged); `test_c2_crew_jobs.py` 9/9; suite 760/116/0; TS_ torn down, `project_a` crew restored; What's new draft `cb156cb6` "Your crew can see their jobs". Backend: the two routes in `routes/projects.py` + the test file, nothing else. 12 §8 silences, all reasonable; one worth a follow-up: `ProjectPhotos` draws its own "Photos · N" header and admin-flavoured sub-copy inside the crew job page (shared component untouched), so the label repeats.
+- Next: Josh reviews C2 on his phone; C3 (time clock) prototype.
