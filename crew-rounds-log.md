@@ -65,3 +65,7 @@ Rules: `crew-app-handover.md` §1. Rounds are C1, C2, …; one round at a time a
 
 - Josh: "send". Pre-send review (three readers: C1 consistency, implementability, ambiguity) found 13 blocking items in the C2 notes, all fixed as v3 before sending: the detail payload's `notes` key clashed with the isolation test that forbids `notes` → renamed `access_notes`; `products_map` is an async `products_map(db, admin_id)`, written out; the job-screen guard is the root-layout guard from follow-up B (no per-screen guard); `crew.alpha.two` = `crew_a_new`, seeded unflagged; test 7 flips `crew_visible` via PUT or a DB write (the PATCH allow-list is not to be touched); test 8 approves a variation via `POST /public/variation/{token}/respond`; the test-id list added; Today's-job fallback to the first Coming-up job made explicit; null-date pills and lines ("Starts soon", "Done", "Start to be confirmed"); Done sort fallback; `materials.where`; crew list includes the viewer; `location` and `photos_link` dropped from the payload; shared pieces imported from `(tabs)/_layout.tsx`, not moved. Minor refs fixed. Message `roundC2-message.md` (29k chars) sent; queued `db6anc9qhfus73fsrcdg`.
 - Next: "Round C1 follow-up B done", then "Round C2 done". Nothing else goes meanwhile.
+
+## 12 Oct — Emergent's plan check answered
+
+- Before starting, Emergent asked (a) B then C2 as written or (b) B only. Answered **1a** (housekeeping inside the round, §1 rule 1). Also seen in the job: a stray "ignor" from Josh at 09:31 that Emergent acknowledged with no change.
