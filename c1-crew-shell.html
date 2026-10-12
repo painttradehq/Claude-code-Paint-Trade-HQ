@@ -107,10 +107,38 @@ input{font-family:inherit}
 .clock.in .clock-status{color:var(--success)}
 .clock-big{font-family:var(--font-display);font-weight:600;font-size:34px;letter-spacing:-.01em;margin:10px 0 2px;line-height:1.1}
 .clock-line{font-size:14.5px;color:var(--text-secondary)}
-.clock-job{display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 12px;background:var(--surface-sunken);border-radius:var(--radius-sm);font-size:14.5px}
+.clock-job{display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 12px;background:var(--surface-sunken);border-radius:var(--radius-sm);font-size:14.5px;width:100%;text-align:left;min-height:44px}
 .clock-job svg{width:18px;height:18px;color:var(--text-secondary);flex-shrink:0}
+.clock-job span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .clock-job b{font-weight:600}
+.clock-job .chev{width:18px;height:18px}
+.clock-off{margin-top:12px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--warning-bg);color:#5A2E0B;font-size:14px;line-height:1.4}
+.clock-off b{display:block;color:var(--warning);font-size:15px;margin-bottom:2px}
+.clock-nogps{margin-top:12px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--surface-sunken);color:var(--text-secondary);font-size:14px;line-height:1.4}
+.clock-legal{font-size:12.5px;color:var(--text-muted);text-align:center;margin-top:10px;line-height:1.4}
 .clock .btn{margin-top:14px}
+.btn[disabled]{opacity:.7;cursor:default}
+
+/* job picker sheet */
+.scrim{position:absolute;inset:0;background:rgba(30,28,26,.45);display:flex;flex-direction:column;justify-content:flex-end;z-index:20}
+.sheet{background:var(--surface);border-radius:20px 20px 0 0;padding:8px 16px calc(env(safe-area-inset-bottom) + 16px);max-height:80%;display:flex;flex-direction:column}
+.sheet-grab{width:36px;height:4px;border-radius:2px;background:var(--border-strong);margin:4px auto 10px;flex-shrink:0}
+.sheet h2{font-family:var(--font-display);font-weight:600;font-size:22px;margin:0 0 10px;letter-spacing:-.01em}
+.sheet .list{overflow-y:auto}
+.sheet .btn{margin-top:12px;flex-shrink:0}
+
+/* my hours */
+.day{display:flex;justify-content:space-between;align-items:baseline;margin:18px 4px 8px}
+.day:first-child{margin-top:8px}
+.day b{font-size:14px;font-weight:600}
+.day span{font-size:13.5px;color:var(--text-secondary)}
+.sess{display:flex;align-items:center;gap:12px;padding:13px 16px;min-height:60px;border-top:1px solid var(--border)}
+.sess:first-child{border-top:0}
+.sess-t{flex:1;min-width:0}
+.sess-time{font-size:15.5px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sess-sub{font-size:13.5px;color:var(--text-secondary);margin-top:2px}
+.sess-h{font-size:15px;font-weight:600;white-space:nowrap}
+.pill.off{background:var(--warning-bg);color:var(--warning)}
 
 /* today's job card */
 .jobcard{padding:16px 18px;width:100%;text-align:left}
@@ -258,8 +286,11 @@ input{font-family:inherit}
           <div class="clock-top"><span class="dot"></span><span class="clock-status" id="clockStatus">Signed out</span></div>
           <div class="clock-big" id="clockBig">Not on the clock</div>
           <div class="clock-line" id="clockLine">Last signed out 5:12 pm yesterday</div>
-          <div class="clock-job" id="clockJob" data-testid="crew-today-job"><svg><use href="#i-pin"/></svg><span id="clockJobText">No job yet</span></div>
+          <button class="clock-job hide" id="clockJob" data-testid="crew-today-job"><svg><use href="#i-pin"/></svg><span id="clockJobText"></span><svg class="chev hide" id="clockJobChev"><use href="#i-chev"/></svg></button>
+          <div class="clock-off hide" id="clockOff" data-testid="crew-clock-offsite"></div>
+          <div class="clock-nogps hide" id="clockNoGps" data-testid="crew-clock-nogps"></div>
           <button class="btn btn-primary" id="clockBtn" data-testid="crew-today-clock-btn">Sign in</button>
+          <div class="clock-legal" data-testid="crew-clock-legal">Your location is recorded only when you sign in or out, never in between.</div>
         </div>
 
         <div class="sect">Today's job</div>
@@ -367,6 +398,25 @@ input{font-family:inherit}
     </div>
     <div class="body nobar" id="jobBody"></div>
   </section>
+
+  <!-- ================= MY HOURS (stack screen, no tab bar) ================= -->
+  <section id="s-hours" class="hide" data-testid="crew-hours" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <button class="back" id="hoursBack" data-testid="crew-hours-back"><svg><use href="#i-back"/></svg>Me</button>
+      <div class="job-title">My hours</div>
+    </div>
+    <div class="body nobar" id="hoursBody"></div>
+  </section>
+
+  <!-- ================= JOB PICKER (sheet over Today) ================= -->
+  <div class="scrim hide" id="picker" data-testid="crew-clock-picker">
+    <div class="sheet" role="dialog" aria-label="Which job?">
+      <div class="sheet-grab"></div>
+      <h2>Which job?</h2>
+      <div class="list" id="pickerList"></div>
+      <button class="btn btn-outline" id="pickerCancel" data-testid="crew-clock-picker-cancel">Cancel</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -401,7 +451,12 @@ input{font-family:inherit}
   if (q.get('jobs') === '0') jobs.length = 0;
   const state = {
     signedIn: q.get('state') === 'in',
+    job: q.get('job') || (jobs.find(x => x.status === 'now') || {}).id || 'general', // the job of the open session
     since: '7:04 am', elapsed: '2 h 35 m',
+    offsite: q.get('offsite') === '1',   // the open session was flagged by the backend geofence
+    nogps: q.get('nogps') === '1',       // the open session was recorded without a position
+    last: 'Last signed out 5:12 pm yesterday · 7 h 50 m · Wattle St repaint',
+    busy: false,
     seg: 'now',
     notifs: q.get('notifs') === '0' ? [] : [
       { id: 'n1', kind: 'contract',  title: 'Your contract is ready to sign',   sub: 'Employment agreement · from Josh',      when: '8:12 am',   link: '/employee/contracts', read: false },
@@ -412,6 +467,16 @@ input{font-family:inherit}
     ],
   };
   const icon = { contract: 'i-sign', equipment: 'i-gear', report: 'i-chat', star: 'i-coach' };
+  // GET /timeclock/my-records rows, newest first, grouped by the day of sign-in (device time)
+  const sessions = q.get('hours') === '0' ? [] : [
+    { day: 'Fri 10 Oct', in: '7:02 am', out: '2:52 pm', job: 'Wattle St repaint', h: '7 h 50 m' },
+    { day: 'Thu 9 Oct',  in: '6:58 am', out: '3:13 pm', job: 'Wattle St repaint', h: '8 h 15 m', off: '820 m off site' },
+    { day: 'Wed 8 Oct',  in: '7:00 am', out: '2:30 pm', job: 'Wattle St repaint', h: '7 h 30 m', note: 'Edited by Josh · Forgot to sign out, left at 2:30' },
+    { day: 'Tue 7 Oct',  in: '7:00 am', out: '6:00 pm', job: 'General',          h: '9 h 00 m', note: 'Closed automatically at 6:00 pm' },
+    { day: 'Fri 3 Oct',  in: '6:55 am', out: '1:00 pm', job: 'Patel exterior',   h: '6 h 05 m' },
+    { day: 'Thu 2 Oct',  in: '7:10 am', out: '11:40 am', job: 'Patel exterior',  h: '4 h 30 m' },
+    { day: 'Thu 2 Oct',  in: '12:30 pm', out: '3:45 pm', job: 'Patel exterior',  h: '3 h 15 m', note: 'Added by Josh · Phone was flat' },
+  ];
   const currentJob = () => jobs.find(x => x.status === 'now') || null;
   const subOf = (j) => [j.client !== j.name ? j.client : null, j.addr !== j.name ? j.addr : null].filter(Boolean).join(' · ');
 
@@ -432,7 +497,7 @@ input{font-family:inherit}
     meList: [
       { tid: 'crew-me-contracts', go: '/employee/contracts',         icon: 'i-sign',  title: 'My documents', sub: 'Contracts and policies to read and sign', count: 1 },
       { tid: 'crew-me-equipment', go: '/employee/request-equipment', icon: 'i-gear',  title: 'My equipment', sub: 'Your gear, and requests for more' },
-      { tid: 'crew-me-hours',     go: '/employee/time-clock',        icon: 'i-clock', title: 'My hours',     sub: 'Your last 10 sign-ins' },
+      { tid: 'crew-me-hours',     go: '/employee/time-clock',        icon: 'i-clock', title: 'My hours',     sub: 'Your sign-ins and hours, by day' },
     ],
     teamList: [
       { tid: 'crew-me-events', go: '/employee/team-events', icon: 'i-cal', title: 'Team events', sub: 'Upcoming events and your RSVPs' },
@@ -441,25 +506,78 @@ input{font-family:inherit}
   Object.keys(hubs).forEach(id => { $('#' + id).innerHTML = hubs[id].map(rowHtml).join(''); });
 
   // ---- render: Today ----
+  const jobName = (id) => id === 'general' ? 'General' : ((jobs.find(x => x.id === id) || {}).name || 'General');
   function renderClock(){
-    const c = $('#clock'); const j = currentJob();
+    const c = $('#clock'); const btn = $('#clockBtn');
     c.classList.toggle('in', state.signedIn);
+    $('#clockJob').classList.toggle('hide', !state.signedIn);
+    $('#clockOff').classList.toggle('hide', !(state.signedIn && state.offsite));
+    $('#clockNoGps').classList.toggle('hide', !(state.signedIn && state.nogps));
     if (state.signedIn) {
       $('#clockStatus').textContent = 'Signed in';
       $('#clockBig').textContent = state.elapsed + ' on the clock';
       $('#clockLine').textContent = 'Since ' + state.since + ' today';
-      $('#clockJobText').innerHTML = 'Job: <b>' + esc(j ? j.name : 'General') + '</b>';
-      $('#clockBtn').textContent = 'Sign out';
-      $('#clockBtn').className = 'btn btn-outline';
+      $('#clockJobText').innerHTML = 'Job: <b>' + esc(jobName(state.job)) + '</b>';
+      $('#clockJobChev').classList.toggle('hide', state.job === 'general');
+      $('#clockJob').dataset.job = state.job === 'general' ? '' : state.job;
+      // off-site: the backend's warning (sign-in) or status.session.outside_radius; wording as the owner's Timesheets
+      $('#clockOff').innerHTML = '<b>820 m off site</b>Further than 100 m from the job. Your hours still count; your employer sees the distance.';
+      $('#clockNoGps').textContent = 'No location from this phone. Your employer sees this sign-in without a position.';
+      btn.textContent = state.busy ? 'Getting your location…' : 'Sign out';
+      btn.className = 'btn btn-outline';
     } else {
       $('#clockStatus').textContent = 'Signed out';
       $('#clockBig').textContent = 'Not on the clock';
-      $('#clockLine').textContent = 'Last signed out 5:12 pm yesterday';
-      $('#clockJobText').textContent = 'No job yet';
-      $('#clockBtn').textContent = 'Sign in';
-      $('#clockBtn').className = 'btn btn-primary';
+      $('#clockLine').textContent = state.last;
+      btn.textContent = state.busy ? 'Getting your location…' : 'Sign in';
+      btn.className = 'btn btn-primary';
     }
+    btn.disabled = state.busy;
   }
+  // ---- the job picker (sheet) ----
+  const pickable = () => jobs.filter(j => j.status === 'now').concat(jobs.filter(j => j.status === 'up'));
+  function openPicker(){
+    const rows = pickable();
+    if (!rows.length) { startSignIn('general'); return; }   // nothing to pick: General, no sheet
+    $('#pickerList').innerHTML = rows.map(j => `
+      <button class="jobrow" data-testid="crew-clock-pick" data-pick="${j.id}">
+        <div class="jobrow-top"><span class="jobrow-name">${esc(j.name)}</span><span class="pill ${j.status === 'now' ? 'live' : 'soon'}">${esc(j.pill)}</span></div>
+        <div class="jobrow-addr">${esc(subOf(j))}</div>
+      </button>`).join('') + `
+      <button class="jobrow" data-testid="crew-clock-pick" data-pick="general">
+        <div class="jobrow-top"><span class="jobrow-name">General</span></div>
+        <div class="jobrow-addr">Not on a job today</div>
+      </button>`;
+    $('#picker').classList.remove('hide');
+  }
+  function closePicker(){ $('#picker').classList.add('hide'); }
+  // sign-in: job picked → one location fix (never 0,0) → POST /timeclock/sign-in → card from the response
+  function startSignIn(jobId){
+    closePicker(); state.busy = true; renderClock();
+    setTimeout(() => { state.busy = false; state.signedIn = true; state.job = jobId; state.since = '7:04 am'; state.elapsed = '0 h 00 m'; renderClock(); renderHours(); }, 500);
+  }
+  function startSignOut(){
+    state.busy = true; renderClock();
+    setTimeout(() => { state.busy = false; state.signedIn = false; state.last = 'Last signed out 9:39 am today · ' + state.elapsed + ' · ' + jobName(state.job); state.offsite = false; state.nogps = false; renderClock(); renderHours(); }, 500);
+  }
+  // ---- My hours ----
+  function renderHours(){
+    const open = state.signedIn ? [{ day: 'Today', in: state.since, out: null, job: jobName(state.job), h: state.elapsed, off: state.offsite ? '820 m off site' : null }] : [];
+    const all = open.concat(sessions);
+    if (!all.length) { $('#hoursBody').innerHTML = '<div class="card"><div class="empty" data-testid="crew-hours-empty">No sign-ins yet. Your hours show here after your first sign-in.</div></div>'; return; }
+    const days = []; all.forEach(x => { let d = days.find(y => y.day === x.day); if (!d) { d = { day: x.day, rows: [] }; days.push(d); } d.rows.push(x); });
+    const sum = (rows) => { const m = rows.reduce((t, r) => { const mm = /(\d+) h (\d+) m/.exec(r.h); return t + (mm ? +mm[1] * 60 + +mm[2] : 0); }, 0); return Math.floor(m / 60) + ' h ' + String(m % 60).padStart(2, '0') + ' m'; };
+    $('#hoursBody').innerHTML = days.map(d => `
+      <div class="day" data-testid="crew-hours-day"><b>${esc(d.day)}</b><span>${sum(d.rows)}</span></div>
+      <div class="list">${d.rows.map(r => `
+        <div class="sess" data-testid="crew-hours-session">
+          <div class="sess-t"><div class="sess-time">${esc(r.in)} – ${r.out ? esc(r.out) : 'now'}${r.out ? '' : '<span class="pill live">On the clock</span>'}${r.off ? `<span class="pill off">${esc(r.off)}</span>` : ''}</div><div class="sess-sub">${esc(r.job)}${r.note ? ' · ' + esc(r.note) : ''}</div></div>
+          <div class="sess-h">${esc(r.h)}</div>
+        </div>`).join('')}</div>`).join('') +
+      '<div class="foot-note" data-testid="crew-hours-foot">Hours here are as you clocked them. Pay comes from your employer\'s timesheet.</div>';
+  }
+  function openHours(){ renderHours(); $('#s-app').classList.add('hide'); $('#s-hours').classList.remove('hide'); $('#hoursBody').scrollTop = 0; document.body.dataset.lastGo = '/employee/time-clock'; }
+  function closeHours(){ $('#s-hours').classList.add('hide'); $('#s-app').classList.remove('hide'); showTab('me'); }
   function renderTodayJob(){
     const j = currentJob() || jobs.find(x => x.status === 'up');
     const el = $('#todayJob');
@@ -541,25 +659,31 @@ input{font-family:inherit}
     document.querySelectorAll('.pane.on .body').forEach(b => b.scrollTop = 0);
   }
   function showApp(tab){
-    $('#s-login').classList.add('hide'); $('#s-job').classList.add('hide'); $('#s-app').classList.remove('hide');
+    $('#s-login').classList.add('hide'); $('#s-job').classList.add('hide'); $('#s-hours').classList.add('hide'); $('#s-app').classList.remove('hide');
     renderClock(); renderTodayJob(); renderNotifs(); renderJobs(); showTab(tab || 'today');
   }
   function showLogin(){
-    $('#s-app').classList.add('hide'); $('#s-job').classList.add('hide'); $('#s-login').classList.remove('hide');
+    $('#s-app').classList.add('hide'); $('#s-job').classList.add('hide'); $('#s-hours').classList.add('hide'); $('#s-login').classList.remove('hide');
     $('#password').value = '';
   }
 
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab)));
   document.querySelectorAll('#jobsSeg button').forEach(b => b.addEventListener('click', () => { state.seg = b.dataset.seg; renderJobs(); }));
-  $('#clockBtn').addEventListener('click', () => { state.signedIn = !state.signedIn; renderClock(); });
+  $('#clockBtn').addEventListener('click', () => { if (state.busy) return; state.signedIn ? startSignOut() : openPicker(); });
+  $('#pickerCancel').addEventListener('click', closePicker);
+  $('#picker').addEventListener('click', (e) => { if (e.target === $('#picker')) closePicker(); });
+  $('#hoursBack').addEventListener('click', closeHours);
   $('#jobBack').addEventListener('click', closeJob);
   $('#jobReport').addEventListener('click', () => { document.body.dataset.lastGo = '/employee/daily-report'; });
   $('#jobDirections').addEventListener('click', () => { document.body.dataset.lastGo = 'maps'; });
   document.body.addEventListener('click', (e) => {
+    const pk = e.target.closest('[data-pick]');
+    if (pk) { startSignIn(pk.dataset.pick); return; }
     const jb = e.target.closest('[data-job]');
-    if (jb) { openJob(jb.dataset.job); return; }
+    if (jb) { if (jb.dataset.job) openJob(jb.dataset.job); return; }
     const row = e.target.closest('[data-go]');
     if (!row) return;
+    if (row.dataset.testid === 'crew-me-hours') { openHours(); return; }
     if (row.dataset.id) { const n = state.notifs.find(x => x.id === row.dataset.id); if (n) { n.read = true; renderNotifs(); } }
     document.body.dataset.lastGo = row.dataset.go; // prototype: records the route the real app would push
   });
@@ -582,7 +706,9 @@ input{font-family:inherit}
   // ---- deep links for review / tests ----
   if (q.get('error') === 'restricted') { $('#loginErrorText').textContent = RESTRICTED; $('#loginError').classList.remove('hide'); }
   if (q.get('screen') === 'job') { showApp('jobs'); openJob(q.get('id') || 'j1'); }
-  else if (q.get('screen') === 'app') showApp(q.get('tab') || 'today'); else showLogin();
+  else if (q.get('screen') === 'hours') { showApp('me'); openHours(); }
+  else if (q.get('screen') === 'app') { showApp(q.get('tab') || 'today'); if (q.get('picker') === '1') openPicker(); }
+  else showLogin();
 })();
 </script>
 </body>

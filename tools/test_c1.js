@@ -1,4 +1,4 @@
-// C1 crew shell prototype (v2: Today · Jobs · Inbox · Learn · Me + Job screen) — Playwright checks at 390 × 844 then 360 × 800.
+// Crew shell prototype (C1 shell + C2 Jobs + C3 time clock) — Playwright checks at 390 × 844 then 360 × 800.
 // Run: NODE_PATH=$(npm root -g) node tools/test_c1.js [shots-dir]
 const { chromium } = require('playwright');
 const T = (id) => `[data-testid="${id}"]`;
@@ -40,14 +40,32 @@ async function run(b, W, H, tag) {
   const tb = await box(T('crew-tabbar'));
   ok('tab bar on the bottom edge: Today · Jobs · Inbox · Learn · Me' + full, Math.abs(tb.y + tb.height - H) < 1 && (await p.evaluate(() => [...document.querySelectorAll('.tab')].map(t => t.textContent.replace(/\d/g, '').trim()).join(' '))) === 'Today Jobs Inbox Learn Me');
   ok('tabs are at least 44 px tall' + full, (await box(T('crew-tab-jobs'))).height >= 44);
-  ok('clock card: signed out state' + full, /Signed out/.test(await txt('#clockStatus')) && /Not on the clock/.test(await txt('#clockBig')) && (await txt(T('crew-today-job'))) === 'No job yet' && (await txt(T('crew-today-clock-btn'))) === 'Sign in');
+  ok('clock card: signed out = last sign-out with its hours, no job row, Sign in, the one location line' + full, /Signed out/.test(await txt('#clockStatus')) && /Not on the clock/.test(await txt('#clockBig')) && (await txt('#clockLine')) === 'Last signed out 5:12 pm yesterday · 7 h 50 m · Wattle St repaint' && !(await p.locator(T('crew-today-job')).isVisible()) && (await txt(T('crew-today-clock-btn'))) === 'Sign in' && (await txt(T('crew-clock-legal'))) === 'Your location is recorded only when you sign in or out, never in between.' && !(await p.locator(T('crew-clock-offsite')).isVisible()) && !(await p.locator(T('crew-clock-nogps')).isVisible()));
   ok("today's job card: the in-progress job, address, who else is on it, access line" + full, /Nguyen/.test(await txt(T('crew-today-jobcard'))) && /14 Wattle St, Brunswick/.test(await txt(T('crew-today-jobcard'))) && /Tom with you/.test(await txt(T('crew-today-jobcard'))) && /Key under the pot plant/.test(await txt(T('crew-today-jobcard'))));
   ok('unread: heading count, three rows on Today, badge on the Inbox tab' + full, (await txt('#notifHead')) === 'Unread · 3' && (await p.locator('#notifList ' + T('crew-notif-row')).count()) === 3 && (await txt(T('crew-tab-inbox-badge'))) === '3');
   ok('notification rows are at least 44 px tall' + full, (await box(T('crew-notif-row'))).height >= 44);
   await p.screenshot({ path: OUT + `c1-today-out-${tag}.png` });
+  // ---- C3: sign in = pick the job → one location fix → signed in ----
   await p.click(T('crew-today-clock-btn')); await p.waitForTimeout(150);
-  ok('clock card: signed in shows time on the clock, since, the job, Sign out' + full, /Signed in/.test(await txt('#clockStatus')) && /2 h 35 m on the clock/.test(await txt('#clockBig')) && /Since 7:04 am today/.test(await txt('#clockLine')) && /Job: Wattle St repaint/.test(await txt(T('crew-today-job'))) && (await txt(T('crew-today-clock-btn'))) === 'Sign out');
+  ok('Sign in opens the job sheet: Now job, Coming-up job, General; Cancel' + full, await p.locator(T('crew-clock-picker')).isVisible() && (await p.locator(T('crew-clock-pick')).count()) === 3 && /Wattle St repaint/.test(await txt(T('crew-clock-pick'))) && /In progress/.test(await txt(T('crew-clock-pick'))) && (await p.locator(T('crew-clock-pick')).nth(1).textContent()).includes('Starts Mon 20 Oct') && /General/.test(await p.locator(T('crew-clock-pick')).nth(2).textContent()) && await p.locator(T('crew-clock-picker-cancel')).isVisible());
+  ok('job sheet rows are at least 44 px tall' + full, (await box(T('crew-clock-pick'))).height >= 44);
+  await p.screenshot({ path: OUT + `c3-picker-${tag}.png` });
+  await p.click(T('crew-clock-picker-cancel')); await p.waitForTimeout(100);
+  ok('Cancel closes the sheet and nothing is signed in' + full, !(await p.locator(T('crew-clock-picker')).isVisible()) && /Signed out/.test(await txt('#clockStatus')));
+  await p.click(T('crew-today-clock-btn')); await p.waitForTimeout(100); await p.locator(T('crew-clock-pick')).first().click(); await p.waitForTimeout(80);
+  ok('picking a job closes the sheet; the button reads "Getting your location…" and is disabled' + full, !(await p.locator(T('crew-clock-picker')).isVisible()) && (await txt(T('crew-today-clock-btn'))) === 'Getting your location…' && await p.locator(T('crew-today-clock-btn')).isDisabled());
+  await p.waitForTimeout(700);
+  ok('clock card: signed in = time on the clock, since, the job row, Sign out' + full, /Signed in/.test(await txt('#clockStatus')) && /0 h 00 m on the clock/.test(await txt('#clockBig')) && /Since 7:04 am today/.test(await txt('#clockLine')) && /Job: Wattle St repaint/.test(await txt(T('crew-today-job'))) && (await txt(T('crew-today-clock-btn'))) === 'Sign out' && !(await p.locator(T('crew-clock-offsite')).isVisible()));
   await p.screenshot({ path: OUT + `c1-today-in-${tag}.png` });
+  await p.click(T('crew-today-job')); await p.waitForTimeout(150);
+  ok('the job row on the clock card opens the job screen' + full, await p.locator(T('crew-job')).isVisible() && (await txt('#jobTitle')) === 'Wattle St repaint');
+  await p.click(T('crew-job-back')); await p.waitForTimeout(100); await p.click(T('crew-tab-today')); await p.waitForTimeout(100);
+  await p.click(T('crew-today-clock-btn')); await p.waitForTimeout(80);
+  ok('Sign out: no sheet, "Getting your location…" first' + full, !(await p.locator(T('crew-clock-picker')).isVisible()) && (await txt(T('crew-today-clock-btn'))) === 'Getting your location…');
+  await p.waitForTimeout(700);
+  ok('after sign-out the card shows the sign-out time, the hours and the job' + full, /Signed out/.test(await txt('#clockStatus')) && (await txt('#clockLine')) === 'Last signed out 9:39 am today · 0 h 00 m · Wattle St repaint' && (await txt(T('crew-today-clock-btn'))) === 'Sign in');
+  await p.screenshot({ path: OUT + `c3-today-after-out-${tag}.png` });
+  await p.click(T('crew-today-clock-btn')); await p.waitForTimeout(100); await p.locator(T('crew-clock-pick')).first().click(); await p.waitForTimeout(700);
   await p.locator('#notifList ' + T('crew-notif-row')).first().click(); await p.waitForTimeout(150);
   ok('tapping a notification marks it read and records its link' + full, (await txt('#notifHead')) === 'Unread · 2' && (await txt(T('crew-tab-inbox-badge'))) === '2' && (await go()) === '/employee/contracts');
   ok('Daily report row opens the existing screen' + full, (await p.locator(T('crew-today-report')).getAttribute('data-go')) === '/employee/daily-report');
@@ -97,6 +115,18 @@ async function run(b, W, H, tag) {
   await p.screenshot({ path: OUT + `c1-learn-${tag}.png` });
   await p.click(T('crew-tab-me')); await p.waitForTimeout(120);
   ok('Me: profile row, My documents (1), My equipment, My hours, Team events, Sign out' + full, await p.locator(T('crew-me-profile')).isVisible() && (await txt(T('crew-me-contracts') + ' .count')) === '1' && (await p.locator('#meList .row').count()) === 3 && (await p.locator('#teamList .row').count()) === 1 && await p.locator(T('crew-me-signout')).isVisible());
+  // ---- C3: My hours ----
+  await p.click(T('crew-me-hours')); await p.waitForTimeout(150);
+  ok('My hours opens as a stack screen: back to Me, days newest first, the open session on top' + full, await p.locator(T('crew-hours')).isVisible() && !(await p.locator(T('crew-tabbar')).isVisible()) && (await go()) === '/employee/time-clock' && (await p.locator(T('crew-hours-day')).count()) === 7 && (await txt(T('crew-hours-day'))) === 'Today0 h 00 m' && /On the clock/.test(await txt(T('crew-hours-session'))) && /7:04 am – now/.test(await txt(T('crew-hours-session'))));
+  ok('My hours: a day sums its sessions; off-site, edited, auto-closed and added sessions say so' + full, await p.evaluate(() => {
+    const days = [...document.querySelectorAll('[data-testid="crew-hours-day"]')].map(d => d.textContent);
+    const sess = [...document.querySelectorAll('[data-testid="crew-hours-session"]')].map(d => d.textContent);
+    return days[1] === 'Fri 10 Oct7 h 50 m' && days[6] === 'Thu 2 Oct7 h 45 m' && sess.some(t => /820 m off site/.test(t)) && sess.some(t => /Edited by Josh · Forgot to sign out, left at 2:30/.test(t)) && sess.some(t => /Closed automatically at 6:00 pm/.test(t)) && sess.some(t => /Added by Josh · Phone was flat/.test(t)) && sess.filter(t => /Patel exterior/.test(t)).length === 3;
+  }) && (await txt(T('crew-hours-foot'))) === "Hours here are as you clocked them. Pay comes from your employer's timesheet.");
+  ok('My hours: back row ≥ 44 px, no horizontal scroll' + full, (await box(T('crew-hours-back'))).height >= 44 && await noHScroll());
+  await p.screenshot({ path: OUT + `c3-hours-${tag}.png` });
+  await p.click(T('crew-hours-back')); await p.waitForTimeout(120);
+  ok('back returns to Me' + full, await p.locator(T('crew-pane-me')).isVisible() && await p.locator(T('crew-tabbar')).isVisible());
   ok('every existing crew screen is reachable from the shell' + full, await p.evaluate(() => {
     const want = ['/employee/time-clock','/employee/daily-report','/employee/team-events','/employee/training','/employee/contracts','/employee/request-equipment','/employee/notifications','/employee/profile','/employee/feedback','/employee/my-validations','/employee/strike-system'];
     const have = new Set([...document.querySelectorAll('[data-go]')].map(e => e.dataset.go));
@@ -115,6 +145,28 @@ async function run(b, W, H, tag) {
   ok('deep link: a coming-up job with no files shows "No files shared for this job." and no reports' + full, (await txt('#jobTitle')) === '2/88 Lygon St, Carlton' && (await txt('#jobAddr')) === 'Harrow Strata' && /No files shared for this job/.test(await txt(T('crew-job-files'))) && /No reports for this job yet/.test(await txt(T('crew-job-reports'))));
   await p.goto(U + '?error=restricted'); await p.waitForTimeout(200);
   ok('deep link: restricted error on login' + full, await p.locator(T('employee-login-error')).isVisible());
+  // ---- C3 deep links ----
+  await p.goto(U + '?screen=app&tab=today&state=in&offsite=1'); await p.waitForTimeout(300);
+  ok('off-site sign-in: the card says how far and that the hours still count, in the owner\'s words' + full, await p.locator(T('crew-clock-offsite')).isVisible() && (await txt(T('crew-clock-offsite'))) === '820 m off siteFurther than 100 m from the job. Your hours still count; your employer sees the distance.' && /2 h 35 m on the clock/.test(await txt('#clockBig')));
+  ok('off-site card still fits: content ends above the tab bar' + full, await p.evaluate(() => { const c = document.getElementById('clock').getBoundingClientRect(); const tab = document.querySelector('.tabbar').getBoundingClientRect().top; return c.bottom <= tab; }));
+  await p.screenshot({ path: OUT + `c3-today-offsite-${tag}.png` });
+  await p.goto(U + '?screen=app&tab=today&state=in&nogps=1'); await p.waitForTimeout(300);
+  ok('sign-in without a position: one plain line, no off-site block' + full, await p.locator(T('crew-clock-nogps')).isVisible() && (await txt(T('crew-clock-nogps'))) === 'No location from this phone. Your employer sees this sign-in without a position.' && !(await p.locator(T('crew-clock-offsite')).isVisible()));
+  await p.screenshot({ path: OUT + `c3-today-nogps-${tag}.png` });
+  await p.goto(U + '?screen=app&tab=today&state=in&job=general'); await p.waitForTimeout(300);
+  ok('signed in to General: the job row says General and opens nothing' + full, /Job: General/.test(await txt(T('crew-today-job'))) && !(await p.locator('#clockJobChev').isVisible()));
+  await p.click(T('crew-today-job')); await p.waitForTimeout(100);
+  ok('…tapping it stays on Today' + full, await p.locator(T('crew-pane-today')).isVisible() && !(await p.locator(T('crew-job')).isVisible()));
+  await p.goto(U + '?screen=app&tab=today&jobs=0'); await p.waitForTimeout(300); await p.click(T('crew-today-clock-btn')); await p.waitForTimeout(80);
+  ok('no jobs at all: Sign in skips the sheet and signs in to General' + full, !(await p.locator(T('crew-clock-picker')).isVisible()) && (await txt(T('crew-today-clock-btn'))) === 'Getting your location…');
+  await p.waitForTimeout(700);
+  ok('…signed in to General' + full, /Signed in/.test(await txt('#clockStatus')) && /Job: General/.test(await txt(T('crew-today-job'))));
+  await p.goto(U + '?screen=hours&hours=0'); await p.waitForTimeout(300);
+  ok('My hours empty state' + full, await p.locator(T('crew-hours-empty')).isVisible() && /No sign-ins yet/.test(await txt(T('crew-hours-empty'))));
+  await p.goto(U + '?screen=hours'); await p.waitForTimeout(300);
+  ok('My hours while signed out: no Today group, six days' + full, (await p.locator(T('crew-hours-day')).count()) === 6 && (await txt(T('crew-hours-day'))) === 'Fri 10 Oct7 h 50 m');
+  await p.goto(U + '?screen=app&tab=today&picker=1'); await p.waitForTimeout(300);
+  ok('deep link: the job sheet open over Today' + full, await p.locator(T('crew-clock-picker')).isVisible() && (await p.locator(T('crew-clock-pick')).count()) === 3);
 
   ok('no page errors' + full, errs.length === 0); if (errs.length) console.log(errs);
   await p.close();
