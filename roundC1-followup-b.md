@@ -1,7 +1,7 @@
 Round C1 — §8 answers and follow-up B (guard every crew screen)
 
 §8 answers (keep as built unless stated):
-1. Keep. C2 may move the shared pieces to a new crew-only folder `components/crew/` and re-point the imports; nothing else goes in that folder.
+1. Keep. C2 imports the shared pieces from `app/employee/(tabs)/_layout.tsx` and does not move them.
 2–7. Keep.
 8. Expected; the job on sign-in arrives in C3.
 9. Not this round. Noted for C3 (time clock), which touches `routes/timeclock.py` anyway: compare naive and aware timestamps safely in `/timeclock/status`.
