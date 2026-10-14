@@ -68,7 +68,7 @@ async function run(b, W, H, tag) {
   await p.click(T('crew-today-clock-btn')); await p.waitForTimeout(100); await p.locator(T('crew-clock-pick')).first().click(); await p.waitForTimeout(700);
   await p.locator('#notifList ' + T('crew-notif-row')).first().click(); await p.waitForTimeout(150);
   ok('tapping a notification marks it read and records its link' + full, (await txt('#notifHead')) === 'Unread · 2' && (await txt(T('crew-tab-inbox-badge'))) === '2' && (await go()) === '/employee/contracts');
-  ok('Daily report row opens the existing screen' + full, (await p.locator(T('crew-today-report')).getAttribute('data-go')) === '/employee/daily-report');
+  ok('Daily report row leads to the reports list' + full, (await p.locator(T('crew-today-report')).getAttribute('data-go')) === '/employee/daily-report');
   ok('Today: content ends above the tab bar' + full, await p.evaluate(() => { const b = document.querySelector('#t-today .body'); b.scrollTop = b.scrollHeight; const last = b.lastElementChild.getBoundingClientRect().bottom; const tab = document.querySelector('.tabbar').getBoundingClientRect().top; return last <= tab; }));
   ok('no horizontal scroll' + full, await noHScroll());
 
@@ -95,7 +95,10 @@ async function run(b, W, H, tag) {
   await p.screenshot({ path: OUT + `c1-job-${tag}.png` });
   await p.evaluate(() => { document.getElementById('jobBody').scrollTop = 99999; }); await p.waitForTimeout(100);
   await p.screenshot({ path: OUT + `c1-job-bottom-${tag}.png` });
-  await p.click(T('crew-job-report-btn')); ok('job: Daily report button opens the report screen' + full, (await go()) === '/employee/daily-report');
+  await p.click(T('crew-job-report-btn')); await p.waitForTimeout(150);
+  ok('job: Daily report button opens the report form with this job preselected' + full, await p.locator(T('crew-report-form')).isVisible() && (await go()) === '/employee/daily-report/new?project=j1' && /Wattle St repaint/.test(await txt(T('crew-report-job'))));
+  await p.click(T('crew-report-form-back')); await p.waitForTimeout(100); await p.click(T('crew-reports-back')); await p.waitForTimeout(100);
+  await p.click(T('crew-tab-jobs')); await p.waitForTimeout(100); await p.locator(T('crew-job-row')).first().click(); await p.waitForTimeout(150);
   await p.click(T('crew-job-back')); await p.waitForTimeout(150);
   ok('back returns to the Jobs tab' + full, await p.locator(T('crew-pane-jobs')).isVisible() && await p.locator(T('crew-tabbar')).isVisible());
   await p.click(T('crew-tab-today')); await p.waitForTimeout(100); await p.click(T('crew-today-jobcard')); await p.waitForTimeout(150);
@@ -139,6 +142,48 @@ async function run(b, W, H, tag) {
     return want.every(w => have.has(w));
   }));
   await p.screenshot({ path: OUT + `c1-me-${tag}.png` });
+  // ---- C4: daily reports ----
+  await p.click(T('crew-tab-today')); await p.waitForTimeout(100); await p.click(T('crew-today-report')); await p.waitForTimeout(150);
+  ok('Daily reports list: Write button on top, past reports by day with hours, first line, Replied and Flagged pills' + full, await p.locator(T('crew-reports')).isVisible() && !(await p.locator(T('crew-tabbar')).isVisible()) && await p.locator(T('crew-reports-new')).isVisible() && (await p.locator(T('crew-report-row')).count()) === 3 && /7.5 h · Living room walls second coat/.test(await txt(T('crew-report-row'))) && (await p.locator(T('crew-report-row') + ' .pill.live').count()) === 2 && (await p.locator(T('crew-report-row') + ' .pill.flag').count()) === 1 && (await go()) === '/employee/daily-report');
+  await p.screenshot({ path: OUT + `c4-reports-${tag}.png` });
+  await p.locator(T('crew-report-row')).nth(1).click(); await p.waitForTimeout(150);
+  ok('a flagged report: problem card, what was done, photos, checklist with a No, notes, "No reply yet.", edited in the meta, no Edit after 24 h' + full, await p.locator(T('crew-report')).isVisible() && (await txt('#rpTitle')) === 'Wattle St repaint' && (await txt('#rpMeta')) === 'Thu 9 Oct · sent 3:20 pm · 8 h · edited' && /Ran out of ceiling white/.test(await txt(T('crew-report-problem-view'))) && (await p.locator(T('crew-report-done-view') + ' li').count()) === 2 && (await p.locator(T('crew-report-photos-view') + ' .ph').count()) === 2 && (await p.locator(T('crew-report-checklist-view') + ' .v.no').count()) === 1 && await p.locator(T('crew-report-noreply')).isVisible() && !(await p.locator(T('crew-report-edit')).isVisible()));
+  await p.screenshot({ path: OUT + `c4-report-flagged-${tag}.png` });
+  await p.click(T('crew-report-back')); await p.waitForTimeout(100); await p.locator(T('crew-report-row')).first().click(); await p.waitForTimeout(150);
+  ok("a replied report: the owner's reply by first name with the date, no problem card" + full, /^Josh · Fri 10 Oct, 6:10 pm\s*Great finish on the hallway, thanks\.$/.test(await txt(T('crew-report-reply'))) && (await p.locator(T('crew-report-problem-view')).count()) === 0);
+  await p.screenshot({ path: OUT + `c4-report-${tag}.png` });
+  await p.click(T('crew-report-back')); await p.waitForTimeout(100); await p.click(T('crew-reports-new')); await p.waitForTimeout(150);
+  ok("the form: Today's report, the clock's job preselected, hours prefilled, one done line, no photos with the nudge, problems No, weather chips, the job's crew preselected, checklist unanswered" + full, await p.locator(T('crew-report-form')).isVisible() && (await txt('#rfTitle')) === "Today's report" && /Wattle St repaint/.test(await txt(T('crew-report-job'))) && (await p.locator(T('crew-report-hours')).inputValue()) === '2.6' && (await p.locator(T('crew-report-done') + ' input').count()) === 1 && /Add at least 2 photos/.test(await txt(T('crew-report-photos') + ' + .hint')) && (await p.locator(T('crew-report-problem') + ' button.on').textContent()) === 'No' && (await p.locator(T('crew-report-weather') + ' .chip').count()) === 6 && (await p.locator(T('crew-report-team') + ' .chip.on').count()) === 2 && (await p.locator(T('crew-report-checklist') + ' button.on').count()) === 0 && (await txt(T('crew-report-send'))) === 'Send report');
+  ok('form controls are at least 44 px tall (job row, inputs, send)' + full, (await box(T('crew-report-job'))).height >= 44 && (await box(T('crew-report-hours'))).height >= 44 && (await box(T('crew-report-send'))).height >= 44 && (await box(T('crew-report-photo-add'))).height >= 44);
+  await p.screenshot({ path: OUT + `c4-form-${tag}.png` });
+  await p.click(T('crew-report-send')); await p.waitForTimeout(150);
+  ok('Send with nothing done: one inline error under the field, still on the form' + full, await p.locator(T('crew-report-form')).isVisible() && (await txt(T('crew-report-done') + ' .err')) === 'Add at least one line.' && (await p.locator('#rfBody .err').count()) === 1);
+  await p.locator(T('crew-report-done') + ' input').first().fill('Living room walls second coat');
+  await p.click('[data-add="done"]'); await p.waitForTimeout(80);
+  await p.locator(T('crew-report-done') + ' input').nth(1).fill('Ceiling done');
+  await p.click(T('crew-report-photo-add')); await p.click(T('crew-report-photo-add')); await p.waitForTimeout(80);
+  await p.click('[data-problem="1"]'); await p.waitForTimeout(80); await p.fill(T('crew-report-problem-text'), 'Ran out of ceiling white');
+  await p.click('[data-weather="Sunny"]'); await p.click('[data-chk="Vacuumed"][data-val="yes"]'); await p.click('[data-chk="Cleaned store"][data-val="no"]'); await p.waitForTimeout(80);
+  ok('filling: two lines, two photos (nudge gone), problem text shown, Sunny on, Yes and No pills' + full, (await p.locator(T('crew-report-done') + ' input').count()) === 2 && (await p.locator(T('crew-report-photos') + ' .ph:not(.add)').count()) === 2 && !/Add at least/.test(await txt(T('crew-report-photos') + ' + .hint')) && (await p.locator(T('crew-report-problem-text')).inputValue()) === 'Ran out of ceiling white' && (await p.locator('[data-weather="Sunny"]').getAttribute('class')).includes('on') && (await p.locator('[data-chk="Vacuumed"].y').getAttribute('class')).includes('on') && (await p.locator('[data-chk="Cleaned store"].n').getAttribute('class')).includes('on'));
+  await p.click('[data-chk="Vacuumed"][data-val="yes"]'); await p.waitForTimeout(60);
+  ok('tapping a chosen Yes again clears it' + full, !(await p.locator('[data-chk="Vacuumed"].y').getAttribute('class')).includes('on'));
+  await p.click(T('crew-report-job')); await p.waitForTimeout(120);
+  ok('the job row opens the same job sheet as the clock' + full, await p.locator(T('crew-clock-picker')).isVisible() && (await p.locator(T('crew-clock-pick')).count()) === 3);
+  await p.locator(T('crew-clock-pick')).nth(2).click(); await p.waitForTimeout(120);
+  ok('General: the Where-were-you field appears and the crew chips go' + full, await p.locator(T('crew-report-site')).isVisible() && (await p.locator(T('crew-report-team')).count()) === 0 && /General/.test(await txt(T('crew-report-job'))));
+  await p.fill(T('crew-report-site'), 'The shed'); await p.evaluate(() => { document.querySelector('.form-body').scrollTop = 99999; }); await p.waitForTimeout(80);
+  await p.screenshot({ path: OUT + `c4-form-bottom-${tag}.png` });
+  await p.click(T('crew-report-send')); await p.waitForTimeout(200);
+  ok('Send: back on the list with the new report under Today, Flagged, no pop-up' + full, await p.locator(T('crew-reports')).isVisible() && (await p.locator(T('crew-report-row')).count()) === 4 && /^The shed\s*Flagged\s*2\.6 h · Living room walls second coat$/.test(await txt(T('crew-report-row'))) && (await p.locator('#reportsBody .sect').first().textContent()) === 'Today');
+  await p.locator(T('crew-report-row')).first().click(); await p.waitForTimeout(150);
+  ok("today's report: Edit shown within 24 h; opens the form prefilled as Edit report" + full, await p.locator(T('crew-report-edit')).isVisible() && (await txt('#rpMeta')) === 'Today · sent 3:41 pm · 2.6 h');
+  await p.click(T('crew-report-edit')); await p.waitForTimeout(150);
+  ok('edit form prefilled' + full, (await txt('#rfTitle')) === 'Edit report' && (await txt(T('crew-report-send'))) === 'Save changes' && (await p.locator(T('crew-report-done') + ' input').first().inputValue()) === 'Living room walls second coat' && (await p.locator(T('crew-report-site')).inputValue()) === 'The shed');
+  await p.click(T('crew-report-send')); await p.waitForTimeout(150);
+  ok('Save changes returns to the report, now marked edited' + full, await p.locator(T('crew-report')).isVisible() && /· edited$/.test(await txt('#rpMeta')));
+  await p.click(T('crew-report-back')); await p.waitForTimeout(100); await p.click(T('crew-reports-back')); await p.waitForTimeout(100);
+  ok('back from the list lands on Today' + full, await p.locator(T('crew-pane-today')).isVisible() && await p.locator(T('crew-tabbar')).isVisible());
+  await p.click(T('crew-tab-me')); await p.waitForTimeout(100);
   await p.click(T('crew-me-signout')); await p.waitForTimeout(200);
   ok('Sign out returns to the sign-in screen with the password cleared' + full, await p.locator(T('crew-login')).isVisible() && (await p.locator(T('employee-login-password')).inputValue()) === '');
 
@@ -175,6 +220,16 @@ async function run(b, W, H, tag) {
   ok('deep link: the locked previous week' + full, (await txt(T('crew-hours-week-pill'))) === 'Locked' && (await txt('#wkSub')) === 'Mon 29 Sep – Sun 5 Oct');
   await p.goto(U + '?screen=app&tab=today&picker=1'); await p.waitForTimeout(300);
   ok('deep link: the job sheet open over Today' + full, await p.locator(T('crew-clock-picker')).isVisible() && (await p.locator(T('crew-clock-pick')).count()) === 3);
+  // ---- C4 deep links ----
+  await p.goto(U + '?screen=reports&reports=0'); await p.waitForTimeout(300);
+  ok('reports empty state' + full, await p.locator(T('crew-reports-empty')).isVisible() && (await txt(T('crew-reports-empty'))) === 'No reports yet. Your first one goes here.' && await p.locator(T('crew-reports-new')).isVisible());
+  await p.goto(U + '?screen=report-new&project=j2'); await p.waitForTimeout(300);
+  ok('deep link ?project=: the form with that job preselected and its crew' + full, /2\/88 Lygon St, Carlton/.test(await txt(T('crew-report-job'))) && (await p.locator(T('crew-report-team') + ' .chip.on').count()) === 1 && (await p.locator(T('crew-report-hours')).inputValue()) === '7.5');
+  await p.goto(U + '?screen=report-new&jobs=0'); await p.waitForTimeout(300);
+  ok('no jobs: the form opens on General with the Where-were-you field' + full, /General/.test(await txt(T('crew-report-job'))) && await p.locator(T('crew-report-site')).isVisible());
+  await p.goto(U + '?screen=app&tab=today'); await p.waitForTimeout(300);
+  await p.locator('#notifList ' + T('crew-notif-row')).nth(2).click(); await p.waitForTimeout(150);
+  ok('the feedback notification opens that report with the reply' + full, await p.locator(T('crew-report')).isVisible() && (await go()) === '/employee/daily-report/r1' && await p.locator(T('crew-report-reply')).isVisible());
 
   ok('no page errors' + full, errs.length === 0); if (errs.length) console.log(errs);
   await p.close();

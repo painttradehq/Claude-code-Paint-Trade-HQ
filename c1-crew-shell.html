@@ -155,6 +155,63 @@ input{font-family:inherit}
 .wk-line{font-size:14.5px;color:var(--text-secondary);margin-top:6px}
 .day .ot{color:var(--warning)}
 
+/* C4 — daily report: list, form, detail */
+.rrow{display:flex;flex-direction:column;gap:3px;padding:14px 16px;width:100%;text-align:left;border-top:1px solid var(--border);min-height:64px}
+.rrow:first-child{border-top:0}
+.rrow:active{background:var(--surface-sunken)}
+.rrow-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.rrow-name{font-size:16px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rrow-sub{font-size:13.5px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pills{display:flex;gap:6px;flex-shrink:0}
+.pill.flag{background:var(--danger-bg);color:var(--danger)}
+.form-body{flex:1;overflow-y:auto;padding:4px 16px calc(env(safe-area-inset-bottom) + 24px)}
+.fld{margin:0 0 6px}
+.fld label,.fld .lbl{display:block;font-size:13px;font-weight:600;color:var(--text-secondary);margin:0 4px 6px}
+.fld .hint{font-size:12.5px;color:var(--text-muted);margin:6px 4px 0;line-height:1.4}
+.fld .err{font-size:13px;color:var(--danger);margin:6px 4px 0;font-weight:500}
+.tin{width:100%;min-height:48px;border:1px solid var(--border-strong);border-radius:var(--radius-md);background:var(--surface);padding:12px 14px;font-size:16px;color:var(--text-primary);outline:none;font-family:inherit}
+.tin:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.tin.bad{border-color:var(--danger)}
+textarea.tin{min-height:84px;resize:none;line-height:1.4}
+.hrs{display:flex;align-items:center;gap:10px}
+.hrs .tin{width:110px;text-align:center;font-size:20px;font-weight:600;font-family:var(--font-display)}
+.lines{display:flex;flex-direction:column;gap:8px}
+.line{display:flex;align-items:center;gap:8px}
+.line .n{width:22px;font-size:14px;color:var(--text-muted);text-align:right;flex-shrink:0}
+.addline{align-self:flex-start;height:40px;padding:0 10px;font-size:14px;font-weight:600;color:var(--accent);display:flex;align-items:center;gap:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--border-strong);background:var(--surface);font-size:14.5px;font-weight:500;display:flex;align-items:center;gap:6px;color:var(--text-primary)}
+.chip.on{background:var(--accent-bg);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.seg2{display:flex;background:var(--surface-sunken);border-radius:12px;padding:3px;width:180px}
+.seg2 button{flex:1;height:38px;border-radius:9px;font-size:14.5px;font-weight:600;color:var(--text-secondary)}
+.seg2 button.on{background:var(--surface);color:var(--text-primary);box-shadow:var(--shadow-card)}
+.seg2 button.on.yes{color:var(--danger)}
+.chk{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-top:1px solid var(--border);min-height:56px}
+.chk:first-child{border-top:0}
+.chk span{font-size:15px;flex:1}
+.yn{display:flex;gap:6px;flex-shrink:0}
+.yn button{height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--border-strong);font-size:13.5px;font-weight:600;color:var(--text-secondary);background:var(--surface)}
+.yn button.y.on{background:var(--success-bg);border-color:var(--success);color:var(--success)}
+.yn button.n.on{background:var(--danger-bg);border-color:var(--danger);color:var(--danger)}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.pgrid .ph{position:relative}
+.pgrid .ph .rm{position:absolute;top:-6px;right:-6px;width:24px;height:24px;border-radius:12px;background:var(--danger);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface)}
+.sendbar{padding:12px 16px calc(env(safe-area-inset-bottom) + 12px);border-top:1px solid var(--border);background:var(--surface)}
+.problem{border-left:4px solid var(--danger);background:var(--danger-bg);border-color:var(--danger-bg);color:#6B1E18}
+.problem b{color:var(--danger)}
+.reply{padding:14px 16px}
+.reply-by{font-size:13px;font-weight:600;color:var(--accent);margin-bottom:4px}
+.reply-text{font-size:15px;line-height:1.5}
+.ol{margin:0;padding:12px 16px 12px 34px;font-size:15px;line-height:1.5;display:flex;flex-direction:column;gap:4px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:12px 16px}
+.kv div{display:flex;justify-content:space-between;align-items:center;gap:6px;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13.5px;background:var(--surface)}
+.kv .v{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--surface-sunken);color:var(--text-secondary)}
+.kv .v.yes{background:var(--success-bg);color:var(--success)}
+.kv .v.no{background:var(--danger-bg);color:var(--danger)}
+.meta{font-size:14.5px;color:var(--text-secondary)}
+.hdr-link{font-size:15px;font-weight:600;color:var(--accent);height:44px;display:inline-flex;align-items:center;padding:0 4px}
+.jobhdr .row2{display:flex;align-items:center;justify-content:space-between}
+
 /* today's job card */
 .jobcard{padding:16px 18px;width:100%;text-align:left}
 .jobcard-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
@@ -435,6 +492,36 @@ input{font-family:inherit}
     </div>
   </section>
 
+  <!-- ================= DAILY REPORTS: list (stack, no tab bar) ================= -->
+  <section id="s-reports" class="hide" data-testid="crew-reports" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <button class="back" id="reportsBack" data-testid="crew-reports-back"><svg><use href="#i-back"/></svg>Back</button>
+      <div class="job-title">Daily reports</div>
+    </div>
+    <div class="body nobar" id="reportsBody"></div>
+  </section>
+
+  <!-- ================= DAILY REPORT: the form (stack) ================= -->
+  <section id="s-report-new" class="hide" data-testid="crew-report-form" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="rfBack" data-testid="crew-report-form-back"><svg><use href="#i-back"/></svg>Back</button></div>
+      <div class="job-title" id="rfTitle">Today's report</div>
+      <div class="meta" id="rfDate">Saturday 11 October</div>
+    </div>
+    <div class="form-body" id="rfBody"></div>
+    <div class="sendbar"><button class="btn btn-primary" id="rfSend" data-testid="crew-report-send">Send report</button></div>
+  </section>
+
+  <!-- ================= DAILY REPORT: one report (stack) ================= -->
+  <section id="s-report" class="hide" data-testid="crew-report" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="rpBack" data-testid="crew-report-back"><svg><use href="#i-back"/></svg>Daily reports</button><button class="hdr-link hide" id="rpEdit" data-testid="crew-report-edit">Edit</button></div>
+      <div class="job-title" id="rpTitle"></div>
+      <div class="meta" id="rpMeta"></div>
+    </div>
+    <div class="body nobar" id="rpBody"></div>
+  </section>
+
   <!-- ================= JOB PICKER (sheet over Today) ================= -->
   <div class="scrim hide" id="picker" data-testid="crew-clock-picker">
     <div class="sheet" role="dialog" aria-label="Which job?">
@@ -514,6 +601,13 @@ input{font-family:inherit}
       ] },
   ];
   let wk = q.get('week') === 'prev' ? 1 : 0;
+  // GET /daily-reports/my-reports (C4 shape): newest first, parsed server-side, owner's reply by first name
+  const reports = q.get('reports') === '0' ? [] : [
+    { id: 'r1', day: 'Fri 10 Oct', sent: '3:42 pm', job: 'j1', title: 'Wattle St repaint', hours: 7.5, done: ['Living room walls second coat', 'Ceiling done', 'Hallway doors primed'], photos: 3, problems: '', weather: ['Sunny', 'Windy'], team: ['Mia', 'Tom'], tomorrow: ['Hallway walls second coat', 'Skirting gloss'], checklist: { 'Vacuumed': 'yes', 'Closed doors/windows': 'yes', 'Cleaned store': 'yes', 'Productive day': 'yes' }, notes: '', reply: { by: 'Josh', at: 'Fri 10 Oct, 6:10 pm', text: 'Great finish on the hallway, thanks.' }, edited: false, canEdit: false },
+    { id: 'r2', day: 'Thu 9 Oct', sent: '3:20 pm', job: 'j1', title: 'Wattle St repaint', hours: 8, done: ['Prep and first coat living room', 'Patched stairwell walls'], photos: 2, problems: 'Ran out of ceiling white about 2 pm, lost an hour waiting on the pick-up.', weather: ['Cloudy'], team: ['Mia', 'Tom'], tomorrow: ['Second coat living room'], checklist: { 'Vacuumed': 'yes', 'Closed doors/windows': 'yes', 'Cleaned store': 'no', 'Productive day': 'yes' }, notes: 'Client asked about the laundry colour, told her to call Josh.', reply: null, edited: true, canEdit: false },
+    { id: 'r3', day: 'Fri 3 Oct', sent: '1:05 pm', job: 'j3', title: 'Patel exterior', hours: 6, done: ['Final coat eaves and fascia', 'Clean-up, drop sheets packed'], photos: 4, problems: '', weather: ['Sunny', 'Hot'], team: ['Mia', 'Tom', 'Lee'], tomorrow: [], checklist: { 'Vacuumed': 'na', 'Closed doors/windows': 'na', 'Cleaned store': 'yes', 'Productive day': 'yes' }, notes: '', reply: { by: 'Josh', at: 'Sat 4 Oct, 8:02 am', text: 'Nice one — the Patels left a 5-star review and named you.' }, edited: false, canEdit: false },
+  ];
+  const MIN_PHOTOS = 2;
   const currentJob = () => jobs.find(x => x.status === 'now') || null;
   const subOf = (j) => [j.client !== j.name ? j.client : null, j.addr !== j.name ? j.addr : null].filter(Boolean).join(' · ');
 
@@ -587,10 +681,13 @@ input{font-family:inherit}
       </button>`;
     $('#picker').classList.remove('hide');
   }
-  function closePicker(){ $('#picker').classList.add('hide'); }
+  function closePicker(){ $('#picker').classList.add('hide'); pickFor = 'clock'; }
   // sign-in: job picked → one location fix (never 0,0) → POST /timeclock/sign-in → card from the response
+  let pickFor = 'clock';
   function startSignIn(jobId){
-    closePicker(); state.busy = true; renderClock();
+    const forReport = pickFor === 'report';
+    closePicker();
+    if (forReport) { pickFor = 'clock'; form.job = jobId; const j = jobs.find(x => x.id === jobId); form.team = j ? j.crew.slice() : []; renderReportForm(); return; } state.busy = true; renderClock();
     setTimeout(() => { state.busy = false; state.signedIn = true; state.job = jobId; state.since = '7:04 am'; state.elapsed = '0 h 00 m'; renderClock(); renderHours(); }, 500);
   }
   function startSignOut(){
@@ -618,6 +715,114 @@ input{font-family:inherit}
           ${r.h ? `<div class="sess-h">${esc(r.h)}</div>` : ''}
         </div>`).join('')}</div>`).join('') +
       '<div class="foot-note" data-testid="crew-hours-foot">Rounded to the nearest 15 min. Overtime after 8 h a day or 38 h a week.</div>';
+  }
+  // ---- C4: daily reports ----
+  const firstDone = (r) => r.done.length ? r.done[0] : 'Nothing listed.';
+  const hoursTxt = (h) => h === null || h === undefined ? 'No hours' : (Number.isInteger(h) ? h : h.toFixed(1)) + ' h';
+  function reportRow(r){
+    return `<button class="rrow" data-testid="crew-report-row" data-report="${r.id}">
+      <div class="rrow-top"><span class="rrow-name">${esc(r.title)}</span><span class="pills">${r.problems ? '<span class="pill flag">Flagged</span>' : ''}${r.reply ? '<span class="pill live">Replied</span>' : ''}</span></div>
+      <div class="rrow-sub">${esc(hoursTxt(r.hours))} · ${esc(firstDone(r))}</div>
+    </button>`;
+  }
+  function renderReports(){
+    const today = reports.filter(r => r.day === 'Today'), past = reports.filter(r => r.day !== 'Today');
+    const days = []; past.forEach(r => { let d = days.find(x => x.day === r.day); if (!d) { d = { day: r.day, rows: [] }; days.push(d); } d.rows.push(r); });
+    $('#reportsBody').innerHTML = `
+      <button class="btn btn-primary" id="reportsNew" data-testid="crew-reports-new" style="margin:8px 0 4px">Write today's report</button>
+      ${today.length ? `<div class="sect">Today</div><div class="list">${today.map(reportRow).join('')}</div>` : ''}
+      ${reports.length ? days.map(d => `<div class="sect">${esc(d.day)}</div><div class="list">${d.rows.map(reportRow).join('')}</div>`).join('') : '<div class="card" style="margin-top:14px"><div class="empty" data-testid="crew-reports-empty">No reports yet. Your first one goes here.</div></div>'}`;
+  }
+  function openReports(){ renderReports(); $('#s-app').classList.add('hide'); $('#s-job').classList.add('hide'); $('#s-report').classList.add('hide'); $('#s-report-new').classList.add('hide'); $('#s-reports').classList.remove('hide'); $('#reportsBody').scrollTop = 0; document.body.dataset.lastGo = '/employee/daily-report'; }
+  function closeReports(){ $('#s-reports').classList.add('hide'); $('#s-app').classList.remove('hide'); showTab('today'); }
+
+  // the form (new or edit)
+  const form = { job: 'general', site: '', hours: '', done: [''], photos: 0, problem: false, problemText: '', weather: [], team: [], extra: '', tomorrow: [''], checklist: {}, notes: '', editing: null, tried: false };
+  const CHECKS = ['Vacuumed', 'Closed doors/windows', 'Cleaned store', 'Productive day'];
+  const CHECK_Q = { 'Vacuumed': 'Did you vacuum?', 'Closed doors/windows': 'Doors and windows closed?', 'Cleaned store': 'Store cleaned up?', 'Productive day': 'Was it a productive day?' };
+  const WEATHER = ['Sunny', 'Cloudy', 'Rainy', 'Windy', 'Hot', 'Cold'];
+  function defaultJob(projectId){
+    if (projectId && jobs.find(j => j.id === projectId)) return projectId;
+    if (state.signedIn && state.job !== 'general' && jobs.find(j => j.id === state.job)) return state.job;   // the open clock session's job
+    const now = jobs.find(j => j.status === 'now'); return now ? now.id : 'general';
+  }
+  function openReportNew(projectId, editOf){
+    const r = editOf ? reports.find(x => x.id === editOf) : null;
+    Object.assign(form, r ? { job: r.job, site: r.job === 'general' ? r.title : '', hours: String(r.hours ?? ''), done: r.done.length ? r.done.slice() : [''], photos: r.photos, problem: !!r.problems, problemText: r.problems, weather: r.weather.slice(), team: r.team.slice(), extra: '', tomorrow: r.tomorrow.length ? r.tomorrow.slice() : [''], checklist: Object.assign({}, r.checklist), notes: r.notes, editing: r.id, tried: false }
+      : { job: defaultJob(projectId), site: '', hours: state.signedIn ? '2.6' : '7.5', done: [''], photos: 0, problem: false, problemText: '', weather: [], team: null, extra: '', tomorrow: [''], checklist: {}, notes: '', editing: null, tried: false });
+    if (form.team === null) { const j = jobs.find(x => x.id === form.job); form.team = j ? j.crew.slice() : []; }
+    $('#rfTitle').textContent = r ? 'Edit report' : "Today's report";
+    $('#rfDate').textContent = r ? r.day + ' · sent ' + r.sent : 'Saturday 11 October';
+    $('#rfSend').textContent = r ? 'Save changes' : 'Send report';
+    renderReportForm();
+    $('#s-app').classList.add('hide'); $('#s-job').classList.add('hide'); $('#s-reports').classList.add('hide'); $('#s-report').classList.add('hide'); $('#s-report-new').classList.remove('hide'); $('#rfBody').scrollTop = 0;
+    document.body.dataset.lastGo = r ? '/employee/daily-report/' + r.id + '/edit' : '/employee/daily-report/new' + (projectId ? '?project=' + projectId : '');
+  }
+  function renderReportForm(){
+    const j = form.job === 'general' ? null : jobs.find(x => x.id === form.job);
+    const doneBad = form.tried && !form.done.some(l => l.trim());
+    const siteBad = form.tried && !j && !form.site.trim();
+    const linesHtml = (arr, key, ph) => `<div class="lines">${arr.map((v, i) => `<div class="line"><span class="n">${i + 1}.</span><input class="tin ${key === 'done' && doneBad ? 'bad' : ''}" data-key="${key}" data-i="${i}" value="${esc(v)}" placeholder="${ph}"></div>`).join('')}</div><button class="addline" data-add="${key}">+ Add a line</button>`;
+    $('#rfBody').innerHTML = `
+      <div class="sect">Job</div>
+      <div class="list"><button class="row" id="rfJob" data-testid="crew-report-job"><span class="ico"><svg><use href="#i-pin"/></svg></span><span class="row-t"><span class="row-title">${esc(j ? j.name : 'General')}</span><span class="row-sub">${esc(j ? subOf(j) : 'Not on a job')}</span></span><svg class="chev"><use href="#i-chev"/></svg></button></div>
+      ${j ? '' : `<div class="fld" style="margin-top:8px"><label for="rfSite">Where were you?</label><input id="rfSite" data-testid="crew-report-site" class="tin ${siteBad ? 'bad' : ''}" value="${esc(form.site)}" placeholder="e.g. the shed, 12 Smith St">${siteBad ? '<div class="err">Say where you were.</div>' : ''}</div>`}
+      <div class="sect">Hours today</div>
+      <div class="fld"><div class="hrs"><input id="rfHours" data-testid="crew-report-hours" class="tin" inputmode="decimal" value="${esc(form.hours)}"><span class="meta">hours</span></div><div class="hint">From your sign-ins today. Change it if it's wrong.</div></div>
+      <div class="sect">What was done</div>
+      <div class="fld" data-testid="crew-report-done">${linesHtml(form.done, 'done', 'e.g. Living room walls second coat')}${doneBad ? '<div class="err">Add at least one line.</div>' : ''}</div>
+      <div class="sect">Photos</div>
+      <div class="fld"><div class="pgrid" data-testid="crew-report-photos">${Array.from({ length: form.photos }, (_, i) => `<div class="ph ${i % 2 ? 'after' : ''}"><button class="rm" data-rm="${i}" aria-label="Remove photo">×</button></div>`).join('')}<button class="ph add" id="rfAddPhoto" data-testid="crew-report-photo-add">+ Add</button></div>${form.photos < MIN_PHOTOS ? `<div class="hint">Add at least ${MIN_PHOTOS} photos of today's work. They go on the job's photo page too.</div>` : '<div class="hint">They go on the job\'s photo page too.</div>'}</div>
+      <div class="sect">Any problems on site?</div>
+      <div class="fld"><div class="seg2" data-testid="crew-report-problem"><button class="${form.problem ? '' : 'on'}" data-problem="0">No</button><button class="${form.problem ? 'on yes' : ''}" data-problem="1">Yes</button></div>
+        ${form.problem ? `<textarea id="rfProblem" data-testid="crew-report-problem-text" class="tin" style="margin-top:10px" placeholder="What happened?">${esc(form.problemText)}</textarea><div class="hint">Your employer sees this as a flag on the report.</div>` : ''}</div>
+      <div class="sect">Weather</div>
+      <div class="fld"><div class="chips" data-testid="crew-report-weather">${WEATHER.map(w => `<button class="chip ${form.weather.includes(w) ? 'on' : ''}" data-weather="${w}">${w}</button>`).join('')}</div></div>
+      <div class="sect">Who was on site</div>
+      <div class="fld">${j ? `<div class="chips" data-testid="crew-report-team">${j.crew.map(n => `<button class="chip ${form.team.includes(n) ? 'on' : ''}" data-team="${esc(n)}">${esc(n)}</button>`).join('')}</div>` : ''}<input id="rfExtra" class="tin" style="margin-top:${j ? 8 : 0}px" value="${esc(form.extra)}" placeholder="${j ? 'Anyone else' : 'Names, separated by commas'}"></div>
+      <div class="sect">Plan for tomorrow</div>
+      <div class="fld">${linesHtml(form.tomorrow, 'tomorrow', 'e.g. Second coat on the hallway')}</div>
+      <div class="sect">End of day</div>
+      <div class="list" data-testid="crew-report-checklist">${CHECKS.map(c => `<div class="chk"><span>${CHECK_Q[c]}</span><span class="yn"><button class="y ${form.checklist[c] === 'yes' ? 'on' : ''}" data-chk="${c}" data-val="yes">Yes</button><button class="n ${form.checklist[c] === 'no' ? 'on' : ''}" data-chk="${c}" data-val="no">No</button></span></div>`).join('')}</div>
+      <div class="sect">Notes</div>
+      <div class="fld"><textarea id="rfNotes" data-testid="crew-report-notes" class="tin" placeholder="Anything else for your employer (optional)">${esc(form.notes)}</textarea></div>`;
+  }
+  function readForm(){
+    document.querySelectorAll('#rfBody input[data-key]').forEach(i => { form[i.dataset.key][+i.dataset.i] = i.value; });
+    const site = $('#rfSite'); if (site) form.site = site.value;
+    form.hours = $('#rfHours').value; form.notes = $('#rfNotes').value; const ex = $('#rfExtra'); if (ex) form.extra = ex.value;
+    const pt = $('#rfProblem'); if (pt) form.problemText = pt.value;
+  }
+  function sendReport(){
+    readForm(); form.tried = true;
+    const j = form.job === 'general' ? null : jobs.find(x => x.id === form.job);
+    if (!form.done.some(l => l.trim()) || (!j && !form.site.trim())) { renderReportForm(); $('#rfBody').scrollTop = 0; return; }
+    const extra = form.extra.split(',').map(x => x.trim()).filter(Boolean);
+    const data = { job: form.job, title: j ? j.name : form.site.trim(), hours: form.hours === '' ? null : parseFloat(form.hours), done: form.done.map(x => x.trim()).filter(Boolean), photos: form.photos, problems: form.problem ? form.problemText.trim() : '', weather: form.weather.slice(), team: (form.team || []).concat(extra), tomorrow: form.tomorrow.map(x => x.trim()).filter(Boolean), checklist: Object.assign({}, form.checklist), notes: form.notes.trim() };
+    if (form.editing) { const r = reports.find(x => x.id === form.editing); Object.assign(r, data, { edited: true }); $('#s-report-new').classList.add('hide'); openReport(r.id); return; }
+    reports.unshift(Object.assign({ id: 'r' + (reports.length + 1), day: 'Today', sent: '3:41 pm', reply: null, edited: false, canEdit: true }, data));
+    $('#s-report-new').classList.add('hide'); openReports();
+  }
+  function openReport(id){
+    const r = reports.find(x => x.id === id); if (!r) return;
+    $('#rpTitle').textContent = r.title;
+    $('#rpMeta').textContent = r.day + ' · sent ' + r.sent + ' · ' + hoursTxt(r.hours) + (r.edited ? ' · edited' : '');
+    $('#rpEdit').classList.toggle('hide', !r.canEdit); $('#rpEdit').dataset.edit = r.id;
+    const kv = Object.keys(r.checklist).filter(k => r.checklist[k] !== 'na').map(k => `<div><span>${esc(CHECK_Q[k] || k)}</span><span class="v ${r.checklist[k]}">${r.checklist[k] === 'yes' ? 'Yes' : 'No'}</span></div>`).join('');
+    $('#rpBody').innerHTML = `
+      ${r.problems ? `<div class="sect">Problem on site</div><div class="card note problem" data-testid="crew-report-problem-view"><b>Flagged.</b> ${esc(r.problems)}</div>` : ''}
+      <div class="sect">What was done</div>
+      <div class="list"><ol class="ol" data-testid="crew-report-done-view">${r.done.map(d => `<li>${esc(d)}</li>`).join('') || '<li style="list-style:none;margin-left:-18px;color:var(--text-muted)">Nothing listed.</li>'}</ol></div>
+      <div class="sect">Photos · ${r.photos}</div>
+      <div class="list"><div class="grid" data-testid="crew-report-photos-view">${Array.from({ length: r.photos }, (_, i) => `<div class="ph ${i % 2 ? 'after' : ''}"></div>`).join('') || '<div class="empty" style="grid-column:1/-1">No photos</div>'}</div></div>
+      ${r.weather.length || r.team.length ? `<div class="sect">On site</div><div class="card note" data-testid="crew-report-site-view">${r.team.length ? esc(r.team.join(', ')) : ''}${r.team.length && r.weather.length ? '<br>' : ''}<span style="color:var(--text-secondary)">${esc(r.weather.join(' · '))}</span></div>` : ''}
+      ${r.tomorrow.length ? `<div class="sect">Plan for tomorrow</div><div class="list"><ol class="ol">${r.tomorrow.map(d => `<li>${esc(d)}</li>`).join('')}</ol></div>` : ''}
+      ${kv ? `<div class="sect">End of day</div><div class="list"><div class="kv" data-testid="crew-report-checklist-view">${kv}</div></div>` : ''}
+      ${r.notes ? `<div class="sect">Notes</div><div class="card note">${esc(r.notes)}</div>` : ''}
+      <div class="sect">Reply</div>
+      ${r.reply ? `<div class="card reply" data-testid="crew-report-reply"><div class="reply-by">${esc(r.reply.by)} · ${esc(r.reply.at)}</div><div class="reply-text">${esc(r.reply.text)}</div></div>` : '<div class="card"><div class="empty" data-testid="crew-report-noreply">No reply yet.</div></div>'}`;
+    $('#s-app').classList.add('hide'); $('#s-job').classList.add('hide'); $('#s-reports').classList.add('hide'); $('#s-report-new').classList.add('hide'); $('#s-report').classList.remove('hide'); $('#rpBody').scrollTop = 0;
+    document.body.dataset.lastGo = '/employee/daily-report/' + id;
   }
   function openHours(){ renderHours(); $('#s-app').classList.add('hide'); $('#s-hours').classList.remove('hide'); $('#hoursScroll').scrollTop = 0; document.body.dataset.lastGo = '/employee/time-clock'; }
   function closeHours(){ $('#s-hours').classList.add('hide'); $('#s-app').classList.remove('hide'); showTab('me'); }
@@ -716,19 +921,41 @@ input{font-family:inherit}
   $('#pickerCancel').addEventListener('click', closePicker);
   $('#picker').addEventListener('click', (e) => { if (e.target === $('#picker')) closePicker(); });
   $('#hoursBack').addEventListener('click', closeHours);
+  $('#reportsBack').addEventListener('click', closeReports);
+  $('#rfBack').addEventListener('click', () => { $('#s-report-new').classList.add('hide'); if (form.editing) openReport(form.editing); else openReports(); });
+  $('#rpBack').addEventListener('click', () => { $('#s-report').classList.add('hide'); openReports(); });
+  $('#rpEdit').addEventListener('click', () => { $('#s-report').classList.add('hide'); openReportNew(null, $('#rpEdit').dataset.edit); });
+  $('#rfSend').addEventListener('click', sendReport);
+  $('#rfBody').addEventListener('click', (e) => {
+    const t = e.target.closest('button'); if (!t) return;
+    readForm();
+    if (t.id === 'rfJob') { pickFor = 'report'; openPicker(); return; }
+    if (t.dataset.add) { form[t.dataset.add].push(''); renderReportForm(); return; }
+    if (t.id === 'rfAddPhoto') { form.photos += 1; renderReportForm(); return; }
+    if (t.dataset.rm !== undefined) { form.photos -= 1; renderReportForm(); return; }
+    if (t.dataset.problem !== undefined) { form.problem = t.dataset.problem === '1'; renderReportForm(); return; }
+    if (t.dataset.weather) { const w = t.dataset.weather; form.weather = form.weather.includes(w) ? form.weather.filter(x => x !== w) : form.weather.concat(w); renderReportForm(); return; }
+    if (t.dataset.team) { const n = t.dataset.team; form.team = form.team.includes(n) ? form.team.filter(x => x !== n) : form.team.concat(n); renderReportForm(); return; }
+    if (t.dataset.chk) { const c = t.dataset.chk, v = t.dataset.val; form.checklist[c] = form.checklist[c] === v ? 'na' : v; renderReportForm(); return; }
+  });
   $('#wkPrev').addEventListener('click', () => { if (wk < weeks.length - 1) { wk++; renderHours(); $('#hoursScroll').scrollTop = 0; } });
   $('#wkNext').addEventListener('click', () => { if (wk > 0) { wk--; renderHours(); $('#hoursScroll').scrollTop = 0; } });
   $('#jobBack').addEventListener('click', closeJob);
-  $('#jobReport').addEventListener('click', () => { document.body.dataset.lastGo = '/employee/daily-report'; });
+  $('#jobReport').addEventListener('click', () => { const id = document.body.dataset.lastGo.split('/').pop(); openReportNew(id); });
   $('#jobDirections').addEventListener('click', () => { document.body.dataset.lastGo = 'maps'; });
   document.body.addEventListener('click', (e) => {
     const pk = e.target.closest('[data-pick]');
     if (pk) { startSignIn(pk.dataset.pick); return; }
+    const rr = e.target.closest('[data-report]');
+    if (rr) { openReport(rr.dataset.report); return; }
+    if (e.target.closest('#reportsNew')) { openReportNew(null); return; }
     const jb = e.target.closest('[data-job]');
     if (jb) { if (jb.dataset.job) openJob(jb.dataset.job); return; }
     const row = e.target.closest('[data-go]');
     if (!row) return;
     if (row.dataset.testid === 'crew-me-hours') { openHours(); return; }
+    if (row.dataset.testid === 'crew-today-report') { openReports(); return; }
+    if (row.dataset.id && /^\/employee\/daily-report\?report=/.test(row.dataset.go)) { const n = state.notifs.find(x => x.id === row.dataset.id); if (n) { n.read = true; renderNotifs(); } openReport(row.dataset.go.split('=')[1]); return; }
     if (row.dataset.id) { const n = state.notifs.find(x => x.id === row.dataset.id); if (n) { n.read = true; renderNotifs(); } }
     document.body.dataset.lastGo = row.dataset.go; // prototype: records the route the real app would push
   });
@@ -752,6 +979,9 @@ input{font-family:inherit}
   if (q.get('error') === 'restricted') { $('#loginErrorText').textContent = RESTRICTED; $('#loginError').classList.remove('hide'); }
   if (q.get('screen') === 'job') { showApp('jobs'); openJob(q.get('id') || 'j1'); }
   else if (q.get('screen') === 'hours') { showApp('me'); openHours(); }
+  else if (q.get('screen') === 'reports') { showApp('today'); openReports(); }
+  else if (q.get('screen') === 'report-new') { showApp('today'); openReportNew(q.get('project')); }
+  else if (q.get('screen') === 'report') { showApp('today'); openReport(q.get('id') || 'r1'); }
   else if (q.get('screen') === 'app') { showApp(q.get('tab') || 'today'); if (q.get('picker') === '1') openPicker(); }
   else showLogin();
 })();
