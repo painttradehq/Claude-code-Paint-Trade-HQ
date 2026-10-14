@@ -328,6 +328,15 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
 .tin.ro{background:var(--surface-sunken);color:var(--text-secondary)}
 .btn.saved{background:var(--success)}
 .pcard{display:flex;align-items:center;gap:14px;padding:14px 16px}
+.vid{padding:0;overflow:hidden;width:100%;text-align:left}
+.vid-thumb{aspect-ratio:16/9;background:linear-gradient(135deg,#34295E,#4B3E86);display:flex;align-items:center;justify-content:center}
+.vid-thumb .play{width:56px;height:56px;border-radius:28px;background:rgba(255,255,255,.92);color:var(--accent);display:flex;align-items:center;justify-content:center}
+.vid-thumb .play svg{width:26px;height:26px;margin-left:3px}
+.vid-cap{padding:10px 14px;font-size:14px;color:var(--text-secondary);display:flex;align-items:center;gap:8px}
+.cul{border-top:1px solid var(--border)}.cul:first-child{border-top:0}
+.cul-h{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;padding:14px 16px;font-size:15.5px;font-weight:600;min-height:52px}
+.cul-lines{margin:0;padding:0 16px 14px 34px;color:var(--text-secondary);font-size:14.5px;line-height:1.5}
+.cul-lines li{margin:4px 0}
 </style>
 </head>
 <body>
@@ -627,6 +636,14 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
       <h2 id="dsTitle"></h2>
       <div id="dsBody"></div>
       <button class="btn btn-outline" id="dsDone" data-testid="crew-doc-sheet-done">Done</button>
+    </div>
+  </div>
+  <div class="scrim hide" id="pwSheet" data-testid="crew-pw-sheet">
+    <div class="sheet" role="dialog" aria-label="Change password">
+      <div class="sheet-grab"></div>
+      <h2>Change password</h2>
+      <div id="pwBody"></div>
+      <div style="display:flex;gap:10px;margin-top:12px"><button class="btn btn-outline" id="pwCancel" data-testid="crew-pw-cancel" style="flex:1">Cancel</button><button class="btn btn-primary" id="pwSave" data-testid="crew-pw-save" style="flex:1">Save</button></div>
     </div>
   </div>
   <div class="scrim hide" id="signSheet" data-testid="crew-sign">
@@ -1130,9 +1147,20 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   function stackOpen(id){ $('#s-app').classList.add('hide'); $('#s-login').classList.add('hide'); hideC5(); $(id).classList.remove('hide'); const b = $(id + ' .form-body'); if (b) b.scrollTop = 0; }
   const MARK = $('#s-login .mark').innerHTML;
 
-  // ---- onboarding ----
-  const onb = { step: 0, name: '', dob: '', phone: '', email: '', emergency: '', password: '', photo: false, docs: {}, agree: false, tried: false,
-    biz: q.get('biz') === '0' ? null : { business_name: BIZ, owner_name: 'Josh Sano' }, invalid: q.get('invalid') === '1' };
+  // ---- onboarding (register mode: QR invite; finish mode: crew added by the owner with a temporary password) ----
+  const WELCOME = q.get('culture') === '0' ? null : { title: 'The Painting Family Mentality', intro: 'At Sano Painting, we believe that great work comes from great relationships. We\'re not just a crew - we\'re a family that supports each other on and off the job.',
+    sections: [ { title: 'Team building events', lines: ['Monthly team dinners', 'Quarterly BBQs', 'Social gatherings at local pubs', 'Team celebrations for milestones'] },
+      { title: 'Communication', lines: ['If there\'s ever a personality clash or issue, we encourage open communication. Talk it through respectfully, and if needed, bring it to Josh. We handle conflicts professionally and fairly.'] },
+      { title: 'Client interactions', lines: ['Always be polite and professional with clients. If there\'s a concern, let them know you\'ll pass it on to Josh.', '"Thanks for the feedback, I\'ll make sure Josh knows."', '"Let\'s take a moment and I\'ll call Josh to discuss this."'] } ] };
+  const onb = { step: 0, name: '', dob: '', phone: '', email: '', emergency: '', password: '', tempPw: '', photo: false, docs: {}, agree: false, tried: false, watched: false, open: {},
+    finish: q.get('finish') === '1',
+    biz: q.get('biz') === '0' ? null : { business_name: BIZ, owner_name: 'Josh Sano', video: q.get('video') === '0' ? null : 'dQw4w9WgXcQ', welcome: WELCOME }, invalid: q.get('invalid') === '1' };
+  const hasCulture = () => !!(onb.biz && onb.biz.welcome);
+  const STEP_TOTAL = () => hasCulture() ? 5 : 4;
+  // step ids: 0 welcome · 1 about you · 2 photo · 3 documents · 4 our team (only with content) · 5 agree · 6 done
+  const nextStep = (n) => (n === 3 && !hasCulture()) ? 5 : n + 1;
+  const prevStep = (n) => (n === 5 && !hasCulture()) ? 3 : n - 1;
+  const stepNo = (n) => n <= 3 ? n : (hasCulture() ? n - 0 : n - 1); // 4 → 4, 5 → 5 (or 4 without culture)
   function onbErrors(){
     const e = {};
     if (onb.step === 1) {
@@ -1140,12 +1168,13 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
       const age = ageOf(onb.dob);
       if (age === null) e.dob = 'Enter your date of birth as DD/MM/YYYY.'; else if (age < 0 || age > 100) e.dob = 'Check your date of birth.'; else if (age < 15) e.dob = 'You need to be 15 or older to join a crew.';
       if (!/^(\+?61|0)[2-478]?\d{8,9}$/.test(onb.phone.replace(/\s/g, ''))) e.phone = 'Enter an Australian mobile number.';
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(onb.email.trim())) e.email = 'Enter your email address.';
+      if (!onb.finish && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(onb.email.trim())) e.email = 'Enter your email address.';
       if (!onb.emergency.trim()) e.emergency = 'Who should your employer call in an emergency?';
+      if (onb.finish && !onb.tempPw) e.tempPw = 'Enter the temporary password from your email.';
       if (onb.password.length < 8) e.password = 'At least 8 characters.';
     }
     if (onb.step === 3) DOC_CAT.filter(d => d[2]).forEach(([k]) => { const d = onb.docs[k]; if (!d) e[k] = 'Add this one to continue.'; else if (!d.exp) e[k] = 'Add the expiry date.'; });
-    if (onb.step === 4 && !onb.agree) e.agree = 'Tick the agreement to continue.';
+    if (onb.step === 5 && !onb.agree) e.agree = 'Tick the agreement to continue.';
     return e;
   }
   const isMinor = () => { const a = ageOf(onb.dob); return a !== null && a >= 15 && a < 18; };
@@ -1153,26 +1182,32 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     const e = onb.tried ? onbErrors() : {};
     const bad = (k) => e[k] ? 'bad' : '';
     const err = (k) => e[k] ? `<div class="err" data-testid="crew-onb-err">${esc(e[k])}</div>` : '';
-    const n = onb.step, biz = onb.biz;
-    $('#onbHead').innerHTML = (n >= 1 && n <= 4 && !onb.invalid) ? `<div class="jobhdr" style="padding-bottom:0"><div class="row2"><button class="back" data-testid="crew-onb-back" data-onb="back"><svg><use href="#i-back"/></svg>Back</button></div></div><div class="prog" data-testid="crew-onb-step"><div class="bar"><i style="width:${(n / 4) * 100}%"></i></div><span>Step ${n} of 4</span></div>` : '';
-    let body = '', bar = '';
+    const n = onb.step, biz = onb.biz, total = STEP_TOTAL();
     const first = (onb.name.trim().split(' ')[0] || 'there');
+    const ownerFirst = biz ? biz.owner_name.split(' ')[0] : 'Your employer';
+    $('#onbHead').innerHTML = (n >= 1 && n <= 5 && !onb.invalid) ? `<div class="jobhdr" style="padding-bottom:0"><div class="row2"><button class="back" data-testid="crew-onb-back" data-onb="back"><svg><use href="#i-back"/></svg>Back</button></div></div><div class="prog" data-testid="crew-onb-step"><div class="bar"><i style="width:${(stepNo(n) / total) * 100}%"></i></div><span>Step ${stepNo(n)} of ${total}</span></div>` : '';
+    let body = '', bar = '';
     if (onb.invalid) {
       body = `<div class="onb-top"><div class="mark" aria-hidden="true">${MARK}</div><div class="onb-kicker">Paint Trade HQ Crew</div><div class="onb-title" data-testid="crew-onb-invalid">This invite link isn't valid.</div><div class="onb-sub">Ask your employer for a new one. They make it in Team › Invite link.</div></div>`;
       bar = `<button class="btn btn-outline" data-testid="crew-onb-signin" data-onb="signin">Already on the team? Sign in</button>`;
     } else if (n === 0) {
-      body = `<div class="onb-top"><div class="mark" aria-hidden="true">${MARK}</div><div class="onb-kicker">Paint Trade HQ Crew</div><div class="onb-title" data-testid="crew-onb-title">${biz ? 'Join ' + esc(biz.business_name) : 'Join the team'}</div><div class="onb-sub">${biz ? esc(biz.owner_name) + ' has invited you.' : 'Your employer has invited you.'} It takes about five minutes.</div></div>
+      const video = biz && biz.video ? `<div class="sect">${esc(ownerFirst)} has a message for you</div><button class="card vid" data-testid="crew-onb-video" data-onb="video"><div class="vid-thumb"><span class="play"><svg><use href="#i-play"/></svg></span></div><div class="vid-cap">${onb.watched ? '<span class="pill live">Watched</span> ' : ''}Welcome from ${esc(ownerFirst)} · 2 min</div></button>` : '';
+      body = `<div class="onb-top"><div class="mark" aria-hidden="true">${MARK}</div><div class="onb-kicker">Paint Trade HQ Crew</div><div class="onb-title" data-testid="crew-onb-title">${onb.finish ? 'Finish setting up' : (biz ? 'Join ' + esc(biz.business_name) : 'Join the team')}</div><div class="onb-sub">${onb.finish ? esc(biz ? biz.business_name : 'Your employer') + ' added you. Check your details, set your password and add your documents.' : ((biz ? esc(biz.owner_name) + ' has invited you.' : 'Your employer has invited you.') + ' It takes about five minutes.')}</div></div>${video}
         <div class="sect">You'll need</div>
         <div class="card need"><div><span class="ico"><svg><use href="#i-file"/></svg></span>Your driving licence or photo ID</div><div><span class="ico"><svg><use href="#i-check"/></svg></span>Your white card</div><div><span class="ico"><svg><use href="#i-phone"/></svg></span>An emergency contact's name and number</div></div>`;
-      bar = `<button class="btn btn-primary" data-testid="crew-onb-start" data-onb="next">Let's go</button><div class="login-foot" style="margin-top:10px">Already on the team? <a href="#" class="login-foot-link" data-testid="crew-onb-signin" data-onb="signin">Sign in</a></div>`;
+      bar = `<button class="btn btn-primary" data-testid="crew-onb-start" data-onb="next">Let's go</button>${onb.finish ? '' : `<div class="login-foot" style="margin-top:10px">Already on the team? <a href="#" class="login-foot-link" data-testid="crew-onb-signin" data-onb="signin">Sign in</a></div>`}`;
     } else if (n === 1) {
+      const pw = onb.finish
+        ? `<div class="fld"><label for="onbTpw">Temporary password</label><input id="onbTpw" data-testid="crew-onb-temp-password" data-f="tempPw" class="tin ${bad('tempPw')}" type="password" value="${esc(onb.tempPw)}" autocomplete="current-password"><div class="hint">The one in your email.</div>${err('tempPw')}</div>
+           <div class="fld"><label for="onbPw">New password</label><div class="pw"><input id="onbPw" data-testid="crew-onb-password" data-f="password" class="tin ${bad('password')}" type="${onb.showPw ? 'text' : 'password'}" value="${esc(onb.password)}" autocomplete="new-password"><button type="button" data-onb="showpw" data-testid="crew-onb-password-show">${onb.showPw ? 'Hide' : 'Show'}</button></div><div class="hint">At least 8 characters. You'll sign in with this from now on.</div>${err('password')}</div>`
+        : `<div class="fld"><label for="onbPw">Create a password</label><div class="pw"><input id="onbPw" data-testid="crew-onb-password" data-f="password" class="tin ${bad('password')}" type="${onb.showPw ? 'text' : 'password'}" value="${esc(onb.password)}" autocomplete="new-password"><button type="button" data-onb="showpw" data-testid="crew-onb-password-show">${onb.showPw ? 'Hide' : 'Show'}</button></div><div class="hint">At least 8 characters.</div>${err('password')}</div>`;
       body = `<div class="sect">About you</div>
         <div class="fld"><label for="onbName">Full name</label><input id="onbName" data-testid="crew-onb-name" data-f="name" class="tin ${bad('name')}" value="${esc(onb.name)}" autocomplete="name">${err('name')}</div>
         <div class="fld"><label for="onbDob">Date of birth</label><input id="onbDob" data-testid="crew-onb-dob" data-f="dob" class="tin ${bad('dob')}" value="${esc(onb.dob)}" placeholder="DD/MM/YYYY" inputmode="numeric" maxlength="10">${err('dob')}${isMinor() ? `<div class="minor" data-testid="crew-onb-minor">Under 18? Your employer needs your parent or guardian's consent. Check with them before you go on.</div>` : ''}</div>
         <div class="fld"><label for="onbPhone">Mobile number</label><input id="onbPhone" data-testid="crew-onb-phone" data-f="phone" class="tin ${bad('phone')}" value="${esc(onb.phone)}" inputmode="tel" autocomplete="tel">${err('phone')}</div>
-        <div class="fld"><label for="onbEmail">Email</label><input id="onbEmail" data-testid="crew-onb-email" data-f="email" class="tin ${bad('email')}" value="${esc(onb.email)}" inputmode="email" autocomplete="email" autocapitalize="none"><div class="hint">You'll sign in with this.</div>${err('email')}</div>
+        <div class="fld"><label for="onbEmail">Email</label><input id="onbEmail" data-testid="crew-onb-email" data-f="email" class="tin ${onb.finish ? 'ro' : ''} ${bad('email')}" value="${esc(onb.email)}" inputmode="email" autocomplete="email" autocapitalize="none" ${onb.finish ? 'readonly' : ''}><div class="hint">${onb.finish ? 'Ask your employer to change your email.' : "You'll sign in with this."}</div>${err('email')}</div>
         <div class="fld"><label for="onbEm">Emergency contact</label><input id="onbEm" data-testid="crew-onb-emergency" data-f="emergency" class="tin ${bad('emergency')}" value="${esc(onb.emergency)}" placeholder="Name and phone number">${err('emergency')}</div>
-        <div class="fld"><label for="onbPw">Create a password</label><div class="pw"><input id="onbPw" data-testid="crew-onb-password" data-f="password" class="tin ${bad('password')}" type="${onb.showPw ? 'text' : 'password'}" value="${esc(onb.password)}" autocomplete="new-password"><button type="button" data-onb="showpw" data-testid="crew-onb-password-show">${onb.showPw ? 'Hide' : 'Show'}</button></div><div class="hint">At least 8 characters.</div>${err('password')}</div>`;
+        ${pw}`;
       bar = `<button class="btn btn-primary" data-testid="crew-onb-next" data-onb="next">Continue</button>`;
     } else if (n === 2) {
       body = `<div class="sect">Your photo</div><div class="card" style="padding:18px 16px;text-align:center"><div class="photo-big ${onb.photo ? 'has' : ''}" data-testid="crew-onb-photo">${onb.photo ? '' : esc((onb.name.trim()[0] || 'M').toUpperCase())}</div><button class="btn btn-outline btn-sm" style="width:auto;padding:0 20px;display:inline-flex" data-testid="crew-onb-photo-add" data-onb="photo">${onb.photo ? 'Change photo' : 'Add a photo'}</button><div class="hint" style="margin-top:12px">Your employer sees it on your profile. You can add it later from Me › Profile.</div></div>`;
@@ -1181,28 +1216,37 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
       body = `<div class="sect">Your documents</div><div class="hint" style="margin:-6px 4px 10px">A photo or a PDF, up to 5 MB each. Only your employer and you can see them.</div><div class="card" style="padding:0">${DOC_CAT.map(([k, label, req]) => { const d = onb.docs[k]; const st = d ? { cls: 'ok', txt: d.exp ? 'Added · expires ' + d.exp : 'Added' } : { cls: '', txt: req ? 'Required' : 'Optional' }; return `<button class="drow" data-testid="crew-onb-doc-${k}" data-doc="${k}"><span class="st ${e[k] ? 'bad' : st.cls}"></span><span class="dt"><span class="dn">${label}</span><span class="ds ${e[k] ? 'bad' : ''}">${e[k] ? esc(e[k]) : st.txt}</span></span><svg class="chev"><use href="#i-chev"/></svg></button>`; }).join('')}</div>`;
       bar = `<button class="btn btn-primary" data-testid="crew-onb-next" data-onb="next">Continue</button>`;
     } else if (n === 4) {
+      const w = biz.welcome;
+      body = `<div class="sect">Our team</div><div class="card" style="padding:16px"><div class="onb-title" style="font-size:22px;margin:0 0 6px" data-testid="crew-onb-culture-title">${esc(w.title)}</div><div class="onb-sub" style="text-align:left">${esc(w.intro)}</div></div>
+        <div class="card" style="padding:0" data-testid="crew-onb-culture">${w.sections.map((sec, i) => `<div class="cul"><button class="cul-h" data-onb="toggle" data-i="${i}" data-testid="crew-onb-culture-${i}"><span>${esc(sec.title)}</span><svg class="chev" style="transform:rotate(${onb.open[i] ? 90 : 0}deg)"><use href="#i-chev"/></svg></button>${onb.open[i] ? `<ul class="cul-lines">${sec.lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}</div>`).join('')}</div>`;
+      bar = `<button class="btn btn-primary" data-testid="crew-onb-next" data-onb="next">Continue</button>`;
+    } else if (n === 5) {
       const bn = biz ? esc(biz.business_name) : 'your employer';
-      body = `<div class="sect">Before you join</div><div class="card facts"><div><span class="ico"><svg><use href="#i-people"/></svg></span><span><b>${bn} sees your details</b>Your name, contact details, documents, hours and reports go to ${bn}. Paint Trade HQ stores them for that business.</span></div><div><span class="ico"><svg><use href="#i-pin"/></svg></span><span><b>Location at sign-in and sign-out only</b>Your location is recorded when you sign in or out of a job, never in between.</span></div><div><span class="ico"><svg><use href="#i-file"/></svg></span><span><b>Your documents stay private</b>Your licences and signed documents are never shared by link. Only ${bn} and you can open them.</span></div></div>
+      body = `<div class="sect">Before you ${onb.finish ? 'start' : 'join'}</div><div class="card facts"><div><span class="ico"><svg><use href="#i-people"/></svg></span><span><b>${bn} sees your details</b>Your name, contact details, documents, hours and reports go to ${bn}. Paint Trade HQ stores them for that business.</span></div><div><span class="ico"><svg><use href="#i-pin"/></svg></span><span><b>Location at sign-in and sign-out only</b>Your location is recorded when you sign in or out of a job, never in between.</span></div><div><span class="ico"><svg><use href="#i-file"/></svg></span><span><b>Your documents stay private</b>Your licences and signed documents are never shared by link. Only ${bn} and you can open them.</span></div></div>
         <button class="agree ${onb.agree ? 'on' : ''} ${e.agree ? 'bad' : ''}" data-testid="crew-onb-agree" data-onb="agree" role="checkbox" aria-checked="${onb.agree}"><span class="box">${onb.agree ? '✓' : ''}</span><span class="at">I've read and agree to the <a href="#" data-testid="crew-onb-terms" data-legal="/terms">Terms of Service</a> and the <a href="#" data-testid="crew-onb-privacy" data-legal="/privacy">Privacy Policy</a>.</span></button><div class="fld">${err('agree')}</div>`;
-      bar = `<button class="btn btn-primary" data-testid="crew-onb-join" data-onb="next">Join the team</button>`;
+      bar = `<button class="btn btn-primary" data-testid="crew-onb-join" data-onb="next">${onb.finish ? "I'm done" : 'Join the team'}</button>`;
     } else {
-      body = `<div class="onb-top"><span class="ico ok" style="width:64px;height:64px;border-radius:32px;margin:10px auto 14px"><svg style="width:30px;height:30px"><use href="#i-check"/></svg></span><div class="onb-title" data-testid="crew-onb-done">You're on the team, ${esc(first)}.</div><div class="onb-sub">Sign in with <b>${esc(onb.email)}</b> and the password you just created.</div></div>`;
-      bar = `<button class="btn btn-primary" data-testid="crew-onb-signin" data-onb="signin">Sign in</button>`;
+      body = onb.finish
+        ? `<div class="onb-top"><span class="ico ok" style="width:64px;height:64px;border-radius:32px;margin:10px auto 14px"><svg style="width:30px;height:30px"><use href="#i-check"/></svg></span><div class="onb-title" data-testid="crew-onb-done">You're all set, ${esc(first)}.</div><div class="onb-sub">From now on sign in with <b>${esc(onb.email)}</b> and your new password.</div></div>`
+        : `<div class="onb-top"><span class="ico ok" style="width:64px;height:64px;border-radius:32px;margin:10px auto 14px"><svg style="width:30px;height:30px"><use href="#i-check"/></svg></span><div class="onb-title" data-testid="crew-onb-done">You're on the team, ${esc(first)}.</div><div class="onb-sub">Sign in with <b>${esc(onb.email)}</b> and the password you just created.</div></div>`;
+      bar = onb.finish ? `<button class="btn btn-primary" data-testid="crew-onb-today" data-onb="today">Go to Today</button>` : `<button class="btn btn-primary" data-testid="crew-onb-signin" data-onb="signin">Sign in</button>`;
     }
     $('#onbBody').innerHTML = body; $('#onbBar').innerHTML = bar;
-    document.body.dataset.lastGo = '/employee/onboarding' + (n ? '#step' + n : '');
+    document.body.dataset.lastGo = '/employee/onboarding' + (onb.finish ? '?finish=1' : '') + (n ? '#step' + n : '');
   }
   function openOnb(step){
-    if (step > 0) Object.assign(onb, { name: 'Mia Nguyen', dob: q.get('minor') === '1' ? '12/04/2010' : '12/04/1998', phone: '0412 345 678', email: 'mia@example.com', emergency: 'Tom Nguyen 0411 222 333', password: 'painter2026' });
+    if (onb.finish) Object.assign(onb, { name: prof.name, dob: prof.dob, phone: prof.phone, email: prof.email, emergency: prof.emergency });
+    if (step > 0 && !onb.finish) Object.assign(onb, { name: 'Mia Nguyen', dob: q.get('minor') === '1' ? '12/04/2010' : '12/04/1998', phone: '0412 345 678', email: 'mia@example.com', emergency: 'Tom Nguyen 0411 222 333', password: 'painter2026' });
+    if (step > 1 && onb.finish) Object.assign(onb, { tempPw: 'temp-1234', password: 'painter2026' });
     if (step >= 4) onb.docs = { driving_licence: { on: true, exp: '01/03/2027' }, white_card: { on: true, exp: '28/10/2026' } };
     if (q.get('agree') === '1') onb.agree = true;
-    onb.step = Math.min(Math.max(step, 0), 5); onb.tried = false;
+    onb.step = Math.min(Math.max(step, 0), 6); if (onb.step === 4 && !hasCulture()) onb.step = 5; onb.tried = false;
     stackOpen('#s-onb'); renderOnb();
   }
   function onbNext(){
     onb.tried = true; const e = onbErrors();
     if (Object.keys(e).length) { renderOnb(); const b = $('#onbBody .bad, #onbBody .ds.bad'); if (b) b.scrollIntoView({ block: 'center' }); return; }
-    onb.tried = false; onb.step = Math.min(onb.step + 1, 5); renderOnb();
+    onb.tried = false; onb.step = Math.min(nextStep(onb.step), 6); renderOnb();
   }
 
   // ---- document sheet (shared: onboarding + profile) ----
@@ -1242,6 +1286,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
       ${f('emergency', 'Emergency contact', 'placeholder="Name and phone number"')}
       ${f('address', 'Street address', 'autocomplete="street-address"')}
       ${f('suburb', 'Suburb, state and postcode', 'placeholder="e.g. Brunswick VIC 3056"')}
+      <div class="card" style="padding:0;margin-top:6px"><button class="row" data-testid="crew-profile-password" data-prof="password"><span class="ico"><svg><use href="#i-sign"/></svg></span><span class="row-t"><span class="row-title">Change password</span><span class="row-sub">${prof.pwChanged ? 'Changed just now' : 'Your current password, then a new one'}</span></span><svg class="chev"><use href="#i-chev"/></svg></button></div>
       <div class="sect">Documents</div>
       <div class="card" style="padding:0">${DOC_CAT.map(([k, label, req]) => { const st = docStatus(prof.docs[k]); const cls = !prof.docs[k] && req ? 'bad' : st.cls; const txt = !prof.docs[k] && req ? 'Required · not uploaded' : st.txt; return `<button class="drow" data-testid="crew-profile-doc-${k}" data-pdoc="${k}"><span class="st ${cls}"></span><span class="dt"><span class="dn">${label}</span><span class="ds ${cls}">${txt}</span></span><svg class="chev"><use href="#i-chev"/></svg></button>`; }).join('')}</div>
       <div class="hint" style="margin:8px 4px 0">A photo or a PDF, up to 5 MB. Expiry dates go on your employer's calendar. Only your employer and you can see your documents.</div>`;
@@ -1288,19 +1333,31 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   function openPhotoSheet(ctx){ ds.ctx = ctx; $('#photoSheet').classList.remove('hide'); }
   function closePhotoSheet(){ $('#photoSheet').classList.add('hide'); }
 
+  // ---- change password sheet (Profile) ----
+  const pw = { cur: '', nw: '', err: {} };
+  function renderPwSheet(){
+    $('#pwBody').innerHTML = `<div class="fld"><label for="pwCur">Current password</label><input id="pwCur" data-testid="crew-pw-current" class="tin ${pw.err.cur ? 'bad' : ''}" type="password" value="${esc(pw.cur)}" autocomplete="current-password">${pw.err.cur ? `<div class="err" data-testid="crew-pw-err">${esc(pw.err.cur)}</div>` : ''}</div><div class="fld"><label for="pwNew">New password</label><input id="pwNew" data-testid="crew-pw-new" class="tin ${pw.err.nw ? 'bad' : ''}" type="password" value="${esc(pw.nw)}" autocomplete="new-password"><div class="hint">At least 8 characters.</div>${pw.err.nw ? `<div class="err" data-testid="crew-pw-err">${esc(pw.err.nw)}</div>` : ''}</div>`;
+  }
+  function openPwSheet(){ pw.cur = ''; pw.nw = ''; pw.err = {}; renderPwSheet(); $('#pwSheet').classList.remove('hide'); }
+  function closePwSheet(){ $('#pwSheet').classList.add('hide'); }
+  function savePw(){ pw.err = {}; if (!pw.cur) pw.err.cur = 'Enter your current password.'; if (pw.nw.length < 8) pw.err.nw = 'At least 8 characters.'; if (Object.keys(pw.err).length) { renderPwSheet(); return; } closePwSheet(); prof.pwChanged = true; renderProfile(); }
+
   // ---- C5 handlers ----
   document.body.addEventListener('click', (e) => {
     const t = e.target;
     const lg0 = t.closest('[data-legal]'); if (lg0) { e.preventDefault(); e.stopPropagation(); document.body.dataset.lastGo = lg0.dataset.legal; return; }
     const o = t.closest('[data-onb]');
     if (o) { e.preventDefault(); const a = o.dataset.onb;
-      if (a === 'next') onbNext(); else if (a === 'back') { onb.tried = false; onb.step = Math.max(onb.step - 1, 0); renderOnb(); }
+      if (a === 'next') onbNext(); else if (a === 'back') { onb.tried = false; onb.step = Math.max(prevStep(onb.step), 0); renderOnb(); }
       else if (a === 'signin') { showLogin(); $('#email').value = onb.email || ''; } else if (a === 'photo') openPhotoSheet('onb');
       else if (a === 'agree') { onb.agree = !onb.agree; renderOnb(); } else if (a === 'showpw') { onb.showPw = !onb.showPw; renderOnb(); }
+      else if (a === 'video') { onb.watched = true; renderOnb(); document.body.dataset.lastGo = 'youtube:' + onb.biz.video; }
+      else if (a === 'toggle') { onb.open[o.dataset.i] = !onb.open[o.dataset.i]; renderOnb(); }
+      else if (a === 'today') { showApp('today'); }
       return; }
     const dr = t.closest('[data-doc]'); if (dr) { openDocSheet('onb', dr.dataset.doc); return; }
     const pr = t.closest('[data-pdoc]'); if (pr) { openDocSheet('profile', pr.dataset.pdoc); return; }
-    const pf = t.closest('[data-prof]'); if (pf) { if (pf.dataset.prof === 'photo') openPhotoSheet('profile'); return; }
+    const pf = t.closest('[data-prof]'); if (pf) { if (pf.dataset.prof === 'photo') openPhotoSheet('profile'); else if (pf.dataset.prof === 'password') openPwSheet(); return; }
     const ph = t.closest('[data-photo]'); if (ph) { if (ds.ctx === 'onb') onb.photo = true; else prof.photo = true; closePhotoSheet(); if (ds.ctx === 'onb') renderOnb(); else renderProfile(); return; }
     const da = t.closest('[data-ds]'); if (da) { const a = da.dataset.ds; const st = dsStore();
       if (a === 'camera' || a === 'file' || a === 'replace') { st[ds.key] = Object.assign(st[ds.key] || {}, { on: true, name: a === 'file' ? 'white-card.pdf' : 'IMG_2041.jpg' }); if (st[ds.key].exp === undefined) st[ds.key].exp = ''; ds.bad = false; renderDocSheet(); }
@@ -1317,6 +1374,8 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     if (t.closest('#profBody') && t.dataset.f) { let v = t.value; if (t.dataset.f === 'dob') { v = maskDMY(v); t.value = v; } prof[t.dataset.f] = v; return; }
     if (t.id === 'dsExp') { const v = maskDMY(t.value); t.value = v; const d = dsStore()[ds.key]; if (ds.ctx === 'onb') d.exp = v.length === 10 ? v : ''; else d.exp = fromDMY(v); return; }
     if (t.id === 'docQ') { const c = contracts.find(x => x.id === $('#docBody [data-docq]').dataset.docq); c.q = t.value; return; }
+    if (t.id === 'pwCur') { pw.cur = t.value; return; }
+    if (t.id === 'pwNew') { pw.nw = t.value; return; }
     if (t.id === 'sigIn') { sig.text = t.value; $('[data-testid="crew-sign-preview"]').textContent = t.value; if (sig.err && t.value.trim()) { sig.err = ''; t.classList.remove('bad'); const e2 = $('[data-testid="crew-sign-err"]'); if (e2) e2.remove(); } return; }
   });
   $('#profBack').addEventListener('click', closeProfile);
@@ -1327,6 +1386,9 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   $('#docSheet').addEventListener('click', (e) => { if (e.target === $('#docSheet')) closeDocSheet(); });
   $('#photoCancel').addEventListener('click', closePhotoSheet);
   $('#photoSheet').addEventListener('click', (e) => { if (e.target === $('#photoSheet')) closePhotoSheet(); });
+  $('#pwCancel').addEventListener('click', closePwSheet);
+  $('#pwSave').addEventListener('click', savePw);
+  $('#pwSheet').addEventListener('click', (e) => { if (e.target === $('#pwSheet')) closePwSheet(); });
   $('#signCancel').addEventListener('click', closeSign);
   $('#signConfirm').addEventListener('click', confirmSign);
   $('#signSheet').addEventListener('click', (e) => { if (e.target === $('#signSheet')) closeSign(); });
