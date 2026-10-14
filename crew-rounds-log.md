@@ -140,3 +140,7 @@ Rules: `crew-app-handover.md` §1. Rounds are C1, C2, …; one round at a time a
 ## 14 Oct — C3 tried on Josh's phone: working
 
 - Josh tried C3 (sign in with the job, location, My hours) on his phone via `/crew` on the preview: **working**. No fix to ride the C4 message. C3 is accepted as built.
+
+## 14 Oct — C5 (documents) research starts
+
+- Josh: "start" (C4 building meanwhile). C5 per handover §7: onboarding (Terms/Privacy tick instead of the silent `agreed_to_terms`, the pickers), profile, contracts (Round 22: restyle only, no behaviour change, plus a native PDF share instead of the "emailed" alert); legal items §4.6 (15+ with guardian consent 15–17 held by the employer; staff documents and signatures private). Five readers (onboarding, profile, contracts, legal, native file APIs) over the clone and the clone's `memory/specs/{contracts,legal,employees}` + Round 22/66/17c reports. Then prototype in the shell, then notes v1 for Josh. Nothing sent.
