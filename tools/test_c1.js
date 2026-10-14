@@ -1,4 +1,4 @@
-// Crew shell prototype (C1 shell + C2 Jobs + C3 time clock) — Playwright checks at 390 × 844 then 360 × 800.
+// Crew shell prototype (C1 shell + C2 Jobs + C3 time clock + C4 daily report + C5 documents) — Playwright checks at 390 × 844 then 360 × 800.
 // Run: NODE_PATH=$(npm root -g) node tools/test_c1.js [shots-dir]
 const { chromium } = require('playwright');
 const T = (id) => `[data-testid="${id}"]`;
@@ -230,6 +230,111 @@ async function run(b, W, H, tag) {
   await p.goto(U + '?screen=app&tab=today'); await p.waitForTimeout(300);
   await p.locator('#notifList ' + T('crew-notif-row')).nth(2).click(); await p.waitForTimeout(150);
   ok('the feedback notification opens that report with the reply' + full, await p.locator(T('crew-report')).isVisible() && (await go()) === '/employee/daily-report/r1' && await p.locator(T('crew-report-reply')).isVisible());
+
+  // ---- C5: onboarding, profile, my documents ----
+  await p.goto(U + '?screen=onboarding'); await p.waitForTimeout(300);
+  ok('onboarding 0: invite from the business, Let\'s go, Sign in link' + full, (await txt(T('crew-onb-title'))) === 'Join Sano Painting' && /Josh Sano has invited you/.test(await txt('#onbBody')) && await p.locator(T('crew-onb-start')).isVisible() && await p.locator(T('crew-onb-signin')).isVisible());
+  ok('onboarding 0: no tab bar, no horizontal scroll' + full, !(await p.locator(T('crew-tabbar')).isVisible()) && await noHScroll());
+  await p.screenshot({ path: OUT + `c5-onb-0-${tag}.png` });
+  await p.click(T('crew-onb-start')); await p.waitForTimeout(150);
+  ok('onboarding 1: About you with six fields and Step 1 of 4' + full, (await txt(T('crew-onb-step'))) === 'Step 1 of 4' && await p.locator(T('crew-onb-name')).isVisible() && await p.locator(T('crew-onb-password')).isVisible());
+  await p.click(T('crew-onb-next')); await p.waitForTimeout(150);
+  ok('onboarding 1: empty Continue shows inline errors, stays on step 1' + full, (await p.locator(T('crew-onb-err')).count()) >= 6 && (await txt(T('crew-onb-step'))) === 'Step 1 of 4');
+  await p.fill(T('crew-onb-name'), 'Mia Nguyen'); await p.fill(T('crew-onb-dob'), '12042012'); await p.click(T('crew-onb-next')); await p.waitForTimeout(150);
+  ok('onboarding 1: a 14-year-old is refused with the 15+ line' + full, /You need to be 15 or older to join a crew\./.test(await txt('#onbBody')) && (await txt(T('crew-onb-step'))) === 'Step 1 of 4');
+  await p.fill(T('crew-onb-dob'), '12042010'); await p.waitForTimeout(150);
+  ok('onboarding 1: 15–17 shows the guardian-consent line' + full, await p.locator(T('crew-onb-minor')).isVisible() && /parent or guardian/.test(await txt(T('crew-onb-minor'))));
+  await p.screenshot({ path: OUT + `c5-onb-1-${tag}.png` });
+  await p.fill(T('crew-onb-phone'), '0412 345 678'); await p.fill(T('crew-onb-email'), 'mia@example.com'); await p.fill(T('crew-onb-emergency'), 'Tom Nguyen 0411 222 333'); await p.fill(T('crew-onb-password'), 'painter2026');
+  await p.click(T('crew-onb-next')); await p.waitForTimeout(150);
+  ok('onboarding 2: photo step with Add a photo and Skip for now' + full, (await txt(T('crew-onb-step'))) === 'Step 2 of 4' && await p.locator(T('crew-onb-photo-add')).isVisible() && (await txt(T('crew-onb-next'))) === 'Skip for now');
+  await p.click(T('crew-onb-photo-add')); await p.waitForTimeout(150);
+  ok('onboarding 2: the photo sheet offers camera and library' + full, await p.locator(T('crew-photo-sheet')).isVisible() && await p.locator(T('crew-photo-camera')).isVisible() && await p.locator(T('crew-photo-library')).isVisible());
+  await p.click(T('crew-photo-camera')); await p.waitForTimeout(150);
+  ok('onboarding 2: after a photo the button reads Continue' + full, (await txt(T('crew-onb-next'))) === 'Continue' && (await txt(T('crew-onb-photo-add'))) === 'Change photo');
+  await p.click(T('crew-onb-next')); await p.waitForTimeout(150);
+  ok('onboarding 3: eight document rows, two required' + full, (await p.locator('#onbBody .drow').count()) === 8 && /Required/.test(await txt(T('crew-onb-doc-driving_licence'))) && /Optional/.test(await txt(T('crew-onb-doc-other'))));
+  await p.click(T('crew-onb-next')); await p.waitForTimeout(150);
+  ok('onboarding 3: Continue without the required two marks them inline' + full, /Add this one to continue/.test(await txt(T('crew-onb-doc-white_card'))) && (await txt(T('crew-onb-step'))) === 'Step 3 of 4');
+  await p.screenshot({ path: OUT + `c5-onb-3-${tag}.png` });
+  await p.click(T('crew-onb-doc-driving_licence')); await p.waitForTimeout(150);
+  ok('onboarding 3: the document sheet offers a photo or a file' + full, await p.locator(T('crew-doc-sheet')).isVisible() && await p.locator(T('crew-doc-sheet-camera')).isVisible() && await p.locator(T('crew-doc-sheet-file')).isVisible());
+  await p.click(T('crew-doc-sheet-camera')); await p.waitForTimeout(150);
+  ok('onboarding 3: after the photo the sheet asks for the expiry date' + full, await p.locator(T('crew-doc-sheet-expiry')).isVisible() && await p.locator(T('crew-doc-sheet-replace')).isVisible());
+  await p.fill(T('crew-doc-sheet-expiry'), '01032027'); await p.click(T('crew-doc-sheet-done')); await p.waitForTimeout(150);
+  ok('onboarding 3: the row shows Added with the expiry' + full, /Added · expires 01\/03\/2027/.test(await txt(T('crew-onb-doc-driving_licence'))));
+  await p.click(T('crew-onb-doc-white_card')); await p.click(T('crew-doc-sheet-file')); await p.fill(T('crew-doc-sheet-expiry'), '28102026'); await p.click(T('crew-doc-sheet-done')); await p.waitForTimeout(150);
+  await p.click(T('crew-onb-next')); await p.waitForTimeout(150);
+  ok('onboarding 4: the three facts and the agreement with both links' + full, (await txt(T('crew-onb-step'))) === 'Step 4 of 4' && (await p.locator('#onbBody .facts > div').count()) === 3 && await p.locator(T('crew-onb-terms')).isVisible() && await p.locator(T('crew-onb-privacy')).isVisible() && (await txt(T('crew-onb-join'))) === 'Join the team');
+  await p.click(T('crew-onb-join')); await p.waitForTimeout(150);
+  ok('onboarding 4: Join without the tick shows the one line' + full, (await txt(T('crew-onb-err'))) === 'Tick the agreement to continue.');
+  await p.click(T('crew-onb-terms')); await p.waitForTimeout(100);
+  ok('onboarding 4: the Terms link opens /terms without ticking the box' + full, (await go()) === '/terms' && (await p.locator(T('crew-onb-agree')).getAttribute('aria-checked')) === 'false');
+  await p.screenshot({ path: OUT + `c5-onb-4-${tag}.png` });
+  await p.click(T('crew-onb-agree') + ' .box'); await p.waitForTimeout(100);
+  ok('onboarding 4: tapping the box ticks it' + full, (await p.locator(T('crew-onb-agree')).getAttribute('aria-checked')) === 'true');
+  await p.click(T('crew-onb-join')); await p.waitForTimeout(150);
+  ok('onboarding 5: done screen names the crew member and the email' + full, /You're on the team, Mia\./.test(await txt(T('crew-onb-done'))) && /mia@example\.com/.test(await txt('#onbBody')) && (await txt(T('crew-onb-signin'))) === 'Sign in');
+  await p.screenshot({ path: OUT + `c5-onb-5-${tag}.png` });
+  await p.click(T('crew-onb-signin')); await p.waitForTimeout(150);
+  ok('onboarding 5: Sign in opens the crew sign-in with the email filled' + full, await p.locator(T('crew-login')).isVisible() && (await p.locator(T('employee-login-email')).inputValue()) === 'mia@example.com');
+  await p.goto(U + '?screen=onboarding&invalid=1'); await p.waitForTimeout(300);
+  ok('onboarding: an invalid link shows the one screen and no form' + full, await p.locator(T('crew-onb-invalid')).isVisible() && (await p.locator(T('crew-onb-name')).count()) === 0);
+  await p.goto(U + '?screen=onboarding&biz=0'); await p.waitForTimeout(300);
+  ok('onboarding: no business profile → "Join the team"' + full, (await txt(T('crew-onb-title'))) === 'Join the team');
+
+  // profile
+  await p.goto(U + '?screen=profile'); await p.waitForTimeout(300);
+  ok('profile: card, details, email read-only with its hint, Save bar' + full, await p.locator(T('crew-profile')).isVisible() && (await p.locator(T('crew-profile-email')).getAttribute('readonly')) !== null && /Ask your employer to change your email/.test(await txt('#profBody')) && await p.locator(T('crew-profile-save')).isVisible());
+  ok('profile: eight document rows with statuses' + full, (await p.locator('#profBody .drow').count()) === 8 && /On file · expires 1 Mar 2027/.test(await txt(T('crew-profile-doc-driving_licence'))) && /Expires in 14 days/.test(await txt(T('crew-profile-doc-white_card'))) && /Expired 30 Sep 2026/.test(await txt(T('crew-profile-doc-first_aid'))) && /Not uploaded/.test(await txt(T('crew-profile-doc-other'))));
+  ok('profile: no horizontal scroll' + full, await noHScroll());
+  await p.screenshot({ path: OUT + `c5-profile-${tag}.png` });
+  await p.click(T('crew-profile-doc-first_aid')); await p.waitForTimeout(150);
+  ok('profile: an uploaded document opens with View, Replace and its expiry' + full, await p.locator(T('crew-doc-sheet-view')).isVisible() && await p.locator(T('crew-doc-sheet-replace')).isVisible() && (await p.locator(T('crew-doc-sheet-expiry')).inputValue()) === '30/09/2026');
+  await p.click(T('crew-doc-sheet-view')); ok('profile: View opens the stored file' + full, (await go()) === 'view:first_aid');
+  await p.click(T('crew-doc-sheet-done')); await p.waitForTimeout(150);
+  await p.fill(T('crew-profile-name'), ''); await p.click(T('crew-profile-save')); await p.waitForTimeout(150);
+  ok('profile: Save with an empty name shows the inline error' + full, (await txt(T('crew-profile-err'))) === 'Enter your full name.');
+  await p.fill(T('crew-profile-name'), 'Mia Nguyen'); await p.click(T('crew-profile-save')); await p.waitForTimeout(150);
+  ok('profile: Save → the button reads Saved' + full, (await txt(T('crew-profile-save'))) === 'Saved');
+  await p.click(T('crew-profile-back')); await p.waitForTimeout(150);
+  ok('profile: Back returns to Me' + full, await p.locator(T('crew-pane-me')).isVisible());
+  await p.click(T('crew-me-profile')); await p.waitForTimeout(150);
+  ok('Me › profile card opens Profile' + full, await p.locator(T('crew-profile')).isVisible() && (await go()) === '/employee/profile');
+
+  // my documents
+  await p.goto(U + '?screen=docs'); await p.waitForTimeout(300);
+  ok('documents: three rows with pills and the "1 to sign" line' + full, (await p.locator(T('crew-docs-row')).count()) === 3 && (await txt(T('crew-docs-meta'))) === '1 to sign' && /Awaiting signature/.test(await txt(T('crew-docs-row'))) && /Sent 13 Oct 2026/.test(await txt(T('crew-docs-row'))));
+  await p.screenshot({ path: OUT + `c5-docs-${tag}.png` });
+  await p.locator(T('crew-docs-row')).first().click(); await p.waitForTimeout(150);
+  ok('document: text with the unfilled fields highlighted, question box, Sign bar' + full, await p.locator(T('crew-doc')).isVisible() && (await p.locator(T('crew-contract-unfilled')).count()) === 2 && await p.locator(T('crew-contract-question-input')).isVisible() && await p.locator(T('crew-contract-sign')).isVisible() && (await go()) === '/employee/contracts/d1');
+  await p.click(T('crew-contract-question-send')); await p.waitForTimeout(150);
+  ok('document: Send with no question shows the one line' + full, (await txt(T('crew-contract-question-err'))) === 'Write your question first.');
+  await p.fill(T('crew-contract-question-input'), 'Is the start date flexible?'); await p.click(T('crew-contract-question-send')); await p.waitForTimeout(150);
+  ok('document: a sent question shows the confirmation line and keeps the Sign bar' + full, /went to your employer/.test(await txt(T('crew-contract-question-sent'))) && await p.locator(T('crew-contract-sign')).isVisible());
+  await p.screenshot({ path: OUT + `c5-doc-sent-${tag}.png` });
+  await p.click(T('crew-contract-sign')); await p.waitForTimeout(150);
+  ok('sign sheet: the sentence, the name field and the preview' + full, await p.locator(T('crew-sign')).isVisible() && /read, understood, and agree/.test(await txt('#signBody')) && await p.locator(T('crew-sign-input')).isVisible());
+  await p.click(T('crew-sign-confirm')); await p.waitForTimeout(150);
+  ok('sign sheet: Confirm with no name shows the one line' + full, (await txt(T('crew-sign-err'))) === 'Type your full name to sign.');
+  await p.fill(T('crew-sign-input'), 'Mia Nguyen'); await p.waitForTimeout(100);
+  ok('sign sheet: the preview shows the typed name' + full, (await txt(T('crew-sign-preview'))) === 'Mia Nguyen');
+  await p.screenshot({ path: OUT + `c5-sign-${tag}.png` });
+  await p.click(T('crew-sign-confirm')); await p.waitForTimeout(200);
+  ok('signed: the pill reads Signed, the Sign bar is gone, the copy line waits for the countersign' + full, /Signed/.test(await txt(T('crew-doc-meta'))) && !(await p.locator(T('crew-contract-sign')).isVisible()) && await p.locator(T('crew-contract-notready')).isVisible() && (await p.locator(T('crew-contract-question')).count()) === 0);
+  await p.click(T('crew-doc-back')); await p.waitForTimeout(150);
+  ok('documents: after signing nothing is waiting' + full, (await txt(T('crew-docs-meta'))) === 'Nothing waiting for your signature');
+  await p.goto(U + '?screen=doc&id=d2'); await p.waitForTimeout(300);
+  ok('a countersigned document offers Download my signed copy' + full, await p.locator(T('crew-contract-download')).isVisible() && !(await p.locator(T('crew-contract-sign')).isVisible()));
+  await p.click(T('crew-contract-download')); ok('Download → the share sheet on the phone' + full, (await go()) === 'share:d2');
+  await p.screenshot({ path: OUT + `c5-doc-signed-${tag}.png` });
+  await p.goto(U + '?screen=doc&id=d3'); await p.waitForTimeout(300);
+  ok('an ended document: Ended pill, no question box, no sign bar' + full, /Ended/.test(await txt(T('crew-doc-meta'))) && (await p.locator(T('crew-contract-question')).count()) === 0 && !(await p.locator(T('crew-contract-sign')).isVisible()));
+  await p.goto(U + '?screen=docs&contracts=0'); await p.waitForTimeout(300);
+  ok('documents: empty state' + full, /No documents yet/.test(await txt(T('crew-docs-empty'))));
+  await p.goto(U + '?screen=app&tab=me'); await p.waitForTimeout(300);
+  await p.click(T('crew-me-contracts')); await p.waitForTimeout(150);
+  ok('Me › My documents opens the list' + full, await p.locator(T('crew-docs')).isVisible() && (await go()) === '/employee/contracts');
 
   ok('no page errors' + full, errs.length === 0); if (errs.length) console.log(errs);
   await p.close();

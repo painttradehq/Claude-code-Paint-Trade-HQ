@@ -278,6 +278,56 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
 .tab.on{color:var(--accent-ink)}
 .tab.on .tico{background:var(--accent-bg);color:var(--accent)}
 .tab .badge{position:absolute;top:8px;left:50%;margin-left:6px;min-width:17px;height:17px;border-radius:9px;background:var(--danger);color:#fff;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px;border:2px solid var(--surface)}
+
+/* ---- C5: onboarding, profile, my documents ---- */
+.onb-top{padding:26px 20px 6px;text-align:center}
+.onb-top .mark{margin:0 auto 10px}
+.onb-kicker{font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
+.onb-title{font-family:var(--font-display);font-size:28px;font-weight:600;letter-spacing:-.02em;line-height:1.15;margin:4px 0 6px;color:var(--text-primary)}
+.onb-sub{font-size:15px;color:var(--text-secondary);line-height:1.45}
+.onb-sub b{color:var(--text-primary)}
+.prog{display:flex;align-items:center;gap:10px;padding:4px 16px 8px}
+.prog .bar{flex:1;height:4px;border-radius:2px;background:var(--border)}
+.prog .bar i{display:block;height:100%;border-radius:2px;background:var(--accent)}
+.prog span{font-size:12.5px;font-weight:600;color:var(--text-muted);white-space:nowrap}
+.need{display:flex;flex-direction:column;gap:12px;padding:14px 16px}
+.need div{display:flex;gap:12px;align-items:center;font-size:15px}
+.need .ico{width:36px;height:36px;border-radius:10px}
+.minor{margin:8px 0 0;font-size:13.5px;color:var(--accent-ink);line-height:1.4;padding:10px 12px;background:var(--accent-bg);border-radius:var(--radius-sm)}
+.photo-big{width:120px;height:120px;border-radius:60px;background:var(--accent-bg);color:var(--accent-ink);font-family:var(--font-display);font-size:48px;font-weight:600;display:flex;align-items:center;justify-content:center;margin:6px auto 14px;border:3px solid var(--surface);box-shadow:var(--shadow-card)}
+.photo-big.has{background:#D9D2EE;color:transparent}
+.drow{display:flex;align-items:center;gap:12px;padding:12px 16px;min-height:60px;width:100%;text-align:left;border-top:1px solid var(--border)}
+.drow:first-child{border-top:0}
+.drow:active{background:var(--surface-sunken)}
+.drow .st{width:10px;height:10px;border-radius:5px;background:var(--border-strong);flex-shrink:0}
+.drow .st.ok{background:var(--success)}.drow .st.warn{background:var(--warning)}.drow .st.bad{background:var(--danger)}
+.drow .dt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.drow .dn{font-size:15.5px;font-weight:600}
+.drow .ds{font-size:13px;color:var(--text-secondary)}
+.drow .ds.warn{color:var(--warning)}.drow .ds.bad{color:var(--danger);font-weight:500}
+.agree{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1px solid var(--border-strong);border-radius:var(--radius-md);background:var(--surface);margin-top:14px;width:100%;text-align:left}
+.agree.bad{border-color:var(--danger)}
+.agree .box{width:24px;height:24px;border-radius:7px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:700;margin-top:1px}
+.agree.on .box{background:var(--accent);border-color:var(--accent)}
+.agree .at{font-size:15px;line-height:1.45}
+.agree .at a{color:var(--accent);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.facts{padding:4px 16px}
+.facts div{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--border);font-size:14px;line-height:1.4;color:var(--text-secondary)}
+.facts div:first-child{border-top:0}
+.facts .ico{width:36px;height:36px;border-radius:10px}
+.facts b{color:var(--text-primary);font-weight:600;display:block;font-size:15px}
+.doc-body{white-space:pre-wrap;font-family:Georgia,serif;font-size:14.5px;line-height:1.55;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);margin-top:10px}
+.doc-body mark{background:#FDF1DC;color:#6B3F0A;font-family:ui-monospace,Menlo,monospace;font-size:13px;padding:0 3px;border-radius:3px}
+.sigprev{min-height:56px;display:flex;align-items:center;justify-content:center;font-family:'Snell Roundhand','Brush Script MT','Segoe Script',cursive;font-size:30px;color:var(--accent);border-bottom:1px solid var(--border-strong);margin:8px 0 4px}
+.okline{font-size:13.5px;color:var(--success);font-weight:500;margin:8px 4px 0}
+.pill.wait{background:var(--warning-bg);color:var(--warning)}
+.pill.ended{background:var(--surface-sunken);color:var(--text-muted)}
+.sheet .srow{display:flex;align-items:center;gap:12px;min-height:52px;width:100%;text-align:left;font-size:16px;border-top:1px solid var(--border);padding:0 4px}
+.sheet .srow:first-child{border-top:0}
+.sheet .srow .ico{width:36px;height:36px;border-radius:10px}
+.tin.ro{background:var(--surface-sunken);color:var(--text-secondary)}
+.btn.saved{background:var(--success)}
+.pcard{display:flex;align-items:center;gap:14px;padding:14px 16px}
 </style>
 </head>
 <body>
@@ -523,6 +573,71 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   </section>
 
   <!-- ================= JOB PICKER (sheet over Today) ================= -->
+
+  <!-- ================= C5: ONBOARDING (stack, signed out) ================= -->
+  <section id="s-onb" class="hide" data-testid="crew-onb" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div id="onbHead"></div>
+    <div class="form-body" id="onbBody"></div>
+    <div class="sendbar" id="onbBar"></div>
+  </section>
+
+  <!-- ================= C5: PROFILE (stack) ================= -->
+  <section id="s-profile" class="hide" data-testid="crew-profile" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="profBack" data-testid="crew-profile-back"><svg><use href="#i-back"/></svg>Me</button></div>
+      <div class="job-title">Profile</div>
+    </div>
+    <div class="form-body" id="profBody"></div>
+    <div class="sendbar"><button class="btn btn-primary" id="profSave" data-testid="crew-profile-save">Save changes</button></div>
+  </section>
+
+  <!-- ================= C5: MY DOCUMENTS (stack) ================= -->
+  <section id="s-docs" class="hide" data-testid="crew-docs" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="docsBack" data-testid="crew-docs-back"><svg><use href="#i-back"/></svg>Me</button></div>
+      <div class="job-title">My documents</div>
+      <div class="meta" id="docsMeta" data-testid="crew-docs-meta"></div>
+    </div>
+    <div class="form-body" id="docsBody"></div>
+  </section>
+
+  <!-- ================= C5: ONE DOCUMENT (stack) ================= -->
+  <section id="s-doc" class="hide" data-testid="crew-doc" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="docBack" data-testid="crew-doc-back"><svg><use href="#i-back"/></svg>My documents</button></div>
+      <div class="job-title" id="docTitle"></div>
+      <div class="meta" id="docMeta" data-testid="crew-doc-meta"></div>
+    </div>
+    <div class="form-body" id="docBody"></div>
+    <div class="sendbar hide" id="docBar"></div>
+  </section>
+
+  <!-- C5 sheets -->
+  <div class="scrim hide" id="photoSheet" data-testid="crew-photo-sheet">
+    <div class="sheet" role="dialog" aria-label="Add a photo">
+      <div class="sheet-grab"></div>
+      <button class="srow" data-testid="crew-photo-camera" data-photo="camera"><span class="ico"><svg><use href="#i-file"/></svg></span>Take a photo</button>
+      <button class="srow" data-testid="crew-photo-library" data-photo="library"><span class="ico"><svg><use href="#i-me"/></svg></span>Choose from library</button>
+      <button class="btn btn-outline" id="photoCancel" data-testid="crew-photo-cancel">Cancel</button>
+    </div>
+  </div>
+  <div class="scrim hide" id="docSheet" data-testid="crew-doc-sheet">
+    <div class="sheet" role="dialog" aria-label="Document">
+      <div class="sheet-grab"></div>
+      <h2 id="dsTitle"></h2>
+      <div id="dsBody"></div>
+      <button class="btn btn-outline" id="dsDone" data-testid="crew-doc-sheet-done">Done</button>
+    </div>
+  </div>
+  <div class="scrim hide" id="signSheet" data-testid="crew-sign">
+    <div class="sheet" role="dialog" aria-label="Sign">
+      <div class="sheet-grab"></div>
+      <h2 id="signTitle"></h2>
+      <div id="signBody"></div>
+      <div style="display:flex;gap:10px;margin-top:12px"><button class="btn btn-outline" id="signCancel" data-testid="crew-sign-cancel" style="flex:1">Cancel</button><button class="btn btn-primary" id="signConfirm" data-testid="crew-sign-confirm" style="flex:1">Confirm &amp; sign</button></div>
+    </div>
+  </div>
+
   <div class="scrim hide" id="picker" data-testid="crew-clock-picker">
     <div class="sheet" role="dialog" aria-label="Which job?">
       <div class="sheet-grab"></div>
@@ -906,11 +1021,11 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.tab === name));
     document.querySelectorAll('.pane.on .body').forEach(b => b.scrollTop = 0);
   }
-  function showApp(tab){
+  function showApp(tab){ hideC5();
     $('#s-login').classList.add('hide'); $('#s-job').classList.add('hide'); $('#s-hours').classList.add('hide'); $('#s-app').classList.remove('hide');
     renderClock(); renderTodayJob(); renderNotifs(); renderJobs(); showTab(tab || 'today');
   }
-  function showLogin(){
+  function showLogin(){ hideC5();
     $('#s-app').classList.add('hide'); $('#s-job').classList.add('hide'); $('#s-hours').classList.add('hide'); $('#s-login').classList.remove('hide');
     $('#password').value = '';
   }
@@ -955,6 +1070,8 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     if (!row) return;
     if (row.dataset.testid === 'crew-me-hours') { openHours(); return; }
     if (row.dataset.testid === 'crew-today-report') { openReports(); return; }
+    if (row.dataset.testid === 'crew-me-profile') { openProfile(); return; }
+    if (row.dataset.testid === 'crew-me-contracts') { openDocs(); return; }
     if (row.dataset.id && /^\/employee\/daily-report\?report=/.test(row.dataset.go)) { const n = state.notifs.find(x => x.id === row.dataset.id); if (n) { n.read = true; renderNotifs(); } openReport(row.dataset.go.split('=')[1]); return; }
     if (row.dataset.id) { const n = state.notifs.find(x => x.id === row.dataset.id); if (n) { n.read = true; renderNotifs(); } }
     document.body.dataset.lastGo = row.dataset.go; // prototype: records the route the real app would push
@@ -977,11 +1094,252 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
 
   // ---- deep links for review / tests ----
   if (q.get('error') === 'restricted') { $('#loginErrorText').textContent = RESTRICTED; $('#loginError').classList.remove('hide'); }
+
+  // ================= C5: documents — onboarding, profile, my documents =================
+  const DOC_CAT = [
+    ['driving_licence', 'Driving licence or photo ID', true], ['white_card', 'White card (construction induction)', true],
+    ['working_height', 'Working at heights', false], ['first_aid', 'First aid certificate', false], ['police_check', 'Police check', false],
+    ['children_check', 'Working with children check', false], ['public_liability', 'Public liability insurance', false], ['other', 'Other', false],
+  ];
+  const TODAY5 = new Date(2026, 9, 14);
+  const MONS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dMY = (iso) => { if (!iso) return ''; const [y, m, d] = iso.split('-').map(Number); return `${d} ${MONS[m - 1]} ${y}`; };
+  const toDMY = (iso) => iso ? iso.split('-').reverse().join('/') : '';
+  const fromDMY = (s) => { const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(s); return m ? `${m[3]}-${m[2]}-${m[1]}` : ''; };
+  const daysTo = (iso) => { const [y, m, d] = iso.split('-').map(Number); return Math.round((Date.UTC(y, m - 1, d) - Date.UTC(2026, 9, 14)) / 86400000); };
+  const ageOf = (dmy) => { const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(dmy); if (!m) return null; const b = new Date(+m[3], +m[2] - 1, +m[1]); if (isNaN(b)) return null; return (TODAY5 - b) / (365.25 * 86400000); };
+  const maskDMY = (v) => { const d = v.replace(/\D/g, '').slice(0, 8); return d.length > 4 ? `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}` : d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d; };
+  const docStatus = (d) => {
+    if (!d || !d.on) return { cls: '', txt: 'Not uploaded' };
+    if (!d.exp) return { cls: 'ok', txt: 'On file' };
+    const n = daysTo(d.exp);
+    if (n < 0) return { cls: 'bad', txt: `Expired ${dMY(d.exp)}` };
+    if (n <= 30) return { cls: 'warn', txt: `Expires in ${n} days` };
+    return { cls: 'ok', txt: `On file · expires ${dMY(d.exp)}` };
+  };
+  const BIZ = 'Sano Painting';
+  const prof = { name: 'Mia Nguyen', dob: '12/04/1998', phone: '0412 345 678', email: 'mia@example.com', emergency: 'Tom Nguyen 0411 222 333', address: '', suburb: '', photo: false, tried: false, saved: false,
+    docs: q.get('docs') === '0' ? {} : { driving_licence: { on: true, exp: '2027-03-01' }, white_card: { on: true, exp: '2026-10-28' }, first_aid: { on: true, exp: '2026-09-30' }, working_height: { on: true, exp: '' } } };
+  const contracts = q.get('contracts') === '0' ? [] : [
+    { id: 'd1', name: 'Employment agreement', status: 'sent', sent: '2026-10-13', content: 'EMPLOYMENT AGREEMENT\n\nBetween Sano Painting Pty Ltd (the employer) and Mia Nguyen (the employee).\n\n1. Position: Painter, starting [START DATE].\n2. Hours: 38 a week, Monday to Friday, at the sites the employer allocates.\n3. Pay: as set out in the attached schedule, paid weekly.\n4. Safety: the employee follows the site safety plan and wears the PPE issued.\n5. Notice: two weeks by either side.\n\nSigned: [DATE SIGNED]' },
+    { id: 'd2', name: 'Code of conduct', status: 'signed', sent: '2026-10-01', signed: '2026-10-02', countersigned: '2026-10-03', content: 'CODE OF CONDUCT\n\n1. Be on site on time, every day.\n2. Treat clients and their homes with respect.\n3. Report hazards straight away.\n4. No phones on ladders.\n\nSigned: 2 Oct 2026' },
+    { id: 'd3', name: 'Safety agreement', status: 'ended', sent: '2026-05-01', signed: '2026-05-02', countersigned: '2026-05-02', ended: '2026-09-30', content: 'SAFETY AGREEMENT\n\nReplaced by the site safety plan of 30 Sep 2026.' },
+  ];
+  const cStatus = (c) => c.status === 'sent' ? { cls: 'wait', txt: 'Awaiting signature' } : c.status === 'signed' ? { cls: 'live', txt: 'Signed' } : { cls: 'ended', txt: 'Ended' };
+  function hideC5(){ ['#s-onb', '#s-profile', '#s-docs', '#s-doc'].forEach(x => $(x).classList.add('hide')); }
+  function stackOpen(id){ $('#s-app').classList.add('hide'); $('#s-login').classList.add('hide'); hideC5(); $(id).classList.remove('hide'); const b = $(id + ' .form-body'); if (b) b.scrollTop = 0; }
+  const MARK = $('#s-login .mark').innerHTML;
+
+  // ---- onboarding ----
+  const onb = { step: 0, name: '', dob: '', phone: '', email: '', emergency: '', password: '', photo: false, docs: {}, agree: false, tried: false,
+    biz: q.get('biz') === '0' ? null : { business_name: BIZ, owner_name: 'Josh Sano' }, invalid: q.get('invalid') === '1' };
+  function onbErrors(){
+    const e = {};
+    if (onb.step === 1) {
+      if (!onb.name.trim()) e.name = 'Enter your full name.';
+      const age = ageOf(onb.dob);
+      if (age === null) e.dob = 'Enter your date of birth as DD/MM/YYYY.'; else if (age < 0 || age > 100) e.dob = 'Check your date of birth.'; else if (age < 15) e.dob = 'You need to be 15 or older to join a crew.';
+      if (!/^(\+?61|0)[2-478]?\d{8,9}$/.test(onb.phone.replace(/\s/g, ''))) e.phone = 'Enter an Australian mobile number.';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(onb.email.trim())) e.email = 'Enter your email address.';
+      if (!onb.emergency.trim()) e.emergency = 'Who should your employer call in an emergency?';
+      if (onb.password.length < 8) e.password = 'At least 8 characters.';
+    }
+    if (onb.step === 3) DOC_CAT.filter(d => d[2]).forEach(([k]) => { const d = onb.docs[k]; if (!d) e[k] = 'Add this one to continue.'; else if (!d.exp) e[k] = 'Add the expiry date.'; });
+    if (onb.step === 4 && !onb.agree) e.agree = 'Tick the agreement to continue.';
+    return e;
+  }
+  const isMinor = () => { const a = ageOf(onb.dob); return a !== null && a >= 15 && a < 18; };
+  function renderOnb(){
+    const e = onb.tried ? onbErrors() : {};
+    const bad = (k) => e[k] ? 'bad' : '';
+    const err = (k) => e[k] ? `<div class="err" data-testid="crew-onb-err">${esc(e[k])}</div>` : '';
+    const n = onb.step, biz = onb.biz;
+    $('#onbHead').innerHTML = (n >= 1 && n <= 4 && !onb.invalid) ? `<div class="jobhdr" style="padding-bottom:0"><div class="row2"><button class="back" data-testid="crew-onb-back" data-onb="back"><svg><use href="#i-back"/></svg>Back</button></div></div><div class="prog" data-testid="crew-onb-step"><div class="bar"><i style="width:${(n / 4) * 100}%"></i></div><span>Step ${n} of 4</span></div>` : '';
+    let body = '', bar = '';
+    const first = (onb.name.trim().split(' ')[0] || 'there');
+    if (onb.invalid) {
+      body = `<div class="onb-top"><div class="mark" aria-hidden="true">${MARK}</div><div class="onb-kicker">Paint Trade HQ Crew</div><div class="onb-title" data-testid="crew-onb-invalid">This invite link isn't valid.</div><div class="onb-sub">Ask your employer for a new one. They make it in Team › Invite link.</div></div>`;
+      bar = `<button class="btn btn-outline" data-testid="crew-onb-signin" data-onb="signin">Already on the team? Sign in</button>`;
+    } else if (n === 0) {
+      body = `<div class="onb-top"><div class="mark" aria-hidden="true">${MARK}</div><div class="onb-kicker">Paint Trade HQ Crew</div><div class="onb-title" data-testid="crew-onb-title">${biz ? 'Join ' + esc(biz.business_name) : 'Join the team'}</div><div class="onb-sub">${biz ? esc(biz.owner_name) + ' has invited you.' : 'Your employer has invited you.'} It takes about five minutes.</div></div>
+        <div class="sect">You'll need</div>
+        <div class="card need"><div><span class="ico"><svg><use href="#i-file"/></svg></span>Your driving licence or photo ID</div><div><span class="ico"><svg><use href="#i-check"/></svg></span>Your white card</div><div><span class="ico"><svg><use href="#i-phone"/></svg></span>An emergency contact's name and number</div></div>`;
+      bar = `<button class="btn btn-primary" data-testid="crew-onb-start" data-onb="next">Let's go</button><div class="login-foot" style="margin-top:10px">Already on the team? <a href="#" class="login-foot-link" data-testid="crew-onb-signin" data-onb="signin">Sign in</a></div>`;
+    } else if (n === 1) {
+      body = `<div class="sect">About you</div>
+        <div class="fld"><label for="onbName">Full name</label><input id="onbName" data-testid="crew-onb-name" data-f="name" class="tin ${bad('name')}" value="${esc(onb.name)}" autocomplete="name">${err('name')}</div>
+        <div class="fld"><label for="onbDob">Date of birth</label><input id="onbDob" data-testid="crew-onb-dob" data-f="dob" class="tin ${bad('dob')}" value="${esc(onb.dob)}" placeholder="DD/MM/YYYY" inputmode="numeric" maxlength="10">${err('dob')}${isMinor() ? `<div class="minor" data-testid="crew-onb-minor">Under 18? Your employer needs your parent or guardian's consent. Check with them before you go on.</div>` : ''}</div>
+        <div class="fld"><label for="onbPhone">Mobile number</label><input id="onbPhone" data-testid="crew-onb-phone" data-f="phone" class="tin ${bad('phone')}" value="${esc(onb.phone)}" inputmode="tel" autocomplete="tel">${err('phone')}</div>
+        <div class="fld"><label for="onbEmail">Email</label><input id="onbEmail" data-testid="crew-onb-email" data-f="email" class="tin ${bad('email')}" value="${esc(onb.email)}" inputmode="email" autocomplete="email" autocapitalize="none"><div class="hint">You'll sign in with this.</div>${err('email')}</div>
+        <div class="fld"><label for="onbEm">Emergency contact</label><input id="onbEm" data-testid="crew-onb-emergency" data-f="emergency" class="tin ${bad('emergency')}" value="${esc(onb.emergency)}" placeholder="Name and phone number">${err('emergency')}</div>
+        <div class="fld"><label for="onbPw">Create a password</label><div class="pw"><input id="onbPw" data-testid="crew-onb-password" data-f="password" class="tin ${bad('password')}" type="${onb.showPw ? 'text' : 'password'}" value="${esc(onb.password)}" autocomplete="new-password"><button type="button" data-onb="showpw" data-testid="crew-onb-password-show">${onb.showPw ? 'Hide' : 'Show'}</button></div><div class="hint">At least 8 characters.</div>${err('password')}</div>`;
+      bar = `<button class="btn btn-primary" data-testid="crew-onb-next" data-onb="next">Continue</button>`;
+    } else if (n === 2) {
+      body = `<div class="sect">Your photo</div><div class="card" style="padding:18px 16px;text-align:center"><div class="photo-big ${onb.photo ? 'has' : ''}" data-testid="crew-onb-photo">${onb.photo ? '' : esc((onb.name.trim()[0] || 'M').toUpperCase())}</div><button class="btn btn-outline btn-sm" style="width:auto;padding:0 20px;display:inline-flex" data-testid="crew-onb-photo-add" data-onb="photo">${onb.photo ? 'Change photo' : 'Add a photo'}</button><div class="hint" style="margin-top:12px">Your employer sees it on your profile. You can add it later from Me › Profile.</div></div>`;
+      bar = `<button class="btn btn-primary" data-testid="crew-onb-next" data-onb="next">${onb.photo ? 'Continue' : 'Skip for now'}</button>`;
+    } else if (n === 3) {
+      body = `<div class="sect">Your documents</div><div class="hint" style="margin:-6px 4px 10px">A photo or a PDF, up to 5 MB each. Only your employer and you can see them.</div><div class="card" style="padding:0">${DOC_CAT.map(([k, label, req]) => { const d = onb.docs[k]; const st = d ? { cls: 'ok', txt: d.exp ? 'Added · expires ' + d.exp : 'Added' } : { cls: '', txt: req ? 'Required' : 'Optional' }; return `<button class="drow" data-testid="crew-onb-doc-${k}" data-doc="${k}"><span class="st ${e[k] ? 'bad' : st.cls}"></span><span class="dt"><span class="dn">${label}</span><span class="ds ${e[k] ? 'bad' : ''}">${e[k] ? esc(e[k]) : st.txt}</span></span><svg class="chev"><use href="#i-chev"/></svg></button>`; }).join('')}</div>`;
+      bar = `<button class="btn btn-primary" data-testid="crew-onb-next" data-onb="next">Continue</button>`;
+    } else if (n === 4) {
+      const bn = biz ? esc(biz.business_name) : 'your employer';
+      body = `<div class="sect">Before you join</div><div class="card facts"><div><span class="ico"><svg><use href="#i-people"/></svg></span><span><b>${bn} sees your details</b>Your name, contact details, documents, hours and reports go to ${bn}. Paint Trade HQ stores them for that business.</span></div><div><span class="ico"><svg><use href="#i-pin"/></svg></span><span><b>Location at sign-in and sign-out only</b>Your location is recorded when you sign in or out of a job, never in between.</span></div><div><span class="ico"><svg><use href="#i-file"/></svg></span><span><b>Your documents stay private</b>Your licences and signed documents are never shared by link. Only ${bn} and you can open them.</span></div></div>
+        <button class="agree ${onb.agree ? 'on' : ''} ${e.agree ? 'bad' : ''}" data-testid="crew-onb-agree" data-onb="agree" role="checkbox" aria-checked="${onb.agree}"><span class="box">${onb.agree ? '✓' : ''}</span><span class="at">I've read and agree to the <a href="#" data-testid="crew-onb-terms" data-legal="/terms">Terms of Service</a> and the <a href="#" data-testid="crew-onb-privacy" data-legal="/privacy">Privacy Policy</a>.</span></button><div class="fld">${err('agree')}</div>`;
+      bar = `<button class="btn btn-primary" data-testid="crew-onb-join" data-onb="next">Join the team</button>`;
+    } else {
+      body = `<div class="onb-top"><span class="ico ok" style="width:64px;height:64px;border-radius:32px;margin:10px auto 14px"><svg style="width:30px;height:30px"><use href="#i-check"/></svg></span><div class="onb-title" data-testid="crew-onb-done">You're on the team, ${esc(first)}.</div><div class="onb-sub">Sign in with <b>${esc(onb.email)}</b> and the password you just created.</div></div>`;
+      bar = `<button class="btn btn-primary" data-testid="crew-onb-signin" data-onb="signin">Sign in</button>`;
+    }
+    $('#onbBody').innerHTML = body; $('#onbBar').innerHTML = bar;
+    document.body.dataset.lastGo = '/employee/onboarding' + (n ? '#step' + n : '');
+  }
+  function openOnb(step){
+    if (step > 0) Object.assign(onb, { name: 'Mia Nguyen', dob: q.get('minor') === '1' ? '12/04/2010' : '12/04/1998', phone: '0412 345 678', email: 'mia@example.com', emergency: 'Tom Nguyen 0411 222 333', password: 'painter2026' });
+    if (step >= 4) onb.docs = { driving_licence: { on: true, exp: '01/03/2027' }, white_card: { on: true, exp: '28/10/2026' } };
+    if (q.get('agree') === '1') onb.agree = true;
+    onb.step = Math.min(Math.max(step, 0), 5); onb.tried = false;
+    stackOpen('#s-onb'); renderOnb();
+  }
+  function onbNext(){
+    onb.tried = true; const e = onbErrors();
+    if (Object.keys(e).length) { renderOnb(); const b = $('#onbBody .bad, #onbBody .ds.bad'); if (b) b.scrollIntoView({ block: 'center' }); return; }
+    onb.tried = false; onb.step = Math.min(onb.step + 1, 5); renderOnb();
+  }
+
+  // ---- document sheet (shared: onboarding + profile) ----
+  const ds = { ctx: 'onb', key: '' };
+  const dsStore = () => ds.ctx === 'onb' ? onb.docs : prof.docs;
+  function renderDocSheet(){
+    const [k, label, req] = DOC_CAT.find(d => d[0] === ds.key); const d = dsStore()[k];
+    $('#dsTitle').textContent = label;
+    $('#dsBody').innerHTML = d && d.on ? `<div class="hint" style="margin:0 4px 10px">${esc(d.name || 'On file')}${req ? ' · required' : ''}</div>
+        <div class="fld"><label for="dsExp">Expiry date${req ? '' : ' (if it has one)'}</label><input id="dsExp" data-testid="crew-doc-sheet-expiry" class="tin ${ds.bad ? 'bad' : ''}" value="${esc(ds.ctx === 'onb' ? (d.exp || '') : toDMY(d.exp))}" placeholder="DD/MM/YYYY" inputmode="numeric" maxlength="10">${ds.bad ? '<div class="err">Enter the date as DD/MM/YYYY.</div>' : ''}</div>
+        <div class="list" style="margin-top:6px">${ds.ctx === 'profile' ? `<button class="srow" data-testid="crew-doc-sheet-view" data-ds="view"><span class="ico"><svg><use href="#i-file"/></svg></span>View</button>` : ''}<button class="srow" data-testid="crew-doc-sheet-replace" data-ds="replace"><span class="ico"><svg><use href="#i-sign"/></svg></span>Replace</button></div>`
+      : `<div class="hint" style="margin:0 4px 10px">A photo or a PDF, up to 5 MB.${req ? ' Required.' : ''}</div><div class="list"><button class="srow" data-testid="crew-doc-sheet-camera" data-ds="camera"><span class="ico"><svg><use href="#i-file"/></svg></span>Take a photo</button><button class="srow" data-testid="crew-doc-sheet-file" data-ds="file"><span class="ico"><svg><use href="#i-me"/></svg></span>Choose a file</button></div>`;
+  }
+  function openDocSheet(ctx, key){ ds.ctx = ctx; ds.key = key; ds.bad = false; renderDocSheet(); $('#docSheet').classList.remove('hide'); }
+  function closeDocSheet(){ $('#docSheet').classList.add('hide'); if (ds.ctx === 'onb') renderOnb(); else renderProfile(); }
+
+  // ---- profile ----
+  function profErrors(){
+    const e = {};
+    if (!prof.name.trim()) e.name = 'Enter your full name.';
+    if (prof.dob && ageOf(prof.dob) === null) e.dob = 'Enter the date as DD/MM/YYYY.';
+    if (!/^(\+?61|0)[2-478]?\d{8,9}$/.test(prof.phone.replace(/\s/g, ''))) e.phone = 'Enter an Australian mobile number.';
+    return e;
+  }
+  function renderProfile(){
+    const e = prof.tried ? profErrors() : {};
+    const bad = (k) => e[k] ? 'bad' : '';
+    const err = (k) => e[k] ? `<div class="err" data-testid="crew-profile-err">${esc(e[k])}</div>` : '';
+    const f = (k, label, extra, hint) => `<div class="fld"><label for="pf-${k}">${label}</label><input id="pf-${k}" data-testid="crew-profile-${k}" data-f="${k}" class="tin ${bad(k)}" value="${esc(prof[k])}" ${extra || ''}>${hint ? `<div class="hint">${hint}</div>` : ''}${err(k)}</div>`;
+    $('#profBody').innerHTML = `
+      <div class="card pcard"><div class="avatar" style="width:56px;height:56px;font-size:22px;${prof.photo ? 'background:#D9D2EE;color:transparent' : ''}">${prof.photo ? '' : 'M'}</div><div style="flex:1;min-width:0"><div class="me-name">${esc(prof.name)}</div><div class="me-biz">Painter · ${BIZ}</div></div><button class="btn btn-outline btn-sm" style="width:auto;padding:0 14px;display:inline-flex" data-testid="crew-profile-photo" data-prof="photo">${prof.photo ? 'Change' : 'Add photo'}</button></div>
+      <div class="sect">Your details</div>
+      ${f('name', 'Full name', 'autocomplete="name"')}
+      ${f('dob', 'Date of birth', 'placeholder="DD/MM/YYYY" inputmode="numeric" maxlength="10"')}
+      ${f('phone', 'Mobile number', 'inputmode="tel"')}
+      <div class="fld"><label for="pf-email">Email</label><input id="pf-email" data-testid="crew-profile-email" class="tin ro" value="${esc(prof.email)}" readonly><div class="hint">Ask your employer to change your email.</div></div>
+      ${f('emergency', 'Emergency contact', 'placeholder="Name and phone number"')}
+      ${f('address', 'Street address', 'autocomplete="street-address"')}
+      ${f('suburb', 'Suburb, state and postcode', 'placeholder="e.g. Brunswick VIC 3056"')}
+      <div class="sect">Documents</div>
+      <div class="card" style="padding:0">${DOC_CAT.map(([k, label, req]) => { const st = docStatus(prof.docs[k]); const cls = !prof.docs[k] && req ? 'bad' : st.cls; const txt = !prof.docs[k] && req ? 'Required · not uploaded' : st.txt; return `<button class="drow" data-testid="crew-profile-doc-${k}" data-pdoc="${k}"><span class="st ${cls}"></span><span class="dt"><span class="dn">${label}</span><span class="ds ${cls}">${txt}</span></span><svg class="chev"><use href="#i-chev"/></svg></button>`; }).join('')}</div>
+      <div class="hint" style="margin:8px 4px 0">A photo or a PDF, up to 5 MB. Expiry dates go on your employer's calendar. Only your employer and you can see your documents.</div>`;
+    $('#profSave').textContent = prof.saved ? 'Saved' : 'Save changes'; $('#profSave').classList.toggle('saved', prof.saved);
+  }
+  function openProfile(){ prof.tried = false; prof.saved = false; stackOpen('#s-profile'); renderProfile(); document.body.dataset.lastGo = '/employee/profile'; }
+  function closeProfile(){ $('#s-profile').classList.add('hide'); $('#s-app').classList.remove('hide'); showTab('me'); }
+  function saveProfile(){ prof.tried = true; const e = profErrors(); if (Object.keys(e).length) { renderProfile(); const b = $('#profBody .bad'); if (b) b.scrollIntoView({ block: 'center' }); return; } prof.tried = false; prof.saved = true; renderProfile(); setTimeout(() => { prof.saved = false; if (!$('#s-profile').classList.contains('hide')) renderProfile(); }, 1500); }
+
+  // ---- my documents (contracts) ----
+  function renderDocs(){
+    const wait = contracts.filter(c => c.status === 'sent').length;
+    $('#docsMeta').textContent = wait ? `${wait} to sign` : (contracts.length ? 'Nothing waiting for your signature' : '');
+    $('#docsBody').innerHTML = contracts.length ? `<div class="card" style="padding:0;margin-top:10px">${contracts.map(c => { const s = cStatus(c); return `<button class="rrow" data-testid="crew-docs-row" data-doc-open="${c.id}"><div class="rrow-top"><span class="rrow-name">${esc(c.name)}</span><span class="pills"><span class="pill ${s.cls}">${s.txt}</span></span></div><div class="rrow-sub">${c.status === 'sent' ? 'Sent ' + dMY(c.sent) : c.status === 'signed' ? 'Signed ' + dMY(c.signed) : 'Ended ' + dMY(c.ended)}</div></button>`; }).join('')}</div>` : `<div class="empty" data-testid="crew-docs-empty">No documents yet. When your employer sends you one to read and sign, it shows here.</div>`;
+    const row = $('[data-testid="crew-me-contracts"] .count'); if (row) { row.textContent = wait; row.style.display = wait ? '' : 'none'; }
+  }
+  function openDocs(){ stackOpen('#s-docs'); renderDocs(); document.body.dataset.lastGo = '/employee/contracts'; }
+  function closeDocs(){ $('#s-docs').classList.add('hide'); $('#s-app').classList.remove('hide'); showTab('me'); }
+  function renderDoc(c){
+    const s = cStatus(c);
+    $('#docTitle').textContent = c.name;
+    $('#docMeta').innerHTML = `<span class="pill ${s.cls}">${s.txt}</span> · ${c.status === 'sent' ? 'Sent ' + dMY(c.sent) : 'Signed ' + dMY(c.signed) + (c.ended ? ' · Ended ' + dMY(c.ended) : '')}`;
+    const body = esc(c.content).replace(/(\[[A-Z ]+\])/g, '<mark data-testid="crew-contract-unfilled">$1</mark>');
+    let html = `<div class="doc-body" data-testid="crew-contract-text">${body}</div>`;
+    if (c.status === 'sent') html += `<div class="sect">I have a question</div><div class="fld" data-testid="crew-contract-question"><textarea class="tin" id="docQ" data-testid="crew-contract-question-input" placeholder="Ask your employer before you sign">${esc(c.q || '')}</textarea>${c.qErr ? '<div class="err" data-testid="crew-contract-question-err">' + esc(c.qErr) + '</div>' : ''}${c.qSent ? '<div class="okline" data-testid="crew-contract-question-sent">Your question went to your employer. You can sign later.</div>' : ''}<button class="btn btn-outline" style="margin-top:10px" data-testid="crew-contract-question-send" data-docq="${c.id}">Send my question</button></div>`;
+    if (c.countersigned) html += `<div class="sect">Your copy</div><button class="btn btn-outline" data-testid="crew-contract-download" data-docdl="${c.id}">Download my signed copy</button>`;
+    else if (c.status === 'signed') html += `<div class="sect">Your copy</div><div class="hint" style="margin:0 4px" data-testid="crew-contract-notready">Your signed copy is available once ${BIZ} has countersigned.</div>`;
+    $('#docBody').innerHTML = html;
+    $('#docBar').classList.toggle('hide', c.status !== 'sent');
+    $('#docBar').innerHTML = c.status === 'sent' ? `<button class="btn btn-primary" data-testid="crew-contract-sign" data-docsign="${c.id}">Sign this document</button>` : '';
+  }
+  function openDoc(id){ const c = contracts.find(x => x.id === id); if (!c) return; stackOpen('#s-doc'); renderDoc(c); document.body.dataset.lastGo = '/employee/contracts/' + id; }
+  function closeDoc(){ $('#s-doc').classList.add('hide'); openDocs(); }
+  const sig = { id: '', text: '', err: '' };
+  function renderSign(){
+    const c = contracts.find(x => x.id === sig.id);
+    $('#signTitle').textContent = 'Sign ' + c.name;
+    $('#signBody').innerHTML = `<div class="hint" style="margin:0 4px 10px;font-size:14px;color:var(--text-secondary)">By signing below, you confirm that you have read, understood, and agree to the terms of this document.</div><div class="fld"><label for="sigIn">Type your full name</label><input id="sigIn" data-testid="crew-sign-input" class="tin ${sig.err ? 'bad' : ''}" value="${esc(sig.text)}" autocomplete="name" autocapitalize="words">${sig.err ? `<div class="err" data-testid="crew-sign-err">${esc(sig.err)}</div>` : ''}</div><div class="sigprev" data-testid="crew-sign-preview">${esc(sig.text)}</div>`;
+  }
+  function openSign(id){ sig.id = id; sig.text = ''; sig.err = ''; renderSign(); $('#signSheet').classList.remove('hide'); }
+  function closeSign(){ $('#signSheet').classList.add('hide'); }
+  function confirmSign(){ if (!sig.text.trim()) { sig.err = 'Type your full name to sign.'; renderSign(); return; } const c = contracts.find(x => x.id === sig.id); c.status = 'signed'; c.signed = '2026-10-14'; closeSign(); renderDoc(c); renderDocs(); }
+
+  function openPhotoSheet(ctx){ ds.ctx = ctx; $('#photoSheet').classList.remove('hide'); }
+  function closePhotoSheet(){ $('#photoSheet').classList.add('hide'); }
+
+  // ---- C5 handlers ----
+  document.body.addEventListener('click', (e) => {
+    const t = e.target;
+    const lg0 = t.closest('[data-legal]'); if (lg0) { e.preventDefault(); e.stopPropagation(); document.body.dataset.lastGo = lg0.dataset.legal; return; }
+    const o = t.closest('[data-onb]');
+    if (o) { e.preventDefault(); const a = o.dataset.onb;
+      if (a === 'next') onbNext(); else if (a === 'back') { onb.tried = false; onb.step = Math.max(onb.step - 1, 0); renderOnb(); }
+      else if (a === 'signin') { showLogin(); $('#email').value = onb.email || ''; } else if (a === 'photo') openPhotoSheet('onb');
+      else if (a === 'agree') { onb.agree = !onb.agree; renderOnb(); } else if (a === 'showpw') { onb.showPw = !onb.showPw; renderOnb(); }
+      return; }
+    const dr = t.closest('[data-doc]'); if (dr) { openDocSheet('onb', dr.dataset.doc); return; }
+    const pr = t.closest('[data-pdoc]'); if (pr) { openDocSheet('profile', pr.dataset.pdoc); return; }
+    const pf = t.closest('[data-prof]'); if (pf) { if (pf.dataset.prof === 'photo') openPhotoSheet('profile'); return; }
+    const ph = t.closest('[data-photo]'); if (ph) { if (ds.ctx === 'onb') onb.photo = true; else prof.photo = true; closePhotoSheet(); if (ds.ctx === 'onb') renderOnb(); else renderProfile(); return; }
+    const da = t.closest('[data-ds]'); if (da) { const a = da.dataset.ds; const st = dsStore();
+      if (a === 'camera' || a === 'file' || a === 'replace') { st[ds.key] = Object.assign(st[ds.key] || {}, { on: true, name: a === 'file' ? 'white-card.pdf' : 'IMG_2041.jpg' }); if (st[ds.key].exp === undefined) st[ds.key].exp = ''; ds.bad = false; renderDocSheet(); }
+      else if (a === 'view') document.body.dataset.lastGo = 'view:' + ds.key;
+      return; }
+    const dOpen = t.closest('[data-doc-open]'); if (dOpen) { openDoc(dOpen.dataset.docOpen); return; }
+    const dq = t.closest('[data-docq]'); if (dq) { const c = contracts.find(x => x.id === dq.dataset.docq); if (!c.q || !c.q.trim()) { c.qErr = 'Write your question first.'; c.qSent = false; } else { c.qErr = ''; c.qSent = true; c.q = ''; } renderDoc(c); return; }
+    const dl = t.closest('[data-docdl]'); if (dl) { document.body.dataset.lastGo = 'share:' + dl.dataset.docdl; return; }
+    const sg = t.closest('[data-docsign]'); if (sg) { openSign(sg.dataset.docsign); return; }
+  });
+  document.body.addEventListener('input', (e) => {
+    const t = e.target;
+    if (t.closest('#onbBody') && t.dataset.f) { let v = t.value; if (t.dataset.f === 'dob') { v = maskDMY(v); t.value = v; } onb[t.dataset.f] = v; if (t.dataset.f === 'dob') { const had = $('#onbBody .minor'); if (!!had !== isMinor()) { renderOnb(); const i = $('#onbDob'); i.focus(); i.setSelectionRange(v.length, v.length); } } return; }
+    if (t.closest('#profBody') && t.dataset.f) { let v = t.value; if (t.dataset.f === 'dob') { v = maskDMY(v); t.value = v; } prof[t.dataset.f] = v; return; }
+    if (t.id === 'dsExp') { const v = maskDMY(t.value); t.value = v; const d = dsStore()[ds.key]; if (ds.ctx === 'onb') d.exp = v.length === 10 ? v : ''; else d.exp = fromDMY(v); return; }
+    if (t.id === 'docQ') { const c = contracts.find(x => x.id === $('#docBody [data-docq]').dataset.docq); c.q = t.value; return; }
+    if (t.id === 'sigIn') { sig.text = t.value; $('[data-testid="crew-sign-preview"]').textContent = t.value; if (sig.err && t.value.trim()) { sig.err = ''; t.classList.remove('bad'); const e2 = $('[data-testid="crew-sign-err"]'); if (e2) e2.remove(); } return; }
+  });
+  $('#profBack').addEventListener('click', closeProfile);
+  $('#profSave').addEventListener('click', saveProfile);
+  $('#docsBack').addEventListener('click', closeDocs);
+  $('#docBack').addEventListener('click', closeDoc);
+  $('#dsDone').addEventListener('click', closeDocSheet);
+  $('#docSheet').addEventListener('click', (e) => { if (e.target === $('#docSheet')) closeDocSheet(); });
+  $('#photoCancel').addEventListener('click', closePhotoSheet);
+  $('#photoSheet').addEventListener('click', (e) => { if (e.target === $('#photoSheet')) closePhotoSheet(); });
+  $('#signCancel').addEventListener('click', closeSign);
+  $('#signConfirm').addEventListener('click', confirmSign);
+  $('#signSheet').addEventListener('click', (e) => { if (e.target === $('#signSheet')) closeSign(); });
+
   if (q.get('screen') === 'job') { showApp('jobs'); openJob(q.get('id') || 'j1'); }
   else if (q.get('screen') === 'hours') { showApp('me'); openHours(); }
   else if (q.get('screen') === 'reports') { showApp('today'); openReports(); }
   else if (q.get('screen') === 'report-new') { showApp('today'); openReportNew(q.get('project')); }
   else if (q.get('screen') === 'report') { showApp('today'); openReport(q.get('id') || 'r1'); }
+  else if (q.get('screen') === 'onboarding') { openOnb(parseInt(q.get('step') || '0', 10)); }
+  else if (q.get('screen') === 'profile') { showApp('me'); openProfile(); }
+  else if (q.get('screen') === 'docs') { showApp('me'); openDocs(); }
+  else if (q.get('screen') === 'doc') { showApp('me'); openDoc(q.get('id') || 'd1'); if (q.get('sign') === '1') openSign(q.get('id') || 'd1'); }
   else if (q.get('screen') === 'app') { showApp(q.get('tab') || 'today'); if (q.get('picker') === '1') openPicker(); }
   else showLogin();
 })();
