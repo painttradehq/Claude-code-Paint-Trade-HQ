@@ -1,4 +1,4 @@
-# Round 75 — Speed: lists load what they show, photos live as files (proposal for Josh's review, not sent)
+# Round 75 — Speed: lists load what they show, photos live as files (SENT 14 Oct, queued db7vrab9k7ms73ajghq0)
 
 Backend-only round; no prototype (nothing changes on screen). Written from the Round 64 code (line numbers are Round 64; the agent checks them against the current tree before changing anything) and from Emergent support's 14 October diagnosis, which the code confirms.
 
