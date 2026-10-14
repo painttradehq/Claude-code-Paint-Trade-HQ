@@ -1,0 +1,14 @@
+Round C4 — Daily report: the crew form rebuilt, opened from the job, photos on the job, the owner's reply shown. Start now (nothing else is building; the C3 §8 answers are closed); report "Round C4 done", then stop.
+
+The spec is pasted below verbatim; save it as `memory/specs/crew/c4-daily-report-notes.md`. The prototype is the shell Josh uploaded today (`memory/specs/crew/c1-crew-shell.html`, the 84 KB file; it carries the C4 screens): the list `?screen=reports` (`&reports=0` empty), the form `?screen=report-new&project=j1` (`&project=j2` a coming-up job, `&jobs=0` no jobs → General), one report `?screen=report&id=r1` (replied) and `?screen=report&id=r2` (flagged, edited, no reply); also Today › End of day row, the job page's Daily report button and the feedback notification on Today. Open it at 390 × 844 first, then 360 × 800.
+
+Rules for this round:
+1. Touch only: `frontend/app/employee/daily-report.tsx` (deleted; it becomes the folder `frontend/app/employee/daily-report/` with `index.tsx`, `new.tsx`, `[id].tsx`), new `frontend/components/crew/ReportForm.tsx`, `frontend/app/employee/project/[id].tsx` (one line, §5), `frontend/components/daily-report/ViewReportModal.tsx` and `EditReportModal.tsx` (deleted, §5), `backend/routes/daily_reports.py` (§6) and one new test file `backend/tests/test_c4_crew_daily_report.py`. Nothing under `app/admin/*`; nothing else under `components/daily-report/*` (the owner's "New report" modal keeps working as it is); no other file; no env change; no new package (`expo-image-picker` is already installed). `components/crew/JobPicker.tsx` is reused as it is.
+2. Every string, size and colour is in the spec or the prototype; where the spec says "as built" or "as today", keep today's behaviour. No notices, no banners, no pop-up alerts, no duplication. Errors are inline as §4. The crew app has no AI of any kind.
+3. The stored report keeps the owner's shape: `tasks_completed` built by the existing `formToApiFormat` with the six headers and the four checklist labels unchanged (§2, §4); the owner's Daily reports page, CSV and PDF read it unchanged. `GET /daily-reports/my-reports` becomes an allow-list (§6): no owner-only field reaches the phone.
+4. Testing agent at **390 × 844 first, then 360 × 800**, with a **phone user agent**, on the `TS_` tenant (§8); `TS_` rows only — every report, uploaded photo, photo row and notification the tests create deleted at the end; the owner's real tenant read-only.
+5. Create the What's new entry as a **Draft** (text in §9). Never publish.
+6. Report at the end, starting with the words **"Round C4 done"**: each verify item (§8) as agent-tested or Unverified; the testing-agent iteration number at both sizes; the isolation-test run; backend changes, env changes (none), deleted files, removed routes (none); then a "spec silences" list for the owner. Then stop.
+
+Spec (verbatim from `c4-daily-report-notes.md`):
+
