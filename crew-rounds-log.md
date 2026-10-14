@@ -106,3 +106,8 @@ Rules: `crew-app-handover.md` §1. Rounds are C1, C2, …; one round at a time a
 
 - Josh: "send". Job state at send: follow-up C building (device rule removed, index/root layout/manifests in progress), Josh's two "here" uploads in. Sent **Round C3** (`roundC3-message.md`: a preface "queue this; finish follow-up C first", the answers to Emergent's four 13-Oct questions — 1a sheet, 2b sign out then in, 3a allow + show + flag, 4a My hours rebuilt — then the rules and `c3-timeclock-notes.md` v3 verbatim); queued `db7dju3rmojc73a5e6ag`. The prototype pointer now names the shell Josh uploaded with follow-up C (it carries the C3 screens).
 - Next: "Round C2 follow-up C done" → "Round C3 done". Josh says "check" to read either report. Nothing else goes meanwhile.
+
+## 14 Oct — Round C2 follow-up C done
+
+- Emergent: **"Round C2 follow-up C done"** (`roundC2-followupC-report.md` here; `memory/reports/roundC2-followupC-report.md` on the job). Testing agent iteration 136 on desktop, iPhone (390 and 360) and iPad UAs; all seven verify rows agent-tested; suite 762/114/0; `tsc` clean; TS_ torn down. Files as specified plus `components/InstallAppBanner.tsx`; `utils/device.ts` deleted. Two deviations, both accepted: the head script creates the apple-title meta as well as the manifest link (static meta removed); admin → `/crew` is `router.replace` because the admin layout's own auth guard bounces a pushed route (admin-side, not ours; told to the admin chat via Josh).
+- C3 spec saved on the job, "not started" at report time.
