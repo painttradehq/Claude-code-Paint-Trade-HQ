@@ -1,4 +1,4 @@
-# Round 76 — Request diet: fewer database trips per request, fewer requests per page (proposal for Josh's review, not sent)
+# Round 76 — Request diet: fewer database trips per request, fewer requests per page (SENT 15 Oct, queued db86m1fp4n2s73afr0qg)
 
 Backend + admin-frontend round; no prototype (nothing changes on screen). Written from Emergent's read-only diagnosis of the live logs (15 Oct, 10:10 AEDT recording) and the Round 64 code. Answers Emergent's own "Round 76 — Request diet" question with a spec instead of a one-word pick.
 
