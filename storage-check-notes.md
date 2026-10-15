@@ -1,4 +1,4 @@
-# Round 75b — Storage check and media move, run from inside the app (proposal for Josh's review, not sent)
+# Round 75b — Storage check and media move, run from inside the app (SENT 15 Oct)
 
 Backend + one owner-only admin card. Follows Round 75 (done, live) and Emergent's housekeeping answers of 15 October.
 
@@ -50,4 +50,4 @@ Publish → the owner clicks Check storage on the live app and sends the lines h
 
 1. No prototype; build the Storage card as written.
 2. Yes: videos move too, and new videos are stored as files.
-3. What follows this round (Round 72 GST or Round 77 dashboard home) is still to be picked; it does not change this round.
+3. After this round: **Round 77** (dashboard home) first, then Round 72 (GST).
