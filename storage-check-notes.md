@@ -46,8 +46,8 @@ Commit `backend/.env.example` and `frontend/yarn.lock` as they are (Emergent's r
 
 Publish → the owner clicks Check storage on the live app and sends the lines here → database move to us-central1 by support (Option 1) → the owner downloads the data export and clicks Apply → Round 72 (GST) or Round 77 (dashboard home diet), the owner's pick.
 
-## 8. Questions for Josh (one line each)
+## 8. Josh's answers (15 October)
 
-1. Build it as written, or prototype the Storage card first (your rule; my view: not needed for an owner-only tool)?
-2. OK to have the videos moved too, and new videos stored as files? (Yes keeps the fix complete; no leaves videos as text in the record.)
-3. After this: Round 72 GST first, or Round 77 dashboard home (4.7–5 s on production today; 35–45 database trips, the calendar read twice, weather and briefing inline)?
+1. No prototype; build the Storage card as written.
+2. Yes: videos move too, and new videos are stored as files.
+3. What follows this round (Round 72 GST or Round 77 dashboard home) is still to be picked; it does not change this round.
