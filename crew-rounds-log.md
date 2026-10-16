@@ -155,3 +155,9 @@ Rules: `crew-app-handover.md` §1. Rounds are C1, C2, …; one round at a time a
 
 - Josh: keep the welcome video and the team culture; the employment agreement belongs in Contracts; crew with a temporary password are the onboarding crew — how do they set a real password? Checked: no route lets a crew member change a password and no crew forgot-password exists (the owner can't reset one either).
 - v2: the welcome video and team page stay **per business** (`crew_welcome` on the admin document: YouTube id, title, intro, sections; the owner's editor is an admin-chat Settings card; Josh's tenant seeded once with the current Sano text); the agreement step goes; **finish path** — crew the owner adds go through the same wizard at first sign-in (temporary password + new password, email read-only, "I'm done" → Today) via `POST /employees/onboarding/finish`; **Change password** on Profile via `PUT /employees/password`; the crew layout sends `onboarding_complete: false` crew to the wizard. Prototype updated (video card on Welcome, "Our team" step 4 of 5, finish mode, password sheet); `tools/test_c1.js` **290/290**. Waiting for Josh. Nothing sent.
+
+## 16 Oct — C5 decisions from Josh
+
+- §10.1 **"go default"**: Josh's tenant is seeded once with the current team text on deploy (one deliberate write to his real tenant); the video link stays empty until he adds one. §10.6 agreed: crew the owner adds finish the wizard before using the app.
+- Josh: the onboarding video and the principles are each owner's, not his — has an owner ever been able to set them? Answer from the code: never; the text was hard-coded in the crew app and no admin setting exists. C5 adds the per-business field and seeds his text; the owner's Settings card ("Crew welcome": YouTube link, title, intro, ordered sections) is written up in §7 as the admin chat's paired item.
+- Emergent connector disconnected in this session; needs re-authorising before the next check or send.
