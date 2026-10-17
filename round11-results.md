@@ -343,3 +343,6 @@
 
 ## Round 74 SENT (17 Oct)
 - Josh uploaded the two presentation prototypes ("uploaded") and said "send 74". Sent `presentation-notes.md` §1–§5 verbatim with the three answers as prototyped (default switch on for new businesses; page 2 on by default; pages at the back on the web page); prototypes to memory/specs/round-74/, prototypes win; report "Round 74 done" pasted as text; no publish. Next from this chat: Fix Round G after Josh's check rounds; the billing round and in-app learning after his decisions.
+
+## Check (17 Oct, 22:30 AEDT): Round 74 blocked on the wrong gear file · 78b unverified
+- Emergent saved the spec and the files; the second upload was **`quote-setup-gst.html` byte-identical to the Round 72 prototype**, not `quote-setup-presentation.html` — the editor (§2.3) cannot be built from it. Emergent asked a / b; answered **a** (build §2.1, 2.2, 2.4, 2.5, 2.6 + tests now; §2.3 when the file arrives; replace the Round 72 copy under memory/specs/round-74/). Also told it to **finish Round 78b** (Documents listing) properly first — full suite, browser check, report `round-78b-report.md` pasted as text — since its suite/browser/report had not run. Re-sent `quote-setup-presentation.html` to Josh to upload with "here".
