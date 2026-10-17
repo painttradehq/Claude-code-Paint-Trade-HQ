@@ -1,4 +1,4 @@
-# Round 72 — GST-inclusive pricing (proposal for Josh's review, not sent)
+# Round 72 — GST-inclusive pricing (BUILT — Round 72 done 17 Oct, via round-72-message.md)
 
 Prototypes: **`quote-setup-gst.html?setup=pricing`** (Quote set-up › Pricing: the switch; Save; PDF tab › Live preview shows the inclusive total line) and **`estimate-builder-gst.html`** (Quote details › GST switch; `?gst=incl` opens the demo quote already inclusive). Open at **1440** first, then **1024**. Playwright: `tools/test_gst.js`, **40/40** at both widths. Screenshots: `gst-gear-1440.png`, `gst-details-1440.png`, `gst-builder-1440.png`, `gst-client-1440.png`.
 
