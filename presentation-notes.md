@@ -1,4 +1,4 @@
-# Round 74 — Presentation pages: one or two pages of large photos (proposal for Josh's review, not sent)
+# Round 74 — Presentation pages: one or two pages of large photos (SENT 17 Oct)
 
 Prototypes: **`quote-setup-presentation.html?setup=presentation`** (Quote set-up › Presentation: the switch for new quotes, the template list, click **Standard residential** → the two-page editor → **Live preview** on the left) and **`estimate-builder-presentation.html?pres=on`** (Review & Send → the client view ends with the pages; Quote details › Presentation pages). Open at **1440** first, then **1024**. Playwright: `tools/test_presentation.js`, **62/62** at both widths. Screenshots: `pres-editor-1440.png`, `pres-editor-edited-1440.png`, `pres-client-1440.png`, `pres-editor-1024.png`.
 
