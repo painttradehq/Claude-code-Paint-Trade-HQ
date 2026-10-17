@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estimates — Paint Trade HQ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter:wght@400..700&family=IBM+Plex+Mono:wght@400..700&display=swap');
+
+  :root{
+    /* ---- Color tokens ---- */
+    --accent:        #4B3E86; /* Undercoat — primary accent, actions only */
+    --accent-hover:  #5C4C9E;
+    --accent-bg:     #F1EEFA; /* light tint for selected/AI surfaces */
+    --accent-ink:    #34295E; /* darker text-on-tint variant */
+
+    --success:       #1C8A4B; /* live / paid / accepted */
+    --success-bg:    #E7F6ED;
+    --warning:       #B45309; /* pending / due soon */
+    --warning-bg:    #FCF0E1;
+    --danger:        #C6382E; /* overdue / declined */
+    --danger-bg:     #FBEAEA;
+
+    --bg:            #FAF9F6;
+    --surface:       #FFFFFF;
+    --surface-sunken:#F4F2EE;
+    --border:        #E7E3DA;
+    --border-strong: #D8D3C7;
+
+    --text-primary:  #1E1C1A;
+    --text-secondary:#6B675F;
+    --text-muted:    #9B968A;
+
+    /* ---- Type ---- */
+    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+
+    /* ---- Spacing scale (base 4px) ---- */
+    --sp-1: 4px;
+    --sp-2: 8px;
+    --sp-3: 12px;
+    --sp-4: 16px;
+    --sp-6: 24px;
+    --sp-8: 32px;
+    --sp-12: 48px;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --shadow-card: 0 1px 2px rgba(30,28,26,0.04), 0 1px 8px rgba(30,28,26,0.03);
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family: inherit; cursor:pointer; }
+  ::selection{ background: var(--accent-bg); color: var(--accent-ink); }
+
+  .app{ display:flex; min-height:100vh; }
+  /* ================= SIDEBAR ================= */
+  .sidebar{
+    width: 260px;
+    flex-shrink:0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    padding: var(--sp-6) var(--sp-4) var(--sp-4);
+    position: sticky;
+    top:0;
+    height:100vh;
+    overflow-y:auto;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap: var(--sp-3);
+    padding: 0 var(--sp-2);
+    margin-bottom: var(--sp-8);
+  }
+  .brand-mark{
+    width:34px; height:34px;
+    border-radius: 9px;
+    background: var(--accent);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .brand-mark svg{ width:18px; height:18px; }
+  .brand-text{ line-height:1.2; }
+  .brand-name{ font-family: var(--font-display); font-weight:600; font-size:16px; color: var(--text-primary); }
+  .brand-sub{ font-size:11.5px; color: var(--text-muted); margin-top:1px; }
+
+  .nav-group{ margin-bottom: var(--sp-6); }
+  .nav-group-label{
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    padding: 0 var(--sp-2);
+    margin-bottom: var(--sp-2);
+  }
+  .nav-item{
+    display:flex;
+    align-items:center;
+    gap: var(--sp-3);
+    padding: 9px var(--sp-2);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 1px;
+    transition: background .12s ease, color .12s ease;
+    position:relative;
+  }
+  .nav-item svg{ width:18px; height:18px; flex-shrink:0; opacity:.85; }
+  .nav-item:hover{ background: var(--surface-sunken); color: var(--text-primary); }
+  .nav-item.active{ background: var(--accent-bg); color: var(--accent-ink); font-weight:600; }
+  .nav-item.active svg{ opacity:1; }
+  .nav-item .pro{
+    margin-left:auto;
+    font-size:10px;
+    font-weight:600;
+    color: var(--accent);
+    background: var(--accent-bg);
+    border-radius: 5px;
+    padding: 2px 6px;
+    letter-spacing: .01em;
+  }
+
+  .sidebar-footer{
+    margin-top:auto;
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--border);
+    display:flex;
+    align-items:center;
+    gap: var(--sp-3);
+    padding-left: var(--sp-2);
+  }
+  .sidebar-footer .avatar{
+    width:32px; height:32px;
+    border-radius:50%;
+    background: var(--accent);
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--font-display);
+    font-weight:600;
+    font-size:13px;
+    flex-shrink:0;
+  }
+  .sidebar-footer-name{ font-size:13.5px; font-weight:600; color: var(--text-primary); }
+  .sidebar-footer-role{ font-size:11.5px; color: var(--text-muted); }
+  
+  /* ================= MAIN — shared Estimates / Invoices list layout ================= */
+  main{ flex:1; min-width:0; padding:var(--sp-6) var(--sp-12) var(--sp-12); max-width:1360px; }
+  .page-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:18px; flex-wrap:wrap; }
+  .page-title{ font-family:var(--font-display); font-weight:600; font-size:27px; margin:0 0 4px; letter-spacing:-0.01em; }
+  .page-sub{ font-size:13.5px; color:var(--text-muted); margin:0; max-width:620px; line-height:1.45; }
+  .page-actions{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .btn{ font-family:inherit; font-size:13.5px; font-weight:600; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:7px; padding:9px 16px; border:1px solid transparent; white-space:nowrap; }
+  .btn svg{ width:15px; height:15px; }
+  .btn-primary{ background:var(--accent); color:#fff; }
+  .btn-primary:hover{ background:var(--accent-hover); }
+  .btn-ghost{ background:var(--surface); color:var(--text-primary); border-color:var(--border-strong); }
+  .btn-ghost:hover{ background:var(--surface-sunken); }
+  .btn-icon{ width:40px; height:40px; padding:0; justify-content:center; color:var(--accent); }
+  .btn-icon svg{ width:18px; height:18px; }
+
+  /* stat tiles — clickable filters */
+  .stats{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; margin-bottom:18px; }
+  .stat{ text-align:left; background:var(--surface); border:1.5px solid var(--border); border-radius:14px; padding:14px 16px 13px; cursor:pointer; font-family:inherit; display:flex; flex-direction:column; gap:4px; transition:box-shadow .15s ease, border-color .15s ease, transform .15s ease; position:relative; }
+  .stat:hover{ border-color:var(--accent); box-shadow:0 6px 20px rgba(30,28,26,0.09), 0 1px 3px rgba(30,28,26,0.06); transform:translateY(-2px); }
+  .stat.active{ border-color:var(--accent); background:var(--accent-bg); }
+  .stat .lbl{ display:flex; align-items:center; gap:7px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); }
+  .stat .lbl svg{ width:14px; height:14px; }
+  .stat .val{ font-family:var(--font-mono); font-weight:700; font-size:24px; color:var(--text-primary); line-height:1.1; margin-top:2px; }
+  .stat .sub{ font-size:12px; color:var(--text-secondary); }
+  .stat.danger .lbl{ color:var(--danger); }
+  .stat.danger .val{ color:var(--danger); }
+  .stat.danger.active{ border-color:var(--danger); background:var(--danger-bg); }
+  .stat.success .lbl{ color:var(--success); }
+  .stat.success.active{ border-color:var(--success); background:var(--success-bg); }
+  .stat.warning .lbl{ color:var(--warning); }
+  .stat.warning.active{ border-color:var(--warning); background:var(--warning-bg); }
+  .stat .go{ position:absolute; right:12px; top:12px; color:var(--text-muted); opacity:0; transition:opacity .12s; }
+  .stat .go svg{ width:14px; height:14px; }
+  .stat:hover .go{ opacity:.7; }
+
+  /* toolbar: attention view + status tabs + search */
+  .toolbar{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+  .tabs{ display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+  .tab{ display:inline-flex; align-items:center; gap:6px; padding:7px 12px; border-radius:999px; border:none; background:none; font-family:inherit; font-size:13px; font-weight:500; color:var(--text-secondary); cursor:pointer; transition:background-color .12s, color .12s; }
+  .tab:hover{ background:var(--surface-sunken); }
+  .tab.active{ background:var(--accent-bg); color:var(--accent-ink); font-weight:600; }
+  .tab .n{ font-family:var(--font-mono); font-weight:600; font-size:11px; color:var(--text-muted); background:var(--surface-sunken); padding:1px 6px; border-radius:999px; min-width:18px; text-align:center; }
+  .tab.active .n{ color:var(--accent); background:#fff; }
+  .tab.attn{ border:1px solid #F1D9B8; background:var(--warning-bg); color:#6B3F0A; font-weight:600; padding-left:9px; }
+  .tab.attn svg{ width:14px; height:14px; color:var(--warning); }
+  .tab.attn .n{ background:#F7E2C4; color:var(--warning); }
+  .tab.attn.active{ background:var(--warning); border-color:var(--warning); color:#fff; }
+  .tab.attn.active svg{ color:#fff; }
+  .tab.attn.active .n{ background:rgba(255,255,255,.25); color:#fff; }
+  .tab.attn.zero{ opacity:.55; }
+  .tsep{ width:1px; height:20px; background:var(--border-strong); margin:0 6px; }
+  .search-box{ display:flex; align-items:center; gap:8px; flex:1; min-width:240px; max-width:380px; margin-left:auto; background:var(--surface); border:1px solid var(--border); padding:8px 12px; border-radius:8px; }
+  .search-box:focus-within{ border-color:var(--accent); }
+  .search-box svg{ width:16px; height:16px; color:var(--text-muted); flex-shrink:0; }
+  .search-box input{ flex:1; border:none; background:none; font:inherit; font-size:13.5px; color:var(--text-primary); outline:none; min-width:0; }
+  .search-box button{ border:none; background:none; color:var(--text-muted); display:flex; padding:0; cursor:pointer; }
+  .search-box button svg{ width:16px; height:16px; }
+
+  /* table card */
+  .table-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; overflow-x:auto; box-shadow:0 1px 2px rgba(30,28,26,0.03); }
+  .trow{ display:flex; align-items:center; gap:12px; padding:11px 20px; border-bottom:1px solid var(--border); transition:background-color .12s; min-width:900px; }
+  .trow:last-child{ border-bottom:none; }
+  .trow.body{ cursor:pointer; }
+  .trow.body:hover{ background:var(--accent-bg); }
+  .thead{ background:var(--surface-sunken); padding:9px 20px; }
+  .thead .c{ font-size:11.5px; font-weight:600; letter-spacing:.04em; color:var(--text-muted); text-transform:uppercase; }
+  .c{ min-width:0; font-size:13.5px; color:var(--text-primary); }
+  .c .l1{ display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .c .l2{ display:block; font-size:11.5px; color:var(--text-muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .c.right{ text-align:right; }
+  .mono{ font-family:var(--font-mono); font-size:13px; font-weight:500; }
+  .strong{ font-weight:600; }
+  .muted{ color:var(--text-muted); font-size:13px; }
+  .clientlink{ color:var(--text-primary); font-weight:600; text-decoration:none; }
+  .clientlink:hover{ color:var(--accent); text-decoration:underline; }
+  .pillst{ display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; font-size:11.5px; font-weight:600; white-space:nowrap; }
+  .pillst::before{ content:''; width:6px; height:6px; border-radius:3px; background:currentColor; opacity:.9; }
+  .pillst.neutral{ background:var(--surface-sunken); color:var(--text-secondary); }
+  .pillst.info{ background:var(--accent-bg); color:var(--accent-ink); }
+  .pillst.success{ background:var(--success-bg); color:var(--success); }
+  .pillst.warning{ background:var(--warning-bg); color:var(--warning); }
+  .pillst.danger{ background:var(--danger-bg); color:var(--danger); }
+  .act{ display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .act svg{ width:14px; height:14px; flex-shrink:0; color:var(--text-muted); }
+  .act.warning, .act.warning svg{ color:var(--warning); font-weight:600; }
+  .act.danger, .act.danger svg{ color:var(--danger); font-weight:600; }
+  .act.success svg{ color:var(--success); }
+  .act.info svg{ color:var(--accent); }
+  .act .ago{ color:var(--text-muted); font-weight:400; margin-left:2px; }
+  .c .flag{ display:flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .c .flag svg{ width:12px; height:12px; flex-shrink:0; }
+  .c .flag.warning{ color:var(--warning); }
+  .c .flag.danger{ color:var(--danger); }
+  .c .flag.muted{ color:var(--text-muted); font-weight:500; }
+  .rowmenu{ width:28px; height:28px; border-radius:6px; border:none; background:none; display:flex; align-items:center; justify-content:center; color:var(--text-muted); cursor:pointer; margin-left:auto; }
+  .rowmenu svg{ width:16px; height:16px; }
+  .rowmenu:hover{ background:var(--accent-bg); color:var(--accent); }
+  .cmenu{ width:40px; flex-shrink:0; display:flex; justify-content:flex-end; }
+
+  .empty{ display:flex; flex-direction:column; align-items:center; gap:8px; padding:56px 20px; color:var(--text-muted); }
+  .empty svg{ width:34px; height:34px; }
+  .empty b{ font-size:15px; color:var(--text-secondary); }
+  .empty span{ font-size:13px; }
+  .empty .btn{ margin-top:8px; }
+
+  .pager{ display:flex; align-items:center; justify-content:center; gap:14px; margin-top:16px; font-size:13px; color:var(--text-muted); }
+  .pager .btn{ padding:8px 14px; font-size:13px; }
+
+  /* drawer */
+  .scrim{ position:fixed; inset:0; background:rgba(30,26,20,.35); z-index:40; display:flex; justify-content:flex-end; }
+  .scrim[hidden]{ display:none; }
+  .drawer{ width:460px; max-width:92%; height:100%; background:var(--bg); border-left:1px solid var(--border); box-shadow:-12px 0 40px rgba(20,16,10,.18); display:flex; flex-direction:column; }
+  .dhead{ display:flex; align-items:center; gap:10px; padding:18px 24px; border-bottom:1px solid var(--border); background:var(--surface); }
+  .dhead .t{ flex:1; min-width:0; }
+  .dhead h2{ font-family:var(--font-display); font-weight:600; font-size:19px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dhead .s{ font-size:12.5px; color:var(--text-muted); margin-top:3px; }
+  .dhead .s b{ font-family:var(--font-mono); font-weight:500; color:var(--text-secondary); }
+  .dclose{ width:28px; height:28px; border-radius:6px; border:none; background:none; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .dclose:hover{ background:var(--surface-sunken); color:var(--text-primary); }
+  .dclose svg{ width:18px; height:18px; }
+  .dbody{ flex:1; overflow:auto; padding:20px 24px; display:flex; flex-direction:column; gap:16px; }
+  .dfoot{ display:flex; gap:10px; padding:16px 20px; border-top:1px solid var(--border); background:var(--surface); position:relative; }
+  .dfoot .btn{ flex:1; justify-content:center; }
+  .timeline{ background:var(--accent-bg); border-left:3px solid var(--accent); border-radius:10px; padding:14px 16px; }
+  .timeline .h{ font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); margin-bottom:12px; }
+  .steps{ display:flex; align-items:flex-start; gap:4px; }
+  .step{ flex:1; display:flex; flex-direction:column; align-items:center; position:relative; text-align:center; }
+  .step .dot{ width:14px; height:14px; border-radius:999px; border:2px solid var(--border-strong); background:var(--surface); margin-bottom:6px; z-index:1; }
+  .step.on .dot{ border-color:var(--step); background:var(--step); }
+  .step .sl{ font-size:12px; font-weight:500; color:var(--text-muted); }
+  .step.on .sl{ color:var(--text-primary); font-weight:600; }
+  .step .st{ font-family:var(--font-mono); font-size:11px; color:var(--text-muted); margin-top:2px; }
+  .step .st.hl{ color:var(--warning); }
+  .step .conn{ position:absolute; top:6px; left:60%; right:-40%; height:2px; background:var(--border); }
+  .step.conn-on .conn{ background:var(--accent); }
+  .bigmoney{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; display:flex; align-items:flex-end; justify-content:space-between; gap:12px; }
+  .bigmoney .k{ font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); margin-bottom:4px; }
+  .bigmoney .v{ font-family:var(--font-mono); font-weight:700; font-size:26px; line-height:1; }
+  .bigmoney .v.danger{ color:var(--danger); }
+  .bigmoney .v.success{ color:var(--success); }
+  .bigmoney .of{ font-size:12.5px; color:var(--text-secondary); margin-top:6px; }
+  .bigmoney .due{ text-align:right; font-size:12.5px; color:var(--text-secondary); }
+  .bigmoney .due b{ display:block; font-size:13.5px; color:var(--text-primary); }
+  .bigmoney .due b.danger{ color:var(--danger); }
+  .bigmoney .due b.warning{ color:var(--warning); }
+  .agrid{ display:flex; flex-wrap:wrap; gap:10px; }
+  .atile{ flex:1 1 47%; display:flex; align-items:center; gap:10px; padding:11px 12px; border-radius:10px; background:var(--surface-sunken); border:1px solid var(--border); font-family:inherit; font-size:13.5px; font-weight:600; color:var(--text-primary); cursor:pointer; text-align:left; }
+  .atile:hover{ background:var(--accent-bg); }
+  .atile svg{ width:17px; height:17px; color:var(--accent); flex-shrink:0; }
+  .atile.success{ border-color:#BFE3CC; color:var(--success); }
+  .atile.success svg{ color:var(--success); }
+  .atile.accentf{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .atile.accentf svg{ color:#fff; }
+  .atile.accentf:hover{ background:var(--accent-hover); }
+  .atile.danger{ border-color:#EFC9C6; color:var(--danger); }
+  .atile.danger svg{ color:var(--danger); }
+  .atile.wide{ flex-basis:100%; }
+  .drow{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:4px 0; }
+  .drow .k{ font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--text-muted); }
+  .drow .v{ display:flex; align-items:center; gap:7px; font-size:13.5px; color:var(--text-primary); text-align:right; min-width:0; }
+  .drow .v svg{ width:14px; height:14px; color:var(--text-muted); flex-shrink:0; }
+  .drow .v a{ color:var(--accent); text-decoration:none; font-weight:600; }
+  .drow .v a:hover{ text-decoration:underline; }
+  .dsec{ display:flex; flex-direction:column; gap:8px; }
+  .dsec .k{ display:flex; align-items:center; justify-content:space-between; font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--text-muted); }
+  .dsec .k button{ border:none; background:none; font-family:inherit; font-size:12px; font-weight:600; color:var(--accent); cursor:pointer; text-transform:none; letter-spacing:0; display:inline-flex; align-items:center; gap:4px; padding:0; }
+  .dsec .k button svg{ width:13px; height:13px; }
+  .fu{ display:flex; align-items:flex-start; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:10px 12px; }
+  .fu.due{ border-color:#F1D9B8; background:var(--warning-bg); }
+  .fu input[type=checkbox]{ margin-top:2px; accent-color:var(--accent); width:15px; height:15px; cursor:pointer; }
+  .fu .n{ flex:1; font-size:13.5px; color:var(--text-primary); }
+  .fu .n.done{ text-decoration:line-through; color:var(--text-muted); }
+  .fu .w{ font-size:11.5px; font-weight:600; margin-top:2px; }
+  .fu .w.warning{ color:var(--warning); }
+  .fu .w.muted{ color:var(--text-muted); font-weight:500; }
+  .fu .w.danger{ color:var(--danger); }
+  .dempty{ font-size:13px; color:var(--text-muted); }
+  .pay{ display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:9px 12px; font-size:13px; }
+  .pay svg{ width:15px; height:15px; color:var(--success); flex-shrink:0; }
+  .pay .m{ font-family:var(--font-mono); font-weight:600; margin-left:auto; }
+  .pay .d{ color:var(--text-muted); }
+  .form{ background:var(--surface); border:1px solid var(--border-strong); border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:10px; }
+  .form .fr{ display:flex; gap:10px; }
+  .form label{ flex:1; display:flex; flex-direction:column; gap:4px; font-size:11.5px; font-weight:600; color:var(--text-secondary); }
+  .form input, .form select{ font:inherit; font-size:13.5px; color:var(--text-primary); background:var(--surface-sunken); border:1px solid var(--border-strong); border-radius:8px; padding:8px 10px; outline:none; }
+  .form input:focus, .form select:focus{ border-color:var(--accent); background:#fff; }
+  .form .fa{ display:flex; justify-content:flex-end; gap:8px; }
+  .form .btn{ padding:7px 14px; font-size:13px; }
+  .drowtotal{ display:flex; align-items:center; justify-content:space-between; padding:10px 0 2px; border-top:1px solid var(--border); }
+  .drowtotal .k{ font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--text-muted); }
+  .drowtotal .v{ font-family:var(--font-mono); font-weight:700; font-size:19px; }
+  .markas{ position:absolute; bottom:64px; right:20px; min-width:200px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:6px; box-shadow:0 8px 24px rgba(30,28,26,.12); z-index:5; }
+  .markas[hidden]{ display:none; }
+  .markas button{ display:flex; align-items:center; gap:10px; width:100%; padding:8px 10px; border:none; background:none; border-radius:6px; font:inherit; font-size:13.5px; color:var(--text-primary); cursor:pointer; text-align:left; }
+  .markas button:hover{ background:var(--surface-sunken); }
+  .markas button.on{ background:var(--accent-bg); color:var(--accent); font-weight:600; }
+  .markas button svg{ width:15px; height:15px; }
+  .alink{ border:none; background:none; font-family:inherit; font-size:12.5px; font-weight:600; color:var(--text-muted); cursor:pointer; display:inline-flex; align-items:center; gap:5px; align-self:flex-start; padding:0; }
+  .alink svg{ width:13px; height:13px; }
+  .alink:hover{ color:var(--danger); }
+
+  /* modal (type picker / convert picker) */
+  .mscrim{ position:fixed; inset:0; background:rgba(30,26,20,.35); z-index:45; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .mscrim[hidden]{ display:none; }
+  .modal{ width:100%; max-width:560px; background:var(--surface); border-radius:16px; box-shadow:0 20px 60px rgba(20,16,10,.25); overflow:hidden; }
+  .mhead{ display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); }
+  .mhead h3{ margin:0; font-family:var(--font-display); font-weight:600; font-size:18px; }
+  .mbody{ padding:16px 20px 20px; }
+  /* New estimate — the app's existing two-step chooser (NewEstimateModal.tsx), reproduced 1:1 */
+  .nescrim{ position:fixed; inset:0; background:rgba(30,26,20,.45); backdrop-filter:blur(6px); z-index:45; display:flex; align-items:center; justify-content:center; padding:16px; }
+  .nescrim[hidden]{ display:none; }
+  .nesheet{ width:100%; max-width:820px; background:var(--surface); border-radius:20px; overflow:hidden; box-shadow:0 32px 80px rgba(20,16,10,.32); }
+  .nehead{ display:flex; align-items:flex-start; gap:12px; padding:22px 28px 6px; }
+  .nehead .t{ flex:1; }
+  .necrumbs{ display:flex; align-items:center; gap:6px; margin-bottom:10px; }
+  .necrumb{ font-size:11px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; color:var(--text-muted); }
+  .necrumb.on{ color:var(--accent); }
+  .necrumbs svg{ width:12px; height:12px; color:var(--text-muted); }
+  .netitle{ font-family:var(--font-display); font-weight:500; font-size:26px; line-height:32px; margin:0; color:var(--text-primary); }
+  .nesub{ font-size:13.5px; color:var(--text-muted); margin:4px 0 0; }
+  .neclose{ width:34px; height:34px; border-radius:10px; border:none; background:var(--surface-sunken); color:var(--text-muted); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .neclose svg{ width:18px; height:18px; }
+  .negrid{ display:flex; gap:14px; padding:20px 28px 28px; }
+  @keyframes pthqRise{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
+  .necard{ flex:1; min-height:190px; padding:20px; border-radius:16px; border:1.5px solid var(--border); background:var(--surface-sunken); display:flex; flex-direction:column; gap:8px; cursor:pointer; font-family:inherit; text-align:left; transition:transform .16s, border-color .16s, background-color .16s, box-shadow .16s; animation:pthqRise .32s both; }
+  .necard:hover{ border-color:var(--accent); background:var(--surface); transform:translateY(-3px); box-shadow:0 14px 30px rgba(31,27,46,.12); }
+  .necard .ic{ width:48px; height:48px; border-radius:14px; background:var(--accent-bg); display:flex; align-items:center; justify-content:center; margin-bottom:6px; color:var(--accent); }
+  .necard .ic svg{ width:26px; height:26px; }
+  .necard .nt{ font-family:var(--font-display); font-weight:500; font-size:19px; color:var(--text-primary); }
+  .necard .nb{ font-size:12.5px; line-height:18px; color:var(--text-secondary); flex:1; }
+  .necard .ng{ display:flex; align-items:center; gap:6px; margin-top:6px; font-size:12.5px; font-weight:600; color:var(--accent); }
+  .necard .ng svg{ width:13px; height:13px; }
+  .nefoot{ display:flex; align-items:center; justify-content:space-between; padding:14px 28px; border-top:1px solid var(--border); }
+  .neback{ display:inline-flex; align-items:center; gap:6px; padding:6px 0; border:none; background:none; font-family:inherit; font-size:12.5px; font-weight:600; color:var(--text-secondary); cursor:pointer; }
+  .neback svg{ width:14px; height:14px; }
+  .nehint{ font-size:11.5px; color:var(--text-muted); }
+  @media (max-width:720px){ .negrid{ flex-direction:column; } }
+
+  /* quiet banner in the estimate drawer */
+  .quiet{ display:flex; align-items:flex-start; gap:10px; background:var(--warning-bg); border:1px solid #F1D9B8; border-radius:10px; padding:10px 12px; }
+  .quiet svg{ width:16px; height:16px; color:var(--warning); flex-shrink:0; margin-top:1px; }
+  .quiet b{ display:block; font-size:13.5px; font-weight:600; color:#6B3F0A; }
+  .quiet span{ display:block; font-size:12px; color:var(--warning); margin-top:1px; }
+  .prow{ display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
+  .prow:last-child{ border-bottom:none; }
+  .prow .t{ flex:1; min-width:0; }
+  .prow .t b{ display:block; font-size:14px; font-weight:600; }
+  .prow .t span{ font-size:12.5px; color:var(--text-muted); }
+  .prow .badge{ display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; color:var(--accent-ink); background:var(--accent-bg); border-radius:999px; padding:2px 8px; margin-left:6px; }
+  .prow .badge svg{ width:11px; height:11px; }
+  .prow .m{ font-family:var(--font-mono); font-weight:600; min-width:80px; text-align:right; }
+  .prow .btn{ padding:7px 12px; font-size:12.5px; }
+  .toast{ position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--text-primary); color:#fff; padding:10px 16px; border-radius:10px; font-size:13px; opacity:0; pointer-events:none; transition:all .18s ease; z-index:60; font-family:var(--font-mono); }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  @media (max-width:1100px){ .stat .val{ font-size:21px; } }
+  @media (max-width:760px){ .stats{ grid-template-columns:1fr; } }
+
+  [hidden]{ display:none !important; }
+  #qsGear.on{ border-color:var(--accent); color:var(--accent); background:var(--accent-bg); }
+  .qs-scrim{ position:fixed; inset:0; background:rgba(30,26,20,.32); z-index:60; }
+  .qs-panel{ position:fixed; top:0; right:0; bottom:0; width:680px; max-width:100vw; background:var(--surface); border-left:1px solid var(--border); box-shadow:-18px 0 50px rgba(20,16,10,.18); display:flex; flex-direction:column; }
+  .qs-head{ padding:18px 22px 0; }
+  .qs-head h2{ font-family:var(--font-display); font-weight:600; font-size:21px; margin:0; display:flex; align-items:center; gap:10px; }
+  .qs-head h2 svg{ width:18px; height:18px; color:var(--accent); }
+  .qs-head .s{ font-size:12.5px; color:var(--text-muted); margin:3px 0 12px; }
+  .qs-x{ position:absolute; top:14px; right:16px; width:32px; height:32px; border-radius:8px; border:none; background:none; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .qs-x:hover{ background:var(--surface-sunken); color:var(--text-primary); }
+  .qs-x svg{ width:18px; height:18px; }
+  .qs-tabs{ display:flex; gap:2px; border-bottom:1px solid var(--border); padding:0 22px; }
+  .qs-tabs button{ background:none; border:none; border-bottom:2px solid transparent; padding:8px 12px 10px; font-family:inherit; font-size:13px; font-weight:600; color:var(--text-secondary); cursor:pointer; margin-bottom:-1px; }
+  .qs-tabs button.on{ color:var(--accent-ink); border-bottom-color:var(--accent); }
+  .qs-tabs button .d{ display:inline-block; width:6px; height:6px; border-radius:99px; background:var(--warning); margin-left:6px; vertical-align:2px; }
+  .qs-body{ flex:1; overflow:auto; padding:18px 22px 24px; }
+  .qs-foot{ border-top:1px solid var(--border); padding:12px 22px; display:flex; align-items:center; gap:10px; background:var(--surface); }
+  .qs-foot .note{ font-size:12px; color:var(--text-muted); flex:1; }
+  .qs-foot .btn{ padding:8px 14px; font-size:13px; }
+  .qs-sec{ margin-bottom:22px; }
+  .qs-sec h3{ font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); margin:0 0 10px; display:flex; align-items:center; gap:8px; }
+  .qs-sec h3 .n{ font-family:var(--font-mono); font-weight:500; letter-spacing:0; }
+  .qs-sec .p{ font-size:12.5px; color:var(--text-muted); margin:-4px 0 10px; line-height:1.5; }
+  .fr{ display:flex; gap:12px; margin-bottom:12px; }
+  .fr.tight{ margin-bottom:8px; }
+  label.f{ flex:1; display:flex; flex-direction:column; gap:4px; font-size:11.5px; font-weight:600; color:var(--text-secondary); min-width:0; }
+  label.f.w2{ flex:2; }
+  label.f .in{ display:flex; align-items:center; gap:6px; }
+  label.f input, label.f select, label.f textarea{ font:inherit; font-size:13.5px; color:var(--text-primary); background:var(--surface-sunken); border:1px solid var(--border-strong); border-radius:8px; padding:8px 10px; outline:none; width:100%; box-sizing:border-box; }
+  label.f input:focus, label.f textarea:focus{ border-color:var(--accent); background:#fff; }
+  label.f input[type=number]{ font-family:var(--font-mono); text-align:right; }
+  label.f textarea{ min-height:74px; resize:vertical; line-height:1.45; }
+  label.f .u{ font-size:12.5px; color:var(--text-muted); font-weight:500; white-space:nowrap; }
+  label.f .hint{ font-size:11px; color:var(--text-muted); font-weight:500; }
+  label.f.bad input{ border-color:var(--danger); }
+  .err{ font-size:11.5px; color:var(--danger); font-weight:500; }
+  .sw{ display:flex; align-items:center; gap:10px; font-size:13px; padding:6px 0; }
+  .sw .t{ flex:1; } .sw .t small{ display:block; font-size:11.5px; color:var(--text-muted); font-weight:500; }
+  .tog{ width:38px; height:22px; border-radius:99px; background:var(--border-strong); border:none; position:relative; cursor:pointer; flex-shrink:0; }
+  .tog::after{ content:''; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:99px; background:#fff; transition:left .12s; }
+  .tog.on{ background:var(--accent); } .tog.on::after{ left:19px; }
+  .chips{ display:flex; gap:6px; flex-wrap:wrap; }
+  .chips button{ border:1px solid var(--border-strong); background:var(--surface); border-radius:999px; padding:5px 11px; font-family:var(--font-mono); font-size:12px; font-weight:600; cursor:pointer; color:var(--text-secondary); }
+  .chips button.on{ border-color:var(--accent); background:var(--accent-bg); color:var(--accent-ink); }
+  /* milestone structure */
+  .ms{ border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:10px; }
+  .ms .h{ display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600; margin-bottom:8px; }
+  .ms .h .sum{ margin-left:auto; font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--success); }
+  .ms .h .sum.bad{ color:var(--danger); }
+  .ms .row{ display:flex; gap:8px; align-items:center; margin-bottom:6px; }
+  .ms .row input{ font:inherit; font-size:13px; background:var(--surface-sunken); border:1px solid var(--border-strong); border-radius:8px; padding:6px 9px; }
+  .ms .row input.l{ flex:1; } .ms .row input.p{ width:70px; text-align:right; font-family:var(--font-mono); }
+  .ms .row .pc{ font-size:12px; color:var(--text-muted); }
+  .ms .row .rm{ border:none; background:none; color:var(--text-muted); cursor:pointer; width:26px; height:26px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; }
+  .ms .row .rm:hover{ background:var(--danger-bg); color:var(--danger); } .ms .row .rm svg{ width:14px; height:14px; }
+  .lnk{ background:none; border:none; color:var(--accent); font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer; padding:2px 0; }
+  /* template lists */
+  .tl{ border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:10px; }
+  .tl .it{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--border); font-size:13px; }
+  .tl .it:last-child{ border-bottom:none; }
+  .tl .it .nm{ flex:1; font-weight:600; min-width:0; } .tl .it .nm small{ display:block; font-weight:500; font-size:11.5px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tl .it .btn{ padding:4px 9px; font-size:12px; }
+  .tl .ed{ padding:10px 12px 12px; background:var(--surface-sunken); border-bottom:1px solid var(--border); }
+  .tl .ed textarea{ min-height:150px; font-size:13px; background:#fff; }
+  .pillst.default{ background:var(--accent-bg); color:var(--accent-ink); }
+  .newrow{ display:flex; gap:8px; align-items:center; }
+  .newrow input{ flex:1; font:inherit; font-size:13px; background:var(--surface-sunken); border:1px solid var(--border-strong); border-radius:8px; padding:7px 10px; }
+  /* pdf sections */
+  .secl{ border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+  .secl .it{ display:flex; align-items:center; gap:10px; padding:8px 10px; border-bottom:1px solid var(--border); font-size:13px; }
+  .secl .it:last-child{ border-bottom:none; }
+  .secl .it.off{ opacity:.55; }
+  .secl .mv{ display:flex; flex-direction:column; gap:0; }
+  .secl .mv button{ border:none; background:none; width:22px; height:14px; padding:0; cursor:pointer; color:var(--text-muted); display:inline-flex; align-items:center; justify-content:center; }
+  .secl .mv button:disabled{ opacity:.25; cursor:default; } .secl .mv button svg{ width:12px; height:12px; }
+  .secl .t{ flex:1; min-width:0; } .secl .t b{ display:block; font-weight:600; } .secl .t small{ display:block; font-size:11.5px; color:var(--text-muted); }
+  .secl .lk{ font-size:11px; color:var(--text-muted); display:inline-flex; align-items:center; gap:4px; } .secl .lk svg{ width:12px; height:12px; }
+  .accent{ display:flex; align-items:center; gap:10px; }
+  .accent .sw2{ width:36px; height:36px; border-radius:8px; border:1px solid var(--border-strong); }
+  .accent input[type=color]{ width:36px; height:36px; border:none; padding:0; background:none; cursor:pointer; }
+  .accent input.hex{ width:110px; font:inherit; font-family:var(--font-mono); font-size:13px; background:var(--surface-sunken); border:1px solid var(--border-strong); border-radius:8px; padding:7px 10px; }
+  .accent .chip{ width:22px; height:22px; border-radius:99px; border:2px solid #fff; box-shadow:0 0 0 1px var(--border-strong); cursor:pointer; padding:0; }
+  .accent .chip.on{ box-shadow:0 0 0 2px var(--accent); }
+  .stats2{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .stats2 .st{ display:flex; gap:6px; align-items:center; }
+  .stats2 .st input{ font:inherit; font-size:13px; background:var(--surface-sunken); border:1px solid var(--border-strong); border-radius:8px; padding:6px 9px; min-width:0; }
+  .stats2 .st input.v{ width:80px; font-family:var(--font-mono); } .stats2 .st input.l{ flex:1; }
+  .stats2 .st .rm{ border:none; background:none; color:var(--text-muted); cursor:pointer; width:24px; height:24px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; } .stats2 .st .rm svg{ width:13px; height:13px; }
+  /* presentation */
+  .pres{ border:1px solid var(--border); border-radius:12px; margin-bottom:10px; overflow:hidden; }
+  .pres .top{ display:flex; gap:12px; padding:12px; align-items:center; }
+  .pres .cov{ width:84px; height:56px; border-radius:8px; background:linear-gradient(135deg,#DCD8CE,#EFEDE6); display:flex; align-items:center; justify-content:center; color:var(--text-muted); flex-shrink:0; overflow:hidden; }
+  .pres .cov.has{ background:linear-gradient(135deg,#4B3E86,#8A7BC8); color:#fff; }
+  .pres .cov svg{ width:20px; height:20px; }
+  .pres .t{ flex:1; min-width:0; } .pres .t b{ display:block; font-weight:600; font-size:14px; } .pres .t small{ display:block; font-size:12px; color:var(--text-muted); margin-top:2px; }
+  .pres .acts{ display:flex; gap:6px; } .pres .acts .btn{ padding:4px 9px; font-size:12px; }
+  .pres .ed{ padding:12px; border-top:1px solid var(--border); background:var(--surface-sunken); }
+  .pres .ed label.f input, .pres .ed label.f textarea{ background:#fff; }
+  .list{ display:flex; flex-direction:column; gap:6px; }
+  .list .li{ display:flex; gap:8px; align-items:center; font-size:12.5px; }
+  .list .li input{ flex:1; font:inherit; font-size:12.5px; background:#fff; border:1px solid var(--border-strong); border-radius:8px; padding:6px 9px; min-width:0; }
+  .list .li .rm{ border:none; background:none; color:var(--text-muted); cursor:pointer; width:24px; height:24px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; } .list .li .rm svg{ width:13px; height:13px; }
+  .list .li svg.ic{ width:14px; height:14px; color:var(--text-muted); flex-shrink:0; }
+  .typechips button{ font-family:inherit; }
+  .stars{ color:var(--warning); display:inline-flex; gap:1px; } .stars svg{ width:13px; height:13px; fill:currentColor; }
+  .empty{ font-size:12.5px; color:var(--text-muted); padding:8px 0; }
+  .cscrim{ position:fixed; inset:0; background:rgba(30,26,20,.35); z-index:70; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .cbox{ width:100%; max-width:420px; background:var(--surface); border-radius:14px; padding:20px 22px; box-shadow:0 20px 60px rgba(20,16,10,.25); }
+  .cbox h3{ margin:0 0 6px; font-family:var(--font-display); font-weight:600; font-size:17px; }
+  .cbox p{ margin:0 0 14px; font-size:13.5px; color:var(--text-secondary); line-height:1.5; }
+  .cbox .fa{ display:flex; justify-content:flex-end; gap:8px; }
+  .btn-danger{ background:var(--danger); color:#fff; }
+  .ms .row input, .stats2 .st input, .list .li input, .newrow input, .accent input.hex{ color:var(--text-primary); }
+  .secl .mv button svg{ width:14px; height:14px; }
+  /* preview pane beside the panel */
+  .qs-preview{ position:fixed; top:0; bottom:0; right:680px; width:520px; background:#EFEDE6; border-left:1px solid var(--border); box-shadow:-18px 0 50px rgba(20,16,10,.12); display:flex; flex-direction:column; z-index:61; }
+  .qs-preview .ph{ display:flex; align-items:center; gap:10px; padding:14px 18px; font-size:13px; font-weight:600; background:var(--surface); border-bottom:1px solid var(--border); }
+  .qs-preview .ph svg{ width:16px; height:16px; color:var(--accent); }
+  .qs-preview .ph span{ flex:1; } .qs-preview .ph small{ font-weight:500; color:var(--text-muted); }
+  .qs-preview .ph button{ width:28px; height:28px; border:none; background:none; color:var(--text-muted); cursor:pointer; border-radius:6px; display:flex; align-items:center; justify-content:center; }
+  .qs-preview .pb{ flex:1; overflow:auto; padding:18px; }
+  .a4{ background:#fff; width:100%; box-shadow:0 6px 24px rgba(20,16,10,.18); border-radius:4px; overflow:hidden; font-size:10.5px; color:#2A2622; }
+  .a4 .hero{ padding:16px 18px; color:#fff; display:flex; justify-content:space-between; align-items:flex-start; }
+  .a4 .hero b{ font-family:var(--font-display); font-size:16px; display:block; } .a4 .hero small{ opacity:.85; display:block; font-size:9.5px; }
+  .a4 .sec{ padding:12px 18px; border-bottom:1px solid #EEE; }
+  .a4 .sec h4{ margin:0 0 5px; font-size:9px; letter-spacing:.08em; text-transform:uppercase; color:#8A8378; }
+  .a4 .stats{ display:flex; gap:8px; margin-top:6px; } .a4 .stats div{ flex:1; background:#F6F4EF; border-radius:6px; padding:6px 8px; } .a4 .stats b{ display:block; font-size:12px; }
+  .a4 table{ width:100%; border-collapse:collapse; } .a4 td{ padding:3px 0; border-bottom:1px solid #F1EFE9; } .a4 td.r{ text-align:right; font-family:var(--font-mono); }
+  .a4 .total{ padding:10px 18px; color:#fff; display:flex; justify-content:space-between; font-family:var(--font-mono); font-weight:700; font-size:12px; }
+  .a4 .foot{ padding:12px 18px; color:#fff; font-size:10px; text-align:center; }
+  .a4 .ms2{ display:flex; gap:6px; } .a4 .ms2 div{ flex:1; border:1px solid #EEE; border-radius:5px; padding:5px 7px; text-align:center; } .a4 .ms2 b{ display:block; font-size:11px; }
+  .a4 .prs{ padding:14px 18px; background:#F6F4EF; } .a4 .prs .cov{ height:70px; border-radius:6px; margin-bottom:8px; } .a4 .prs .gal{ display:flex; gap:4px; } .a4 .prs .gal div{ flex:1; height:34px; border-radius:4px; }
+  .a4 .ghost{ padding:8px 18px; color:#B8B2A6; font-size:9.5px; font-style:italic; border-bottom:1px dashed #E5E1D8; }
+  .qs-sec h3 .sp{ flex:1; }
+  .qs-sec h3 .btn{ padding:5px 10px; font-size:12px; text-transform:none; letter-spacing:0; font-weight:600; }
+  .qs-sec h3 .btn.on{ border-color:var(--accent); color:var(--accent-ink); background:var(--accent-bg); }
+  /* combined pricing: two-column stages */
+  .two{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; margin-bottom:6px; }
+  .two .ms{ margin-bottom:0; min-width:0; }
+  .two .ms .h{ flex-wrap:wrap; } .two .ms .row input.p{ width:58px; } .two .ms .h .sum{ font-size:11px; }
+  .ms .row input.l{ min-width:0; }
+  /* presentation editor (covers the panel body) */
+  .pe-head{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .pe-head .back{ border:none; background:none; color:var(--accent); font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:4px; padding:0; }
+  .pe-head .back svg{ width:14px; height:14px; }
+  .pe-head h3{ margin:0; font-family:var(--font-display); font-weight:600; font-size:17px; flex:1; letter-spacing:0; text-transform:none; color:var(--text-primary); }
+  .cover{ position:relative; height:190px; border-radius:12px; border:2px dashed var(--border-strong); background:var(--surface-sunken); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:6px; color:var(--text-muted); font-size:12.5px; cursor:pointer; overflow:hidden; }
+  .cover b{ color:var(--text-primary); }
+  .cover.has{ border-style:solid; border-color:var(--border); color:#fff; background:linear-gradient(135deg,#4B3E86 0%,#8A7BC8 60%,#C9B8FF 100%); }
+  .cover svg{ width:22px; height:22px; }
+  .cover .cap{ position:absolute; left:10px; bottom:8px; font-family:var(--font-mono); font-size:11px; background:rgba(0,0,0,.35); padding:2px 6px; border-radius:6px; }
+  .cover .acts{ position:absolute; right:10px; top:10px; display:flex; gap:6px; }
+  .cover .acts .btn{ padding:4px 9px; font-size:12px; background:rgba(255,255,255,.92); color:var(--text-primary); border-color:transparent; }
+  .thumbs{ display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; }
+  .thumb{ position:relative; aspect-ratio:4/3; border-radius:10px; overflow:hidden; border:1px solid var(--border); display:flex; align-items:flex-end; }
+  .thumb.t0{ background:linear-gradient(160deg,#D9CFC0,#A8977E); } .thumb.t1{ background:linear-gradient(160deg,#CFD9D0,#7E9A88); } .thumb.t2{ background:linear-gradient(160deg,#D8D3E6,#8A7BC8); } .thumb.t3{ background:linear-gradient(160deg,#E6D8CF,#C68B6E); } .thumb.t4{ background:linear-gradient(160deg,#D2DDE6,#6E93B8); }
+  .thumb .cap{ font-family:var(--font-mono); font-size:9.5px; color:#fff; background:rgba(0,0,0,.35); padding:2px 5px; margin:6px; border-radius:5px; max-width:calc(100% - 12px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .thumb .rm{ position:absolute; top:5px; right:5px; width:20px; height:20px; border-radius:99px; border:none; background:rgba(0,0,0,.45); color:#fff; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; } .thumb .rm svg{ width:11px; height:11px; }
+  .thumb.drop{ border:2px dashed var(--border-strong); background:var(--surface-sunken); align-items:center; justify-content:center; flex-direction:column; gap:3px; color:var(--text-muted); font-size:11px; cursor:pointer; }
+  .thumb.drop svg{ width:16px; height:16px; }
+  .vids{ display:flex; flex-direction:column; gap:6px; }
+  .vid{ display:flex; gap:10px; align-items:center; }
+  .vid .pl{ width:52px; height:36px; border-radius:6px; background:#1F1D2E; color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; } .vid .pl svg{ width:14px; height:14px; fill:#fff; }
+  .vid input{ flex:1; font:inherit; font-size:13px; background:var(--surface-sunken); border:1px solid var(--border-strong); border-radius:8px; padding:7px 10px; min-width:0; color:var(--text-primary); }
+  .vid .rm{ border:none; background:none; color:var(--text-muted); cursor:pointer; width:26px; height:26px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; } .vid .rm svg{ width:13px; height:13px; }
+  .pres.card{ cursor:pointer; } .pres.card:hover{ border-color:var(--accent); }
+  label.f textarea.tall{ min-height:150px; }
+  /* ---- Round 74: presentation pages editor ---- */
+  .pg{ border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:12px; background:var(--surface); }
+  .pg .pgh{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .pg .pgh .no{ font-family:var(--font-mono); font-size:11px; color:var(--text-muted); background:var(--surface-sunken); border-radius:6px; padding:2px 7px; }
+  .pg .pgh h4{ margin:0; font-size:14px; font-weight:600; flex:1; }
+  .pg .fr label.f{ margin-bottom:8px; }
+  .hero{ position:relative; height:200px; border-radius:12px; border:2px dashed var(--border-strong); background:var(--surface-sunken); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:6px; color:var(--text-muted); font-size:12.5px; cursor:pointer; text-align:center; padding:0 20px; }
+  .hero b{ color:var(--text-primary); } .hero svg{ width:22px; height:22px; }
+  .hero.has{ border-style:solid; border-color:var(--border); color:#fff; }
+  .hero .cap{ position:absolute; left:10px; bottom:8px; font-family:var(--font-mono); font-size:11px; background:rgba(0,0,0,.35); padding:2px 6px; border-radius:6px; }
+  .hero .acts{ position:absolute; right:10px; top:10px; display:flex; gap:6px; }
+  .hero .acts .btn{ padding:4px 9px; font-size:12px; background:rgba(255,255,255,.92); color:var(--text-primary); border-color:transparent; }
+  .big4{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; }
+  .wide3{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:10px; }
+  .slot{ display:flex; flex-direction:column; gap:6px; min-width:0; }
+  .slot .ph{ position:relative; border-radius:10px; overflow:hidden; border:1px solid var(--border); aspect-ratio:4/3; display:flex; align-items:center; justify-content:center; }
+  .wide3 .slot .ph{ aspect-ratio:16/9; }
+  .slot .ph.empty{ border:2px dashed var(--border-strong); background:var(--surface-sunken); color:var(--text-muted); font-size:12px; cursor:pointer; flex-direction:column; gap:3px; }
+  .slot .ph.empty svg{ width:16px; height:16px; }
+  .slot .ph .rm{ position:absolute; top:6px; right:6px; width:22px; height:22px; border-radius:99px; border:none; background:rgba(0,0,0,.45); color:#fff; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; } .slot .ph .rm svg{ width:12px; height:12px; }
+  .slot .ph .nm{ position:absolute; left:8px; bottom:6px; font-family:var(--font-mono); font-size:10px; color:#fff; background:rgba(0,0,0,.35); padding:2px 5px; border-radius:5px; max-width:calc(100% - 16px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .slot input.cap{ font:inherit; font-size:12.5px; background:var(--surface-sunken); border:1px solid var(--border-strong); border-radius:8px; padding:6px 9px; color:var(--text-primary); min-width:0; }
+  .slot input.cap:disabled{ opacity:.5; }
+  .g0{ background:linear-gradient(160deg,#D9CFC0,#A8977E); } .g1{ background:linear-gradient(160deg,#CFD9D0,#7E9A88); } .g2{ background:linear-gradient(160deg,#D8D3E6,#8A7BC8); } .g3{ background:linear-gradient(160deg,#E6D8CF,#C89A7B); } .g4{ background:linear-gradient(160deg,#CFD6E6,#7B93C8); } .g5{ background:linear-gradient(160deg,#E0E6CF,#9AB07B); } .g6{ background:linear-gradient(160deg,#E6CFD8,#C87B9A); } .g7{ background:linear-gradient(160deg,#D2D2D2,#8C8C8C); }
+  .jobpick{ margin-top:10px; border:1px solid var(--border); border-radius:10px; padding:10px; background:var(--surface-sunken); }
+  .jobpick .t{ font-size:12px; color:var(--text-secondary); margin-bottom:8px; }
+  .jobpick .row{ display:grid; grid-template-columns:repeat(6,1fr); gap:6px; }
+  .jobpick .row button{ aspect-ratio:4/3; border-radius:8px; border:2px solid transparent; cursor:pointer; position:relative; padding:0; }
+  .jobpick .row button:hover{ border-color:var(--accent); }
+  .jobpick .row button span{ position:absolute; left:4px; right:4px; bottom:3px; font-family:var(--font-mono); font-size:9px; color:#fff; background:rgba(0,0,0,.4); padding:1px 4px; border-radius:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:left; }
+  .pgoff{ color:var(--text-muted); font-size:12.5px; padding:4px 0; }
+  .pe-head .btn{ padding:5px 10px; font-size:12px; } .pe-head .btn.on{ border-color:var(--accent); color:var(--accent-ink); background:var(--accent-bg); } .pe-head .btn svg{ width:14px; height:14px; }
+  /* preview sheets (the pages as the client sees them) */
+  .sheet{ background:#fff; box-shadow:0 6px 24px rgba(20,16,10,.18); border-radius:4px; overflow:hidden; margin-bottom:16px; aspect-ratio:1/1.414; display:flex; flex-direction:column; color:#2A2622; }
+  .sheet .pt{ padding:16px 18px 8px; font-family:var(--font-display); font-weight:600; font-size:18px; }
+  .sheet .pt small{ display:block; font-family:var(--font-body); font-weight:500; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#8A8378; margin-bottom:4px; }
+  .sheet .shero{ margin:0 18px; flex:0 0 38%; border-radius:6px; }
+  .sheet .sgrid{ margin:10px 18px 0; display:grid; grid-template-columns:1fr 1fr; gap:8px; flex:1; }
+  .sheet .sgrid div, .sheet .swide div{ border-radius:5px; position:relative; }
+  .sheet i{ position:absolute; left:6px; bottom:5px; font-style:normal; font-size:8.5px; color:#fff; background:rgba(0,0,0,.35); padding:1px 5px; border-radius:4px; }
+  .sheet .stext{ padding:0 18px; font-size:10.5px; line-height:1.55; color:#3B3548; }
+  .sheet .stext p{ margin:0 0 8px; }
+  .sheet .swide{ margin:12px 18px 0; display:grid; grid-template-columns:repeat(3,1fr); gap:8px; flex:0 0 22%; }
+  .sheet .srev{ margin:14px 18px 0; display:flex; align-items:center; gap:10px; font-size:10px; } .sheet .srev b{ font-size:16px; } .sheet .srev .st{ color:#E8B923; letter-spacing:1px; }
+  .sheet .slinks{ margin:10px 18px 0; display:flex; gap:8px; } .sheet .slinks span{ flex:1; border:1px solid #E5E1D8; border-radius:6px; padding:7px 9px; font-size:9.5px; font-weight:600; }
+  .sheet .sfoot{ margin-top:auto; padding:10px 18px; font-size:9px; color:#8A8378; display:flex; justify-content:space-between; }
+  .pe-del{ color:var(--danger); display:inline-flex; align-items:center; gap:6px; } .pe-del svg{ width:14px; height:14px; }
+  @media (max-width:1100px){ .qs-panel{ width:600px; } .qs-preview{ right:600px; width:400px; } .thumbs{ grid-template-columns:repeat(4, 1fr); } }
+  @media (max-width:1250px){ .two{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 20 L4 14 Q4 11 7 11 L14 11 Q17 11 17 8 L17 4"/>
+          <circle cx="18" cy="4" r="2.2" fill="#fff" stroke="none"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-name">Paint Trade HQ</div>
+        <div class="brand-sub">Sano Painting &amp; Decorating</div>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>
+        Dashboard
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Pipeline</div>
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l4 4V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z"/><path d="M14 3.5V8h4"/><path d="M9 13h6M9 16.5h6"/></svg>
+        Estimates
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-2.5-1.6L13 20.5l-2.5-1.6L8 20.5l-2-1.6V3.5Z"/><path d="M9 8h6M9 11.5h6M9 15h4"/></svg>
+        Invoices
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11a2 2 0 0 1 .9-1.7l6-4a2 2 0 0 1 2.2 0l6 4A2 2 0 0 1 20 11v9"/><path d="M2.5 20h19"/><path d="M9.5 20v-5.5h5V20"/></svg>
+        Live Projects
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 20c0-3.3 2.5-6 5.5-6s5.5 2.7 5.5 6"/><circle cx="17.5" cy="8.5" r="2.3"/><path d="M15.8 12.8c2.4.4 4.2 2.6 4.2 5.4"/></svg>
+        CRM
+        <span class="pro">Pro</span>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Operations</div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17"/><path d="M8 3v3M16 3v3"/></svg>
+        Calendar
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3.5" width="14" height="17" rx="1.5"/><path d="M9 3.5V6h6V3.5"/><path d="M8.5 11.5l2 2 3.5-4"/><path d="M8.5 16h7"/></svg>
+        Daily Reports
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+        Timesheets
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6.5 17.5 3.5c1.2 1 2 1.8 3 3l-3 3"/><path d="M14.5 9.5 4.5 19.5l-1-3 10-10Z"/><path d="M11 7l6 6"/></svg>
+        Equipment
+        <span class="pro">Pro</span>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">HR</div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>
+        Employees
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V4.5"/><path d="M4 16l4.5-5 3.5 3 5.5-7 3 3.5"/></svg>
+        Performance
+        <span class="pro">Pro</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l4 4V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z"/><path d="M14 3.5V8h4"/><path d="M9 14.5c1.8 1.4 4.2 1.4 6-.3"/></svg>
+        Contracts
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="14" height="12" rx="1.5"/><path d="M17 9.5l4-2.3v9.6l-4-2.3"/><path d="M9 9v4l3.5-2Z" fill="currentColor" stroke="none"/></svg>
+        Training Videos
+        <span class="pro">Pro</span>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8 12 3.5 20.5 8 12 12.5Z"/><path d="M3.5 8v8L12 20.5 20.5 16V8"/><path d="M12 12.5V20.5"/></svg>
+        Products
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.3M12 18.2v2.3M20.5 12h-2.3M5.8 12H3.5M18 6l-1.6 1.6M7.6 16.4 6 18M18 18l-1.6-1.6M7.6 7.6 6 6"/></svg>
+        Settings
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="avatar">JS</div>
+      <div>
+        <div class="sidebar-footer-name">Josh Sano</div>
+        <div class="sidebar-footer-role">Owner &middot; Admin</div>
+      </div>
+    </div>
+  </aside>
+  <main>
+    <div class="page-top">
+      <div style="flex:1;min-width:220px;">
+        <h1 class="page-title">Estimates</h1>
+        <p class="page-sub" id="pageSub"></p>
+      </div>
+      <div class="page-actions"><button class="btn btn-ghost btn-icon" id="qsGear" data-testid="est-settings" title="Quote setup" aria-label="Quote setup"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg></button>
+<button class="btn btn-ghost btn-icon" data-go="/admin/library" title="Library" aria-label="Library"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v14.5"/><path d="M4 19.5A1.5 1.5 0 0 1 5.5 18H20"/><path d="M8 8h8M8 11.5h5"/></svg></button>
+<button class="btn btn-primary" id="newBtn"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>New estimate</button></div>
+    </div>
+
+    <div class="stats" id="stats"></div>
+    <div class="toolbar">
+      <div class="tabs" id="tabs"></div>
+      <div class="search-box"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="q" type="text" placeholder="Search number, client, address, job, type, estimator…"><button id="qClear" hidden><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    </div>
+    <div class="table-card" id="table"></div>
+    <div class="pager" id="pager"></div>
+
+  </main>
+</div>
+
+<div class="scrim" id="scrim" hidden><div class="drawer" id="drawer"></div></div>
+<div class="nescrim" id="typeModal" hidden><div class="nesheet" id="neSheet"></div></div>
+
+<div class="qs-scrim" id="qsScrim" hidden><div class="qs-panel" id="qsPanel" data-testid="qs-panel" role="dialog" aria-label="Quote setup">
+  <button class="qs-x" id="qsClose" data-testid="qs-close" aria-label="Close"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  <div class="qs-head"><h2><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg> Quote setup</h2><div class="s">Defaults for every new quote. A single quote is changed in its builder, not here.</div></div>
+  <div class="qs-tabs" id="qsTabs"></div>
+  <div class="qs-body" id="qsBody"></div>
+  <div class="qs-foot"><div class="note" id="qsNote"></div><button class="btn btn-ghost" id="qsCancel" data-testid="qs-cancel">Cancel</button><button class="btn btn-primary" id="qsSave" data-testid="qs-save"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Save</button></div>
+</div>
+<div class="qs-preview" id="qsPreview" hidden data-testid="qs-preview-pane"><div class="ph"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg> <span>Live preview <small>· the PDF your client gets — in the build this pane shows the real PDF from the renderer; this drawing only shows where it sits</small></span><button id="qsPreviewClose" data-testid="qs-preview-close" aria-label="Close preview"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div><div class="pb" id="qsPreviewBody"></div></div></div>
+<div class="cscrim" id="cscrim" hidden><div class="cbox"><h3 id="cTitle"></h3><p id="cText"></p><div class="fa"><button class="btn btn-ghost" id="cCancel">Keep editing</button><button class="btn btn-primary" id="cOk"></button></div></div></div>
+
+<div class="toast" id="toast"></div>
+<script>
+const ICONS = {"search": "<circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"M21 21l-4.3-4.3\"/>", "close": "<path d=\"M18 6 6 18M6 6l12 12\"/>", "plus": "<path d=\"M12 5v14M5 12h14\"/>", "more": "<circle cx=\"6\" cy=\"12\" r=\"1.6\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"12\" cy=\"12\" r=\"1.6\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"18\" cy=\"12\" r=\"1.6\" fill=\"currentColor\" stroke=\"none\"/>", "chev": "<path d=\"m9 6 6 6-6 6\"/>", "chevd": "<path d=\"m6 9 6 6 6-6\"/>", "chevu": "<path d=\"m6 15 6-6 6 6\"/>", "library": "<path d=\"M4 19.5V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v14.5\"/><path d=\"M4 19.5A1.5 1.5 0 0 1 5.5 18H20\"/><path d=\"M8 8h8M8 11.5h5\"/>", "doc": "<path d=\"M7 3.5h7l4 4V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z\"/><path d=\"M14 3.5V8h4\"/><path d=\"M9 13h6M9 16.5h6\"/>", "receipt": "<path d=\"M6 3.5h12v17l-2.5-1.6L13 20.5l-2.5-1.6L8 20.5l-2-1.6V3.5Z\"/><path d=\"M9 8h6M9 11.5h6M9 15h4\"/>", "send": "<path d=\"M22 2 11 13\"/><path d=\"M22 2 15 22l-4-9-9-4z\"/>", "eye": "<path d=\"M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/>", "check": "<path d=\"M20 6 9 17l-5-5\"/>", "checkc": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"m8.5 12 2.5 2.5 4.5-5\"/>", "xc": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M15 9l-6 6M9 9l6 6\"/>", "pause": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M10 9v6M14 9v6\"/>", "archive": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"4\" rx=\"1\"/><path d=\"M5 8v12h14V8M10 12h4\"/>", "clock": "<circle cx=\"12\" cy=\"12\" r=\"8.5\"/><path d=\"M12 7.5V12l3 2\"/>", "gear": "<circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z\"/>", "globe": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18\"/>", "undo": "<path d=\"M9 14 4 9l5-5\"/><path d=\"M4 9h10.5a5.5 5.5 0 0 1 0 11H11\"/>", "copy": "<rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/>", "bell": "<path d=\"M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9\"/><path d=\"M10.3 21a1.9 1.9 0 0 0 3.4 0\"/>", "flag": "<path d=\"M4 21V4\"/><path d=\"M4 4h12l-2 4 2 4H4\"/>", "warn": "<path d=\"M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z\"/>", "alert": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 8v4M12 16h.01\"/>", "download": "<path d=\"M12 3v12\"/><path d=\"m7 10 5 5 5-5\"/><path d=\"M4 20h16\"/>", "rocket": "<path d=\"M5 14s-1 3 1 5 5 1 5 1\"/><path d=\"M14 4c3-1 6 0 6 0s1 3 0 6c-2 4-8 8-8 8l-4-4s4-6 6-10z\"/><circle cx=\"15\" cy=\"9\" r=\"1.5\"/>", "edit": "<path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z\"/>", "swap": "<path d=\"M7 4v16M7 20l-3-3M7 20l3-3\"/><path d=\"M17 20V4M17 4l-3 3M17 4l3 3\"/>", "pin": "<path d=\"M12 21s-6-5.3-6-11a6 6 0 0 1 12 0c0 5.7-6 11-6 11z\"/><circle cx=\"12\" cy=\"10\" r=\"2.3\"/>", "phone": "<path d=\"M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A17 17 0 0 1 3 5a2 2 0 0 1 2-2z\"/>", "folder": "<path d=\"M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z\"/>", "user": "<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 3.6-7 8-7s8 3 8 7\"/>", "home": "<path d=\"M3 11l9-8 9 8\"/><path d=\"M5 9v11h14V9\"/>", "building": "<rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"1\"/><path d=\"M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2M10 21v-3h4v3\"/>", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4\"/>", "dollar": "<path d=\"M12 2v20\"/><path d=\"M17 6.5H9.5a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6\"/>", "card": "<rect x=\"2.5\" y=\"5\" width=\"19\" height=\"14\" rx=\"2\"/><path d=\"M2.5 10h19\"/><path d=\"M6 15h4\"/>", "trend": "<path d=\"M3 17l6-6 4 4 8-8\"/><path d=\"M15 7h6v6\"/>", "inbox": "<path d=\"M3 13l2.5-8h13L21 13v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z\"/><path d=\"M3 13h5l1.5 3h5l1.5-3h5\"/>", "cube": "<path d=\"m12 3 8 4.5v9L12 21l-8-4.5v-9z\"/><path d=\"M12 12 4 7.5M12 12l8-4.5M12 12v9\"/>", "sign": "<path d=\"M3 17c3 0 4-6 6-6s2 6 4 6 2-4 4-4\"/><path d=\"M3 21h18\"/>", "calendar": "<rect x=\"3\" y=\"5\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 10h18M8 3v4M16 3v4\"/>", "trash": "<path d=\"M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z\"/>", "link": "<path d=\"M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.5\"/><path d=\"M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.5\"/>", "sparkle": "<path d=\"M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z\"/>", "grid": "<rect x=\"3.5\" y=\"3.5\" width=\"7\" height=\"7\" rx=\"1.5\"/><rect x=\"13.5\" y=\"3.5\" width=\"7\" height=\"7\" rx=\"1.5\"/><rect x=\"3.5\" y=\"13.5\" width=\"7\" height=\"7\" rx=\"1.5\"/><rect x=\"13.5\" y=\"13.5\" width=\"7\" height=\"7\" rx=\"1.5\"/>", "partly": "<circle cx=\"9\" cy=\"9\" r=\"3.5\"/><path d=\"M9 2.5v1.5M9 14v1.5M2.5 9H4M14 9h1.5M4.4 4.4l1 1M12.6 4.4l-1 1\"/><path d=\"M12 20h6.5a3 3 0 0 0 .3-6 4.5 4.5 0 0 0-8.6-1.2A3.5 3.5 0 0 0 12 20z\"/>", "palette": "<path d=\"M12 3a9 9 0 0 0 0 18c1.4 0 2-.9 2-2 0-.6-.3-1.1-.6-1.5-.4-.5-.4-1.5.6-1.5H16a5 5 0 0 0 5-5c0-4.4-4-8-9-8z\"/><circle cx=\"7.5\" cy=\"11\" r=\"1.2\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"10.5\" cy=\"7.5\" r=\"1.2\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"15\" cy=\"7.5\" r=\"1.2\" fill=\"currentColor\" stroke=\"none\"/>", "arrowr": "<path d=\"M5 12h14\"/><path d=\"m13 6 6 6-6 6\"/>", "arrowl": "<path d=\"M19 12H5\"/><path d=\"m11 18-6-6 6-6\"/>", "up": "<path d=\"m18 15-6-6-6 6\"/>", "down": "<path d=\"m6 9 6 6 6-6\"/>", "image": "<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"/><circle cx=\"8.5\" cy=\"8.5\" r=\"1.5\"/><path d=\"m21 15-5-5L5 21\"/>", "lock": "<rect x=\"3\" y=\"11\" width=\"18\" height=\"11\" rx=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"/>", "star": "<path d=\"m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z\"/>", "play": "<polygon points=\"6 3 20 12 6 21 6 3\"/>"};
+
+const $ = (s, r=document) => r.querySelector(s); const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const svg = (n, cls='') => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</svg>`;
+const AUD = (n) => (n === undefined || n === null || isNaN(n)) ? '—' : '$' + Math.round(n).toLocaleString('en-AU');
+const DAY = 86400000;
+const NOW = Date.now();
+// calendar-day arithmetic (local time): "due today" means today's date, not "within 24h"
+const sod = (t) => { const d = new Date(t); d.setHours(0,0,0,0); return d.getTime(); };
+const daysUntil = (iso) => Math.round((sod(iso) - sod(NOW)) / DAY);
+const daysAgo = (iso) => -daysUntil(iso);
+const ago = (iso) => { if (!iso) return ''; const ms = NOW - new Date(iso).getTime(); const m = Math.floor(ms/60000); if (m < 1) return 'just now'; if (m < 60) return m + 'm ago'; const h = Math.floor(m/60); if (h < 24) return h + 'h ago'; const d = Math.floor(h/24); if (d === 1) return 'yesterday'; if (d < 30) return d + 'd ago'; return fmtD(iso); };
+const fmtD = (iso) => iso ? new Date(iso).toLocaleDateString('en-AU', { day:'numeric', month:'short' }) : '—';
+const fmtDY = (iso) => iso ? new Date(iso).toLocaleDateString('en-AU', { day:'numeric', month:'short', year:'numeric' }) : '—';
+const dueWords = (iso) => { const d = daysUntil(iso); if (d < 0) return { cls:'danger', text:`Overdue ${-d} day${-d===1?'':'s'}` }; if (d === 0) return { cls:'warning', text:'Due today' }; if (d === 1) return { cls:'warning', text:'Due tomorrow' }; if (d <= 3) return { cls:'warning', text:`Due in ${d} days` }; return { cls:'', text:`Due ${fmtD(iso)}` }; };
+const sameMonth = (iso) => { const a = new Date(iso), b = new Date(NOW); return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth(); };
+const toast = $('#toast'); let toastT;
+function say(msg){ toast.textContent = msg; toast.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(()=>toast.classList.remove('show'), 1800); }
+function go(href){ say('→ ' + href); }
+document.addEventListener('click', (e) => { const g = e.target.closest('[data-go]'); if (g){ e.preventDefault(); e.stopPropagation(); go(g.dataset.go); } });
+const params = new URLSearchParams(location.search);
+
+
+const RAW = [{"id": "est_012", "estimate_number": "EST-0130", "status": "accepted", "clientName": "Daniel Park", "customer_id": "cus_2019", "clientPhone": "0489 724 960", "clientAddress": "19 Boyce St, Maroubra", "jobTag": "Full interior repaint", "estimate_type": "Residential Interior", "estimator_name": "Mick Tran", "total": 9650, "createdAt": -62, "updatedAt": -62, "sent_at": -62, "sent_to": "daniel@example.com", "last_viewed_at": -60, "view_count": 3, "accepted_at": -60, "signer_name": "Daniel Park", "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": "tok12", "notes": "Colour consult booked for Thursday.", "photos_link": "https://drive.google.com/drive/folders/1aB3\u2026"}, {"id": "est_001", "estimate_number": "EST-0141", "status": "declined", "clientName": "Fiona McAllister", "customer_id": "cus_2533", "clientPhone": "0484 564 470", "clientAddress": "21 Bridge Rd, Glebe", "jobTag": "Fascia, gutters & eaves", "estimate_type": "Residential Exterior", "estimator_name": "Josh Sano", "total": 14620, "createdAt": -60, "updatedAt": -59, "sent_at": -59, "sent_to": "fiona@example.com", "last_viewed_at": -49, "view_count": 1, "accepted_at": null, "signer_name": null, "declined_at": -49, "decline_reason": "Postponing until next year", "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": "tok01", "notes": "Scaffold needed for rear elevation.", "photos_link": "https://drive.google.com/drive/folders/1aB3\u2026"}, {"id": "est_014", "estimate_number": "EST-0128", "status": "on_hold", "clientName": "Marcus Oyelaran", "customer_id": "cus_2478", "clientPhone": "0493 249 726", "clientAddress": "12 Pine Ave, Five Dock", "jobTag": "External walls \u2014 2 levels", "estimate_type": "Commercial Exterior", "estimator_name": "Mick Tran", "total": 5180, "createdAt": -60, "updatedAt": -59, "sent_at": -59, "sent_to": "marcus@example.com", "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": -57, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": "tok14", "notes": "Colour consult booked for Thursday.", "photos_link": null}, {"id": "est_023", "estimate_number": "EST-0119", "status": "accepted", "clientName": "Liam O'Connell", "customer_id": "cus_2252", "clientPhone": "0474 788 282", "clientAddress": "2 Cove St, Birchgrove", "jobTag": "Fascia, gutters & eaves", "estimate_type": "Residential Exterior", "estimator_name": "Josh Sano", "total": 6190, "createdAt": -58, "updatedAt": -58, "sent_at": -58, "sent_to": "liam@example.com", "last_viewed_at": -57, "view_count": 1, "accepted_at": -57, "signer_name": "Liam O'Connell", "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": "tok23", "notes": "Access via side gate. Dog is friendly.", "photos_link": null}, {"id": "est_034", "estimate_number": "EST-0108", "status": "declined", "clientName": "Priya Raman", "customer_id": "cus_2044", "clientPhone": "0452 877 560", "clientAddress": "22 Coogee Bay Rd, Coogee", "jobTag": "Bathroom + ensuite", "estimate_type": "Residential Interior", "estimator_name": "Josh Sano", "total": 21450, "createdAt": -58, "updatedAt": -58, "sent_at": -58, "sent_to": "priya@example.com", "last_viewed_at": -52, "view_count": 1, "accepted_at": null, "signer_name": null, "declined_at": -52, "decline_reason": "Went with another quote", "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": "tok34", "notes": "", "photos_link": null}, {"id": "est_018", "estimate_number": "EST-0124", "status": "accepted", "clientName": "Ravi Patel", "customer_id": "cus_1936", "clientPhone": "0427 526 224", "clientAddress": "27 Ingham Ave, Five Dock", "jobTag": "Fence & gate", "estimate_type": "Residential Exterior", "estimator_name": "Mick Tran", "total": 7450, "createdAt": -58, "updatedAt": -57, "sent_at": -57, "sent_to": "ravi@example.com", "last_viewed_at": -55, "view_count": 2, "accepted_at": -55, "signer_name": "Ravi Patel", "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": ["INV-0039"], "project_id": null, "share_token": "tok18", "notes": "Colour consult booked for Thursday.", "photos_link": null}, {"id": "est_024", "estimate_number": "EST-0118", "status": "on_hold", "clientName": "Charlotte Reeve", "customer_id": "cus_2469", "clientPhone": "0474 415 804", "clientAddress": "4 Hampden Rd, Russell Lea", "jobTag": "Cafe interior", "estimate_type": "Commercial Interior", "estimator_name": "Josh Sano", "total": 41272, "createdAt": -51, "updatedAt": -50, "sent_at": -50, "sent_to": "charlotte@example.com", "last_viewed_at": -49, "view_count": 1, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": -43, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": "tok24", "notes": "Colour consult booked for Thursday.", "photos_link": null}, {"id": "est_000", "estimate_number": "EST-0142", "status": "draft", "clientName": "Harbourline Cafe", "customer_id": "cus_2546", "clientPhone": "0491 292 481", "clientAddress": "2/18 Darling St, Balmain", "jobTag": "Office fit-out repaint", "estimate_type": "Commercial Interior", "estimator_name": "Josh Sano", "total": 14559, "createdAt": -74, "updatedAt": -48, "sent_at": null, "sent_to": null, "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": null, "notes": "Access via side gate. Dog is friendly.", "photos_link": "https://drive.google.com/drive/folders/1aB3\u2026"}, {"id": "est_030", "estimate_number": "EST-0112", "status": "accepted", "clientName": "Mei-Ling Chen", "customer_id": "cus_2136", "clientPhone": "0453 959 507", "clientAddress": "30 Alt St, Ashfield", "jobTag": "Living + dining repaint", "estimate_type": "Residential Interior", "estimator_name": "Josh Sano", "total": 9600, "createdAt": -42, "updatedAt": -40, "sent_at": -40, "sent_to": "mei-ling@example.com", "last_viewed_at": -34, "view_count": 2, "accepted_at": -34, "signer_name": "Mei-Ling Chen", "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": ["INV-0042"], "project_id": null, "share_token": "tok30", "notes": "Access via side gate. Dog is friendly.", "photos_link": "https://drive.google.com/drive/folders/1aB3\u2026"}, {"id": "est_011", "estimate_number": "EST-0131", "status": "draft", "clientName": "Sarah Mitchell", "customer_id": "cus_2345", "clientPhone": "0467 927 840", "clientAddress": "14 Wattle St, Balmain", "jobTag": "Common areas \u2014 3 levels", "estimate_type": "Commercial Interior", "estimator_name": "Josh Sano", "total": 34384, "createdAt": -45, "updatedAt": -39, "sent_at": null, "sent_to": null, "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": null, "notes": "Client wants Dulux Natural White throughout.", "photos_link": null}, {"id": "est_009", "estimate_number": "EST-0133", "status": "sent", "clientName": "Northshore Property Mgmt", "customer_id": "cus_3406", "clientPhone": "0456 250 806", "clientAddress": "Level 2, 9 Help St, Chatswood", "jobTag": "Deck oil + pergola", "estimate_type": "Residential Exterior", "estimator_name": "Josh Sano", "total": 1900, "createdAt": -38, "updatedAt": -38, "sent_at": -38, "sent_to": "northshore@example.com", "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": "tok09", "notes": "", "photos_link": "https://drive.google.com/drive/folders/1aB3\u2026"}, {"id": "est_008", "estimate_number": "EST-0134", "status": "sent", "clientName": "Bluegum Childcare", "customer_id": "cus_2648", "clientPhone": "0425 218 969", "clientAddress": "36 Elliott St, Balmain", "jobTag": "Stairwell & hallway", "estimate_type": "Residential Interior", "estimator_name": "Mick Tran", "total": 7520, "createdAt": -35, "updatedAt": -33, "sent_at": -33, "sent_to": "bluegum@example.com", "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [{"id": "fu_8a", "note": "Ask about start date", "due_at": -1, "done": false}], "invoices": [], "project_id": null, "share_token": "tok08", "notes": "", "photos_link": null}, {"id": "est_005", "estimate_number": "EST-0137", "status": "sent", "clientName": "Amara Okafor", "customer_id": "cus_2124", "clientPhone": "0439 254 184", "clientAddress": "31 Renwick St, Leichhardt", "jobTag": "Render exterior + trims", "estimate_type": "Residential Exterior", "estimator_name": "Josh Sano", "total": 14620, "createdAt": -29, "updatedAt": -28, "sent_at": -28, "sent_to": "amara@example.com", "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [{"id": "fu_5a", "note": "Ask about start date", "due_at": 0, "done": false}, {"id": "fu_5b", "note": "Confirm quote was received", "due_at": -7, "done": true}], "invoices": [], "project_id": null, "share_token": "tok05", "notes": "", "photos_link": "https://drive.google.com/drive/folders/1aB3\u2026"}, {"id": "est_010", "estimate_number": "EST-0132", "status": "on_hold", "clientName": "Ruth Abernathy", "customer_id": "cus_2377", "clientPhone": "0478 654 897", "clientAddress": "88 Norton St, Leichhardt", "jobTag": "Deck oil + pergola", "estimate_type": "Residential Exterior", "estimator_name": "Josh Sano", "total": 5320, "createdAt": -29, "updatedAt": -28, "sent_at": -28, "sent_to": "ruth@example.com", "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": -20, "archived_at": null, "followups": [{"id": "fu_10a", "note": "Ask about start date", "due_at": 8, "done": false}], "invoices": [], "project_id": null, "share_token": "tok10", "notes": "", "photos_link": "https://drive.google.com/drive/folders/1aB3\u2026"}, {"id": "est_013", "estimate_number": "EST-0129", "status": "sent", "clientName": "Isla Ferguson", "customer_id": "cus_2266", "clientPhone": "0421 920 839", "clientAddress": "6 Rose St, Annandale", "jobTag": "Bathroom + ensuite", "estimate_type": "Residential Interior", "estimator_name": "Mick Tran", "total": 5380, "createdAt": -26, "updatedAt": -26, "sent_at": -26, "sent_to": "isla@example.com", "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": "tok13", "notes": "Strata approval pending.", "photos_link": "https://drive.google.com/drive/folders/1aB3\u2026"}, {"id": "est_033", "estimate_number": "EST-0109", "status": "draft", "clientName": "Liam O'Connell", "customer_id": "cus_2252", "clientPhone": "0448 594 670", "clientAddress": "2 Cove St, Birchgrove", "jobTag": "Bathroom + ensuite", "estimate_type": "Residential Interior", "estimator_name": "Josh Sano", "total": 7580, "createdAt": -31, "updatedAt": -26, "sent_at": null, "sent_to": null, "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": null, "notes": "Scaffold needed for rear elevation.", "photos_link": "https://drive.google.com/drive/folders/1aB3\u2026"}, {"id": "est_021", "estimate_number": "EST-0121", "status": "accepted", "clientName": "Tom Harding", "customer_id": "cus_2037", "clientPhone": "0444 873 232", "clientAddress": "3/41 Bay St, Rockdale", "jobTag": "Bathroom + ensuite", "estimate_type": "Residential Interior", "estimator_name": "Josh Sano", "total": 7400, "createdAt": -24, "updatedAt": -21, "sent_at": -21, "sent_to": "tom@example.com", "last_viewed_at": -15, "view_count": 3, "accepted_at": -15, "signer_name": "Tom Harding", "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": ["INV-0031"], "project_id": null, "share_token": "tok21", "notes": "Strata approval pending.", "photos_link": null}, {"id": "est_019", "estimate_number": "EST-0123", "status": "accepted", "clientName": "Nick Papadopoulos", "customer_id": "cus_2692", "clientPhone": "0469 324 864", "clientAddress": "11 Hill St, Leichhardt", "jobTag": "Weatherboard exterior", "estimate_type": "Residential Exterior", "estimator_name": "Mick Tran", "total": 4690, "createdAt": -18, "updatedAt": -17, "sent_at": -17, "sent_to": "nick@example.com", "last_viewed_at": -10, "view_count": 1, "accepted_at": -10, "signer_name": "Nick Papadopoulos", "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": "prj_019", "share_token": "tok19", "notes": "", "photos_link": null}, {"id": "est_029", "estimate_number": "EST-0113", "status": "viewed", "clientName": "Grace Whitlam", "customer_id": "cus_2240", "clientPhone": "0473 997 597", "clientAddress": "7 Lilyfield Rd, Lilyfield", "jobTag": "Bathroom + ensuite", "estimate_type": "Residential Interior", "estimator_name": "Josh Sano", "total": 7400, "createdAt": -19, "updatedAt": -16, "sent_at": -16, "sent_to": "grace@example.com", "last_viewed_at": -13, "view_count": 3, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [{"id": "fu_29a", "note": "Send colour samples", "due_at": 0, "done": false}, {"id": "fu_29b", "note": "Confirm quote was received", "due_at": -7, "done": true}], "invoices": [], "project_id": null, "share_token": "tok29", "notes": "Scaffold needed for rear elevation.", "photos_link": null}, {"id": "est_036", "estimate_number": "EST-0106", "status": "draft", "clientName": "Fiona McAllister", "customer_id": "cus_2533", "clientPhone": "0477 744 909", "clientAddress": "21 Bridge Rd, Glebe", "jobTag": "Kitchen & laundry refresh", "estimate_type": "Residential Interior", "estimator_name": "Josh Sano", "total": 11200, "createdAt": -65, "updatedAt": -16, "sent_at": null, "sent_to": null, "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": null, "notes": "", "photos_link": null}, {"id": "est_006", "estimate_number": "EST-0136", "status": "accepted", "clientName": "Elena Rossi", "customer_id": "cus_2045", "clientPhone": "0498 979 627", "clientAddress": "67 Lyons Rd, Drummoyne", "jobTag": "Full interior repaint", "estimate_type": "Residential Interior", "estimator_name": "Mick Tran", "total": 11320, "createdAt": -17, "updatedAt": -14, "sent_at": -14, "sent_to": "elena@example.com", "last_viewed_at": -12, "view_count": 2, "accepted_at": -12, "signer_name": "Elena Rossi", "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": ["INV-0042"], "project_id": "prj_006", "share_token": "tok06", "notes": "Strata approval pending.", "photos_link": null}, {"id": "est_017", "estimate_number": "EST-0125", "status": "accepted", "clientName": "James Nguyen", "customer_id": "cus_2158", "clientPhone": "0474 563 675", "clientAddress": "8 Marlow Ave, Concord", "jobTag": "Full interior repaint", "estimate_type": "Residential Interior", "estimator_name": "Josh Sano", "total": 7400, "createdAt": -13, "updatedAt": -12, "sent_at": -12, "sent_to": "james@example.com", "last_viewed_at": -7, "view_count": 3, "accepted_at": -7, "signer_name": "James Nguyen", "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": ["INV-0047"], "project_id": null, "share_token": "tok17", "notes": "", "photos_link": null}, {"id": "est_026", "estimate_number": "EST-0116", "status": "draft", "clientName": "Mei-Ling Chen", "customer_id": "cus_2136", "clientPhone": "0437 465 287", "clientAddress": "30 Alt St, Ashfield", "jobTag": "Shopfront exterior", "estimate_type": "Commercial Exterior", "estimator_name": "Josh Sano", "total": 15440, "createdAt": -40, "updatedAt": -10, "sent_at": null, "sent_to": null, "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": null, "notes": "Strata approval pending.", "photos_link": null}, {"id": "est_027", "estimate_number": "EST-0115", "status": "draft", "clientName": "Ahmed Haddad", "customer_id": "cus_2077", "clientPhone": "0448 744 338", "clientAddress": "44 Marion St, Haberfield", "jobTag": "Weatherboard exterior", "estimate_type": "Residential Exterior", "estimator_name": "Josh Sano", "total": 12800, "createdAt": -39, "updatedAt": -8, "sent_at": null, "sent_to": null, "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": null, "notes": "Strata approval pending.", "photos_link": null}, {"id": "est_016", "estimate_number": "EST-0126", "status": "viewed", "clientName": "Olivia Brennan", "customer_id": "cus_2352", "clientPhone": "0433 723 104", "clientAddress": "15 Darling St, Rozelle", "jobTag": "Cafe interior", "estimate_type": "Commercial Interior", "estimator_name": "Josh Sano", "total": 12880, "createdAt": -4, "updatedAt": -4, "sent_at": -4, "sent_to": "olivia@example.com", "last_viewed_at": -4, "view_count": 4, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [{"id": "fu_16a", "note": "Call to check they got the quote", "due_at": 8, "done": false}], "invoices": [], "project_id": null, "share_token": "tok16", "notes": "Scaffold needed for rear elevation.", "photos_link": null}, {"id": "est_020", "estimate_number": "EST-0122", "status": "viewed", "clientName": "Hannah Kowalski", "customer_id": "cus_2459", "clientPhone": "0466 820 118", "clientAddress": "5 Ferry Rd, Glebe", "jobTag": "Bathroom + ensuite", "estimate_type": "Residential Interior", "estimator_name": "Josh Sano", "total": 3320, "createdAt": -4, "updatedAt": -4, "sent_at": -4, "sent_to": "hannah@example.com", "last_viewed_at": -3, "view_count": 1, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": "tok20", "notes": "", "photos_link": "https://drive.google.com/drive/folders/1aB3\u2026"}, {"id": "est_028", "estimate_number": "EST-0114", "status": "declined", "clientName": "Westbrook Dental", "customer_id": "cus_2592", "clientPhone": "0415 236 752", "clientAddress": "Suite 4, 60 Great North Rd, Five Dock", "jobTag": "Common areas \u2014 3 levels", "estimate_type": "Commercial Interior", "estimator_name": "Josh Sano", "total": 3040, "createdAt": -4, "updatedAt": -4, "sent_at": -4, "sent_to": "westbrook@example.com", "last_viewed_at": 0, "view_count": 1, "accepted_at": null, "signer_name": null, "declined_at": 0, "decline_reason": "Too expensive right now", "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": "tok28", "notes": "Strata approval pending.", "photos_link": null}, {"id": "est_031", "estimate_number": "EST-0111", "status": "declined", "clientName": "Westbrook Dental", "customer_id": "cus_2592", "clientPhone": "0445 204 152", "clientAddress": "Suite 4, 60 Great North Rd, Five Dock", "jobTag": "Ceilings throughout", "estimate_type": "Residential Interior", "estimator_name": "Josh Sano", "total": 14590, "createdAt": -7, "updatedAt": -4, "sent_at": -4, "sent_to": "westbrook@example.com", "last_viewed_at": 0, "view_count": 2, "accepted_at": null, "signer_name": null, "declined_at": 0, "decline_reason": "Postponing until next year", "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": "tok31", "notes": "", "photos_link": null}, {"id": "est_025", "estimate_number": "EST-0117", "status": "sent", "clientName": "Bill & Jenny Thorne", "customer_id": "cus_2661", "clientPhone": "0474 786 388", "clientAddress": "52 Wolseley St, Drummoyne", "jobTag": "Cafe interior", "estimate_type": "Commercial Interior", "estimator_name": "Josh Sano", "total": 23200, "createdAt": -4, "updatedAt": -3, "sent_at": -3, "sent_to": "bill@example.com", "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [{"id": "fu_25a", "note": "Call to check they got the quote", "due_at": 8, "done": false}, {"id": "fu_25b", "note": "Confirm quote was received", "due_at": 1, "done": true}], "invoices": [], "project_id": null, "share_token": "tok25", "notes": "Access via side gate. Dog is friendly.", "photos_link": null}, {"id": "est_035", "estimate_number": "EST-0107", "status": "draft", "clientName": "Mei-Ling Chen", "customer_id": "cus_2136", "clientPhone": "0462 492 523", "clientAddress": "30 Alt St, Ashfield", "jobTag": "Kitchen & laundry refresh", "estimate_type": "Residential Interior", "estimator_name": "Mick Tran", "total": 7450, "createdAt": -3, "updatedAt": -3, "sent_at": null, "sent_to": null, "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": null, "notes": "", "photos_link": null}, {"id": "est_037", "estimate_number": "EST-0105", "status": "accepted", "clientName": "Ahmed Haddad", "customer_id": "cus_2077", "clientPhone": "0426 133 535", "clientAddress": "44 Marion St, Haberfield", "jobTag": "Front facade + verandah", "estimate_type": "Residential Exterior", "estimator_name": "Mick Tran", "total": 14590, "createdAt": -3, "updatedAt": -3, "sent_at": -3, "sent_to": "ahmed@example.com", "last_viewed_at": 0, "view_count": 2, "accepted_at": 0, "signer_name": "Ahmed Haddad", "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": "tok37", "notes": "", "photos_link": null}, {"id": "est_039", "estimate_number": "EST-0103", "status": "viewed", "clientName": "Nick Papadopoulos", "customer_id": "cus_2692", "clientPhone": "0477 696 296", "clientAddress": "11 Hill St, Leichhardt", "jobTag": "Bathroom + ensuite", "estimate_type": "Residential Interior", "estimator_name": "Josh Sano", "total": 14500, "createdAt": -3, "updatedAt": -3, "sent_at": -3, "sent_to": "nick@example.com", "last_viewed_at": -1, "view_count": 1, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [{"id": "fu_39a", "note": "Ask about start date", "due_at": 8, "done": false}], "invoices": [], "project_id": null, "share_token": "tok39", "notes": "", "photos_link": "https://drive.google.com/drive/folders/1aB3\u2026"}, {"id": "est_003", "estimate_number": "EST-0139", "status": "viewed", "clientName": "Peter Lindqvist", "customer_id": "cus_2502", "clientPhone": "0418 960 195", "clientAddress": "18 Wharf Rd, Birchgrove", "jobTag": "Common areas \u2014 3 levels", "estimate_type": "Commercial Interior", "estimator_name": "Mick Tran", "total": 27216, "createdAt": -4, "updatedAt": -2, "sent_at": -2, "sent_to": "peter@example.com", "last_viewed_at": -1, "view_count": 4, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [{"id": "fu_3a", "note": "Ask about start date", "due_at": 5, "done": false}, {"id": "fu_3b", "note": "Confirm quote was received", "due_at": -2, "done": true}], "invoices": [], "project_id": null, "share_token": "tok03", "notes": "Client wants Dulux Natural White throughout.", "photos_link": null}, {"id": "est_004", "estimate_number": "EST-0138", "status": "sent", "clientName": "Kenji Watanabe", "customer_id": "cus_2332", "clientPhone": "0426 856 353", "clientAddress": "9 Ramsay St, Haberfield", "jobTag": "Bathroom + ensuite", "estimate_type": "Residential Interior", "estimator_name": "Mick Tran", "total": 4190, "createdAt": -3, "updatedAt": -2, "sent_at": -2, "sent_to": "kenji@example.com", "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [{"id": "fu_4a", "note": "Chase after site visit", "due_at": 1, "done": false}], "invoices": [], "project_id": null, "share_token": "tok04", "notes": "", "photos_link": null}, {"id": "est_015", "estimate_number": "EST-0127", "status": "viewed", "clientName": "Zoe Campbell", "customer_id": "cus_2134", "clientPhone": "0447 613 346", "clientAddress": "40 Booth St, Annandale", "jobTag": "Interior doors & trim", "estimate_type": "Residential Interior", "estimator_name": "Josh Sano", "total": 6150, "createdAt": -2, "updatedAt": -2, "sent_at": -2, "sent_to": "zoe@example.com", "last_viewed_at": -1, "view_count": 2, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": "tok15", "notes": "Strata approval pending.", "photos_link": null}, {"id": "est_002", "estimate_number": "EST-0140", "status": "sent", "clientName": "Strata Plan 41822", "customer_id": "cus_2339", "clientPhone": "0425 624 528", "clientAddress": "120 Victoria Rd, Gladesville", "jobTag": "Render exterior + trims", "estimate_type": "Residential Exterior", "estimator_name": "Josh Sano", "total": 9840, "createdAt": -1, "updatedAt": -1, "sent_at": -1, "sent_to": "strata@example.com", "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [{"id": "fu_2a", "note": "Follow up re scaffold access", "due_at": -1, "done": false}], "invoices": [], "project_id": null, "share_token": "tok02", "notes": "Scaffold needed for rear elevation.", "photos_link": null}, {"id": "est_007", "estimate_number": "EST-0135", "status": "viewed", "clientName": "Priya Raman", "customer_id": "cus_2044", "clientPhone": "0423 100 680", "clientAddress": "22 Coogee Bay Rd, Coogee", "jobTag": "Shopfront exterior", "estimate_type": "Commercial Exterior", "estimator_name": "Josh Sano", "total": 28480, "createdAt": -1, "updatedAt": -1, "sent_at": -1, "sent_to": "priya@example.com", "last_viewed_at": -1, "view_count": 1, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": "tok07", "notes": "Colour consult booked for Thursday.", "photos_link": "https://drive.google.com/drive/folders/1aB3\u2026"}, {"id": "est_022", "estimate_number": "EST-0120", "status": "sent", "clientName": "Sam Delgado", "customer_id": "cus_2009", "clientPhone": "0468 111 447", "clientAddress": "13 Trafalgar St, Annandale", "jobTag": "Bathroom + ensuite", "estimate_type": "Residential Interior", "estimator_name": "Josh Sano", "total": 6800, "createdAt": -1, "updatedAt": -1, "sent_at": -1, "sent_to": "sam@example.com", "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [], "invoices": [], "project_id": null, "share_token": "tok22", "notes": "Scaffold needed for rear elevation.", "photos_link": null}, {"id": "est_032", "estimate_number": "EST-0110", "status": "viewed", "clientName": "Sam Delgado", "customer_id": "cus_2009", "clientPhone": "0416 849 520", "clientAddress": "13 Trafalgar St, Annandale", "jobTag": "Carpark & bollards", "estimate_type": "Commercial Exterior", "estimator_name": "Josh Sano", "total": 5684, "createdAt": -1, "updatedAt": -1, "sent_at": -1, "sent_to": "sam@example.com", "last_viewed_at": -1, "view_count": 4, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [{"id": "fu_32a", "note": "Send colour samples", "due_at": 8, "done": false}, {"id": "fu_32b", "note": "Confirm quote was received", "due_at": 1, "done": true}], "invoices": [], "project_id": null, "share_token": "tok32", "notes": "", "photos_link": null}, {"id": "est_038", "estimate_number": "EST-0104", "status": "sent", "clientName": "Daniel Park", "customer_id": "cus_2019", "clientPhone": "0499 762 966", "clientAddress": "19 Boyce St, Maroubra", "jobTag": "Reception & meeting rooms", "estimate_type": "Commercial Interior", "estimator_name": "Josh Sano", "total": 10880, "createdAt": -1, "updatedAt": -1, "sent_at": -1, "sent_to": "daniel@example.com", "last_viewed_at": null, "view_count": 0, "accepted_at": null, "signer_name": null, "declined_at": null, "decline_reason": null, "on_hold_at": null, "archived_at": null, "followups": [{"id": "fu_38a", "note": "Ask about start date", "due_at": -3, "done": false}], "invoices": [], "project_id": null, "share_token": "tok38", "notes": "Access via side gate. Dog is friendly.", "photos_link": null}];
+const iso = (off) => (off === null || off === undefined) ? null : new Date(NOW + off*DAY - 3*3600000).toISOString();
+const E = RAW.map(r => ({ ...r, createdAt: iso(r.createdAt), updatedAt: iso(r.updatedAt), sent_at: iso(r.sent_at), last_viewed_at: iso(r.last_viewed_at),
+  accepted_at: iso(r.accepted_at), declined_at: iso(r.declined_at), on_hold_at: iso(r.on_hold_at), archived_at: iso(r.archived_at),
+  followups: r.followups.map(f => ({ ...f, due_at: iso(f.due_at) })) }));
+
+const STATUS = { draft:['Draft','neutral'], sent:['Sent','info'], viewed:['Viewed','info'], accepted:['Accepted','success'], declined:['Declined','danger'], on_hold:['On hold','warning'], archived:['Archived','neutral'] };
+const TABS = [['all','All'],['draft','Draft'],['sent','Sent'],['viewed','Viewed'],['accepted','Accepted'],['declined','Declined'],['on_hold','On hold'],['archived','Archived']];
+const OPEN = new Set(['draft','sent','viewed']);
+const AWAIT = new Set(['sent','viewed']);
+const QUIET_DAYS = 3;
+const PAGE = 15;
+const TYPE_SHORT = { 'Residential Interior':'Res · Interior', 'Residential Exterior':'Res · Exterior', 'Commercial Interior':'Com · Interior', 'Commercial Exterior':'Com · Exterior' };
+
+// ---- derived signals (one place; the spec's "Last activity" + "Needs attention" rules) ----
+function derive(e){
+  const acts = [e.updatedAt, e.sent_at, e.last_viewed_at, e.accepted_at, e.declined_at, e.on_hold_at].filter(Boolean).map(x => new Date(x).getTime());
+  const lastAt = acts.length ? new Date(Math.max(...acts)).toISOString() : e.createdAt;
+  const open = e.followups.filter(f => !f.done).sort((a,b) => a.due_at.localeCompare(b.due_at));
+  const next = open[0] || null;
+  const due = next && daysUntil(next.due_at) <= 0 ? next : null;
+  const quiet = AWAIT.has(e.status) && daysAgo(lastAt) >= QUIET_DAYS ? daysAgo(lastAt) : 0;
+  return { lastAt, next, due, quiet, attention: !!due || quiet > 0 };
+}
+const D = Object.fromEntries(E.map(e => [e.id, derive(e)]));
+
+function activityCell(e){
+  const d = D[e.id]; let l1 = '', flag = '';
+  switch (e.status){
+    case 'draft':    l1 = `<span class="act">${svg('edit')}Draft <span class="ago">· edited ${ago(e.updatedAt)}</span></span>`; break;
+    case 'sent':     l1 = `<span class="act">${svg('send')}Sent <span class="ago">${ago(e.sent_at)}</span></span>`; if (!e.view_count && daysAgo(e.sent_at) >= 1) flag = `<span class="flag muted">${svg('eye')}Not opened yet</span>`; break;
+    case 'viewed':   l1 = `<span class="act info">${svg('eye')}Viewed ${e.view_count}× <span class="ago">· ${ago(e.last_viewed_at)}</span></span>`; break;
+    case 'accepted': l1 = `<span class="act success">${svg('checkc')}Accepted <span class="ago">${fmtD(e.accepted_at)}</span></span>`; flag = e.invoices.length ? `<span class="flag muted">${svg('receipt')}Invoiced ${esc(e.invoices.join(', '))}</span>` : `<span class="flag muted">${svg('sign')}Signed by ${esc(e.signer_name)} · not invoiced</span>`; break;
+    case 'declined': l1 = `<span class="act">${svg('xc')}Declined <span class="ago">${ago(e.declined_at)}</span></span>`; if (e.decline_reason) flag = `<span class="flag muted">“${esc(e.decline_reason)}”</span>`; break;
+    case 'on_hold':  l1 = `<span class="act">${svg('pause')}On hold <span class="ago">since ${fmtD(e.on_hold_at)}</span></span>`; break;
+    case 'archived': l1 = `<span class="act">${svg('archive')}Archived <span class="ago">${fmtD(e.archived_at)}</span></span>`; break;
+  }
+  if (d.due){ const n = -daysUntil(d.due.due_at); flag = n > 0 ? `<span class="flag danger">${svg('bell')}Follow-up overdue ${n} day${n===1?'':'s'}</span>` : `<span class="flag warning">${svg('bell')}Follow-up due today</span>`; }
+  else if (d.quiet) flag = `<span class="flag warning">${svg('clock')}No reply for ${d.quiet} days</span>`;
+  else if (d.next) flag = `<span class="flag muted">${svg('bell')}Follow-up ${fmtD(d.next.due_at)}</span>`;
+  return l1 + flag;
+}
+
+// ---- state ----
+const VIEWS = new Set(['attention','open','awaiting','accepted_month']);
+let view = VIEWS.has(params.get('view')) ? params.get('view') : (STATUS[params.get('status')] ? params.get('status') : 'all');
+let q = params.get('q') || '';
+let shown = PAGE;
+let drawerId = null, markOpen = false, fuAdding = false;
+
+const inView = (e) => {
+  switch (view){
+    case 'all': return e.status !== 'archived';
+    case 'attention': return D[e.id].attention;
+    case 'open': return OPEN.has(e.status);
+    case 'awaiting': return AWAIT.has(e.status);
+    case 'accepted_month': return e.status === 'accepted' && sameMonth(e.accepted_at);
+    default: return e.status === view;
+  }
+};
+const matches = (e) => { const s = q.trim().toLowerCase(); if (!s) return true; return [e.estimate_number, e.clientName, e.clientAddress, e.jobTag, e.estimate_type, e.estimator_name, e.clientPhone].filter(Boolean).join(' ').toLowerCase().includes(s); };
+const sortRows = (rows) => rows.slice().sort((a,b) => D[b.id].lastAt.localeCompare(D[a.id].lastAt));
+const sum = (rows) => rows.reduce((t, e) => t + (e.total || 0), 0);
+
+// ---- render ----
+function renderSub(){
+  const live = E.filter(e => e.status !== 'archived');
+  const pipe = live.filter(e => OPEN.has(e.status));
+  $('#pageSub').textContent = `${live.length} estimate${live.length===1?'':'s'} · ${AUD(sum(pipe))} open pipeline across ${pipe.length}`;
+}
+function renderStats(){
+  const open = E.filter(e => OPEN.has(e.status)), awaiting = E.filter(e => AWAIT.has(e.status)), accM = E.filter(e => e.status === 'accepted' && sameMonth(e.accepted_at));
+  const quiet = awaiting.filter(e => D[e.id].quiet).length;
+  const month = new Date(NOW).toLocaleDateString('en-AU', { month:'long' });
+  const tile = (key, cls, icon, label, val, sub) => `<button class="stat ${cls} ${view===key?'active':''}" data-view="${key}"><span class="lbl">${svg(icon)}${label}</span><span class="val">${val}</span><span class="sub">${sub}</span><span class="go">${svg('chev')}</span></button>`;
+  $('#stats').innerHTML =
+    tile('open', '', 'trend', 'Open pipeline', AUD(sum(open)), `${open.length} estimate${open.length===1?'':'s'} in draft, sent or viewed`) +
+    tile('awaiting', 'warning', 'inbox', 'Awaiting reply', AUD(sum(awaiting)), `${awaiting.length} sent · ${quiet} quiet for ${QUIET_DAYS}+ days`) +
+    tile('accepted_month', 'success', 'checkc', `Accepted in ${month}`, AUD(sum(accM)), `${accM.length} won · ${accM.filter(e => !e.invoices.length).length} not yet invoiced`);
+}
+function renderTabs(){
+  const attn = E.filter(e => D[e.id].attention).length;
+  const count = (k) => k === 'all' ? E.filter(e => e.status !== 'archived').length : E.filter(e => e.status === k).length;
+  $('#tabs').innerHTML = `<button class="tab attn ${view==='attention'?'active':''} ${attn?'':'zero'}" data-view="attention">${svg('bell')}Needs attention<span class="n">${attn}</span></button><span class="tsep"></span>` +
+    TABS.map(([k,l]) => `<button class="tab ${view===k?'active':''}" data-view="${k}">${l}<span class="n">${count(k)}</span></button>`).join('');
+}
+function row(e){
+  const [sl, sv] = STATUS[e.status];
+  return `<div class="trow body" data-id="${e.id}">
+    <div class="c" style="width:96px;flex-shrink:0"><span class="pillst ${sv}">${sl}</span></div>
+    <div class="c mono" style="width:92px;flex-shrink:0">${esc(e.estimate_number)}</div>
+    <div class="c" style="flex:1.3;min-width:150px"><a class="clientlink l1" href="#" data-go="/admin/customers/${e.customer_id}">${esc(e.clientName)}</a><span class="l2">${esc(e.jobTag)} · ${esc(e.clientAddress)}</span></div>
+    <div class="c" style="width:126px;flex-shrink:0"><span class="l1">${TYPE_SHORT[e.estimate_type]}</span><span class="l2">${esc(e.estimator_name)}</span></div>
+    <div class="c" style="width:228px;flex-shrink:0">${activityCell(e)}</div>
+    <div class="c mono strong right" style="width:96px;flex-shrink:0">${AUD(e.total)}</div>
+    <div class="cmenu"><button class="rowmenu" data-menu="${e.id}" aria-label="Open details">${svg('more')}</button></div>
+  </div>`;
+}
+function renderTable(){
+  const rows = sortRows(E.filter(e => inView(e) && matches(e)));
+  const head = `<div class="trow thead"><div class="c" style="width:96px;flex-shrink:0">Status</div><div class="c" style="width:92px;flex-shrink:0">Estimate #</div><div class="c" style="flex:1.3;min-width:150px">Client · job</div><div class="c" style="width:126px;flex-shrink:0">Type</div><div class="c" style="width:228px;flex-shrink:0">Last activity</div><div class="c right" style="width:96px;flex-shrink:0">Amount</div><div class="cmenu"></div></div>`;
+  if (!rows.length){
+    const filtered = q.trim() || view !== 'all';
+    const msg = view === 'attention' ? ['Nothing needs attention', 'No quiet quotes and no follow-ups due. Nice.'] : filtered ? ['No estimates match this view', 'Try clearing the search or switching tabs.'] : ['No estimates yet', 'Create your first estimate to get started.'];
+    $('#table').innerHTML = head + `<div class="empty">${svg(view==='attention'?'checkc':'doc')}<b>${msg[0]}</b><span>${msg[1]}</span>${filtered ? '' : `<button class="btn btn-primary" id="emptyNew">${svg('plus')}New estimate</button>`}</div>`;
+    $('#pager').innerHTML = ''; return;
+  }
+  $('#table').innerHTML = head + rows.slice(0, shown).map(row).join('');
+  const left = rows.length - Math.min(shown, rows.length);
+  $('#pager').innerHTML = `<span>Showing ${Math.min(shown, rows.length)} of ${rows.length}</span>` + (left > 0 ? `<button class="btn btn-ghost" id="more">${svg('chevd')}Show ${Math.min(PAGE, left)} more</button>` : '');
+}
+function renderAll(){ renderSub(); renderStats(); renderTabs(); renderTable(); }
+function setView(v){ view = v; shown = PAGE; renderAll(); }
+
+// ---- drawer ----
+function timeline(e){
+  const s = e.status, declined = s === 'declined';
+  const steps = [
+    { l:'Draft', at:e.createdAt, on:true, c:'#9B968A' },
+    { l:'Sent', at:e.sent_at, on:['sent','viewed','accepted','declined','on_hold'].includes(s), c:'#4B3E86' },
+    { l:'Viewed', at:e.last_viewed_at, on:['viewed','accepted','declined'].includes(s) || e.view_count > 0, c:'#B45309', extra: e.view_count > 1 ? `${e.view_count}× opens` : '' },
+    declined ? { l:'Declined', at:e.declined_at, on:true, c:'#C6382E' } : { l:'Accepted', at:e.accepted_at, on:s === 'accepted', c:'#1C8A4B' },
+  ];
+  return `<div class="timeline"><div class="h">Progress</div><div class="steps">${steps.map((st, i) => { const nx = steps[i+1]; return `<div class="step ${st.on?'on':''} ${nx && nx.on ? 'conn-on':''}" style="--step:${st.c}"><span class="dot"></span><span class="sl">${st.l}</span>${st.on && st.at ? `<span class="st">${ago(st.at)}</span>` : ''}${st.extra ? `<span class="st hl">${st.extra}</span>` : ''}${nx ? '<span class="conn"></span>' : ''}</div>`; }).join('')}</div></div>`;
+}
+function fuRow(e, f){
+  const d = daysUntil(f.due_at); let w = '';
+  if (f.done) w = `<span class="w muted">Done</span>`; else if (d < 0) w = `<span class="w danger">Overdue ${-d} day${-d===1?'':'s'}</span>`; else if (d === 0) w = `<span class="w warning">Due today</span>`; else w = `<span class="w muted">Due ${fmtD(f.due_at)}</span>`;
+  return `<label class="fu ${!f.done && d <= 0 ? 'due':''}"><input type="checkbox" data-fu="${f.id}" ${f.done?'checked':''}><span><span class="n ${f.done?'done':''}">${esc(f.note)}</span>${w}</span></label>`;
+}
+function renderDrawer(){
+  const e = E.find(x => x.id === drawerId); if (!e){ $('#scrim').hidden = true; return; }
+  const d = D[e.id];
+  const tiles = [
+    `<button class="atile" data-act="link">${svg('copy')}Copy public link</button>`,
+    `<button class="atile" data-act="resend">${svg('send')}${e.status === 'draft' ? 'Send estimate' : 'Resend email'}</button>`,
+    `<button class="atile" data-act="pdf">${svg('download')}Download PDF</button>`,
+  ];
+  if (e.status === 'accepted') tiles.push(`<button class="atile accentf" data-act="invoice">${svg('receipt')}${e.invoices.length ? 'Create another invoice' : 'Create invoice'}</button>`, `<button class="atile success wide" data-act="project">${svg('rocket')}${e.project_id ? 'Open live project' : 'Create live project'}</button>`);
+  else if (e.status === 'archived') tiles.push(`<button class="atile danger" data-act="delete">${svg('trash')}Delete forever</button>`);
+  else tiles.push(`<button class="atile success" data-act="project">${svg('rocket')}Create live project</button>`);
+  const fus = e.followups.slice().sort((a,b) => (a.done - b.done) || a.due_at.localeCompare(b.due_at));
+  const today = new Date(NOW).toISOString().slice(0,10);
+  $('#drawer').innerHTML = `
+    <div class="dhead"><div class="t"><h2>${esc(e.clientName)}</h2><div class="s">${esc(e.estimate_type)} · <b>${esc(e.estimate_number)}</b> · ${esc(e.jobTag)}</div></div><button class="dclose" id="dclose">${svg('close')}</button></div>
+    <div class="dbody">
+      ${timeline(e)}
+      ${d.quiet ? `<div class="quiet">${svg('clock')}<div><b>No reply for ${d.quiet} days</b><span>Sent ${fmtD(e.sent_at)}${e.view_count ? ` · last opened ${ago(e.last_viewed_at)}` : ' · never opened'}</span></div></div>` : ''}
+      <div class="agrid">${tiles.join('')}</div>
+      <div class="dsec"><div class="k"><span>Follow-ups</span><button id="fuAdd">${svg('plus')}Add follow-up</button></div>
+        ${fuAdding ? `<div class="form" id="fuForm"><label>Note<input id="fuNote" type="text" placeholder="e.g. Call to check they got the quote" autofocus></label><div class="fr"><label>Due<input id="fuDate" type="date" value="${today}"></label></div><div class="fa"><button class="btn btn-ghost" id="fuCancel">Cancel</button><button class="btn btn-primary" id="fuSave">Save</button></div></div>` : ''}
+        ${fus.length ? fus.map(f => fuRow(e, f)).join('') : (fuAdding ? '' : `<span class="dempty">No follow-ups yet.</span>`)}
+      </div>
+      <div class="drow"><span class="k">Address</span><span class="v">${svg('pin')}${esc(e.clientAddress)}</span></div>
+      <div class="drow"><span class="k">Phone</span><span class="v">${svg('phone')}${esc(e.clientPhone)}</span></div>
+      <div class="drow"><span class="k">Customer</span><span class="v">${svg('user')}<a href="#" data-go="/admin/customers/${e.customer_id}">Open customer record</a></span></div>
+      <div class="drow"><span class="k">Photos link</span><span class="v">${svg('folder')}${e.photos_link ? `<a href="#" data-go="${esc(e.photos_link)}">Google Drive folder</a>` : '<a href="#" data-act="photos">Add Google Drive link</a>'}</span></div>
+      <div class="drowtotal"><span class="k">Total</span><span class="v">${AUD(e.total)}</span></div>
+      ${e.notes ? `<div class="drow"><span class="k">Notes</span><span class="v">${esc(e.notes)}</span></div>` : ''}
+    </div>
+    <div class="dfoot">
+      <button class="btn btn-primary" data-act="open">${svg('edit')}Open in editor</button>
+      <button class="btn btn-ghost" id="markBtn">${svg('swap')}Mark as ${svg(markOpen?'chevu':'chevd')}</button>
+      <div class="markas" id="markas" ${markOpen?'':'hidden'}>${['draft','sent','accepted','declined','on_hold','archived'].map(k => `<button class="${e.status===k?'on':''}" data-mark="${k}">${svg({draft:'doc',sent:'send',accepted:'checkc',declined:'xc',on_hold:'pause',archived:'archive'}[k])}${STATUS[k][0]}</button>`).join('')}</div>
+    </div>`;
+  $('#scrim').hidden = false;
+  if (fuAdding) $('#fuNote').focus();
+}
+function openDrawer(id){ drawerId = id; markOpen = false; fuAdding = false; renderDrawer(); }
+function closeDrawer(){ drawerId = null; $('#scrim').hidden = true; }
+function setStatus(e, s){
+  const stamp = { sent:'sent_at', accepted:'accepted_at', declined:'declined_at', on_hold:'on_hold_at', archived:'archived_at' }[s];
+  e.status = s; e.updatedAt = new Date(NOW).toISOString(); if (stamp) e[stamp] = e.updatedAt; if (s === 'sent' && !e.share_token) e.share_token = 'tok_new';
+  D[e.id] = derive(e); say(`Marked ${STATUS[s][0]}`); markOpen = false; renderAll(); renderDrawer();
+}
+
+// ---- New estimate: the app's existing two-step chooser (NewEstimateModal.tsx), unchanged ----
+const SECTORS = [
+  { key:'Residential', icon:'home', blurb:'Houses, units, townhouses — living spaces and the people in them.' },
+  { key:'Commercial', icon:'building', blurb:'Offices, retail, strata, schools — after-hours access and site rules.' },
+];
+const SCOPES = {
+  Residential: [ { key:'Interior', icon:'grid', blurb:'Walls, ceilings, trim, doors — room by room.' }, { key:'Exterior', icon:'partly', blurb:'Weatherboards, render, eaves, fascia, fences.' }, { key:'Full Repaint', icon:'palette', blurb:'Inside and out on one quote.' } ],
+  Commercial:  [ { key:'Interior', icon:'grid', blurb:'Fit-outs, common areas, offices, back of house.' }, { key:'Exterior', icon:'partly', blurb:'Facades, car parks, line marking, awnings.' }, { key:'Full Repaint', icon:'palette', blurb:'Whole building, inside and out.' } ],
+};
+let sector = null;
+function renderNewModal(){
+  const opts = sector ? SCOPES[sector] : SECTORS;
+  $('#neSheet').innerHTML = `
+    <div class="nehead"><div class="t">
+      <div class="necrumbs"><span class="necrumb ${sector?'':'on'}">1 · Job type</span>${svg('chev')}<span class="necrumb ${sector?'on':''}">2 · Scope</span></div>
+      <h2 class="netitle">${sector ? `${sector} — what are we painting?` : 'New estimate'}</h2>
+      <p class="nesub">${sector ? 'Sets the Library scope and the quote template.' : 'Start with the kind of job. You can change it later.'}</p>
+    </div><button class="neclose" id="typeClose">${svg('close')}</button></div>
+    <div class="negrid">${opts.map((o, i) => `<button class="necard" data-pick="${o.key}" style="animation-delay:${i*60}ms"><span class="ic">${svg(o.icon)}</span><span class="nt">${o.key}</span><span class="nb">${o.blurb}</span><span class="ng">${sector ? 'Start estimate' : 'Choose'}${svg('arrowr')}</span></button>`).join('')}</div>
+    <div class="nefoot">${sector ? `<button class="neback" id="neBack">${svg('arrowl')}Back to job type</button>` : '<span></span>'}<span class="nehint">Esc to close</span></div>`;
+}
+function openNewModal(){ sector = null; renderNewModal(); $('#typeModal').hidden = false; }
+
+// ---- events ----
+document.addEventListener('click', (ev) => {
+  const t = ev.target;
+  const v = t.closest('[data-view]'); if (v){ setView(view === v.dataset.view && VIEWS.has(v.dataset.view) ? 'all' : v.dataset.view); return; }
+  if (t.closest('#more')){ shown += PAGE; renderTable(); return; }
+  if (t.closest('#newBtn') || t.closest('#emptyNew')){ openNewModal(); return; }
+  if (t.closest('#typeClose') || (t.id === 'typeModal')){ $('#typeModal').hidden = true; return; }
+  if (t.closest('#neBack')){ sector = null; renderNewModal(); return; }
+  const pk = t.closest('[data-pick]'); if (pk){ if (!sector){ sector = pk.dataset.pick; renderNewModal(); } else { $('#typeModal').hidden = true; go(`/admin/estimate/new?type=${encodeURIComponent(sector + ' ' + pk.dataset.pick)}&template=empty`); } return; }
+  const m = t.closest('[data-menu]'); if (m){ ev.stopPropagation(); openDrawer(m.dataset.menu); return; }
+  const r = t.closest('.trow.body'); if (r && !t.closest('[data-go]')){ go(`/admin/estimate/${r.dataset.id}`); return; }
+  if (t.id === 'scrim' || t.closest('#dclose')){ closeDrawer(); return; }
+  if (t.closest('#markBtn')){ markOpen = !markOpen; renderDrawer(); return; }
+  const mk = t.closest('[data-mark]'); if (mk){ setStatus(E.find(x => x.id === drawerId), mk.dataset.mark); return; }
+  if (t.closest('#fuAdd')){ fuAdding = true; renderDrawer(); return; }
+  if (t.closest('#fuCancel')){ fuAdding = false; renderDrawer(); return; }
+  if (t.closest('#fuSave')){ const e = E.find(x => x.id === drawerId); const note = $('#fuNote').value.trim(), date = $('#fuDate').value; if (!note || !date){ say('Note and due date are required'); return; } e.followups.push({ id:'fu_' + Date.now(), note, due_at: new Date(date + 'T09:00:00').toISOString(), done:false }); D[e.id] = derive(e); fuAdding = false; say('Follow-up added'); renderAll(); renderDrawer(); return; }
+  const a = t.closest('[data-act]'); if (a && drawerId){ ev.preventDefault(); const e = E.find(x => x.id === drawerId); switch (a.dataset.act){
+    case 'link': if (!e.share_token){ say('Send the estimate first to generate a shareable link.'); } else say('Public link copied to clipboard.'); break;
+    case 'resend': if (e.status === 'draft') go(`/admin/estimate/${e.id}?send=1`); else say(`Resent to ${e.sent_to}.`); break;
+    case 'pdf': say(`Downloading Estimate-${e.estimate_number}.pdf`); break;
+    case 'invoice': go(`/admin/invoices?convert=${e.id}`); break;
+    case 'project': go(e.project_id ? `/admin/project/${e.project_id}` : `/projects/from-estimate/${e.id}`); break;
+    case 'delete': if (confirm(`Permanently delete this estimate for ${e.clientName}? This cannot be undone.`)){ E.splice(E.indexOf(e), 1); closeDrawer(); say('Estimate deleted.'); renderAll(); } break;
+    case 'open': go(`/admin/estimate/${e.id}`); break;
+    case 'photos': say('Photos link editor (same inline field as today)'); break;
+  } return; }
+  if (!t.closest('#markas') && !t.closest('#markBtn') && markOpen){ markOpen = false; renderDrawer(); }
+});
+document.addEventListener('change', (ev) => {
+  const c = ev.target.closest('[data-fu]'); if (c){ const e = E.find(x => x.id === drawerId); const f = e.followups.find(f => f.id === c.dataset.fu); f.done = c.checked; D[e.id] = derive(e); renderAll(); renderDrawer(); }
+});
+document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape'){ if (!$('#typeModal').hidden) $('#typeModal').hidden = true; else if (drawerId) closeDrawer(); } });
+$('#q').value = q;
+$('#q').addEventListener('input', () => { q = $('#q').value; $('#qClear').hidden = !q; shown = PAGE; renderTable(); });
+$('#qClear').addEventListener('click', () => { q = ''; $('#q').value = ''; $('#qClear').hidden = true; renderTable(); $('#q').focus(); });
+$('#qClear').hidden = !q;
+renderAll();
+
+// ---------- Quote setup panel ----------
+const QS = {
+  defaults: { tax_label:'GST', tax_rate:10, tax_enabled_by_default:true, presentation_default_on:true, currency:'AUD', labor_hourly_rate:75, overhead_pct:3, markup_pct:0, deposit_pct:50, validity_days:30, estimate_prefix:'EST-', estimate_starting_seq:42,
+    pdf_accent_color:'#4B3E86', about_us_blurb:'Family-run painting and decorating across the Northern Beaches since 2014. Fully licensed and insured, Dulux Accredited, and we leave every site cleaner than we found it.',
+    about_us_stats:[{ value:'12 yrs', label:'in business' }, { value:'480+', label:'homes painted' }, { value:'4.9★', label:'Google rating' }],
+    payment_terms_default:{ threshold:40000, auto_deposit_prompt:true, low_structure:[{ label:'Deposit', pct:30 }, { label:'Progress', pct:40 }, { label:'Final', pct:30 }], high_structure:[{ label:'Deposit', pct:20 }, { label:'Progress 1', pct:30 }, { label:'Progress 2', pct:30 }, { label:'Final', pct:20 }] } },
+  layout: { estimate_footer_text:'Thank you for the opportunity to quote. Call Josh any time on 0411 222 333.', estimate:[
+    { id:'hero', label:'Hero — business identity & quote info', desc:'Business name, ABN, address, contact, quote number.', locked:true, on:true, xref:'Edited under Settings › Business' },
+    { id:'about', label:'About us', desc:'Blurb and up to 4 stat blocks — set below.', on:true },
+    { id:'client-job', label:'Client & job details', desc:'Filled from each quote.', locked:true, on:true },
+    { id:'cost-breakdown', label:'Cost breakdown', desc:'The pricing table, built from the line items.', locked:true, on:true },
+    { id:'products', label:'Products we use', desc:'Hides itself when a quote has no products.', on:true },
+    { id:'total', label:'Total', desc:'Subtotal, discount, tax, grand total. Tax label and rate are on the Pricing tab.', locked:true, on:true },
+    { id:'terms', label:'Terms & conditions', desc:'Wording comes from the default template on the Terms tab.', on:true },
+    { id:'payment-bank', label:'Payment terms & bank details', desc:'Milestones from the Payment terms tab; bank details from Settings › Invoicing.', on:true },
+    { id:'footer', label:'Closing footer', desc:'Short closing line — set below.', on:true },
+    { id:'presentation', label:'Presentation pages', desc:'One or two photo pages from the Presentation tab. New quotes follow the switch on that tab; each quote can change it in its Quote details.', on:false } ] },
+  terms: [ { id:'t1', name:'Standard residential', is_default:true, body:'1. This quote is valid for 30 days from the date above.\n2. A deposit is payable before work begins; the balance is due within 7 days of completion.\n3. Colours are as selected by the client; a change after purchase may incur a restocking fee.\n4. We are not responsible for pre-existing surface defects unless listed in this quote.\n5. Access to water and power is provided by the client.' },
+    { id:'t2', name:'Strata / body corporate', is_default:false, body:'1. Quote valid 30 days.\n2. Progress claims monthly against completed stages.\n3. Site induction, SWMS and insurances provided before commencement.' } ],
+  pres: [ { id:'p1', name:'Standard residential', type:'residential', cover_image_url:'https://storage.example/cover-res.jpg', intro:'We treat your home like our own — tidy, on time and finished to a standard we are proud to put our name on.', about_us:'', photos:['a','b','c','d'], youtube_urls:['https://youtu.be/abc123'], drive_photos_url:'https://drive.google.com/folders/res-photos', drive_videos_url:'', pages:{ one:{ title:'Our work', hero:'hero-manly.jpg', photos:['kitchen-after.jpg','facade-render.jpg','hallway-trim.jpg','deck-oil.jpg'], captions:['Kitchen · Manly','Render refresh · Dee Why','Hallway trims · Mosman','Deck re-oil · Balgowlah'] }, two:{ on:true, headline:'A bit about us', photos:['team-van.jpg','colour-consult.jpg','clean-site.jpg'], captions:['The team','Colour consult','Clean site, every day'], show_reviews:true, show_links:true } } },
+    { id:'p2', name:'Commercial & strata', type:'commercial', cover_image_url:'', intro:'Scheduled around your tenants and trading hours, with SWMS and insurances supplied before day one.', about_us:'', photos:['a','b'], youtube_urls:[], drive_photos_url:'', drive_videos_url:'' } ],
+  reviews: { google_reviews_url:'https://g.page/r/sano-painting/review', google_review_rating:4.9, google_review_count:87 },
+};
+const deep = (o) => JSON.parse(JSON.stringify(o));
+const TABS_QS = [['pricing','Pricing & payment'],['terms','Terms'],['pdf','Quote PDF'],['presentation','Presentation']];
+const TAB_ALIAS = { payment:'pricing' };
+const ACCENTS = ['#4B3E86','#1D4ED8','#1C8A4B','#B45309','#C6382E','#1F1D2E'];
+let qsTab = 'pricing', W = null, dirty = false, tplEdit = null, presEdit = null, presNew = false, previewOn = false;
+const qsOpen = () => !$('#qsScrim').hidden;
+
+function openQS(tab) { tab = TAB_ALIAS[tab] || tab; W = deep(QS); dirty = false; tplEdit = null; presEdit = null; presNew = false; qsTab = TABS_QS.some(([k]) => k === tab) ? tab : 'pricing'; $('#qsScrim').hidden = false; $('#qsGear').classList.add('on'); renderQS(); }
+function closeQS(force) { if (dirty && !force) { confirmBox('Discard your changes?', 'You have unsaved changes on this tab.', 'Discard', () => closeQS(true)); return; } $('#qsScrim').hidden = true; $('#qsGear').classList.remove('on'); setPreview(false); }
+function mark() { dirty = true; qsRenderTabs(); }
+function confirmBox(t, p, ok, fn, danger) { $('#cTitle').textContent = t; $('#cText').textContent = p; $('#cOk').textContent = ok; $('#cOk').className = 'btn ' + (danger ? 'btn-danger' : 'btn-primary'); $('#cscrim').hidden = false; $('#cOk').onclick = () => { $('#cscrim').hidden = true; fn(); }; }
+$('#cCancel').addEventListener('click', () => { $('#cscrim').hidden = true; });
+
+function qsRenderTabs() { $('#qsTabs').innerHTML = TABS_QS.map(([k, l]) => `<button class="${qsTab === k ? 'on' : ''}" data-tab="${k}" data-testid="qs-tab-${k}">${l}${dirty && qsTab === k ? '<span class="d" title="Unsaved"></span>' : ''}</button>`).join(''); }
+const RENDER = { pricing: tabPricing, terms: tabTerms, pdf: tabPdf, presentation: tabPres };
+function renderQS() { qsRenderTabs(); $('#qsBody').innerHTML = RENDER[qsTab](); $('#qsBody').scrollTop = 0; wire(); footer(); if (qsTab !== 'pdf' && !(qsTab === 'presentation' && (presEdit || presNew))) setPreview(false); else if (previewOn) renderPreview(); }
+function footer() { const inEditor = qsTab === 'presentation' && (presEdit || presNew); const note = inEditor ? (presNew ? 'Creates the template — POST /admin/presentation-templates' : 'Saves the template — PATCH /admin/presentation-templates/' + presEdit) : { pricing:'Saves to PUT /admin/profile/estimate-defaults', terms:'Templates save as you go — /admin/contract-terms-templates', pdf:'Saves to PUT /admin/profile/pdf-layout + estimate-defaults', presentation:'Templates and reviews save as you go' }[qsTab]; $('#qsNote').textContent = note; const perTab = (qsTab === 'terms' || qsTab === 'presentation') && !inEditor; $('#qsSave').hidden = perTab; $('#qsSave').innerHTML = svg('check') + (inEditor ? (presNew ? ' Create template' : ' Save template') : ' Save'); $('#qsSave').dataset.testid = inEditor ? 'qs-pres-save' : 'qs-save'; $('#qsCancel').textContent = perTab ? 'Close' : 'Cancel'; }
+const PDF_PREVIEW_HEAD = 'Live preview <small>· the PDF your client gets — in the build this pane shows the real PDF from the renderer; this drawing only shows where it sits</small>';
+function renderPreview() { if (qsTab === 'presentation' && (presEdit || presNew)) return renderPresPreview(); return renderPdfPreview(); }
+function renderPresPreview() { if (!previewOn || !$('#pres-keep')) return; const p = readPresForm(); const pg = p.pages; const r = W.reviews; const stars = '★★★★★'.slice(0, Math.round(r.google_review_rating || 0)); const biz = 'Sano Painting & Decorating';
+  const cell = (u, cap) => `<div class="${u ? gcls(u) : 'g7'}" style="${u ? '' : 'opacity:.35'}">${u && cap ? `<i>${esc(cap)}</i>` : ''}</div>`;
+  let h = `<div class="sheet" data-testid="qs-prev-page1"><div class="pt"><small>${esc(biz)} · presentation</small>${esc(pg.one.title)}</div><div class="shero ${pg.one.hero ? gcls(pg.one.hero) : 'g7'}" style="${pg.one.hero ? '' : 'opacity:.35'}"></div><div class="sgrid">${pg.one.photos.map((u, i) => cell(u, pg.one.captions[i])).join('')}</div><div class="sfoot"><span>${esc(biz)}</span><span>Page 1 of ${pg.two.on ? 2 : 1}</span></div></div>`;
+  if (pg.two.on) h += `<div class="sheet" data-testid="qs-prev-page2"><div class="pt"><small>${esc(biz)} · presentation</small>${esc(pg.two.headline)}</div><div class="stext">${esc(p.intro || 'Your story goes here.').split('\n').filter(Boolean).map(x => `<p>${x}</p>`).join('')}</div><div class="swide">${pg.two.photos.map((u, i) => cell(u, pg.two.captions[i])).join('')}</div>${pg.two.show_reviews && r.google_reviews_url ? `<div class="srev" data-testid="qs-prev-reviews"><b>${esc(String(r.google_review_rating))}</b><span class="st">${stars}</span><span>from ${r.google_review_count} Google reviews</span></div>` : ''}${pg.two.show_links && (p.drive_photos_url || p.drive_videos_url || p.youtube_urls.some(Boolean)) ? `<div class="slinks" data-testid="qs-prev-links">${p.drive_photos_url ? '<span>📸 Full photo gallery</span>' : ''}${(p.drive_videos_url || p.youtube_urls.some(Boolean)) ? '<span>▶ Walkthrough videos</span>' : ''}</div>` : ''}<div class="sfoot"><span>${esc(biz)}</span><span>Page 2 of 2</span></div></div>`;
+  $('#qsPreviewBody').innerHTML = h; $('#qsPreview .ph span').innerHTML = 'Live preview <small>· the pages as the client sees them at the back of the quote; the photos are placeholders here</small>'; }
+function setPreview(on) { previewOn = on; $('#qsPreview').hidden = !on; const b = $('#livePreview'); if (b) { b.classList.toggle('on', on); b.textContent = on ? 'Hide preview' : 'Live preview'; } if (on) renderPreview(); }
+function renderPdfPreview() { if (!previewOn || qsTab !== 'pdf') return; $('#qsPreview .ph span').innerHTML = PDF_PREVIEW_HEAD; readPdf(); const d = W.defaults, L = W.layout, c = d.pdf_accent_color, p = d.payment_terms_default; const blocks = { hero: `<div class="hero" style="background:${c}"><div><b>Sano Painting &amp; Decorating</b><small>ABN 12 345 678 901 · 14 Harbour St, Manly NSW · 0411 222 333</small></div><div style="text-align:right"><b style="font-size:12px">QUOTE ${esc(d.estimate_prefix)}${String(d.estimate_starting_seq).padStart(4, '0')}</b><small>Valid ${d.validity_days} days</small></div></div>`,
+    about: `<div class="sec"><h4>About us</h4><div>${esc(d.about_us_blurb) || '<i style="color:#B8B2A6">No blurb yet</i>'}</div>${d.about_us_stats.filter(s => s.value || s.label).length ? `<div class="stats">${d.about_us_stats.filter(s => s.value || s.label).map(s => `<div><b>${esc(s.value)}</b>${esc(s.label)}</div>`).join('')}</div>` : ''}</div>`,
+    'client-job': `<div class="sec"><h4>Client &amp; job</h4>Whitfield family · 14 Harbour St, Manly · Interior repaint, 3 bedrooms + living</div>`,
+    'cost-breakdown': `<div class="sec"><h4>Cost breakdown</h4><table><tr><td>Prep &amp; masking</td><td class="r">$1,240.00</td></tr><tr><td>Walls &amp; ceilings — 2 coats</td><td class="r">$6,380.00</td></tr><tr><td>Trims &amp; doors</td><td class="r">$1,860.00</td></tr></table></div>`,
+    products: `<div class="sec"><h4>Products we use</h4>Dulux Wash&amp;Wear Low Sheen · Dulux Aquanamel Semi Gloss</div>`,
+    total: `<div class="total" style="background:${c}"><span>Total incl. ${esc(d.tax_label)} ${d.tax_rate}%</span><span>${d.currency === 'AUD' ? '$' : d.currency + ' '}10,428.00</span></div>`,
+    terms: `<div class="sec"><h4>Terms &amp; conditions</h4><div style="white-space:pre-line">${esc((W.terms.find(t => t.is_default) || W.terms[0] || { body:'' }).body.split('\n').slice(0, 3).join('\n'))}</div></div>`,
+    'payment-bank': `<div class="sec"><h4>Payment terms</h4><div class="ms2">${p.low_structure.map(m => `<div><b>${m.pct}%</b>${esc(m.label)}</div>`).join('')}</div><div style="margin-top:6px;color:#8A8378">Bank: Sano Painting Pty Ltd · BSB 062-000 · Acc 1234 5678</div></div>`,
+    footer: `<div class="foot" style="background:${c}">${esc(L.estimate_footer_text)}</div>`,
+    presentation: `<div class="prs"><div class="cov" style="background:linear-gradient(135deg,${c},#C9B8FF)"></div><div class="gal"><div class="thumb t0"></div><div class="thumb t1"></div><div class="thumb t2"></div><div class="thumb t3"></div></div></div>` };
+  $('#qsPreviewBody').innerHTML = `<div class="a4" data-testid="qs-preview-doc">${L.estimate.map(s => s.on ? blocks[s.id] : `<div class="ghost">${s.label} — hidden</div>`).join('')}</div>`; }
+const num = (v) => { const n = parseFloat(v); return isNaN(n) ? null : n; };
+const fld = (id, label, val, o = {}) => `<label class="f ${o.w2 ? 'w2' : ''}" id="f-${id}">${label}<span class="in"><input ${o.type ? `type="${o.type}"` : ''} ${o.step ? `step="${o.step}"` : ''} ${o.min !== undefined ? `min="${o.min}"` : ''} id="${id}" value="${esc(String(val ?? ''))}" data-testid="qs-${id}" ${o.ph ? `placeholder="${o.ph}"` : ''}>${o.unit ? `<span class="u">${o.unit}</span>` : ''}</span>${o.hint ? `<span class="hint">${o.hint}</span>` : ''}<span class="err" hidden></span></label>`;
+const tog = (id, on, label, small) => `<div class="sw"><div class="t">${label}${small ? `<small>${small}</small>` : ''}</div><button class="tog ${on ? 'on' : ''}" id="${id}" data-testid="qs-${id}" role="switch" aria-checked="${on}"></button></div>`;
+
+// ---- Pricing ----
+function structure(key, label, rows) { const sum = rows.reduce((a, r) => a + (num(r.pct) || 0), 0); return `<div class="ms" data-testid="qs-${key}"><div class="h">${label}<span class="sum ${sum === 100 ? '' : 'bad'}" data-testid="qs-${key}-sum">${sum}% of 100%</span></div>
+  ${rows.map((r, i) => `<div class="row"><input class="l" value="${esc(r.label)}" data-ms="${key}" data-i="${i}" data-k="label" data-testid="qs-${key}-${i}-label" placeholder="Stage name"><input class="p" type="number" min="0" max="100" value="${r.pct}" data-ms="${key}" data-i="${i}" data-k="pct" data-testid="qs-${key}-${i}-pct"><span class="pc">%</span><button class="rm" data-msrm="${key}" data-i="${i}" title="Remove" ${rows.length <= 1 ? 'disabled' : ''}>${svg('close')}</button></div>`).join('')}
+  <button class="lnk" data-msadd="${key}" data-testid="qs-${key}-add">+ Add a stage</button></div>`; }
+function tabPricing() { const d = W.defaults, p = d.payment_terms_default; return `
+  <div class="qs-sec"><h3>Tax &amp; currency</h3>
+    <div class="fr">${fld('tax-label', 'Tax label', d.tax_label, { hint:'e.g. GST, VAT' })}${fld('tax-rate', 'Tax rate', d.tax_rate, { type:'number', step:'0.5', min:0, unit:'%' })}<label class="f">Currency<div class="chips" id="cur">${['AUD','NZD','USD','GBP'].map(c => `<button data-cur="${c}" class="${d.currency === c ? 'on' : ''}" data-testid="qs-currency-${c}">${c}</button>`).join('')}</div></label></div>
+    ${tog('tax-default', d.tax_enabled_by_default, 'Add tax to new quotes', 'Turn it off on a quote in the builder when needed.')}
+  </div>
+  <div class="qs-sec"><h3>Rates &amp; numbering</h3>
+    <div class="fr">${fld('labour', 'Labour rate', d.labor_hourly_rate, { type:'number', step:'1', min:0, unit:'$ / h', hint:'When a line has hours.' })}${fld('overhead', 'Overheads', d.overhead_pct, { type:'number', step:'0.5', min:0, unit:'%', hint:'Fuel, insurance, downtime.' })}${fld('markup', 'Markup', d.markup_pct, { type:'number', step:'0.5', min:0, unit:'%', hint:'On top of overheads.' })}</div>
+    <div class="fr">${fld('validity', 'Quote valid for', d.validity_days, { type:'number', step:'1', min:1, unit:'days' })}${fld('prefix', 'Number prefix', d.estimate_prefix, { ph:'EST-' })}${fld('seq', 'Next number', d.estimate_starting_seq, { type:'number', step:'1', min:1, hint:`Next: <b id="nextNo">${esc(d.estimate_prefix)}${String(d.estimate_starting_seq).padStart(4, '0')}</b>` })}</div>
+  </div>
+  <div class="qs-sec"><h3>Payment stages</h3><div class="p">Shown on the quote and used to raise the invoices once the client accepts. Small jobs use the first structure, big jobs the second.</div>
+    <div class="fr">${fld('deposit', 'Deposit shown on the quote', d.deposit_pct, { type:'number', step:'5', min:0, unit:'%' })}${fld('threshold', 'Big job from', p.threshold, { type:'number', step:'1000', min:0, unit:'$' })}</div>
+    <div class="two">${structure('low', 'Below the threshold', p.low_structure)}${structure('high', 'At or above', p.high_structure)}</div>
+    ${tog('auto-deposit', p.auto_deposit_prompt, 'Offer the deposit invoice on accept', 'A "Create the deposit invoice" button appears in the builder once the client accepts.')}
+  </div>`; }
+
+// ---- Terms ----
+function tabTerms() { return `
+  <div class="qs-sec"><h3>Terms &amp; conditions templates <span class="n">${W.terms.length}</span></h3><div class="p">The default goes on every new quote. Change it on one quote in the builder.</div>
+    <div class="tl" data-testid="qs-terms-list">${W.terms.map(t => `<div class="it" data-testid="qs-tpl-${t.id}"><div class="nm">${esc(t.name)} ${t.is_default ? '<span class="pillst default">Default</span>' : ''}<small>${esc(t.body.split('\n')[0])}</small></div>${t.is_default ? '' : `<button class="btn btn-ghost" data-tdef="${t.id}" data-testid="qs-tpl-default-${t.id}">Set default</button>`}<button class="btn btn-ghost" data-tedit="${t.id}" data-testid="qs-tpl-edit-${t.id}">${tplEdit === t.id ? 'Close' : 'Edit'}</button><button class="btn btn-ghost" data-tdel="${t.id}" data-testid="qs-tpl-delete-${t.id}" ${t.is_default && W.terms.length > 1 ? 'title="Set another template as default first" disabled' : ''}>${svg('trash')}</button></div>
+      ${tplEdit === t.id ? `<div class="ed"><label class="f">Wording<textarea id="tplBody" data-testid="qs-tpl-body">${esc(t.body)}</textarea></label><div class="fr" style="justify-content:flex-end;margin:8px 0 0"><button class="btn btn-primary" data-tsave="${t.id}" data-testid="qs-tpl-save">${svg('check')} Save wording</button></div></div>` : ''}`).join('')}${W.terms.length ? '' : '<div class="empty" style="padding:10px 12px">No templates yet — quotes go out without terms until you add one.</div>'}</div>
+    <div class="newrow"><input id="tplNew" placeholder="New template name, e.g. Commercial" data-testid="qs-tpl-new-name"><button class="btn btn-ghost" id="tplAdd" data-testid="qs-tpl-new-add">${svg('plus')} Add</button></div>
+  </div>`; }
+
+// ---- Quote PDF ----
+function tabPdf() { const d = W.defaults, L = W.layout; return `
+  <div class="qs-sec"><h3>Accent colour <span class="sp"></span><button class="btn btn-ghost ${previewOn ? 'on' : ''}" id="livePreview" data-testid="qs-live-preview">${previewOn ? 'Hide preview' : 'Live preview'}</button></h3><div class="p">Hero banner, total bar and footer on the quote PDF. The invoice gets its own colour on the Invoices page.</div>
+    <div class="accent"><input type="color" id="accentPick" value="${d.pdf_accent_color}" data-testid="qs-accent-pick"><input class="hex" id="accentHex" value="${d.pdf_accent_color}" data-testid="qs-accent" maxlength="7">${ACCENTS.map(c => `<button class="chip ${c.toLowerCase() === d.pdf_accent_color.toLowerCase() ? 'on' : ''}" style="background:${c}" data-accent="${c}" data-testid="qs-accent-${c.slice(1)}" title="${c}"></button>`).join('')}<span class="err" id="accentErr" hidden>Use a hex colour like #4B3E86</span></div>
+  </div>
+  <div class="qs-sec"><h3>Sections</h3><div class="p">Order and show or hide. Locked sections are always on.</div>
+    <div class="secl" data-testid="qs-sections">${L.estimate.map((s, i) => `<div class="it ${s.on ? '' : 'off'}" data-testid="qs-sec-${s.id}"><span class="mv"><button data-mv="${i}" data-dir="-1" data-testid="qs-sec-up-${s.id}" ${i === 0 ? 'disabled' : ''}>${svg('up')}</button><button data-mv="${i}" data-dir="1" data-testid="qs-sec-down-${s.id}" ${i === L.estimate.length - 1 ? 'disabled' : ''}>${svg('down')}</button></span><div class="t"><b>${s.label}</b><small>${s.desc}</small></div>${s.locked ? `<span class="lk">${svg('lock')} always</span>` : `<button class="tog ${s.on ? 'on' : ''}" data-secon="${i}" data-testid="qs-sec-on-${s.id}" role="switch" aria-checked="${s.on}"></button>`}</div>`).join('')}</div>
+  </div>
+  <div class="qs-sec"><h3>About us</h3>
+    <label class="f" style="margin-bottom:10px">Blurb<textarea id="aboutBlurb" data-testid="qs-about-blurb" placeholder="Two or three sentences about the business.">${esc(d.about_us_blurb)}</textarea></label>
+    <div class="stats2" id="stats2" data-testid="qs-stats">${d.about_us_stats.map((s, i) => `<div class="st"><input class="v" value="${esc(s.value)}" data-st="${i}" data-k="value" placeholder="480+" data-testid="qs-stat-${i}-value"><input class="l" value="${esc(s.label)}" data-st="${i}" data-k="label" placeholder="homes painted" data-testid="qs-stat-${i}-label"><button class="rm" data-strm="${i}" title="Remove">${svg('close')}</button></div>`).join('')}</div>
+    ${d.about_us_stats.length < 4 ? `<button class="lnk" id="statAdd" data-testid="qs-stat-add" style="margin-top:6px">+ Add a stat (up to 4)</button>` : ''}
+  </div>
+  <div class="qs-sec"><h3>Closing footer</h3>
+    <label class="f">One line at the end of the quote<input id="footerText" value="${esc(L.estimate_footer_text)}" data-testid="qs-footer" maxlength="140"></label>
+  </div>
+  <div class="qs-sec"><button class="btn btn-ghost" id="pdfPreview" data-testid="qs-preview">${svg('download')} Download a sample PDF</button></div>`; }
+
+// ---- Presentation ----
+const PH = (u) => u.startsWith('http') ? u : 'https://storage.example/photo-' + u + '.jpg';
+const JOB_PHOTOS = [['kitchen-after.jpg','Kitchen · Manly'],['facade-render.jpg','Render · Dee Why'],['hallway-trim.jpg','Hallway · Mosman'],['deck-oil.jpg','Deck · Balgowlah'],['team-van.jpg','The team'],['colour-consult.jpg','Colour consult'],['clean-site.jpg','Clean site'],['bedroom-feature.jpg','Feature wall · Manly'],['exterior-weatherboard.jpg','Weatherboards · Freshwater'],['stairwell.jpg','Fire stair · Brookvale'],['shopfront.jpg','Shopfront · Brookvale'],['pergola.jpg','Pergola · Seaforth']];
+const gcls = (name) => 'g' + ([...String(name)].reduce((a, c) => a + c.charCodeAt(0), 0) % 8);
+function ensurePages(p) { if (!p.pages) { const ph = (p.photos || []).map(PH).map(u => u.split('/').pop()); p.pages = { one:{ title:'Our work', hero: p.cover_image_url ? p.cover_image_url.split('/').pop() : '', photos: ph.slice(0, 4), captions:['', '', '', ''] }, two:{ on:true, headline:'A bit about us', photos: ph.slice(4, 7), captions:['', '', ''], show_reviews:true, show_links:true } }; } const pg = p.pages; while (pg.one.photos.length < 4) pg.one.photos.push(''); while (pg.two.photos.length < 3) pg.two.photos.push(''); pg.one.captions = pg.one.captions || ['', '', '', '']; pg.two.captions = pg.two.captions || ['', '', '']; return pg; }
+const photoCount = (pg) => (pg.one.hero ? 1 : 0) + pg.one.photos.filter(Boolean).length + (pg.two.on ? pg.two.photos.filter(Boolean).length : 0);
+function presEditor(p, isNew) { const pg = ensurePages(p); const n = photoCount(pg);
+  const slot = (u, i, cap, kind) => `<div class="slot" data-testid="qs-pres-${kind}-${i}">${u ? `<div class="ph ${gcls(u)}" data-slot="${kind}" data-i="${i}" data-url="${esc(u)}"><span class="nm">${esc(u)}</span><button class="rm" data-slotrm="${kind}" data-i="${i}" title="Remove" data-testid="qs-pres-${kind}-remove-${i}">${svg('close')}</button></div>` : `<div class="ph empty" data-slotadd="${kind}" data-i="${i}" data-testid="qs-pres-${kind}-add-${i}">${svg('plus')}Add photo</div>`}<input class="cap" value="${esc(cap || '')}" placeholder="Caption (optional)" data-cap="${kind}" data-i="${i}" data-testid="qs-pres-${kind}-cap-${i}" ${u ? '' : 'disabled'}></div>`;
+  return `<div class="pe-head"><button class="back" id="presBack" data-testid="qs-pres-back">${svg('arrowl')} Templates</button><h3>${isNew ? 'New template' : esc(p.name)}</h3><button class="btn btn-ghost ${previewOn ? 'on' : ''}" id="presPreviewBtn" data-testid="qs-pres-preview">${svg('eye')} ${previewOn ? 'Hide preview' : 'Live preview'}</button></div>
+    <input type="hidden" id="pres-keep" value="${esc(JSON.stringify(p))}">
+    <div class="fr">${fld('pres-name', 'Template name', p.name, { w2:true, ph:'Standard residential' })}<label class="f">Type<div class="chips typechips" id="presType">${['residential','commercial'].map(t => `<button data-ptype="${t}" class="${p.type === t ? 'on' : ''}" data-testid="qs-pres-type-${t}">${t[0].toUpperCase() + t.slice(1)}</button>`).join('')}</div></label></div>
+    <div class="p" style="margin:0 0 10px">Two pages at the back of the quote, mostly photos. Up to 8 photos across both — <b data-testid="qs-pres-photo-count">${n} of 8</b> used.</div>
+    <div class="pg" data-testid="qs-pres-page1"><div class="pgh"><span class="no">Page 1</span><h4>Our work</h4></div>
+      <div class="fr">${fld('pres-p1-title', 'Page title', pg.one.title, { w2:true, ph:'Our work' })}</div>
+      <div class="hero ${pg.one.hero ? 'has ' + gcls(pg.one.hero) : ''}" id="heroDrop" data-testid="qs-pres-hero-drop">${pg.one.hero ? `<span class="cap">${esc(pg.one.hero)}</span><span class="acts"><button class="btn btn-ghost" id="heroReplace" data-testid="qs-pres-hero-replace">Replace</button><button class="btn btn-ghost" id="heroRemove" data-testid="qs-pres-hero-remove">Remove</button></span>` : `${svg('image')}<b>Hero photo — the biggest picture, full width</b><span>Your best finished job · JPG or PNG up to 10 MB · drop it here or click</span>`}</div>
+      <input type="hidden" id="pres-hero" value="${esc(pg.one.hero)}" data-testid="qs-pres-hero">
+      <div class="big4" id="big4">${pg.one.photos.map((u, i) => slot(u, i, pg.one.captions[i], 'big')).join('')}</div>
+      <button class="lnk" id="jobPickBtn" data-testid="qs-pres-jobpick" style="margin-top:8px">${svg('folder')} Pick from a finished job</button>
+      <div class="jobpick" id="jobPick" hidden data-testid="qs-pres-jobpick-strip"><div class="t">Photos from your finished jobs. Click one to put it in the next empty spot.</div><div class="row">${JOB_PHOTOS.map(([f, l], i) => `<button class="${gcls(f)}" data-job="${esc(f)}" data-testid="qs-pres-jobpick-${i}" title="${esc(l)}"><span>${esc(l)}</span></button>`).join('')}</div></div>
+    </div>
+    <div class="pg" data-testid="qs-pres-page2"><div class="pgh"><span class="no">Page 2</span><h4>About us</h4><button class="tog ${pg.two.on ? 'on' : ''}" id="pres-page2" data-testid="qs-pres-page2-toggle" role="switch" aria-checked="${pg.two.on}"></button></div>
+      ${pg.two.on ? `<div class="fr">${fld('pres-p2-headline', 'Headline', pg.two.headline, { w2:true, ph:'A bit about us' })}</div>
+      <label class="f">Your story<textarea class="tall" id="pres-intro" data-testid="qs-pres-intro" placeholder="Who you are, how you work, what the client can expect. A paragraph or two.">${esc(p.intro)}</textarea></label>
+      <div class="wide3" id="wide3">${pg.two.photos.map((u, i) => slot(u, i, pg.two.captions[i], 'wide')).join('')}</div>
+      ${tog('pres-reviews', pg.two.show_reviews, 'Show your Google reviews', 'The rating, the count and the link from the Reviews box on the Presentation tab.')}
+      ${tog('pres-links', pg.two.show_links, 'Show the Drive and video links', 'Buttons to the folders and videos below.')}
+      <div class="fr" style="margin-top:8px">${fld('pres-drive-photos', 'More photos (Drive folder)', p.drive_photos_url, { ph:'https://drive.google.com/…' })}${fld('pres-drive-videos', 'Videos (Drive folder)', p.drive_videos_url, { ph:'https://drive.google.com/…' })}</div>
+      <div class="vids" id="vids" style="margin-top:4px">${p.youtube_urls.map((u, i) => `<div class="vid"><span class="pl">${svg('play')}</span><input value="${esc(u)}" data-vd="${i}" data-testid="qs-pres-video-${i}" placeholder="https://youtu.be/…"><button class="rm" data-vdrm="${i}" title="Remove">${svg('close')}</button></div>`).join('')}</div>
+      <button class="lnk" id="vdAdd" data-testid="qs-pres-video-add" style="margin-top:6px">+ Add a YouTube link</button>` : `<div class="pgoff" data-testid="qs-pres-page2-off">Off — the quote ends with page 1. Turn it on for your story, three more photos, your reviews and the links.</div>`}
+    </div>
+    ${isNew ? '' : `<div class="qs-sec"><button class="lnk pe-del" data-pdel="${p.id}" data-testid="qs-pres-delete-${p.id}">${svg('trash')} Delete this template</button></div>`}`; }
+function tabPres() {
+  if (presNew) return presEditor({ name:'', type:'residential', cover_image_url:'', intro:'', photos:[], youtube_urls:[], drive_photos_url:'', drive_videos_url:'' }, true);
+  if (presEdit) return presEditor(W.pres.find(x => x.id === presEdit), false);
+  const r = W.reviews; const stars = Math.round(r.google_review_rating || 0); return `
+  <div class="qs-sec">${tog('pres-default', W.defaults.presentation_default_on, 'Add presentation pages to every new quote', 'Each quote can still switch them off in its Quote details. Off: you switch them on per quote.')}</div>
+  <div class="qs-sec"><h3>Presentation templates <span class="n">${W.pres.length}</span><span class="sp"></span><button class="btn btn-ghost" id="presNewBtn" data-testid="qs-pres-new">${svg('plus')} New template</button></h3><div class="p">One or two pages at the back of a quote, mostly large photos of your work, with your story and your reviews. New quotes follow the switch above; any quote can change it in its Quote details. A residential quote picks the residential template, a commercial quote the commercial one. Click a template to open it.</div>
+    ${W.pres.map(p => `<div class="pres card" data-pedit="${p.id}" data-testid="qs-pres-${p.id}"><div class="top"><div class="cov ${p.cover_image_url ? 'has' : ''}">${svg('image')}</div><div class="t"><b>${esc(p.name)} <span class="pillst neutral" style="margin-left:4px">${p.type}</span></b><small>${p.photos.length} photo${p.photos.length === 1 ? '' : 's'} · ${p.youtube_urls.length} video${p.youtube_urls.length === 1 ? '' : 's'}${p.drive_photos_url ? ' · Drive photos' : ''}${p.cover_image_url ? '' : ' · no cover yet'}${p.intro ? '' : ' · no intro yet'}</small></div><div class="acts"><button class="btn btn-ghost" data-pedit="${p.id}" data-testid="qs-pres-edit-${p.id}">Open</button></div></div></div>`).join('')}
+    ${W.pres.length ? '' : '<div class="empty">No templates yet. Add one and the presentation switch appears in the builder.</div>'}
+  </div>
+  <div class="qs-sec"><h3>Google reviews</h3><div class="p">Printed on the presentation pages as "${r.google_review_rating} <span class="stars">${Array.from({ length:5 }, (_, i) => i < stars ? svg('star') : '').join('')}</span> from ${r.google_review_count} reviews" with a link.</div>
+    <div class="fr">${fld('reviews-url', 'Reviews link', r.google_reviews_url, { w2:true, ph:'https://g.page/…' })}${fld('reviews-rating', 'Star rating', r.google_review_rating, { type:'number', step:'0.1', min:0 })}${fld('reviews-count', 'Review count', r.google_review_count, { type:'number', step:'1', min:0 })}</div>
+    <div class="fr" style="justify-content:flex-end;margin:0"><button class="btn btn-ghost" id="reviewsSave" data-testid="qs-reviews-save">${svg('check')} Save reviews</button></div>
+  </div>`; }
+function savePres() { const p = readPresForm(); if (!p.name) { setErr('pres-name', 'Give the template a name'); return; } p.photos = p.photos.filter(Boolean); p.youtube_urls = p.youtube_urls.filter(Boolean); if (presNew) { p.id = 'p' + (Date.now() % 100000); W.pres.push(p); say('Template created — POST /admin/presentation-templates'); } else { Object.assign(W.pres.find(x => x.id === presEdit), p); say('Template saved — PATCH /admin/presentation-templates/' + presEdit); } QS.pres = deep(W.pres); presNew = false; presEdit = null; dirty = false; renderQS(); }
+
+// ---- wiring ----
+function setErr(id, msg) { const f = $('#f-' + id); if (!f) return; f.classList.toggle('bad', !!msg); const e = f.querySelector('.err'); e.hidden = !msg; e.textContent = msg || ''; }
+function wire() {
+  const B = $('#qsBody');
+  B.querySelectorAll('input, textarea').forEach(el => el.addEventListener('input', () => { if (!dirty && (qsTab === 'pricing' || qsTab === 'pdf' || (qsTab === 'presentation' && (presEdit || presNew)))) mark(); if (previewOn) renderPreview(); if (el.id === 'prefix' || el.id === 'seq') { const n = $('#nextNo'); if (n) n.textContent = ($('#prefix').value || '') + String(parseInt($('#seq').value) || 0).padStart(4, '0'); } }));
+}
+$('#qsBody').addEventListener('click', e => {
+  const t = e.target; const stop = () => { e.stopPropagation(); e.preventDefault(); };
+  if (qsTab === 'presentation' && !(presEdit || presNew) && t.closest('#pres-default')) { stop(); const b = t.closest('.tog'); b.classList.toggle('on'); const on = b.classList.contains('on'); b.setAttribute('aria-checked', on); W.defaults.presentation_default_on = on; QS.defaults.presentation_default_on = on; say(on ? 'New quotes get presentation pages — PUT /admin/profile/estimate-defaults' : 'New quotes start without presentation pages — PUT /admin/profile/estimate-defaults'); return; }
+  if (!(qsTab === 'presentation' && (presEdit || presNew))) return;
+  const fill = (p, kind, i, name) => { if (kind === 'big') p.pages.one.photos[i] = name; else p.pages.two.photos[i] = name; };
+  const nextEmpty = (p) => { const i1 = p.pages.one.photos.findIndex(x => !x); if (!p.pages.one.hero) return ['hero', 0]; if (i1 >= 0) return ['big', i1]; if (p.pages.two.on) { const i2 = p.pages.two.photos.findIndex(x => !x); if (i2 >= 0) return ['wide', i2]; } return null; };
+  const done = (p, keepPick) => { rerenderPresForm(p); if (keepPick) $('#jobPick').hidden = false; mark(); renderPreview(); };
+  let x;
+  if (t.closest('#heroDrop') && !t.closest('button')) { stop(); const p = readPresForm(); p.pages.one.hero = 'hero-' + (Date.now() % 1000) + '.jpg'; say('Upload — POST /admin/presentation-templates/{id}/photos'); done(p); return; }
+  if (t.closest('#heroReplace')) { stop(); const p = readPresForm(); p.pages.one.hero = 'hero-' + (Date.now() % 1000) + '.jpg'; say('Upload — the new photo replaces the hero'); done(p); return; }
+  if (t.closest('#heroRemove')) { stop(); const p = readPresForm(); p.pages.one.hero = ''; done(p); return; }
+  if ((x = t.closest('[data-slotadd]'))) { stop(); const p = readPresForm(); fill(p, x.dataset.slotadd, +x.dataset.i, 'upload-' + (Date.now() % 1000) + '.jpg'); say('Upload — POST /admin/presentation-templates/{id}/photos'); done(p); return; }
+  if ((x = t.closest('[data-slotrm]'))) { stop(); const p = readPresForm(); fill(p, x.dataset.slotrm, +x.dataset.i, ''); (x.dataset.slotrm === 'big' ? p.pages.one : p.pages.two).captions[+x.dataset.i] = ''; done(p); return; }
+  if (t.closest('#jobPickBtn')) { stop(); const jp = $('#jobPick'); jp.hidden = !jp.hidden; return; }
+  if ((x = t.closest('[data-job]'))) { stop(); const p = readPresForm(); const at = nextEmpty(p); if (!at) { say('All 8 spots are full — remove one first'); return; } if (at[0] === 'hero') p.pages.one.hero = x.dataset.job; else fill(p, at[0], at[1], x.dataset.job); say(`${x.title} added — GET /projects/{id}/photos`); done(p, true); return; }
+  if (t.closest('#pres-page2')) { stop(); const p = readPresForm(); p.pages.two.on = !p.pages.two.on; done(p); return; }
+  if (t.closest('#pres-reviews') || t.closest('#pres-links')) { stop(); const b = t.closest('.tog'); b.classList.toggle('on'); b.setAttribute('aria-checked', b.classList.contains('on')); mark(); renderPreview(); return; }
+  if (t.closest('#presPreviewBtn')) { stop(); setPreview(!previewOn); const b = $('#presPreviewBtn'); if (b) { b.classList.toggle('on', previewOn); b.innerHTML = svg('eye') + (previewOn ? ' Hide preview' : ' Live preview'); } return; }
+}, true);
+$('#qsBody').addEventListener('click', e => {
+    if (e.target.closest('#phAdd')) { const p = readPresForm(); p.photos.push('https://storage.example/photo-' + String.fromCharCode(97 + p.photos.length) + '.jpg'); say('Upload — POST /admin/profile/photo'); rerenderPresForm(p); mark(); return; }
+    if (e.target.closest('#coverDrop') && !e.target.closest('button')) { const p = readPresForm(); p.cover_image_url = 'https://storage.example/cover-' + (Date.now() % 1000) + '.jpg'; say('Upload — POST /admin/profile/photo; the URL lands on the template'); rerenderPresForm(p); mark(); return; }
+    const card = e.target.closest('.pres.card'); if (card && !e.target.closest('button')) { presEdit = card.dataset.pedit; presNew = false; dirty = false; renderQS(); return; }
+    const t = e.target.closest('button'); if (!t) return;
+    if (t.dataset.cur) { W.defaults.currency = t.dataset.cur; $$('#cur button').forEach(b => b.classList.toggle('on', b === t)); mark(); }
+    else if (t.classList.contains('tog') && t.id) { t.classList.toggle('on'); t.setAttribute('aria-checked', t.classList.contains('on')); mark(); }
+    else if (t.dataset.msadd) { readPricingForm(); W.defaults.payment_terms_default[t.dataset.msadd + '_structure'].push({ label:'', pct:0 }); mark(); renderBody(); }
+    else if (t.dataset.msrm) { readPricingForm(); W.defaults.payment_terms_default[t.dataset.msrm + '_structure'].splice(+t.dataset.i, 1); mark(); renderBody(); }
+    else if (t.dataset.tdef) { W.terms.forEach(x => x.is_default = x.id === t.dataset.tdef); QS.terms = deep(W.terms); say('Default template set — PUT /admin/contract-terms-templates/' + t.dataset.tdef); renderBody(); }
+    else if (t.dataset.tedit) { tplEdit = tplEdit === t.dataset.tedit ? null : t.dataset.tedit; renderBody(); }
+    else if (t.dataset.tsave) { const x = W.terms.find(y => y.id === t.dataset.tsave); x.body = $('#tplBody').value; QS.terms = deep(W.terms); tplEdit = null; say('Wording saved — PUT /admin/contract-terms-templates/' + x.id); renderBody(); }
+    else if (t.dataset.tdel) { const x = W.terms.find(y => y.id === t.dataset.tdel); confirmBox(`Delete “${x.name}”?`, 'Quotes already sent keep their wording. This cannot be undone.', 'Delete', () => { W.terms = W.terms.filter(y => y.id !== x.id); if (W.terms.length && !W.terms.some(y => y.is_default)) W.terms[0].is_default = true; QS.terms = deep(W.terms); say('Template deleted'); renderBody(); }, true); }
+    else if (t.id === 'tplAdd') { const n = $('#tplNew').value.trim(); if (!n) { $('#tplNew').focus(); return; } const id = 't' + (Date.now() % 100000); W.terms.push({ id, name:n, body:'', is_default: W.terms.length === 0 }); QS.terms = deep(W.terms); tplEdit = id; say('Template added — POST /admin/contract-terms-templates'); renderBody(); }
+    else if (t.dataset.accent) { $('#accentHex').value = t.dataset.accent; $('#accentPick').value = t.dataset.accent; $$('.accent .chip').forEach(c => c.classList.toggle('on', c === t)); $('#accentErr').hidden = true; mark(); if (previewOn) renderPreview(); }
+    else if (t.dataset.mv !== undefined) { readPdf(); const i = +t.dataset.mv, j = i + (+t.dataset.dir); const a = W.layout.estimate; [a[i], a[j]] = [a[j], a[i]]; mark(); renderBody(); }
+    else if (t.dataset.secon !== undefined) { readPdf(); const s = W.layout.estimate[+t.dataset.secon]; s.on = !s.on; mark(); renderBody(); }
+    else if (t.id === 'statAdd') { readPdf(); W.defaults.about_us_stats.push({ value:'', label:'' }); mark(); renderBody(); }
+    else if (t.dataset.strm !== undefined) { readPdf(); W.defaults.about_us_stats.splice(+t.dataset.strm, 1); mark(); renderBody(); }
+    else if (t.id === 'pdfPreview') { say('Opens the sample PDF — POST /admin/pdf/preview/estimate with the unsaved values'); }
+    else if (t.dataset.pedit) { presEdit = t.dataset.pedit; presNew = false; dirty = false; renderQS(); }
+    else if (t.dataset.pdel) { const p = W.pres.find(x => x.id === t.dataset.pdel); confirmBox(`Delete “${p.name}”?`, 'Quotes that already use it keep their pages. This cannot be undone.', 'Delete', () => { W.pres = W.pres.filter(x => x.id !== p.id); QS.pres = deep(W.pres); presEdit = null; presNew = false; dirty = false; say('Template deleted — DELETE /admin/presentation-templates/' + p.id); renderQS(); }, true); }
+    else if (t.id === 'presNewBtn') { presNew = true; presEdit = null; dirty = false; renderQS(); }
+    else if (t.id === 'presBack') { const go = () => { presNew = false; presEdit = null; dirty = false; renderQS(); }; if (dirty) confirmBox('Discard your changes?', 'Save the template first, or discard and go back.', 'Discard', go); else go(); }
+    else if (t.dataset.ptype) { $$('#presType button').forEach(b => b.classList.toggle('on', b === t)); mark(); }
+    else if (t.id === 'coverReplace') { const p = readPresForm(); p.cover_image_url = 'https://storage.example/cover-' + (Date.now() % 1000) + '.jpg'; say('Upload — POST /admin/profile/photo; the URL lands on the template'); rerenderPresForm(p); mark(); }
+    else if (t.id === 'coverRemove') { const p = readPresForm(); p.cover_image_url = ''; rerenderPresForm(p); mark(); }
+    else if (t.dataset.phrm !== undefined) { const p = readPresForm(); p.photos.splice(+t.dataset.phrm, 1); rerenderPresForm(p); mark(); }
+    else if (t.id === 'vdAdd') { const p = readPresForm(); p.youtube_urls.push(''); rerenderPresForm(p); mark(); }
+    else if (t.dataset.vdrm !== undefined) { const p = readPresForm(); p.youtube_urls.splice(+t.dataset.vdrm, 1); rerenderPresForm(p); mark(); }
+    else if (t.id === 'livePreview') { setPreview(!previewOn); }
+    else if (t.id === 'reviewsSave') { const r = { google_reviews_url: $('#reviews-url').value.trim(), google_review_rating: num($('#reviews-rating').value), google_review_count: num($('#reviews-count').value) }; if (r.google_review_rating !== null && (r.google_review_rating < 0 || r.google_review_rating > 5)) { setErr('reviews-rating', '0 to 5'); return; } W.reviews = r; QS.reviews = deep(r); say('Reviews saved — PUT /admin/profile/business'); renderBody(); }
+  });
+$('#qsBody').addEventListener('input', e => { const el = e.target; if (el.id === 'accentHex') { const v = el.value.trim(); const ok = /^#[0-9a-f]{6}$/i.test(v); $('#accentErr').hidden = ok; if (ok) { $('#accentPick').value = v; $$('.accent .chip').forEach(c => c.classList.toggle('on', c.dataset.accent.toLowerCase() === v.toLowerCase())); } } if (el.id === 'accentPick') { $('#accentHex').value = el.value; $$('.accent .chip').forEach(c => c.classList.toggle('on', c.dataset.accent.toLowerCase() === el.value.toLowerCase())); mark(); } if (el.dataset.ms) { const key = el.dataset.ms; const rows = $$(`[data-ms="${key}"][data-k="pct"]`); const sum = rows.reduce((a, r) => a + (num(r.value) || 0), 0); const s = $(`[data-testid="qs-${key}-sum"]`); s.textContent = sum + '% of 100%'; s.classList.toggle('bad', sum !== 100); } });
+
+function renderBody() { $('#qsBody').innerHTML = RENDER[qsTab](); wire(); footer(); if (previewOn) renderPreview(); }
+function readPresForm() { const keep = JSON.parse($('#pres-keep').value); const pg = ensurePages(keep); const two = !!$('#pres-page2')?.classList.contains('on');
+  const p = { ...keep, id: presEdit, name: $('#pres-name').value.trim(), type: $('#presType .on')?.dataset.ptype || 'residential', intro: $('#pres-intro') ? $('#pres-intro').value : keep.intro, drive_photos_url: $('#pres-drive-photos') ? $('#pres-drive-photos').value.trim() : keep.drive_photos_url, drive_videos_url: $('#pres-drive-videos') ? $('#pres-drive-videos').value.trim() : keep.drive_videos_url, youtube_urls: $('#vids') ? $$('[data-vd]').map(i => i.value.trim()) : keep.youtube_urls };
+  pg.one.title = $('#pres-p1-title').value.trim() || 'Our work'; pg.one.hero = $('#pres-hero').value.trim(); pg.one.photos = [0, 1, 2, 3].map(i => $(`#big4 [data-slot="big"][data-i="${i}"]`)?.dataset.url || ''); pg.one.captions = [0, 1, 2, 3].map(i => $(`[data-cap="big"][data-i="${i}"]`)?.value.trim() || '');
+  pg.two.on = two; if (two) { pg.two.headline = $('#pres-p2-headline').value.trim() || 'A bit about us'; pg.two.photos = [0, 1, 2].map(i => $(`#wide3 [data-slot="wide"][data-i="${i}"]`)?.dataset.url || ''); pg.two.captions = [0, 1, 2].map(i => $(`[data-cap="wide"][data-i="${i}"]`)?.value.trim() || ''); pg.two.show_reviews = $('#pres-reviews').classList.contains('on'); pg.two.show_links = $('#pres-links').classList.contains('on'); }
+  p.pages = pg; p.cover_image_url = pg.one.hero ? 'https://storage.example/' + pg.one.hero : ''; p.photos = [pg.one.hero, ...pg.one.photos, ...(pg.two.on ? pg.two.photos : [])].filter(Boolean).map(f => 'https://storage.example/' + f); return p; }
+function rerenderPresForm(p) { const top = $('#qsBody').scrollTop; $('#qsBody').innerHTML = presEditor(p, presNew); wire(); $('#qsBody').scrollTop = top; }
+function readPricingForm() { const d = W.defaults; const g = (id) => $('#' + id); if (!g('tax-label')) return; d.tax_label = g('tax-label').value.trim(); d.tax_rate = num(g('tax-rate').value); d.tax_enabled_by_default = g('tax-default').classList.contains('on'); d.labor_hourly_rate = num(g('labour').value); d.overhead_pct = num(g('overhead').value); d.markup_pct = num(g('markup').value); d.deposit_pct = num(g('deposit').value); d.validity_days = num(g('validity').value); d.estimate_prefix = g('prefix').value.trim(); d.estimate_starting_seq = num(g('seq').value); readPayment(); }
+function readPayment() { const p = W.defaults.payment_terms_default; p.threshold = num($('#threshold').value); ['low','high'].forEach(k => { p[k + '_structure'] = $$(`[data-ms="${k}"][data-k="label"]`).map((l, i) => ({ label: l.value, pct: num($$(`[data-ms="${k}"][data-k="pct"]`)[i].value) || 0 })); }); p.auto_deposit_prompt = $('#auto-deposit').classList.contains('on'); }
+function readPdf() { W.defaults.pdf_accent_color = $('#accentHex').value.trim(); W.defaults.about_us_blurb = $('#aboutBlurb').value; W.defaults.about_us_stats = $$('[data-st][data-k="value"]').map((v, i) => ({ value: v.value, label: $$('[data-st][data-k="label"]')[i].value })); W.layout.estimate_footer_text = $('#footerText').value; }
+function save() {
+  if (qsTab === 'pricing') {
+    readPricingForm(); const d = W.defaults; let bad = false; const chk = (id, ok, msg) => { setErr(id, ok ? '' : msg); if (!ok) bad = true; };
+    chk('tax-label', !!d.tax_label, 'Needed on the PDF'); chk('tax-rate', d.tax_rate !== null && d.tax_rate >= 0 && d.tax_rate <= 100, '0 to 100'); chk('labour', d.labor_hourly_rate !== null && d.labor_hourly_rate >= 0, 'A dollar amount'); chk('overhead', d.overhead_pct !== null && d.overhead_pct >= 0 && d.overhead_pct <= 100, '0 to 100'); chk('markup', d.markup_pct !== null && d.markup_pct >= 0 && d.markup_pct <= 100, '0 to 100'); chk('deposit', d.deposit_pct !== null && d.deposit_pct >= 0 && d.deposit_pct <= 100, '0 to 100'); chk('validity', d.validity_days !== null && d.validity_days >= 1 && d.validity_days <= 365, '1 to 365 days'); chk('seq', d.estimate_starting_seq !== null && d.estimate_starting_seq >= QS.defaults.estimate_starting_seq, `Cannot go below ${QS.defaults.estimate_starting_seq} — numbers already used`);
+    const p = d.payment_terms_default; const sum = (r) => r.reduce((a, x) => a + (x.pct || 0), 0);
+    chk('threshold', p.threshold !== null && p.threshold >= 0, 'A dollar amount');
+    if (sum(p.low_structure) !== 100 || sum(p.high_structure) !== 100 || [...p.low_structure, ...p.high_structure].some(r => !r.label.trim())) { say('Each structure needs named stages that add up to 100%'); bad = true; }
+    if (bad) return; QS.defaults = deep(d); dirty = false; say('Pricing & payment saved — PUT /admin/profile/estimate-defaults'); renderQS();
+  } else if (qsTab === 'presentation' && (presEdit || presNew)) { savePres();
+  } else if (qsTab === 'pdf') {
+    readPdf(); if (!/^#[0-9a-f]{6}$/i.test(W.defaults.pdf_accent_color)) { $('#accentErr').hidden = false; return; } W.defaults.about_us_stats = W.defaults.about_us_stats.filter(s => s.value.trim() || s.label.trim());
+    QS.defaults = deep(W.defaults); QS.layout = deep(W.layout); dirty = false; say('Quote PDF saved — PUT /admin/profile/pdf-layout + estimate-defaults'); renderQS();
+  }
+}
+$('#qsGear').addEventListener('click', () => qsOpen() ? closeQS() : openQS('pricing'));
+$('#qsClose').addEventListener('click', () => closeQS());
+$('#qsCancel').addEventListener('click', () => { if (qsTab === 'presentation' && (presEdit || presNew)) { $('#presBack').click(); return; } closeQS(); });
+$('#qsSave').addEventListener('click', save);
+$('#qsPreviewClose').addEventListener('click', () => setPreview(false));
+$('#qsScrim').addEventListener('click', e => { if (e.target === $('#qsScrim')) closeQS(); });
+$('#qsTabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (!b || b.dataset.tab === qsTab) return; const go = () => { qsTab = b.dataset.tab; dirty = false; tplEdit = null; presEdit = null; presNew = false; setPreview(false); renderQS(); }; if (dirty) confirmBox('Discard your changes?', 'Save this tab first, or discard and switch.', 'Discard', go); else go(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (!$('#cscrim').hidden) $('#cscrim').hidden = true; else if (previewOn) setPreview(false); else if (qsOpen()) closeQS(); } });
+if (params.get('setup')) openQS(params.get('setup'));
+window.QSX = { QS, get W() { return W; }, get dirty() { return dirty; }, get previewOn() { return previewOn; } };
+
+</script>
+</body>
+</html>
