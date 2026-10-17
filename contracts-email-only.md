@@ -1,4 +1,4 @@
-# Round 78 — Contracts: the signed copy goes to both emails and to the owner's storage, never inside the record (spec, ready for "send")
+# Round 78 — Contracts: the signed copy goes to both emails and to the owner's storage, never inside the record (SENT 17 Oct)
 
 Owner decision, 17 Oct: "the signed contract PDF gets attached to both emails and to the chosen storage of the admin, under a folder named Employee contracts, and stops being stored inside the record of the app." Admin side plus one unchanged crew screen; no prototype (nothing visual changes except the email and a file in the owner's storage).
 
