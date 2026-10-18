@@ -20,7 +20,20 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     await p.goto(UG + '?setup=presentation'); await p.waitForTimeout(600);
     ok(await p.locator(T('qs-pres-default')).isVisible() && (await p.locator(T('qs-pres-default')).getAttribute('aria-checked')) === 'true', 'Presentation tab: "Add presentation pages to every new quote" switch, on');
     ok(/built from blocks you order as you like/.test(await p.locator('#qsBody').innerText()), 'tab text explains the blocks');
+    // reviews & ratings box on the tab
+    ok(/2 of 3/i.test(await p.locator(T('qs-ratings-count')).innerText()) && (await p.locator(T('qs-rating-platform-1')).inputValue()) === 'hipages', 'Reviews & ratings lists two platforms, Google and hipages');
+    await p.locator(T('qs-rating-add')).click(); await p.waitForTimeout(250);
+    ok(/3 of 3/i.test(await p.locator(T('qs-ratings-count')).innerText()) && (await p.locator(T('qs-rating-platform-2')).inputValue()) === 'oneflare' && (await p.locator(T('qs-rating-add')).count()) === 0, 'Add platform → a third row (Oneflare), and no fourth');
+    await p.locator(T('qs-rating-platform-2')).selectOption('airtasker'); await p.waitForTimeout(250);
+    ok((await p.locator(T('qs-rating-platform-2')).inputValue()) === 'airtasker', 'the platform can be changed on the row');
+    await p.locator(T('qs-rating-remove-2')).click(); await p.waitForTimeout(250);
+    ok(/2 of 3/i.test(await p.locator(T('qs-ratings-count')).innerText()), 'Remove → back to two');
+    await p.locator(T('qs-rating-stars-1')).fill('7'); await p.locator(T('qs-reviews-save')).click(); await p.waitForTimeout(250);
+    ok(/0 to 5/.test(await toast()), 'a rating above 5 is refused');
+    await p.locator(T('qs-rating-stars-1')).fill('4.8'); await p.locator(T('qs-reviews-save')).click(); await p.waitForTimeout(250);
+    ok(/Reviews saved/.test(await toast()), 'Save reviews saves the platforms');
     await p.locator(T('qs-pres-p1')).click(); await p.waitForTimeout(300);
+    ok(/hipages/.test(await p.locator(T('qs-blk-reviews-note')).innerText()), 'the Reviews block names the platforms it prints');
     ok((await order()).join(',') === 'hero,grid,break,message,about,grid,reviews,links', 'template opens as an ordered list of eight blocks (hero, grid, page break, message, about, grid, reviews, links)');
     ok((await p.locator(T('qs-pres-photo-count')).innerText()) === '8 of 8' && /2 pages/.test(await p.locator(T('qs-pres-page-count')).innerText()), 'counters: 8 of 8 photos · 2 pages');
     ok(await p.locator(T('qs-blk-head-b4')).inputValue() === 'A note for you' && /Thanks for having us out/.test(await p.locator(T('qs-blk-text-b4')).inputValue()), 'the Message block has a headline and text');
@@ -28,6 +41,7 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     await p.locator(T('qs-pres-preview')).click(); await p.waitForTimeout(400);
     ok(await p.locator(T('qs-preview-pane')).isVisible() && await p.locator(T('qs-prev-page1')).isVisible() && await p.locator(T('qs-prev-page2')).isVisible(), 'Live preview shows page 1 and page 2');
     ok(/A note for you/.test(await p.locator(T('qs-prev-page2')).innerText()) && await p.locator(T('qs-prev-reviews')).isVisible() && await p.locator(T('qs-prev-links')).isVisible(), 'page 2 of the preview carries the message, the reviews and the links');
+    ok(/hipages/.test(await p.locator(T('qs-prev-reviews')).innerText()) && /Google/.test(await p.locator(T('qs-prev-reviews')).innerText()), 'the preview prints both platforms');
     await p.screenshot({ path: path.join(SHOTS, `pres-editor-${W}.png`) });
     // move: message above the page break → it prints on page 1
     await p.locator(T('qs-blk-up-b4')).click(); await p.waitForTimeout(300);
@@ -87,7 +101,7 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     ok(await doc.locator(T('cdoc-blk-hero')).isVisible() && (await doc.locator(T('cdoc-pres-grid') + ' > div').count()) === 4 && (await doc.locator(T('cdoc-pres-wide') + ' > div').count()) === 3, 'hero, a 2 × 2 grid and a three-wide grid render as blocks');
     ok(await doc.locator(T('cdoc-blk-message')).isVisible() && /A note for you/.test(await doc.locator(T('cdoc-blk-message')).innerText()), 'the message block prints as a note to the client');
     ok(await doc.locator(T('cdoc-pres-hero')).evaluate(el => el.getBoundingClientRect().height) >= 150, 'the hero is a large photo area');
-    ok(await doc.locator(T('cdoc-pres-reviews')).isVisible() && await doc.locator(T('cdoc-pres-links')).isVisible(), 'page 2 shows the reviews and the links');
+    ok(await doc.locator(T('cdoc-rating-google')).isVisible() && await doc.locator(T('cdoc-rating-hipages')).isVisible() && /41 reviews on hipages/.test(await doc.locator(T('cdoc-pres-reviews')).innerText()) && await doc.locator(T('cdoc-pres-links')).isVisible(), 'page 2 shows a rating card per platform and the links');
     await doc.locator(T('cdoc-pres-page1')).scrollIntoViewIfNeeded(); await p.waitForTimeout(200);
     await p.screenshot({ path: path.join(SHOTS, `pres-client-${W}.png`) });
     await p.keyboard.press('Escape'); await p.waitForTimeout(250);
