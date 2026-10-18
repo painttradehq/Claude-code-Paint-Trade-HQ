@@ -161,3 +161,8 @@ Rules: `crew-app-handover.md` §1. Rounds are C1, C2, …; one round at a time a
 - §10.1 **"go default"**: Josh's tenant is seeded once with the current team text on deploy (one deliberate write to his real tenant); the video link stays empty until he adds one. §10.6 agreed: crew the owner adds finish the wizard before using the app.
 - Josh: the onboarding video and the principles are each owner's, not his — has an owner ever been able to set them? Answer from the code: never; the text was hard-coded in the crew app and no admin setting exists. C5 adds the per-business field and seeds his text; the owner's Settings card ("Crew welcome": YouTube link, title, intro, ordered sections) is written up in §7 as the admin chat's paired item.
 - Emergent connector disconnected in this session; needs re-authorising before the next check or send.
+
+## 18 Oct — Parking lot checked (`crew-parking-lot.md`)
+
+- Josh's items: push to the phone; GPS tied to sign-in/out and a 10–30 m limit; the owner-adds-employee flow vs the QR/link flow; one general QR per business; copy/send of the QR; the owner's settings for the welcome video and notes.
+- Checked: no push exists (C7); GPS is tied to sign-in (flagged, never refused — Josh's own 3a decision in C3) and not checked at sign-out; a hard 10–30 m block collides with phone GPS accuracy — three options written up; the admin-add flow ends with a temporary password nobody can change (C5 fixes with the finish path); one invite code per business, no per-employee QR, Copy only, no send/SMS/email of the invite (admin-chat item); the welcome settings never existed (C5 field + admin card).
