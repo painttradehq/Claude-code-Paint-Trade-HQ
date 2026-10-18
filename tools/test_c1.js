@@ -235,6 +235,7 @@ async function run(b, W, H, tag) {
   await p.goto(U + '?screen=onboarding'); await p.waitForTimeout(300);
   ok('onboarding 0: invite from the business, Let\'s go, Sign in link' + full, (await txt(T('crew-onb-title'))) === 'Join Sano Painting' && /Josh Sano has invited you/.test(await txt('#onbBody')) && await p.locator(T('crew-onb-start')).isVisible() && await p.locator(T('crew-onb-signin')).isVisible());
   ok('onboarding 0: no tab bar, no horizontal scroll' + full, !(await p.locator(T('crew-tabbar')).isVisible()) && await noHScroll());
+  ok('onboarding 0: the owner\'s note card' + full, /Welcome aboard\./.test(await txt(T('crew-onb-note'))));
   ok('onboarding 0: the owner\'s welcome video card' + full, await p.locator(T('crew-onb-video')).isVisible() && /Welcome from Josh/.test(await txt(T('crew-onb-video'))));
   await p.click(T('crew-onb-video')); await p.waitForTimeout(100);
   ok('onboarding 0: the video opens on YouTube and is marked watched' + full, (await go()) === 'youtube:dQw4w9WgXcQ' && /Watched/.test(await txt(T('crew-onb-video'))));

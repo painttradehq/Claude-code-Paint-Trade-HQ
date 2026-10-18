@@ -86,3 +86,14 @@ Not built; never existed (the text was typed into the crew app's code). C5 adds 
 
 ### Suggested order
 C4 report → C5 (documents) → the soft-block follow-up → C6 (learn and gear) → C7 (push + the two new events) → the invite round (one-time link, SMS, approval, per-person, send/poster; crew + admin chats) → C8 (store). The admin chat's small rounds alongside: the welcome card, Send invite + Download QR.
+
+## Josh's decisions, 18 Oct (the plan from here)
+
+1. **Flagged sign-in** (Josh: call it "flagged", not "soft block"): outside the radius the phone asks **"You're {dist} from the job. Sign in anyway?"**; the sign-in stays flagged off site for the owner, and the record notes the crew member confirmed. **Sign-out measured and asked the same way** (b2). No GPS: the same question with "We can't find your location." A short crew follow-up straight after C5; one string in the owner's drawer (admin chat).
+2. **Push**: web push for the installed crew app (Android now, iPhone once on the Home Screen) — **after the rounds are checked and working**, C7. Native push via Expo: explore later (C8). **No SMS fallback.** Events: the existing three, the clock reminders, plus **"You're on a new job"** and **"Your document was countersigned"**.
+3. **Invite round (both chats)**: the invite link opens the sign-in with the email filled; a **one-time sign-in link replaces the temporary password** (tap → the finish wizard → set a password); invites go by **SMS and email**; the owner's Team page shows "Invited · not finished" with **Resend invite**. Until then C5's finish path uses the temporary password.
+4. **Poster QR + owner approval**: a registration from the general QR waits as **"Pending approval"**; the owner is asked **in the app (a pop-up on screen) and by push on their phone when the app isn't open**. (Admin push is the admin side of C7's backend.) Per-person QR codes: **not needed**.
+5. **Send invite** by SMS or email from the Invite dialog, **Download QR** and an **A4 poster** with the business name: yes, one small admin round.
+6. **A welcome note** in the owner's own words at the top of the first onboarding step: yes — in C5 (`crew_welcome.note`, shown as "A note from {first name}") and on the admin card.
+
+**Order:** C4 report → C5 → flagged sign-in follow-up → C6 (learn and gear) → C7 (web push + token route, the two new events, admin approval push) → the invite round (one-time link, SMS + email, approval, Resend) → C8. Admin-chat rounds alongside: the Crew welcome card (note, video, title, intro, sections), Send invite + Download QR + poster, the "Invited · not finished" row.
