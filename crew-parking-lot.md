@@ -49,3 +49,40 @@ Not built; never existed (the text was typed into the crew app's code). C5 adds 
 ## Open decisions for Josh
 1. Geofence: (a) allow + flag (as built), (b) soft block with "sign in anyway?", (c) hard block, sign-out included. Radius value is yours in Settings either way.
 2. Whether the admin chat's next small round is the crew-welcome Settings card plus "Send invite" (SMS/email) and "Download QR".
+
+## Decisions and options (18 Oct)
+
+**Geofence: Josh picked (b) soft block.** To build as a short crew follow-up after C5 (it touches the clock card, `routes/timeclock.py` and one line of the owner's drawer): outside the radius the card shows **"You're {dist} from the job. Sign in anyway?"** with **Sign in anyway** / **Cancel**; the record stores `off_site_confirmed: true`; the owner's Timesheets drawer reads "Off-site sign-in · {dist} from the job · confirmed by {first name}" (admin chat, one string). Two sub-choices for Josh: **(b1)** ask at sign-in only (as the geofence runs today) or **(b2)** measure sign-out too and ask the same there; and for **no GPS**: ask **"We can't find your location. Sign in anyway?"** (recommended — keeps the Privacy Policy promise) or refuse.
+
+### Options to improve the rest
+
+**Push (C7)**
+1. **Web push for the installed crew app** — Android Chrome now; iPhone only when the app is added to the Home Screen (iOS 16.4+). No store, no accounts. The C7 default.
+2. **Native push through Expo** — reliable on every phone, needs the store build (C8). C7 can ship the backend token route so C8 only adds the phone side.
+3. **SMS fallback via Twilio** for the two that must land: a document to sign and the clock reminders. Costs per message; needs the Twilio sender set up.
+4. **Which events**: the three that exist (document sent or reminder, equipment outcome, daily-report reply), the clock reminders, plus two that have no notification today — **"You're on a new job"** when the owner assigns them, and **"Your document was countersigned"**. Recommendation: 1 + the token route from 2 + the two new events; 3 later if crews miss things.
+
+**The owner-adds-employee flow**
+1. The invite email's link opens the crew sign-in with the email filled in — one tap instead of typing.
+2. **Replace the temporary password with a one-time sign-in link**: the crew member taps it and lands in the finish wizard, sets their own password there; no password in an email. Safer and simpler. Needs a token route and an expiry (7 days).
+3. **Invite by SMS** (Twilio) as well as email — painters read texts, not email. Same link.
+4. The owner's Team page shows "Invited · not finished" with **Resend invite** (admin chat). Recommendation: 2 + 3 as the invite round (crew + admin chats together), 4 with it.
+
+**One general QR vs one per person**
+1. **Keep the general QR, add owner approval**: a new registration waits as "Pending approval"; the crew member sees "Waiting for {business} to approve you" and nothing else; the owner approves from the Team page. Stops strangers with the poster from joining.
+2. **Per-person invites**: the owner adds the person (name, phone or email) and sends them their own link or QR; the registration attaches to that record. With the option above this becomes **one flow with two doors**: a personal invite for known hires, the general poster QR for walk-ups (with approval). The temporary password disappears.
+3. Expire the general code after 30 days or after N uses (owner setting). Recommendation: 1 + 2.
+
+**Copy and send the QR**
+1. **Send invite** from the dialog: SMS (Twilio) or email (Resend) with the link.
+2. **Download QR** (PNG) and a **printable A4 poster** "Join {business} on Paint Trade HQ Crew — scan to start" with the business name and the QR.
+3. On a phone, the owner's share sheet (`navigator.share`) for the link. Recommendation: all three; small admin round.
+
+**The welcome settings card (video + notes)**
+1. **Plain pages** as prototyped: a YouTube link (unlisted is fine), a title, an intro, ordered sections with lines. Simplest; no storage.
+2. **"Must read" sections**: the owner marks sections as must-read; the crew member taps **Got it** on each (recorded as `welcome_acknowledged_at`, the way coaching notes are); the owner sees who has read what. Gives Josh's "importance".
+3. **Uploaded video** instead of YouTube: storage and bandwidth on the platform; later, if YouTube is a problem for owners.
+4. A short **welcome note** from the owner in their own words at the top of the first step. Recommendation: 1 now (C5 + the admin card), 2 as a follow-up once owners use it; 4 is cheap and can ride the admin card.
+
+### Suggested order
+C4 report → C5 (documents) → the soft-block follow-up → C6 (learn and gear) → C7 (push + the two new events) → the invite round (one-time link, SMS, approval, per-person, send/poster; crew + admin chats) → C8 (store). The admin chat's small rounds alongside: the welcome card, Send invite + Download QR.
