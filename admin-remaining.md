@@ -13,7 +13,7 @@ Everything the admin chat has specced so far is built, except the items below. O
 
 | Item | What it is | Needs from Josh |
 |---|---|---|
-| **Round 79 — Settings › Crew app** (`crew-app-settings-notes.md`, prototype `settings-crew-app.html`) | The admin page for the crew app: welcome video and note with a phone preview, which crew features are on, the sign-in distance (50 m, min 30, flag or refuse; moved here from the Timesheets gear), push choices; the record, routes and video stream the crew chat reads. Invites stay on the Employees page. | Answer the two questions, then "send 79" (after Round 74 is done). |
+| **Round 79 — Settings › Crew app** (`crew-app-settings-notes.md`, prototype `settings-crew-app.html`) | The admin page for the crew app: welcome video and note with a phone preview, which crew features are on, the sign-in distance (50 m, min 30, flag or refuse; moved here from the Timesheets gear), push choices; the record, routes and video stream the crew chat reads. Invites stay on the Employees page. | Upload only; one coordinated round with the crew chat (its crew spec is built against §3–§4 of the notes). "send 79" after Round 74 is done and the crew chat has its half ready. |
 | **Round 74 — Presentation pages** | Your words: "one or two pages with large photo areas, if the user wants", instead of today's small section; presentation on by default for new quotes; the public quote page shows the presentation pages (today only the PDF does). | "prototype 74" → review → "send". |
 
 ## Needs something to arrive first
