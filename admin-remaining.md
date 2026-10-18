@@ -13,6 +13,7 @@ Everything the admin chat has specced so far is built, except the items below. O
 
 | Item | What it is | Needs from Josh |
 |---|---|---|
+| **Settings › Crew app** (`crew-app-settings-notes.md`) | The admin page for the crew app: onboarding welcome video and notes, which crew features are on, the sign-in distance rule (flag or block), the general and per-employee invite QR, push choices. The data shape is agreed with the crew chat first. | Answers to the four decisions in the notes, then "prototype crew settings". |
 | **Round 74 — Presentation pages** | Your words: "one or two pages with large photo areas, if the user wants", instead of today's small section; presentation on by default for new quotes; the public quote page shows the presentation pages (today only the PDF does). | "prototype 74" → review → "send". |
 
 ## Needs something to arrive first
