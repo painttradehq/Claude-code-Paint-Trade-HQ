@@ -719,7 +719,7 @@
 
   <div class="content" id="pgCrew" data-testid="set-page-crew" hidden>
     <h2 class="pg">Crew app</h2>
-    <p class="pgs">What your crew sees on their phones, how they join, and the rules for signing in on site.</p>
+    <p class="pgs">What your crew sees on their phones, the welcome they get, and the rule for signing in on site. Invites stay on the Employees page.</p>
 
     <section class="sec" data-testid="sec-onboarding">
       <h3>Onboarding</h3>
@@ -757,23 +757,6 @@ Three things we care about: turn up on time, keep the site tidy, and speak up ea
         <label class="radio on" data-rule="flag" data-testid="crew-rule-flag"><input type="radio" name="rule" value="flag" checked><div><b>Flag it</b><span>Sign-in always works. Entries outside the distance are marked on the timesheet with how far away the phone was, for you to check.</span></div></label>
         <label class="radio" data-rule="block" data-testid="crew-rule-block"><input type="radio" name="rule" value="block"><div><b>Refuse it</b><span>Sign-in is refused outside the distance when the phone's GPS reading is accurate. When the reading is poor, the sign-in goes through flagged instead of locking the crew out.</span></div></label>
       </div></div></div>
-    </section>
-
-    <section class="sec" data-testid="sec-invites">
-      <h3>Invites <span class="now">saves at once</span></h3>
-      <p class="sd">Two ways in. A general code anyone can scan, which waits for your approval, and a personal link or QR on each employee's page, which does not.</p>
-      <div class="inv2">
-        <div class="icard" data-testid="crew-general"><b>General QR and link</b><p class="p">Print it in the van or send it. Whoever scans it signs up as crew of Sano Painting and waits for your approval below before they see anything.</p>
-          <div class="qrwrap"><div class="qr" data-testid="crew-qr"><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class="o"></i><i class=""></i><i class=""></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i><i class=""></i><i class="o"></i><i class=""></i><i class=""></i><i class="o"></i><i class=""></i><i class=""></i><i class=""></i><i class="o"></i><i class=""></i><i class="o"></i><i class=""></i><i class=""></i><i class="o"></i><i class=""></i><i class=""></i><i class=""></i><i class="o"></i><i class=""></i><i class="o"></i><i class="o"></i><i class=""></i><i class="o"></i><i class=""></i><i class=""></i><i class=""></i><i class="o"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i><i class=""></i><i class="o"></i><i class="o"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class="o"></i><i class=""></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i><i class=""></i><i class="o"></i><i class=""></i><i class=""></i><i class="o"></i><i class=""></i><i class="o"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div><div><div class="code" id="crewCode" data-testid="crew-code">SANO-7K2Q</div><div class="p" style="margin-top:6px">app.painttradehq.com.au/crew/join/<span id="crewCode2">SANO-7K2Q</span></div></div></div>
-          <div class="acts"><button class="btn btn-ghost" id="qrCopy" data-testid="crew-qr-copy">${svg('copy')} Copy link</button><button class="btn btn-ghost" id="qrDown" data-testid="crew-qr-download">${svg('download')} Download QR</button><button class="btn btn-ghost" id="qrSend" data-testid="crew-qr-send">${svg('send')} Send…</button><button class="btn btn-ghost" id="qrRegen" data-testid="crew-qr-regen">${svg('undo')} New code</button></div>
-          <div class="sw" style="border:none;padding:4px 0 0"><div class="t">Approval before they see anything<small>Always on for the general code: a scanned sign-up waits here until you approve it.</small></div><span class="lk">${svg('lock')} always</span></div>
-        </div>
-        <div class="icard" data-testid="crew-personal"><b>Personal invite</b><p class="p">Each employee you add gets their own link and QR on their page (Employees › the person › Invite). It is tied to them and skips approval. Copy it or send it from there.</p>
-          <div class="acts"><button class="btn btn-ghost" data-go="/admin/employees" data-testid="crew-open-employees">${svg('user')} Open Employees</button></div>
-          <b style="margin-top:4px">Waiting for your approval <span class="now" id="pendN" data-testid="crew-pending-count">1</span></b>
-          <div id="pending" data-testid="crew-pending"></div>
-        </div>
-      </div>
     </section>
 
     <section class="sec" data-testid="sec-notifications">
@@ -814,7 +797,7 @@ Three things we care about: turn up on time, keep the site tidy, and speak up ea
   <div class="dhead"><div class="t"><h2>First page on the phone</h2><div class="s">What a new crew member sees after joining, before the sign-up basics.</div></div><button class="dclose" id="crClose" data-testid="crew-phone-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
   <div class="dbody">
     <div class="phone"><div class="bar">9:41</div><div class="scr"><div class="vid" id="phVid"></div><h4 id="phHead"></h4><p id="phNote"></p><div class="cta">Continue</div><div class="dots"><i class="on"></i><i></i><i></i></div></div></div>
-    <div class="dnote">Then: name, phone, photo and the documents to sign. The main pages open after that.</div>
+    <div class="dnote">Then the sign-up steps the crew app already has: details, a photo, licence and white card, the terms to sign. The main pages open after that.</div>
   </div>
 </div></div>
 
@@ -894,13 +877,11 @@ const params = new URLSearchParams(location.search);
   });
   renderStorage();
   // ---- Crew app page ----
-  const CR = { video: { name: 'welcome-2026.mp4', len: '1:48', at: '3 Oct' }, code: 'SANO-7K2Q', pending: [{ id: 'p1', name: 'Tom Reilly', when: 'scanned the general code 2 h ago', phone: '0400 118 903' }] };
+  const CR = { video: { name: 'welcome-2026.mp4', len: '1:48', at: '3 Oct' } };
   const FEAT_NAMES = { daily_reports:'Daily reports', photos:'Photos', inbox:'Inbox', learn:'Learn', documents:'Documents & contracts', equipment:'Equipment requests', events:'Team events', feedback:'Feedback' };
   function renderVideo(){ const st = $('#crewVideoSt'), th = $('#vthumb'); if (CR.video) { st.className = 'st ok'; st.innerHTML = `${svg('checkc')} ${esc(CR.video.name)} · ${CR.video.len} · uploaded ${CR.video.at}`; th.className = 'vthumb'; th.innerHTML = svg('play'); $('#crewVideoActs').innerHTML = `<button class="btn btn-ghost" id="vidReplace" data-testid="crew-video-replace">Replace</button><button class="btn danger" id="vidRemove" data-testid="crew-video-remove">Remove</button>`; } else { st.className = 'st'; st.innerHTML = `${svg('image')} No video yet · MP4 or MOV up to 200 MB`; th.className = 'vthumb empty'; th.innerHTML = svg('image'); $('#crewVideoActs').innerHTML = `<button class="btn btn-primary" id="vidUpload" data-testid="crew-video-upload">${svg('plus')} Upload video</button>`; } }
-  function renderPending(){ $('#pendN').textContent = CR.pending.length; $('#pending').innerHTML = CR.pending.length ? CR.pending.map(p => `<div class="pend" data-testid="crew-pend-${p.id}"><div class="who">${esc(p.name)}<small>${esc(p.when)} · ${esc(p.phone)}</small></div><button class="btn btn-primary" data-approve="${p.id}" data-testid="crew-approve-${p.id}">Approve</button><button class="btn btn-ghost" data-decline="${p.id}" data-testid="crew-decline-${p.id}">Decline</button></div>`).join('') : '<div class="p" style="font-size:12.5px;color:var(--text-muted)">Nobody waiting.</div>'; }
   function renderPhone(){ $('#phHead').textContent = $('#crew-headline').value || 'Welcome'; $('#phNote').textContent = $('#crew-note').value; const v = $('#phVid'); if (CR.video || $('#crew-yt').value.trim()) { v.className = 'vid'; v.innerHTML = svg('play'); } else { v.className = 'vid none'; v.textContent = 'No video — the note shows on its own'; } }
   function openPhone(){ renderPhone(); $('#crScrim').hidden = false; } function closePhone(){ $('#crScrim').hidden = true; }
-  const newCode = () => 'SANO-' + Math.random().toString(36).slice(2, 6).toUpperCase();
   document.addEventListener('click', e => {
     const id = e.target.id; let x;
     if (id === 'vidUpload' || id === 'vidReplace'){ CR.video = { name: 'welcome-' + (Date.now() % 1000) + '.mp4', len: '2:05', at: 'today' }; renderVideo(); say('Uploading to your storage · POST /admin/crew-app-settings/video'); return; }
@@ -910,18 +891,12 @@ const params = new URLSearchParams(location.search);
     if ((x = e.target.closest('[data-feat]'))){ x.classList.toggle('on'); const on = x.classList.contains('on'); x.setAttribute('aria-checked', on); say(`${FEAT_NAMES[x.dataset.feat]} ${on ? 'shown to' : 'hidden from'} the crew · PUT /admin/crew-app-settings`); return; }
     if ((x = e.target.closest('[data-notif]'))){ x.classList.toggle('on'); x.setAttribute('aria-checked', x.classList.contains('on')); say('Notification choices saved · PUT /admin/crew-app-settings'); return; }
     if ((x = e.target.closest('.radio'))){ $$('.radio').forEach(r => { r.classList.toggle('on', r === x); r.querySelector('input').checked = r === x; }); say(x.dataset.rule === 'flag' ? 'Outside the distance: flagged on the timesheet · PUT /admin/crew-app-settings' : 'Outside the distance: refused when the GPS reading is accurate · PUT /admin/crew-app-settings'); return; }
-    if (id === 'qrCopy'){ say('Link copied: app.painttradehq.com.au/crew/join/' + CR.code); return; }
-    if (id === 'qrDown'){ say('Downloading crew-invite-' + CR.code + '.png'); return; }
-    if (id === 'qrSend'){ say('Send by SMS or email — opens the share sheet with the link'); return; }
-    if (id === 'qrRegen'){ if (!confirm('Make a new general code? The old QR and link stop working. People already approved are not affected.')) return; CR.code = newCode(); $('#crewCode').textContent = CR.code; $('#crewCode2').textContent = CR.code; say('New general code · POST /admin/crew-app-settings/invite/regenerate'); return; }
-    if ((x = e.target.closest('[data-approve]'))){ const p = CR.pending.find(y => y.id === x.dataset.approve); CR.pending = CR.pending.filter(y => y.id !== p.id); renderPending(); say(`${p.name} approved — they can sign in now · POST /admin/employees/{id}/approve`); return; }
-    if ((x = e.target.closest('[data-decline]'))){ const p = CR.pending.find(y => y.id === x.dataset.decline); CR.pending = CR.pending.filter(y => y.id !== p.id); renderPending(); say(`${p.name} declined — their sign-up is removed`); return; }
   });
   $('#crew-radius').addEventListener('change', () => { const el = $('#crew-radius'); const n = $('#radiusNote'); if (+el.value < 30) { el.value = 30; n.className = 'note bad'; n.textContent = 'Set to 30 m — the minimum. A phone cannot place itself more precisely than that.'; } else { n.className = 'note'; n.textContent = 'Minimum 30 m: a phone\'s own GPS is only accurate to about 5–20 m outdoors, worse under roofs. A job can set its own distance on its page.'; } });
   ['crew-headline', 'crew-note', 'crew-yt'].forEach(i => $('#' + i).addEventListener('input', () => { if (!$('#crScrim').hidden) renderPhone(); }));
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#crScrim').hidden) closePhone(); });
-  renderVideo(); renderPending();
-  if (pageName === 'crew') $('#pageSub').textContent = 'The crew app follows these settings on every phone. Changes reach the crew the next time they open the app.';
+  renderVideo();
+  if (pageName === 'crew') $('#pageSub').textContent = 'The crew app follows these settings on every phone. Changes reach the crew the next time they open the app. Invites and approvals live on the Employees page.';
   else $('#pageSub').textContent = 'Account-wide details only. Everything that belongs to one page lives behind the gear on that page.';
 })();
 

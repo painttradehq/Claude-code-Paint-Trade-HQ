@@ -19,7 +19,7 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     ok(await p.locator(T('set-rail-crew')).isVisible(), 'Settings rail has "Crew app"');
     await p.locator(T('set-rail-crew')).click(); await p.waitForTimeout(300);
     ok(await p.locator(T('set-page-crew')).isVisible() && await p.locator(T('set-page-business')).isHidden(), 'clicking it opens the Crew app page');
-    for (const s of ['sec-onboarding', 'sec-features', 'sec-signin', 'sec-invites', 'sec-notifications']) ok(await p.locator(T(s)).isVisible(), `section ${s} present`);
+    for (const s of ['sec-onboarding', 'sec-features', 'sec-signin', 'sec-notifications']) ok(await p.locator(T(s)).isVisible(), `section ${s} present`);
     // onboarding video
     ok(/welcome-2026\.mp4/.test(await p.locator(T('crew-video-status')).innerText()), 'welcome video shows name, length and upload date');
     await p.locator(T('crew-video-remove')).click(); await p.waitForTimeout(250);
@@ -48,22 +48,12 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     await p.locator(T('crew-rule-block')).click(); await p.waitForTimeout(250);
     ok((await p.locator(T('crew-rule-block')).evaluate(el => el.classList.contains('on'))) && /refused when the GPS reading is accurate/.test(await toast()), '"Refuse it" saves at once and explains the accuracy rule');
     await p.locator(T('crew-rule-flag')).click(); await p.waitForTimeout(150);
-    // invites
-    ok(await p.locator(T('crew-qr')).isVisible() && (await p.locator(T('crew-code')).innerText()) === 'SANO-7K2Q', 'general QR with its code');
-    await p.locator(T('crew-qr-copy')).click(); await p.waitForTimeout(200);
-    ok(/Link copied: .*SANO-7K2Q/.test(await toast()), 'Copy link copies the join address');
-    await p.locator(T('crew-qr-regen')).click(); await p.waitForTimeout(250);
-    const code = await p.locator(T('crew-code')).innerText();
-    ok(code !== 'SANO-7K2Q' && /^SANO-[A-Z0-9]{4}$/.test(code), `New code replaces the general code (${code})`);
-    ok((await p.locator(T('crew-general')).innerText()).includes('always'), 'approval before they see anything is always on for the general code');
-    ok((await p.locator(T('crew-pending-count')).innerText()) === '1' && await p.locator(T('crew-pend-p1')).isVisible(), 'one sign-up waiting for approval');
-    await p.locator(T('crew-approve-p1')).click(); await p.waitForTimeout(250);
-    ok((await p.locator(T('crew-pending-count')).innerText()) === '0' && /Tom Reilly approved/.test(await toast()), 'Approve clears the row with a toast');
     // notifications
     ok((await p.locator(T('crew-notifications') + ' .sw').count()) === 5, 'five push choices');
     await p.locator(T('crew-notif-contract')).click(); await p.waitForTimeout(200);
     ok((await p.locator(T('crew-notif-contract')).getAttribute('aria-checked')) === 'false' && /Notification choices saved/.test(await toast()), 'a push switch saves at once');
-    await p.locator(T('sec-invites')).scrollIntoViewIfNeeded(); await p.waitForTimeout(150);
+    ok((await p.locator(T('set-page-crew')).innerText()).includes('Invites stay on the Employees page') && (await p.locator('[data-testid="sec-invites"]').count()) === 0, 'no Invites section: invites stay on the Employees page');
+    await p.locator(T('sec-notifications')).scrollIntoViewIfNeeded(); await p.waitForTimeout(150);
     await p.screenshot({ path: path.join(SHOTS, `crew-settings-${W}.png`) });
     await p.evaluate(() => window.scrollTo(0, 0)); await p.waitForTimeout(150);
     await p.screenshot({ path: path.join(SHOTS, `crew-settings-top-${W}.png`) });
