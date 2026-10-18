@@ -1,4 +1,4 @@
-# Round 74 — Presentation pages, second design: a block builder (part 2 proposal, not sent)
+# Round 74 — Presentation pages, second design: a block builder (part 2 SENT 18 Oct)
 
 Prototypes (both changed): **`quote-setup-presentation.html?setup=presentation`** (click **Standard residential** → the block editor → **Live preview**) and **`estimate-builder-presentation.html?pres=on`** (Review & Send → the pages at the back of the quote; Quote details › Presentation pages). Open at **1440** first, then **1024**. Playwright: `tools/test_presentation.js`, **90/90** at both widths. Screenshots: `pres-editor-1440.png`, `pres-editor-edited-1440.png`, `pres-client-1440.png`, `pres-editor-1024.png`, `pres-ratings-1440.png` (the Reviews & ratings box).
 
