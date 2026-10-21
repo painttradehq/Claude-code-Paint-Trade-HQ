@@ -21,6 +21,8 @@ Everything the admin chat has specced so far is built, except the items below. O
 - **Round 79 (admin half)** — Settings › Crew app, the crew routes, the time-clock rule, the Timesheets gear pointing at the one distance. The crew half (§4 of the notes) is the crew chat's next round.
 - What's new drafts n 18, n 19, n 20 wait with them (`platform-steps.md` §1).
 
+| **Pay and hours** (`pay-and-hours-notes.md`, parked 21 Oct) | (1) An Overtime rate field beside Hourly rate on the employee page and the Add dialog, and one money rule everywhere (the This week card's hidden 1.5 ×, the project labour cost, the payroll CSV). (2) Settings › Business › Operating hours (7:00 am – 4:00 pm, working days) + two reminder switches on the Crew app page + a backend job that writes the sign-in / sign-out reminders (push when C7 lands). | Five one-line answers in the note (blank overtime rate; project cost; who gets the morning reminder; where the section sits; one round or Fix G). Then a small prototype on the Business page, the Crew app page and the employee card. |
+
 ## Needs something to arrive first
 
 | Item | What it is | Waits for |
