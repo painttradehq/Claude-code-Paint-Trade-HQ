@@ -121,6 +121,61 @@ input{font-family:inherit}
 .ask-sub{font-size:15px;line-height:1.45;color:var(--text-secondary);margin:0 0 4px}
 .sheet .btn + .btn{margin-top:10px}
 .jobcard-meta .wx{font-size:16px;line-height:1;flex-shrink:0;width:16px;text-align:center}
+/* C6: Learn and gear */
+.vrow{display:flex;align-items:center;gap:12px;padding:12px 16px;min-height:64px;width:100%;text-align:left;border-top:1px solid var(--border)}
+.vrow:first-child{border-top:0}
+.vrow .row-t{flex:1;min-width:0}
+.vthumb{width:72px;height:48px;border-radius:8px;background:linear-gradient(135deg,#34295E,#4B3E86);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.vthumb svg{width:22px;height:22px}
+.vthumb.done{background:var(--success-bg);color:var(--success)}
+.reqline{font-size:14.5px;font-weight:600;padding:10px 14px;border-radius:var(--radius-sm);margin:4px 0 12px}
+.reqline.todo{background:var(--warning-bg);color:#5A2E0B}
+.reqline.ok{background:var(--success-bg);color:var(--success)}
+.btn-outline.saved{background:var(--success-bg);border-color:var(--success);color:var(--success)}
+.ncard{padding:14px 16px;margin-bottom:12px}
+.ncard-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.ncard-topic{font-size:13px;font-weight:600;color:var(--text-secondary)}
+.ncard-what{font-size:15.5px;line-height:1.5}
+.good{margin-top:10px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--surface-sunken);font-size:14px;line-height:1.45;color:var(--text-secondary)}
+.good b{display:block;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:3px}
+.ncard-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px}
+.ncard-foot .when{font-size:13px}
+.gotit{height:40px;padding:0 16px;border-radius:12px;border:1px solid var(--border-strong);font-size:14.5px;font-weight:600;background:var(--surface);display:inline-flex;align-items:center}
+.gotit.done{border:0;color:var(--success);background:var(--success-bg)}
+.vlink{display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--accent-bg);color:var(--accent-ink);font-size:14.5px;font-weight:600;width:100%;text-align:left;min-height:44px}
+.vlink svg{width:18px;height:18px;flex-shrink:0}
+.score{width:44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:600;font-size:16px;flex-shrink:0;background:var(--surface-sunken);color:var(--text-secondary)}
+.score.hi{background:var(--success-bg);color:var(--success)}
+.score.mid{background:var(--accent-bg);color:var(--accent-ink)}
+.score.low{background:var(--warning-bg);color:var(--warning)}
+.score.bad{background:var(--danger-bg);color:var(--danger)}
+.trend{padding:16px}
+.trend-big{font-family:var(--font-display);font-weight:600;font-size:40px;line-height:1}
+.trend-big small{font-size:15px;font-weight:500;color:var(--text-secondary);font-family:var(--font-body)}
+.trend-line{font-size:14px;color:var(--text-secondary);margin-top:8px}
+.cat{display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid var(--border);font-size:14.5px}
+.cat:first-child{border-top:0}
+.cat .nm{flex:1;min-width:0}
+.cat .bar{width:84px;height:6px;border-radius:3px;background:var(--surface-sunken);overflow:hidden;flex-shrink:0}
+.cat .bar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.cat .n{width:22px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.reqrow{padding:14px 16px;border-top:1px solid var(--border)}
+.reqrow:first-child{border-top:0}
+.reqrow-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.reqrow-name{font-size:15.5px;font-weight:600}
+.reqrow-sub{font-size:13.5px;color:var(--text-secondary);margin-top:3px;line-height:1.4}
+.reqrow .btn{margin-top:10px}
+.pill.ok{background:var(--success-bg);color:var(--success)}
+.kvl{padding:4px 16px}
+.kvl div{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid var(--border);font-size:14.5px}
+.kvl div:first-child{border-top:0}
+.kvl span:first-child{color:var(--text-secondary)}
+.kvl span:last-child{font-weight:600;text-align:right}
+.warnline{color:var(--warning);font-weight:600}
+.sheet-scroll{overflow-y:auto;min-height:0}
+.row-sub.wrap{white-space:normal;line-height:1.35}
+.sheet .row2{display:flex;align-items:center;gap:6px}
+.srow{display:flex;align-items:center;gap:12px;min-height:56px;width:100%;text-align:left;font-size:16px;font-weight:500;padding:6px 4px}
 .clock-legal{font-size:12.5px;color:var(--text-muted);text-align:center;margin-top:10px;line-height:1.4}
 .clock .btn{margin-top:14px}
 .btn[disabled]{opacity:.7;cursor:default}
@@ -625,6 +680,92 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   </section>
 
   <!-- C5 sheets -->
+  <!-- ================= C6: TRAINING (stack) ================= -->
+  <section id="s-training" class="hide" data-testid="crew-training" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="trainingBack" data-testid="crew-training-back"><svg><use href="#i-back"/></svg>Learn</button><div class="seg2 hide" id="trainSeg" data-testid="crew-training-seg"><button data-seg="all" class="on">All</button><button data-seg="saved">Saved</button></div></div>
+      <div class="job-title">Training</div>
+    </div>
+    <div class="form-body"><div class="reqline hide" id="trainReq" data-testid="crew-training-required"></div><div id="trainBody"></div></div>
+  </section>
+
+  <!-- ================= C6: ONE VIDEO (stack) ================= -->
+  <section id="s-video" class="hide" data-testid="crew-video" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="videoBack" data-testid="crew-video-back"></button></div>
+      <div class="job-title" id="videoTitle" data-testid="crew-video-title"></div>
+      <div class="meta" id="videoMeta" data-testid="crew-video-meta"></div>
+    </div>
+    <div class="form-body" id="videoBody"></div>
+  </section>
+
+  <!-- ================= C6: COACHING (stack) ================= -->
+  <section id="s-coaching" class="hide" data-testid="crew-coaching" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="coachBack" data-testid="crew-coaching-back"><svg><use href="#i-back"/></svg>Learn</button></div>
+      <div class="job-title">Coaching</div>
+      <div class="meta" data-testid="crew-coaching-intro">Notes from Josh. Tap Got it once you've read one.</div>
+    </div>
+    <div class="form-body" id="coachBody" style="padding-top:12px"></div>
+  </section>
+
+  <!-- ================= C6: HOW I'M GOING (stack) ================= -->
+  <section id="s-going" class="hide" data-testid="crew-going" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="goingBack" data-testid="crew-going-back"><svg><use href="#i-back"/></svg>Learn</button></div>
+      <div class="job-title">How I'm going</div>
+    </div>
+    <div class="form-body" id="goingBody"></div>
+  </section>
+
+  <!-- ================= C6: ONE RATING (stack) ================= -->
+  <section id="s-rating" class="hide" data-testid="crew-rating" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="ratingBack" data-testid="crew-rating-back"><svg><use href="#i-back"/></svg>How I'm going</button></div>
+      <div class="job-title" id="ratingTitle" data-testid="crew-rating-title"></div>
+      <div class="meta" id="ratingMeta" data-testid="crew-rating-meta"></div>
+    </div>
+    <div class="form-body" id="ratingBody"></div>
+  </section>
+
+  <!-- ================= C6: MY EQUIPMENT (stack) ================= -->
+  <section id="s-equip" class="hide" data-testid="crew-equip" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="equipBack" data-testid="crew-equip-back"><svg><use href="#i-back"/></svg>Me</button></div>
+      <div class="job-title">My equipment</div>
+      <div class="meta" id="equipMeta" data-testid="crew-equip-meta"></div>
+    </div>
+    <div class="form-body" id="equipBody"></div>
+  </section>
+
+  <!-- ================= C6: ONE ITEM (stack) ================= -->
+  <section id="s-item" class="hide" data-testid="crew-item" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="itemBack" data-testid="crew-item-back"><svg><use href="#i-back"/></svg>My equipment</button></div>
+      <div class="job-title" id="itemTitle" data-testid="crew-item-title"></div>
+      <div class="meta" id="itemMeta" data-testid="crew-item-meta"></div>
+    </div>
+    <div class="form-body" id="itemBody" style="padding-top:12px"></div>
+  </section>
+
+  <div class="scrim hide" id="probSheet" data-testid="crew-problem">
+    <div class="sheet" role="dialog" aria-label="Report a problem">
+      <div class="sheet-grab"></div>
+      <h2>Report a problem</h2>
+      <div id="probBody"></div>
+      <button class="btn btn-primary" id="probSend" data-testid="crew-problem-send">Send</button>
+      <button class="btn btn-outline" id="probCancel" data-testid="crew-problem-cancel">Cancel</button>
+    </div>
+  </div>
+  <div class="scrim hide" id="reqSheet" data-testid="crew-req">
+    <div class="sheet" role="dialog" aria-label="New request">
+      <div class="sheet-grab"></div>
+      <div class="row2"><button class="back hide" id="reqBack" data-testid="crew-req-back" aria-label="Back"><svg><use href="#i-back"/></svg></button><h2 id="reqTitle" data-testid="crew-req-title" style="margin:0"></h2></div>
+      <div class="sheet-scroll" id="reqBody" style="margin-top:10px"></div>
+      <button class="btn btn-primary hide" id="reqSend" data-testid="crew-req-send">Send request</button>
+      <button class="btn btn-outline" id="reqCancel" data-testid="crew-req-cancel">Cancel</button>
+    </div>
+  </div>
   <div class="scrim hide" id="photoSheet" data-testid="crew-photo-sheet">
     <div class="sheet" role="dialog" aria-label="Add a photo">
       <div class="sheet-grab"></div>
@@ -1149,6 +1290,10 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     if (row.dataset.testid === 'crew-today-report') { openReports(); return; }
     if (row.dataset.testid === 'crew-me-profile') { openProfile(); return; }
     if (row.dataset.testid === 'crew-me-contracts') { openDocs(); return; }
+    if (row.dataset.testid === 'crew-learn-training') { openTraining(); return; }
+    if (row.dataset.testid === 'crew-learn-coaching') { openCoaching(); return; }
+    if (row.dataset.testid === 'crew-learn-validations') { openGoing(); return; }
+    if (row.dataset.testid === 'crew-me-equipment') { openEquip(); return; }
     if (row.dataset.id && /^\/employee\/daily-report\?report=/.test(row.dataset.go)) { const n = state.notifs.find(x => x.id === row.dataset.id); if (n) { n.read = true; renderNotifs(); } openReport(row.dataset.go.split('=')[1]); return; }
     if (row.dataset.id) { const n = state.notifs.find(x => x.id === row.dataset.id); if (n) { n.read = true; renderNotifs(); } }
     document.body.dataset.lastGo = row.dataset.go; // prototype: records the route the real app would push
@@ -1203,7 +1348,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     { id: 'd3', name: 'Safety agreement', status: 'ended', sent: '2026-05-01', signed: '2026-05-02', countersigned: '2026-05-02', ended: '2026-09-30', content: 'SAFETY AGREEMENT\n\nReplaced by the site safety plan of 30 Sep 2026.' },
   ];
   const cStatus = (c) => c.status === 'sent' ? { cls: 'wait', txt: 'Awaiting signature' } : c.status === 'signed' ? { cls: 'live', txt: 'Signed' } : { cls: 'ended', txt: 'Ended' };
-  function hideC5(){ ['#s-onb', '#s-profile', '#s-docs', '#s-doc'].forEach(x => $(x).classList.add('hide')); }
+  function hideC5(){ ['#s-onb', '#s-profile', '#s-docs', '#s-doc', '#s-training', '#s-video', '#s-coaching', '#s-going', '#s-rating', '#s-equip', '#s-item'].forEach(x => $(x).classList.add('hide')); }
   function stackOpen(id){ $('#s-app').classList.add('hide'); $('#s-login').classList.add('hide'); hideC5(); $(id).classList.remove('hide'); const b = $(id + ' .form-body'); if (b) b.scrollTop = 0; }
   const MARK = $('#s-login .mark').innerHTML;
 
@@ -1404,6 +1549,197 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   function closePwSheet(){ $('#pwSheet').classList.add('hide'); }
   function savePw(){ pw.err = {}; if (!pw.cur) pw.err.cur = 'Enter your current password.'; if (pw.nw.length < 8) pw.err.nw = 'At least 8 characters.'; if (Object.keys(pw.err).length) { renderPwSheet(); return; } closePwSheet(); prof.pwChanged = true; renderProfile(); }
 
+  // ================= C6: Learn and gear =================
+  // GET /training/mine — the business's collections in order; each video with required / watched / saved for the viewer (C6 §6)
+  const training = q.get('training') === '0' ? [] : [
+    { id: 'c1', name: 'Onboarding', videos: [
+      { id: 'v1', title: 'How we start a job', required: true, watched: true, saved: false, desc: 'Arriving, drop sheets down, the walk-through with the client.' },
+      { id: 'v2', title: 'PPE on site', required: true, watched: true, saved: true, desc: 'Hi-vis, boots and eye protection; mask on for sanding and spraying.' } ] },
+    { id: 'c2', name: 'Safety', videos: [
+      { id: 'v3', title: 'Ladders and heights', required: true, watched: false, saved: false, desc: 'Setting up, tying off, and when to use the platform instead.' } ] },
+    { id: 'c3', name: 'Technique', videos: [
+      { id: 'v4', title: 'Cutting in like a pro', required: false, watched: false, saved: true, desc: '' },
+      { id: 'v5', title: 'Cleaning brushes, rollers and the sprayer', required: false, watched: true, saved: false, desc: '' } ] },
+    { id: 'c4', name: 'Customer care', videos: [] },
+  ];
+  const allVideos = () => training.flatMap(c => c.videos.map(v => Object.assign(v, { col: c.name })));
+  const vidById = (id) => allVideos().find(v => v.id === id);
+  let trainSeg = 'all';
+  function renderTraining(){
+    const vids = allVideos(), req = vids.filter(v => v.required), done = req.filter(v => v.watched).length;
+    const rl = $('#trainReq');
+    if (!req.length) rl.classList.add('hide'); else { rl.className = 'reqline ' + (done === req.length ? 'ok' : 'todo'); rl.textContent = done === req.length ? 'All required videos watched.' : `Required for you: ${done} of ${req.length} watched`; }
+    document.querySelectorAll('#trainSeg button').forEach(b => b.classList.toggle('on', b.dataset.seg === trainSeg));
+    $('#trainSeg').classList.toggle('hide', !vids.length);
+    const groups = training.map(c => ({ name: c.name, videos: c.videos.filter(v => trainSeg === 'all' || v.saved).slice().sort((a, b) => (b.required - a.required)) })).filter(g => g.videos.length);
+    $('#trainBody').innerHTML = !vids.length ? '<div class="card"><div class="empty" data-testid="crew-training-empty">No training videos yet. Your employer adds them here.</div></div>'
+      : !groups.length ? '<div class="card"><div class="empty" data-testid="crew-training-empty">Nothing saved yet. Tap Save for later on a video to keep it here.</div></div>'
+      : groups.map(g => `<div class="sect">${esc(g.name)}</div><div class="list" data-testid="crew-training-group">${g.videos.map(v => `
+        <button class="vrow" data-testid="crew-video-row" data-video="${v.id}">
+          <span class="vthumb ${v.watched ? 'done' : ''}"><svg><use href="#${v.watched ? 'i-check' : 'i-play'}"/></svg></span>
+          <span class="row-t"><span class="row-title">${esc(v.title)}</span><span class="row-sub">${v.watched ? 'Watched' : ''}</span></span>
+          ${v.required ? '<span class="pill soon">Required</span>' : ''}
+          <svg class="chev"><use href="#i-chev"/></svg>
+        </button>`).join('')}</div>`).join('');
+  }
+  function openTraining(){ stackOpen('#s-training'); renderTraining(); document.body.dataset.lastGo = '/employee/training'; }
+  let videoFrom = 'training';
+  // one video: the player (web iframe / native WebView, same YouTube IFrame API) → "ended" marks it watched; Mark as watched stays as the fallback
+  function renderVideo(v){
+    $('#videoTitle').textContent = v.title;
+    $('#videoBack').innerHTML = '<svg><use href="#i-back"/></svg>' + (videoFrom === 'coaching' ? 'Coaching' : 'Training');
+    $('#videoMeta').innerHTML = esc(v.col) + (v.required ? ' · <span class="pill soon">Required</span>' : '');
+    $('#videoBody').innerHTML = `
+      <button class="card vid" data-testid="crew-video-player" data-vplay="${v.id}"><div class="vid-thumb"><span class="play"><svg><use href="#i-play"/></svg></span></div><div class="vid-cap">${v.playing ? 'Playing…' : 'Tap to play'}</div></button>
+      ${v.watched ? '<div class="reqline ok" data-testid="crew-video-watched" style="margin-top:14px">Watched ✓</div>' : `<button class="btn btn-outline" style="margin-top:14px" data-testid="crew-video-mark" data-vmark="${v.id}">Mark as watched</button>`}
+      <button class="btn btn-outline btn-sm ${v.saved ? 'saved' : ''}" style="margin-top:10px" data-testid="crew-video-save" data-vsave="${v.id}">${v.saved ? 'Saved ✓' : 'Save for later'}</button>
+      ${v.desc ? `<div class="card note" data-testid="crew-video-desc" style="margin-top:14px">${esc(v.desc)}</div>` : ''}`;
+  }
+  function openVideo(id, from){ const v = vidById(id); if (!v) return; videoFrom = from || 'training'; stackOpen('#s-video'); renderVideo(v); document.body.dataset.lastGo = '/employee/training/' + id; }
+
+  // GET /coaching/mine — shared notes only, newest first, crew-safe keys (C6 §6)
+  const NOTE_TYPES = { praise: ['Well done', 'live'], reminder: ['Something to work on', 'off'], checkin: ['We talked about this', 'soon'], notice: ['Formal notice', 'flag'] };
+  const coaching = q.get('coaching') === '0' ? [] : [
+    { id: 'n2', type: 'reminder', topic: 'Site tidiness', what: 'Drop sheets were left out overnight at Wattle St on Thursday.', good: 'Drop sheets down, tools packed and rubbish out at the end of every day.', video: null, date: 'Fri 10 Oct', by: 'Josh', ack: false },
+    { id: 'n1', type: 'praise', topic: 'Quality of work', what: 'The Patel eaves were spot on — clean lines, no runs. The client noticed.', good: null, video: null, date: 'Sat 4 Oct', by: 'Josh', ack: true },
+    { id: 'n3', type: 'checkin', topic: 'Punctuality', what: 'We talked about the two late starts last week and agreed on leaving by 6:45.', good: "On site and ready to start at the agreed time. If you're running late, message the lead before start time.", video: 'v1', date: 'Mon 29 Sep', by: 'Josh', ack: true },
+  ];
+  function renderCoaching(){
+    $('#coachBody').innerHTML = !coaching.length ? '<div class="card"><div class="empty" data-testid="crew-coaching-empty">Nothing here yet. Notes your employer shares with you land here.</div></div>'
+      : coaching.map(n => { const [lbl, cls] = NOTE_TYPES[n.type]; const v = n.video ? vidById(n.video) : null; return `
+      <div class="card ncard" data-testid="crew-coaching-note" data-note="${n.id}">
+        <div class="ncard-top"><span class="pill ${cls}" data-testid="crew-coaching-type">${lbl}</span><span class="ncard-topic">${esc(n.topic)}</span></div>
+        <div class="ncard-what">${esc(n.what)}</div>
+        ${n.good ? `<div class="good" data-testid="crew-coaching-good"><b>What good looks like</b>${esc(n.good)}</div>` : ''}
+        ${v ? `<button class="vlink" data-testid="crew-coaching-video" data-cvideo="${v.id}"><svg><use href="#i-play"/></svg>${esc(v.title)}</button>` : ''}
+        <div class="ncard-foot"><span class="when">${n.date} · ${esc(n.by)}</span>${n.ack ? '<span class="gotit done" data-testid="crew-coaching-gotit">✓ Got it</span>' : `<button class="gotit" data-testid="crew-coaching-gotit" data-gotit="${n.id}">Got it</button>`}</div>
+      </div>`; }).join('');
+  }
+  function openCoaching(){ stackOpen('#s-coaching'); renderCoaching(); document.body.dataset.lastGo = '/employee/strike-system'; }
+
+  // GET /validations/my (allow-listed in C6): the owner's category words, the owner's date, the shared note only
+  const CATS = ['Finish quality', 'Workmanship', 'Speed', 'Manner & communication', 'Safety', 'Following instructions', 'Site cleanup', 'Learning', 'Overall experience'];
+  const ratings = q.get('going') === '0' ? [] : [
+    { id: 'g1', date: 'Fri 10 Oct', job: 'Wattle St repaint', score: 8.4, word: 'Strong', note: 'Great week. Keep the cut-ins this sharp.', photos: 2, cats: [9, 9, 7, 8, 9, 8, 7, 9, 10] },
+    { id: 'g2', date: 'Fri 3 Oct', job: 'Patel exterior', score: 7.6, word: 'Strong', note: '', photos: 0, cats: [8, 8, 7, 8, 8, 7, 7, 8, 7] },
+    { id: 'g3', date: 'Fri 19 Sep', job: null, score: 6.9, word: 'Solid', note: 'Watch the drop sheets at the end of the day.', photos: 0, cats: [7, 7, 6, 7, 8, 7, 6, 7, 7] },
+  ];
+  const band = (s) => s >= 7.5 ? 'hi' : s >= 6.5 ? 'mid' : s >= 5 ? 'low' : 'bad';
+  function renderGoing(){
+    if (!ratings.length) { $('#goingBody').innerHTML = '<div class="card"><div class="empty" data-testid="crew-going-empty">No ratings shared with you yet. When your employer shares one, it lands here.</div></div>'; return; }
+    const avg = (ratings.reduce((a, r) => a + r.score, 0) / ratings.length).toFixed(1), best = Math.max(...ratings.map(r => r.score)).toFixed(1), d = (ratings[0].score - ratings[ratings.length - 1].score).toFixed(1);
+    $('#goingBody').innerHTML = `
+      <div class="card trend" data-testid="crew-going-trend"><div class="trend-big">${avg}<small> /10 average</small></div><div class="trend-line">${ratings.length} rating${ratings.length === 1 ? '' : 's'} · best ${best}${ratings.length > 1 ? ` · ${d >= 0 ? 'up ' + d : 'down ' + Math.abs(d)} since your first` : ''}</div></div>
+      <div class="sect">Ratings</div><div class="list">${ratings.map(r => `
+        <button class="row" data-testid="crew-going-row" data-rating="${r.id}">
+          <span class="score ${band(r.score)}">${r.score.toFixed(1)}</span>
+          <span class="row-t"><span class="row-title">${esc(r.job || 'General')}</span><span class="row-sub">${r.date} · ${r.word}${r.note ? ' · ' + esc(r.note) : ''}</span></span>
+          <svg class="chev"><use href="#i-chev"/></svg>
+        </button>`).join('')}</div>`;
+  }
+  function openGoing(){ stackOpen('#s-going'); renderGoing(); document.body.dataset.lastGo = '/employee/my-validations'; }
+  function renderRating(r){
+    $('#ratingTitle').textContent = r.job || 'General';
+    $('#ratingMeta').innerHTML = `${r.date} · <b>${r.score.toFixed(1)}</b>/10 · ${r.word}`;
+    $('#ratingBody').innerHTML = `
+      <div class="sect">Scores</div><div class="list">${CATS.map((c, i) => `<div class="cat" data-testid="crew-rating-cat"><span class="nm">${esc(c)}</span><span class="bar"><i style="width:${r.cats[i] * 10}%"></i></span><span class="n">${r.cats[i]}</span></div>`).join('')}</div>
+      ${r.note ? `<div class="sect">Note from Josh</div><div class="card note" data-testid="crew-rating-note">${esc(r.note)}</div>` : ''}
+      ${r.photos ? `<div class="sect">Photos · ${r.photos}</div><div class="list"><div class="grid" data-testid="crew-rating-photos">${Array.from({ length: r.photos }, () => '<div class="ph"></div>').join('')}</div></div>` : ''}`;
+  }
+  function openRating(id){ const r = ratings.find(x => x.id === id); if (!r) return; stackOpen('#s-rating'); renderRating(r); document.body.dataset.lastGo = '/employee/my-validations/' + id; }
+
+  // GET /equipment/my-items (trimmed) + GET /equipment/requests/my-requests (trimmed) + GET /equipment (the catalogue) — C6 §6
+  const COND = { new: 'New', good: 'Good', fair: 'Fair', poor: 'Poor', out_of_service: 'Out of service' };
+  const gear = q.get('equip') === '0' ? [] : [
+    { id: 'e1', name: 'Extension ladder 3.6 m', tag: 'LAD-03', cat: 'Ladders', cond: 'good', since: 'Mon 6 Oct', check: 'Fri 14 Nov', checkState: 'ok', serial: '', problem: null },
+    { id: 'e2', name: 'Graco airless sprayer', tag: 'SPR-01', cat: 'Spray equipment', cond: 'fair', since: 'Mon 29 Sep', check: 'Fri 3 Oct', checkState: 'overdue', serial: 'GX-44812', problem: null },
+    { id: 'e3', name: 'Dust mask kit', tag: 'SAF-07', cat: 'Safety equipment', cond: 'new', since: 'Mon 6 Oct', check: null, checkState: 'none', serial: '', problem: { at: 'Thu 9 Oct', text: 'Strap broke', photo: true } },
+  ];
+  const CATALOG = { 'Ladders': ['Step ladder 1.8 m', 'Extension ladder 3.6 m', 'Platform ladder'], 'Elevated work platforms': ['Scissor lift', 'Boom lift'], 'Scaffolding & edge protection': ['Scaffold tower', 'Edge rail kit'], 'Spray equipment': ['Airless sprayer', 'Spray tips', 'Hose 15 m'], 'Sanders & prep': ['Orbital sander', 'Dustless vac', 'Scraper set'], 'Painting tools': ['Extension pole 2–4 m', 'Roller frame and sleeves', 'Cutting-in brush set'], 'Safety equipment': ['Hi-vis vest', 'Safety glasses', 'Dust mask kit', 'Harness'], 'General site equipment': ['Drop sheets', 'Work light', 'Extension lead 20 m'] };
+  const requests = q.get('requests') === '0' ? [] : [
+    { id: 'q2', name: 'Orbital sander', cat: 'Sanders & prep', status: 'pending', when: 'Fri 10 Oct', reason: 'The Lygon St doors need a proper sand.' },
+    { id: 'q1', name: 'Extension pole 2–4 m', cat: 'Painting tools', status: 'approved', when: 'Thu 9 Oct', item: 'Extension pole 2–4 m · PNT-04' },
+    { id: 'q3', name: 'Scaffold tower', cat: 'Scaffolding & edge protection', status: 'declined', when: 'Tue 30 Sep', note: 'Use the platform from the yard for now.' },
+  ];
+  const RSTAT = { pending: ['Waiting', 'wait'], approved: ['Approved', 'ok'], declined: ['Declined', 'flag'], cancelled: ['Cancelled', 'done'] };
+  function renderEquip(){
+    $('#equipMeta').textContent = gear.length ? `${gear.length} item${gear.length === 1 ? '' : 's'} with you` : 'Nothing with you right now';
+    $('#equipBody').innerHTML = `
+      <div class="sect">Your gear</div>
+      ${gear.length ? `<div class="list">${gear.map(g => `
+        <button class="row" data-testid="crew-equip-item" data-gear="${g.id}">
+          <span class="ico ${g.checkState === 'overdue' || g.problem ? 'warn' : ''}"><svg><use href="#i-gear"/></svg></span>
+          <span class="row-t"><span class="row-title">${esc(g.name)}</span><span class="row-sub wrap">${g.tag} · ${COND[g.cond]}${g.problem ? ` · <span class="warnline">Problem reported ${g.problem.at}</span>` : g.checkState === 'overdue' ? ` · <span class="warnline">Check was due ${g.check}</span>` : g.check ? ` · Next check ${g.check}` : ''}</span></span>
+          <svg class="chev"><use href="#i-chev"/></svg>
+        </button>`).join('')}</div>` : '<div class="card"><div class="empty" data-testid="crew-equip-empty">Nothing assigned to you yet. Gear your employer gives you shows here.</div></div>'}
+      <div class="sect-row"><div class="sect">Requests</div><a href="#" data-testid="crew-equip-new" id="equipNew">New request</a></div>
+      ${requests.length ? `<div class="list">${requests.map(r => { const [lbl, cls] = RSTAT[r.status]; return `
+        <div class="reqrow" data-testid="crew-equip-request" data-req="${r.id}">
+          <div class="reqrow-top"><span class="reqrow-name">${esc(r.name)}</span><span class="pill ${cls}">${lbl}</span></div>
+          <div class="reqrow-sub">Asked ${r.when}${r.status === 'approved' && r.item ? ` · You've got ${esc(r.item)}` : ''}${r.status === 'declined' && r.note ? ` · ${esc(r.note)}` : ''}${r.status === 'pending' && r.reason ? ` · ${esc(r.reason)}` : ''}</div>
+          ${r.status === 'pending' ? `<button class="btn btn-outline btn-sm" data-testid="crew-equip-request-cancel" data-reqcancel="${r.id}">Cancel request</button>` : ''}
+        </div>`; }).join('')}</div>` : '<div class="card"><div class="empty" data-testid="crew-equip-requests-empty">No requests yet.</div></div>'}`;
+  }
+  function openEquip(){ stackOpen('#s-equip'); renderEquip(); document.body.dataset.lastGo = '/employee/request-equipment'; }
+  function renderItem(g){
+    $('#itemTitle').textContent = g.name; $('#itemMeta').textContent = `${g.tag} · ${g.cat}`;
+    $('#itemBody').innerHTML = `
+      <div class="card kvl"><div><span>Condition</span><span>${COND[g.cond]}</span></div><div><span>With you since</span><span>${g.since}</span></div><div><span>Next check</span><span class="${g.checkState === 'overdue' ? 'warnline' : ''}">${g.check ? (g.checkState === 'overdue' ? 'Was due ' + g.check : g.check) : '—'}</span></div>${g.serial ? `<div><span>Serial</span><span>${esc(g.serial)}</span></div>` : ''}</div>
+      ${g.problem ? `<div class="card note access" data-testid="crew-item-reported" style="margin-top:14px"><b>Problem reported ${g.problem.at}</b>${esc(g.problem.text)}${g.problem.photo ? ' · 1 photo' : ''}<br><span style="color:var(--text-secondary);font-size:13.5px">Your employer has been told.</span></div>` : ''}
+      <button class="btn ${g.problem ? 'btn-outline' : 'btn-primary'}" style="margin-top:14px" data-testid="crew-item-problem" data-gearproblem="${g.id}">${g.problem ? 'Report another problem' : 'Report a problem'}</button>`;
+  }
+  function openItem(id){ const g = gear.find(x => x.id === id); if (!g) return; stackOpen('#s-item'); renderItem(g); document.body.dataset.lastGo = '/employee/request-equipment/' + id; }
+  // POST /equipment/my-items/{id}/problem {text, photo_url} — the sheet
+  const prob = { id: null, text: '', photo: false, err: '' };
+  function renderProblem(){ $('#probBody').innerHTML = `<div class="fld"><label for="probText">What's wrong with it?</label><textarea id="probText" data-testid="crew-problem-text" class="tin ${prob.err ? 'bad' : ''}" placeholder="e.g. The strap snapped">${esc(prob.text)}</textarea>${prob.err ? `<div class="err" data-testid="crew-problem-err">${esc(prob.err)}</div>` : ''}</div><button class="btn btn-outline btn-sm" data-testid="crew-problem-photo" data-probphoto="1">${prob.photo ? '1 photo attached · Change' : 'Add a photo'}</button>`; }
+  function openProblem(id){ prob.id = id; prob.text = ''; prob.photo = false; prob.err = ''; renderProblem(); $('#probSheet').classList.remove('hide'); }
+  function closeProblem(){ $('#probSheet').classList.add('hide'); }
+  function sendProblem(){ prob.text = ($('#probText').value || '').trim(); if (!prob.text) { prob.err = "Say what's wrong."; renderProblem(); return; } const g = gear.find(x => x.id === prob.id); g.problem = { at: 'today', text: prob.text, photo: prob.photo }; closeProblem(); renderItem(g); document.body.dataset.lastGo = 'POST /equipment/my-items/' + g.id + '/problem'; }
+  // POST /equipment/requests — one per picked item — the sheet
+  const req = { cat: null, items: [], reason: '', err: '' };
+  function renderReq(){
+    $('#reqTitle').textContent = req.cat || 'What do you need?';
+    $('#reqBack').classList.toggle('hide', !req.cat);
+    $('#reqBody').innerHTML = !req.cat ? Object.keys(CATALOG).map(c => `<button class="srow" data-testid="crew-req-cat" data-reqcat="${esc(c)}"><span class="ico"><svg><use href="#i-gear"/></svg></span>${esc(c)}<svg class="chev" style="margin-left:auto"><use href="#i-chev"/></svg></button>`).join('')
+      : `<div class="fld"><div class="chips" data-testid="crew-req-items">${CATALOG[req.cat].map(i => `<button class="chip ${req.items.includes(i) ? 'on' : ''}" data-reqitem="${esc(i)}">${esc(i)}</button>`).join('')}</div>${req.err ? `<div class="err" data-testid="crew-req-err">${esc(req.err)}</div>` : ''}</div>
+         <div class="fld"><label for="reqReason">Why do you need it? <span style="font-weight:500;color:var(--text-muted)">optional</span></label><textarea id="reqReason" data-testid="crew-req-reason" class="tin" placeholder="e.g. The Lygon St doors need a proper sand">${esc(req.reason)}</textarea></div>`;
+    $('#reqSend').classList.toggle('hide', !req.cat);
+    $('#reqSend').textContent = req.items.length > 1 ? `Send ${req.items.length} requests` : 'Send request';
+  }
+  function openReq(){ req.cat = null; req.items = []; req.reason = ''; req.err = ''; renderReq(); $('#reqSheet').classList.remove('hide'); }
+  function closeReq(){ $('#reqSheet').classList.add('hide'); }
+  function sendReq(){ req.reason = ($('#reqReason') || {}).value || ''; if (!req.items.length) { req.err = 'Pick at least one.'; renderReq(); return; } req.items.slice().reverse().forEach((i, k) => requests.unshift({ id: 'qn' + k + requests.length, name: i, cat: req.cat, status: 'pending', when: 'today', reason: req.reason.trim() })); closeReq(); renderEquip(); document.body.dataset.lastGo = 'POST /equipment/requests ×' + req.items.length; }
+  function closeTo(tab){ hideC5(); $('#s-app').classList.remove('hide'); showTab(tab); }
+  document.body.addEventListener('click', (e) => {
+    const t = e.target;
+    const vr = t.closest('[data-video]'); if (vr) { openVideo(vr.dataset.video, 'training'); return; }
+    const cv = t.closest('[data-cvideo]'); if (cv) { openVideo(cv.dataset.cvideo, 'coaching'); return; }
+    const pl = t.closest('[data-vplay]'); if (pl) { const v = vidById(pl.dataset.vplay); v.playing = true; renderVideo(v); document.body.dataset.lastGo = 'play:' + v.id; setTimeout(() => { v.playing = false; v.watched = true; renderVideo(v); }, 600); return; }
+    const mk = t.closest('[data-vmark]'); if (mk) { const v = vidById(mk.dataset.vmark); v.watched = true; renderVideo(v); document.body.dataset.lastGo = 'POST /training/' + v.id + '/watched'; return; }
+    const sv = t.closest('[data-vsave]'); if (sv) { const v = vidById(sv.dataset.vsave); v.saved = !v.saved; renderVideo(v); return; }
+    const gi = t.closest('[data-gotit]'); if (gi) { const n = coaching.find(x => x.id === gi.dataset.gotit); n.ack = true; renderCoaching(); document.body.dataset.lastGo = 'POST /coaching/' + n.id + '/got-it'; return; }
+    const rr = t.closest('[data-rating]'); if (rr) { openRating(rr.dataset.rating); return; }
+    const it = t.closest('[data-gear]'); if (it) { openItem(it.dataset.gear); return; }
+    const pb = t.closest('[data-gearproblem]'); if (pb) { openProblem(pb.dataset.gearproblem); return; }
+    const pp = t.closest('[data-probphoto]'); if (pp) { prob.text = ($('#probText').value || ''); openPhotoSheet('problem'); return; }
+    const cn = t.closest('[data-reqcancel]'); if (cn) { const r = requests.find(x => x.id === cn.dataset.reqcancel); r.status = 'cancelled'; renderEquip(); document.body.dataset.lastGo = 'POST /equipment/requests/' + r.id + '/cancel'; return; }
+    if (t.closest('#equipNew')) { e.preventDefault(); openReq(); return; }
+    const rc = t.closest('[data-reqcat]'); if (rc) { req.cat = rc.dataset.reqcat; req.items = []; req.err = ''; renderReq(); return; }
+    const ri = t.closest('[data-reqitem]'); if (ri) { req.reason = ($('#reqReason') || {}).value || ''; const i = ri.dataset.reqitem; req.items = req.items.includes(i) ? req.items.filter(x => x !== i) : req.items.concat(i); req.err = ''; renderReq(); return; }
+    const sg = t.closest('#trainSeg button'); if (sg) { trainSeg = sg.dataset.seg; renderTraining(); return; }
+  });
+  document.body.addEventListener('input', (e) => { if (e.target.id === 'probText' && prob.err) { prob.err = ''; e.target.classList.remove('bad'); const er = $('#probBody .err'); if (er) er.remove(); } });
+  $('#trainingBack').addEventListener('click', () => closeTo('learn'));
+  $('#videoBack').addEventListener('click', () => { if (videoFrom === 'coaching') openCoaching(); else openTraining(); });
+  $('#coachBack').addEventListener('click', () => closeTo('learn'));
+  $('#goingBack').addEventListener('click', () => closeTo('learn'));
+  $('#ratingBack').addEventListener('click', openGoing);
+  $('#equipBack').addEventListener('click', () => closeTo('me'));
+  $('#itemBack').addEventListener('click', openEquip);
+  $('#probCancel').addEventListener('click', closeProblem); $('#probSend').addEventListener('click', sendProblem);
+  $('#reqCancel').addEventListener('click', closeReq); $('#reqSend').addEventListener('click', sendReq);
+  $('#reqBack').addEventListener('click', () => { req.cat = null; req.items = []; req.err = ''; renderReq(); });
+
   // ---- C5 handlers ----
   document.body.addEventListener('click', (e) => {
     const t = e.target;
@@ -1420,7 +1756,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     const dr = t.closest('[data-doc]'); if (dr) { openDocSheet('onb', dr.dataset.doc); return; }
     const pr = t.closest('[data-pdoc]'); if (pr) { openDocSheet('profile', pr.dataset.pdoc); return; }
     const pf = t.closest('[data-prof]'); if (pf) { if (pf.dataset.prof === 'photo') openPhotoSheet('profile'); else if (pf.dataset.prof === 'password') openPwSheet(); return; }
-    const ph = t.closest('[data-photo]'); if (ph) { if (ds.ctx === 'onb') onb.photo = true; else prof.photo = true; closePhotoSheet(); if (ds.ctx === 'onb') renderOnb(); else renderProfile(); return; }
+    const ph = t.closest('[data-photo]'); if (ph) { if (ds.ctx === 'problem') { prob.photo = true; closePhotoSheet(); renderProblem(); return; } if (ds.ctx === 'onb') onb.photo = true; else prof.photo = true; closePhotoSheet(); if (ds.ctx === 'onb') renderOnb(); else renderProfile(); return; }
     const da = t.closest('[data-ds]'); if (da) { const a = da.dataset.ds; const st = dsStore();
       if (a === 'camera' || a === 'file' || a === 'replace') { st[ds.key] = Object.assign(st[ds.key] || {}, { on: true, name: a === 'file' ? 'white-card.pdf' : 'IMG_2041.jpg' }); if (st[ds.key].exp === undefined) st[ds.key].exp = ''; ds.bad = false; renderDocSheet(); }
       else if (a === 'view') document.body.dataset.lastGo = 'view:' + ds.key;
@@ -1463,6 +1799,13 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   else if (q.get('screen') === 'onboarding') { openOnb(parseInt(q.get('step') || '0', 10)); }
   else if (q.get('screen') === 'profile') { showApp('me'); openProfile(); }
   else if (q.get('screen') === 'docs') { showApp('me'); openDocs(); }
+  else if (q.get('screen') === 'training') { showApp('learn'); openTraining(); }
+  else if (q.get('screen') === 'video') { showApp('learn'); openVideo(q.get('id') || 'v3', q.get('from') || 'training'); }
+  else if (q.get('screen') === 'coaching') { showApp('learn'); openCoaching(); }
+  else if (q.get('screen') === 'going') { showApp('learn'); openGoing(); }
+  else if (q.get('screen') === 'rating') { showApp('learn'); openRating(q.get('id') || 'g1'); }
+  else if (q.get('screen') === 'equip') { showApp('me'); openEquip(); if (q.get('request') === '1') openReq(); }
+  else if (q.get('screen') === 'item') { showApp('me'); openItem(q.get('id') || 'e1'); if (q.get('problem') === '1') openProblem(q.get('id') || 'e1'); }
   else if (q.get('screen') === 'doc') { showApp('me'); openDoc(q.get('id') || 'd1'); if (q.get('sign') === '1') openSign(q.get('id') || 'd1'); }
   else if (q.get('screen') === 'app') { showApp(q.get('tab') || 'today'); if (q.get('picker') === '1') openPicker(); }
   else showLogin();

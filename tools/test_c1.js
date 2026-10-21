@@ -1,4 +1,4 @@
-// Crew shell prototype (C1 shell + C2 Jobs + C3 time clock + C4 daily report + C5 documents + follow-up D distance question and weather) — Playwright checks at 390 × 844 then 360 × 800.
+// Crew shell prototype (C1 shell + C2 Jobs + C3 time clock + C4 daily report + C5 documents + follow-up D distance question and weather + C6 Learn and gear) — Playwright checks at 390 × 844 then 360 × 800.
 // Run: NODE_PATH=$(npm root -g) node tools/test_c1.js [shots-dir]
 const { chromium } = require('playwright');
 const T = (id) => `[data-testid="${id}"]`;
@@ -293,6 +293,107 @@ async function run(b, W, H, tag) {
   await p.goto(U + '?screen=app&tab=today'); await p.waitForTimeout(300);
   await p.locator('#notifList ' + T('crew-notif-row')).nth(2).click(); await p.waitForTimeout(150);
   ok('the feedback notification opens that report with the reply' + full, await p.locator(T('crew-report')).isVisible() && (await go()) === '/employee/daily-report/r1' && await p.locator(T('crew-report-reply')).isVisible());
+
+  // ---- C6: Learn and gear ----
+  const chipsOn = (sel) => p.locator(sel + ' .chip.on').count();
+  await p.goto(U + '?screen=app&tab=learn'); await p.waitForTimeout(300);
+  await p.click(T('crew-learn-training')); await p.waitForTimeout(150);
+  ok('Learn › Training: the required line, three collections with videos (the empty one hidden), five rows, Required pills, back reads Learn' + full, await p.locator(T('crew-training')).isVisible() && (await txt(T('crew-training-required'))) === 'Required for you: 2 of 3 watched' && (await p.locator(T('crew-training-group')).count()) === 3 && (await p.locator(T('crew-video-row')).count()) === 5 && (await p.locator(T('crew-video-row') + ' .pill').count()) === 3 && /Learn/.test(await txt(T('crew-training-back'))) && (await go()) === '/employee/training');
+  ok('training rows are at least 64 px tall; no horizontal scroll' + full, (await box(T('crew-video-row'))).height >= 64 && await noHScroll());
+  await p.screenshot({ path: OUT + `c6-training-${tag}.png` });
+  await p.locator(T('crew-video-row')).nth(2).click(); await p.waitForTimeout(150);
+  ok('a not-yet-watched video: title, meta with Required, the player, Mark as watched, Save for later, the description' + full, await p.locator(T('crew-video')).isVisible() && (await txt(T('crew-video-title'))) === 'Ladders and heights' && /^Safety/.test(await txt(T('crew-video-meta'))) && /Required/.test(await txt(T('crew-video-meta'))) && await p.locator(T('crew-video-player')).isVisible() && (await txt(T('crew-video-mark'))) === 'Mark as watched' && (await txt(T('crew-video-save'))) === 'Save for later' && /platform instead/.test(await txt(T('crew-video-desc'))) && /Training/.test(await txt(T('crew-video-back'))));
+  await p.screenshot({ path: OUT + `c6-video-${tag}.png` });
+  await p.click(T('crew-video-player')); await p.waitForTimeout(100);
+  ok('tap to play: "Playing…" and the play is recorded' + full, /Playing…/.test(await txt(T('crew-video-player'))) && (await go()) === 'play:v3');
+  await p.waitForTimeout(700);
+  ok('when the player ends the video is marked watched by itself (no button needed)' + full, await p.locator(T('crew-video-watched')).isVisible() && (await txt(T('crew-video-watched'))) === 'Watched ✓' && !(await p.locator(T('crew-video-mark')).isVisible()));
+  await p.click(T('crew-video-save')); await p.waitForTimeout(80);
+  ok('Save for later → Saved ✓' + full, (await txt(T('crew-video-save'))) === 'Saved ✓');
+  await p.click(T('crew-video-back')); await p.waitForTimeout(150);
+  ok('back to Training: all required watched (green line); the Saved segment lists the three saved' + full, await p.locator(T('crew-training')).isVisible() && (await txt(T('crew-training-required'))) === 'All required videos watched.');
+  await p.locator(T('crew-training-seg') + ' button').nth(1).click(); await p.waitForTimeout(100);
+  ok('Saved segment: three rows' + full, (await p.locator(T('crew-video-row')).count()) === 3);
+  await p.locator(T('crew-training-seg') + ' button').nth(0).click(); await p.waitForTimeout(100);
+  await p.locator(T('crew-video-row')).nth(3).click(); await p.waitForTimeout(150); await p.click(T('crew-video-mark')); await p.waitForTimeout(100);
+  ok('Mark as watched stays as the fallback (native without the player)' + full, await p.locator(T('crew-video-watched')).isVisible() && (await go()) === 'POST /training/v4/watched');
+  await p.click(T('crew-video-back')); await p.waitForTimeout(100); await p.click(T('crew-training-back')); await p.waitForTimeout(150);
+  ok('Training back lands on the Learn tab' + full, await p.locator(T('crew-pane-learn')).isVisible() && (await p.locator(T('crew-tab-learn')).getAttribute('class')).includes('on'));
+  await p.goto(U + '?screen=training&training=0'); await p.waitForTimeout(300);
+  ok('no videos: one line, no required line, no segment' + full, (await txt(T('crew-training-empty'))) === 'No training videos yet. Your employer adds them here.' && !(await p.locator(T('crew-training-required')).isVisible()) && !(await p.locator(T('crew-training-seg')).isVisible()));
+  // coaching
+  await p.goto(U + '?screen=coaching'); await p.waitForTimeout(300);
+  ok('Coaching: three notes newest first; the reminder with its pill, topic, what good looks like and Got it; the praise with ✓ Got it' + full, await p.locator(T('crew-coaching')).isVisible() && (await p.locator(T('crew-coaching-note')).count()) === 3 && (await p.locator(T('crew-coaching-type')).nth(0).textContent()) === 'Something to work on' && /Site tidiness/.test(await p.locator(T('crew-coaching-note')).nth(0).textContent()) && /Drop sheets down, tools packed/.test(await p.locator(T('crew-coaching-good')).nth(0).textContent()) && (await p.locator(T('crew-coaching-gotit')).nth(0).textContent()) === 'Got it' && (await p.locator(T('crew-coaching-type')).nth(1).textContent()) === 'Well done' && (await p.locator(T('crew-coaching-gotit')).nth(1).textContent()) === '✓ Got it' && (await p.locator(T('crew-coaching-good')).count()) === 2);
+  ok('the word strike appears nowhere on the screen' + full, !/strike/i.test(await txt(T('crew-coaching'))));
+  await p.screenshot({ path: OUT + `c6-coaching-${tag}.png` });
+  await p.locator(T('crew-coaching-gotit')).nth(0).click(); await p.waitForTimeout(100);
+  ok('Got it → ✓ Got it, recorded' + full, (await p.locator(T('crew-coaching-gotit')).nth(0).textContent()) === '✓ Got it' && (await go()) === 'POST /coaching/n2/got-it');
+  ok('the check-in note links its training video' + full, (await p.locator(T('crew-coaching-video')).count()) === 1 && /How we start a job/.test(await txt(T('crew-coaching-video'))));
+  await p.click(T('crew-coaching-video')); await p.waitForTimeout(150);
+  ok('the video opens with back reading Coaching' + full, await p.locator(T('crew-video')).isVisible() && (await txt(T('crew-video-title'))) === 'How we start a job' && /Coaching/.test(await txt(T('crew-video-back'))));
+  await p.click(T('crew-video-back')); await p.waitForTimeout(150);
+  ok('…and back returns to Coaching' + full, await p.locator(T('crew-coaching')).isVisible());
+  await p.goto(U + '?screen=coaching&coaching=0'); await p.waitForTimeout(300);
+  ok('no notes: the empty line' + full, (await txt(T('crew-coaching-empty'))) === 'Nothing here yet. Notes your employer shares with you land here.');
+  // how I'm going
+  await p.goto(U + '?screen=going'); await p.waitForTimeout(300);
+  ok("How I'm going: the trend card and three ratings newest first with score badges" + full, await p.locator(T('crew-going')).isVisible() && /7\.6/.test(await txt(T('crew-going-trend'))) && /3 ratings · best 8\.4 · up 1\.5 since your first/.test(await txt(T('crew-going-trend'))) && (await p.locator(T('crew-going-row')).count()) === 3 && /8\.4/.test(await p.locator(T('crew-going-row')).nth(0).textContent()) && /Wattle St repaint/.test(await p.locator(T('crew-going-row')).nth(0).textContent()) && /General/.test(await p.locator(T('crew-going-row')).nth(2).textContent()));
+  await p.screenshot({ path: OUT + `c6-going-${tag}.png` });
+  await p.locator(T('crew-going-row')).nth(0).click(); await p.waitForTimeout(150);
+  ok("one rating: title, date · score · word, the owner's nine category words with scores, the note, two photos" + full, await p.locator(T('crew-rating')).isVisible() && (await txt(T('crew-rating-title'))) === 'Wattle St repaint' && (await txt(T('crew-rating-meta'))) === 'Fri 10 Oct · 8.4/10 · Strong' && (await p.locator(T('crew-rating-cat')).count()) === 9 && /Finish quality/.test(await p.locator(T('crew-rating-cat')).nth(0).textContent()) && /Great week/.test(await txt(T('crew-rating-note'))) && (await p.locator(T('crew-rating-photos') + ' .ph').count()) === 2);
+  await p.screenshot({ path: OUT + `c6-rating-${tag}.png` });
+  await p.click(T('crew-rating-back')); await p.waitForTimeout(150);
+  ok("back to How I'm going" + full, await p.locator(T('crew-going')).isVisible());
+  await p.goto(U + '?screen=going&going=0'); await p.waitForTimeout(300);
+  ok('no ratings: the empty line' + full, (await txt(T('crew-going-empty'))) === 'No ratings shared with you yet. When your employer shares one, it lands here.');
+  // my equipment
+  await p.goto(U + '?screen=app&tab=me'); await p.waitForTimeout(300); await p.click(T('crew-me-equipment')); await p.waitForTimeout(150);
+  ok('Me › My equipment: three items; the overdue check and the reported problem in amber; three requests with Waiting / Approved / Declined; the approved one says what was handed over' + full, await p.locator(T('crew-equip')).isVisible() && (await txt(T('crew-equip-meta'))) === '3 items with you' && (await p.locator(T('crew-equip-item')).count()) === 3 && /Check was due Fri 3 Oct/.test(await p.locator(T('crew-equip-item')).nth(1).textContent()) && /Problem reported Thu 9 Oct/.test(await p.locator(T('crew-equip-item')).nth(2).textContent()) && (await p.locator(T('crew-equip-request')).count()) === 3 && /Waiting/.test(await p.locator(T('crew-equip-request')).nth(0).textContent()) && /You've got Extension pole 2–4 m · PNT-04/.test(await p.locator(T('crew-equip-request')).nth(1).textContent()) && /Declined/.test(await p.locator(T('crew-equip-request')).nth(2).textContent()) && /Use the platform from the yard/.test(await p.locator(T('crew-equip-request')).nth(2).textContent()) && (await p.locator(T('crew-equip-request-cancel')).count()) === 1 && (await go()) === '/employee/request-equipment');
+  await p.screenshot({ path: OUT + `c6-equip-${tag}.png` });
+  await p.click(T('crew-equip-request-cancel')); await p.waitForTimeout(100);
+  ok('Cancel request → Cancelled, no button, the cancel route called' + full, /Cancelled/.test(await p.locator(T('crew-equip-request')).nth(0).textContent()) && (await p.locator(T('crew-equip-request-cancel')).count()) === 0 && (await go()) === 'POST /equipment/requests/q2/cancel');
+  await p.locator(T('crew-equip-item')).nth(0).click(); await p.waitForTimeout(150);
+  ok('one item: title, tag · category, condition, since, next check, Report a problem' + full, await p.locator(T('crew-item')).isVisible() && (await txt(T('crew-item-title'))) === 'Extension ladder 3.6 m' && (await txt(T('crew-item-meta'))) === 'LAD-03 · Ladders' && /Good/.test(await txt('#itemBody')) && /Fri 14 Nov/.test(await txt('#itemBody')) && (await txt(T('crew-item-problem'))) === 'Report a problem' && !(await p.locator(T('crew-item-reported')).isVisible()));
+  await p.click(T('crew-item-problem')); await p.waitForTimeout(150);
+  ok('Report a problem: the sheet with the text box, Add a photo, Send, Cancel' + full, await p.locator(T('crew-problem')).isVisible() && await p.locator(T('crew-problem-text')).isVisible() && (await txt(T('crew-problem-photo'))) === 'Add a photo' && (await box(T('crew-problem-send'))).height >= 44);
+  await p.click(T('crew-problem-send')); await p.waitForTimeout(100);
+  ok('Send with nothing typed: one inline error' + full, (await txt(T('crew-problem-err'))) === "Say what's wrong." && await p.locator(T('crew-problem')).isVisible());
+  await p.fill(T('crew-problem-text'), 'Top rung is cracked'); await p.waitForTimeout(80);
+  ok('typing clears the error' + full, !(await p.locator(T('crew-problem-err')).isVisible()));
+  await p.click(T('crew-problem-photo')); await p.waitForTimeout(100);
+  ok('Add a photo opens the camera / library choice' + full, await p.locator(T('crew-photo-sheet')).isVisible());
+  await p.click(T('crew-photo-camera')); await p.waitForTimeout(100);
+  ok('…one photo attached, the text kept' + full, (await txt(T('crew-problem-photo'))) === '1 photo attached · Change' && (await p.locator(T('crew-problem-text')).inputValue()) === 'Top rung is cracked');
+  await p.screenshot({ path: OUT + `c6-problem-${tag}.png` });
+  await p.click(T('crew-problem-send')); await p.waitForTimeout(150);
+  ok('Send: the sheet closes, the item shows the report with the photo and "Your employer has been told."; the button becomes Report another problem' + full, !(await p.locator(T('crew-problem')).isVisible()) && /Problem reported today/.test(await txt(T('crew-item-reported'))) && /Top rung is cracked · 1 photo/.test(await txt(T('crew-item-reported'))) && /Your employer has been told\./.test(await txt(T('crew-item-reported'))) && (await txt(T('crew-item-problem'))) === 'Report another problem' && (await go()) === 'POST /equipment/my-items/e1/problem');
+  await p.click(T('crew-item-back')); await p.waitForTimeout(150);
+  ok('back to My equipment: the row now says Problem reported today' + full, await p.locator(T('crew-equip')).isVisible() && /Problem reported today/.test(await p.locator(T('crew-equip-item')).nth(0).textContent()));
+  await p.click(T('crew-equip-new')); await p.waitForTimeout(150);
+  ok('New request: the sheet asks what you need, eight categories, no Send yet' + full, await p.locator(T('crew-req')).isVisible() && (await txt(T('crew-req-title'))) === 'What do you need?' && (await p.locator(T('crew-req-cat')).count()) === 8 && !(await p.locator(T('crew-req-send')).isVisible()) && !(await p.locator(T('crew-req-back')).isVisible()));
+  await p.locator(T('crew-req-cat')).nth(4).click(); await p.waitForTimeout(100);
+  ok('a category: its items as chips, the optional reason, Send request, a back arrow' + full, (await txt(T('crew-req-title'))) === 'Sanders & prep' && (await p.locator(T('crew-req-items') + ' .chip').count()) === 3 && await p.locator(T('crew-req-reason')).isVisible() && (await txt(T('crew-req-send'))) === 'Send request' && await p.locator(T('crew-req-back')).isVisible());
+  await p.click(T('crew-req-send')); await p.waitForTimeout(100);
+  ok('Send with nothing picked: one inline error' + full, (await txt(T('crew-req-err'))) === 'Pick at least one.');
+  await p.locator(T('crew-req-items') + ' .chip').nth(0).click(); await p.locator(T('crew-req-items') + ' .chip').nth(2).click(); await p.waitForTimeout(100);
+  ok('two picked → "Send 2 requests"' + full, (await chipsOn(T('crew-req-items'))) === 2 && (await txt(T('crew-req-send'))) === 'Send 2 requests');
+  await p.fill(T('crew-req-reason'), 'Lygon St doors'); await p.screenshot({ path: OUT + `c6-request-${tag}.png` });
+  await p.click(T('crew-req-send')); await p.waitForTimeout(150);
+  ok('Send: the sheet closes and the two new requests sit at the top as Waiting with the reason' + full, !(await p.locator(T('crew-req')).isVisible()) && (await p.locator(T('crew-equip-request')).count()) === 5 && /Orbital sander/.test(await p.locator(T('crew-equip-request')).nth(0).textContent()) && /Waiting/.test(await p.locator(T('crew-equip-request')).nth(0).textContent()) && /Lygon St doors/.test(await p.locator(T('crew-equip-request')).nth(1).textContent()) && /Scraper set/.test(await p.locator(T('crew-equip-request')).nth(1).textContent()) && (await go()) === 'POST /equipment/requests ×2');
+  await p.click(T('crew-equip-back')); await p.waitForTimeout(150);
+  ok('My equipment back lands on Me' + full, await p.locator(T('crew-pane-me')).isVisible());
+  await p.goto(U + '?screen=equip&equip=0&requests=0'); await p.waitForTimeout(300);
+  ok('nothing assigned, no requests: the two empty lines' + full, (await txt(T('crew-equip-meta'))) === 'Nothing with you right now' && (await txt(T('crew-equip-empty'))) === 'Nothing assigned to you yet. Gear your employer gives you shows here.' && (await txt(T('crew-equip-requests-empty'))) === 'No requests yet.' && await p.locator(T('crew-equip-new')).isVisible());
+  await p.goto(U + '?screen=item&id=e2&problem=1'); await p.waitForTimeout(300);
+  ok('deep link: the sprayer with its overdue check and the problem sheet open' + full, await p.locator(T('crew-item')).isVisible() && /Was due Fri 3 Oct/.test(await txt('#itemBody')) && /GX-44812/.test(await txt('#itemBody')) && await p.locator(T('crew-problem')).isVisible());
+  await p.click(T('crew-problem-cancel')); await p.waitForTimeout(100);
+  ok('Cancel closes the sheet, nothing reported' + full, !(await p.locator(T('crew-problem')).isVisible()) && !(await p.locator(T('crew-item-reported')).isVisible()));
+  await p.goto(U + '?screen=app&tab=learn'); await p.waitForTimeout(300); await p.click(T('crew-learn-coaching')); await p.waitForTimeout(150);
+  ok('Learn › Coaching opens Coaching' + full, await p.locator(T('crew-coaching')).isVisible());
+  await p.click(T('crew-coaching-back')); await p.waitForTimeout(100); await p.click(T('crew-learn-validations')); await p.waitForTimeout(150);
+  ok("Learn › How I'm going opens it; back returns to Learn" + full, await p.locator(T('crew-going')).isVisible());
+  await p.click(T('crew-going-back')); await p.waitForTimeout(100);
+  ok('…back on Learn' + full, await p.locator(T('crew-pane-learn')).isVisible());
 
   // ---- C5: onboarding, profile, my documents ----
   await p.goto(U + '?screen=onboarding'); await p.waitForTimeout(300);
