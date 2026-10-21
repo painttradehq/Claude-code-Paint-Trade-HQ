@@ -15,9 +15,9 @@ Josh (21 October): (1) "On the employee profile page there is a section to write
 
 ## 2. The employee page — Overtime rate
 
-- **Pay rates** gets a third field, **Overtime $/h**, after Hourly and Daily (the file card; the Add employee drawer's Pay section the same: Hourly rate · Daily rate · Overtime rate). Same permission as the other two. Help line: "Feeds labour cost on live projects and the payroll file. Hourly wins; daily is used when hourly is empty. Overtime is paid for the hours past the thresholds in the Timesheets gear — leave it blank to pay overtime at the hourly rate." A daily-rate employee (hourly empty, daily set) has the Overtime field greyed with "Overtime is not used with a daily rate — a day is a day."
+- **Pay rates** gets a third field, **Overtime $/h**, after Hourly and Daily on the employee page's file card. Same permission as the other two. **The Add employee dialog loses its Pay section** (Josh, 21 Oct: "we don't need it there, it is already on the employee profile page"): no hourly, daily or overtime field when adding; one line instead, "Pay rates are set on their profile page after they are added, under Pay rates." `POST /employees` ignores pay fields; the file card is the one place. Help line: "Feeds labour cost on live projects and the payroll file. Hourly wins; daily is used when hourly is empty. Overtime is paid for the hours past the thresholds in the Timesheets gear — leave it blank to pay overtime at the hourly rate." A daily-rate employee (hourly empty, daily set) has the Overtime field greyed with "Overtime is not used with a daily rate — a day is a day."
 - **One money rule everywhere:** `regular hours × hourly_rate + overtime hours × (overtime_rate or hourly_rate)`; daily-rate employees: `days worked × daily_rate`. The This week card drops its 1.5 × and prints the rule under the bars ("38 h regular × $52.50 + 4 h overtime × $78.75 = $2,310"); the project labour cost splits each employee's sessions by day with the same `split_overtime` (daily threshold, then the running weekly threshold in the pay week) and prices the overtime part at the overtime rate; the payroll CSV gains `hourly_rate` and `overtime_rate` columns (and `daily_rate`), so the hours and the rates sit on one line.
-- Record: `employee.overtime_rate` (float ≥ 0 or null). `PUT /employees/{id}` and `POST /employees` accept it; the summary route and the MCP listing carry it with the same stripping as `hourly_rate`; the crew's own profile route never returns pay fields (as today).
+- Record: `employee.overtime_rate` (float ≥ 0 or null). `PUT /employees/{id}` accepts it (`POST /employees` no longer takes pay fields); the summary route and the MCP listing carry it with the same stripping as `hourly_rate`; the crew's own profile route never returns pay fields (as today).
 
 ## 3. Settings › Business › Operating hours
 
@@ -53,7 +53,7 @@ The two notification kinds in the push mapping; tapping the sign-in reminder ope
 
 ## 7. Verify (testing agent, 1440 then 1024, TS_ tenant)
 
-1. Employee page › Pay rates: three fields; Overtime blank → the help line; set 78.75 → saved, `GET /employees/{id}` carries `overtime_rate`; a daily-rate employee shows Overtime greyed with the note. Add employee: the three pay fields; a new employee saved with an overtime rate.
+1. Employee page › Pay rates: three fields; Overtime blank → the help line; set 78.75 → saved, `GET /employees/{id}` carries `overtime_rate`; a daily-rate employee shows Overtime greyed with the note. Add employee: no pay fields, the line pointing at the profile page; a new employee is added without rates and gets them on the file card.
 2. The This week card: a TS_ crew member with 9, 9, 8, 9, 7 hours → 38 h regular, 4 h overtime; labour 38 × hourly + 4 × overtime; with Overtime blank, 4 × hourly; the rule line under the bars matches.
 3. Live project page money: the same crew member's sessions on a TS_ project price the overtime hours at the overtime rate; with no overtime rate, at the hourly rate; a daily-rate member at days × daily.
 4. Payroll CSV (Lock week): the three rate columns, the figures matching the employee record; a member without the pay permission still gets no rates anywhere.
@@ -64,7 +64,7 @@ The two notification kinds in the push mapping; tapping the sign-in reminder ope
 
 ## 8. Tests
 
-`backend/tests/test_r81_pay_hours.py` on TS_: `overtime_rate` save / read / stripping; the money rule in the week summary and the project labour cost (blank → hourly; set → overtime rate; daily-rate); the CSV columns; `operations.hours` validation (end ≤ start → 400; days outside 1–7 → 400); the reminder job with a fixed clock (start: assigned and not signed in → one; not assigned → none; twice → still one; end: signed in → one; switch off → none; non-working day → none; cross-tenant → none). Suite green before and after.
+`backend/tests/test_r81_pay_hours.py` on TS_: `overtime_rate` save / read / stripping; `POST /employees` with pay fields → they are ignored; the money rule in the week summary and the project labour cost (blank → hourly; set → overtime rate; daily-rate); the CSV columns; `operations.hours` validation (end ≤ start → 400; days outside 1–7 → 400); the reminder job with a fixed clock (start: assigned and not signed in → one; not assigned → none; twice → still one; end: signed in → one; switch off → none; non-working day → none; cross-tenant → none). Suite green before and after.
 
 ## 9. What's new (Draft only)
 
@@ -79,3 +79,4 @@ The two notification kinds in the push mapping; tapping the sign-in reminder ope
 4. Hours on the Business page, switches on the Crew app page (Josh: "not sure what you mean" → built as proposed: the hours are a business fact other pages can use; what reaches the phone sits with the other push choices; one place for each).
 5. Overtime defined by the operating hours (outside 7–4 = overtime) is not proposed; the 8 h / 38 h thresholds stay the rule.
 6. Builds after Round 80. Both prototypes are patches on existing pages; the employee page prototype is a mock of the real file card from the code, not a redesign of that page.
+7. The Add employee dialog's Pay section (Hourly and Daily today) is removed: one place for pay, the profile page (Josh, 21 Oct).

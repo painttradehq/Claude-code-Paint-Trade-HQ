@@ -57,7 +57,7 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     ok(/Pay rates saved/.test(await toast()) && /overtime_rate/.test(await toast()) && /\$2,310 labour/.test(await txt('week-labour')), 'Overtime 78.75 saved → $2,310 (38 × 52.5 + 4 × 78.75)');
     await p.screenshot({ path: path.join(SHOTS, `employee-pay-${W}.png`) });
     await p.locator(T('emp-add')).click(); await p.waitForTimeout(300);
-    ok(await p.locator(T('emp-add-drawer')).isVisible() && await p.locator(T('add-hourly_rate')).isVisible() && await p.locator(T('add-daily_rate')).isVisible() && await p.locator(T('add-overtime_rate')).isVisible(), 'Add employee opens on the right with the three pay fields');
+    ok(await p.locator(T('emp-add-drawer')).isVisible() && (await p.locator('[data-testid^="add-"][data-testid$="_rate"]').count()) === 0 && /set on their profile page/.test(await txt('add-pay-note')), 'Add employee opens on the right with no pay fields; a line points at the profile page');
     if (W === 1440) await p.screenshot({ path: path.join(SHOTS, `employee-pay-add-${W}.png`) });
     await p.keyboard.press('Escape'); await p.waitForTimeout(200);
     ok(await p.locator(T('emp-add-drawer')).isHidden(), 'Escape closes it');

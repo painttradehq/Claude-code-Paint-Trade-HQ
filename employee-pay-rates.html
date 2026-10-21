@@ -682,9 +682,7 @@
     <div><label>Full name</label><input type="text" placeholder="e.g. Sam Perera" data-testid="add-name"></div>
     <div class="g2"><div><label>Role</label><input type="text" value="Painter" data-testid="add-role"></div><div><label>Employment</label><input type="text" value="Full time" data-testid="add-employment_type"></div></div>
     <div class="g2"><div><label>Email</label><input type="email" data-testid="add-email"></div><div><label>Phone</label><input type="tel" data-testid="add-phone"></div></div>
-    <div class="h">Pay <i>admin only</i></div>
-    <div class="g3"><div><label>Hourly rate $/h</label><input type="number" data-testid="add-hourly_rate"></div><div><label>Daily rate $/day</label><input type="number" data-testid="add-daily_rate"></div><div><label>Overtime rate $/h</label><input type="number" data-testid="add-overtime_rate"></div></div>
-    <div class="muted" style="line-height:1.45">Hourly wins; daily is used when hourly is empty. Overtime is paid for the hours past the thresholds in the Timesheets gear — leave it blank to pay overtime at the hourly rate.</div>
+    <div class="muted" style="line-height:1.45" data-testid="add-pay-note">Pay rates are set on their profile page after they are added, under Pay rates.</div>
     <div class="h">Login</div>
     <div><label>Temporary password</label><input type="text" value="brush-9142-sky" style="font-family:var(--font-mono)" data-testid="add-password"></div>
   </div>
@@ -748,7 +746,7 @@ const params = new URLSearchParams(location.search);
   const close = () => { $('#addScrim').hidden = true; };
   $('#addClose').addEventListener('click', close); $('#addCancel').addEventListener('click', close);
   $('#addScrim').addEventListener('click', e => { if (e.target.id === 'addScrim') close(); });
-  $('#addSave').addEventListener('click', () => { close(); say('Employee added · POST /employees { …, hourly_rate, daily_rate, overtime_rate }'); });
+  $('#addSave').addEventListener('click', () => { close(); say('Employee added · POST /employees (no pay fields)'); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#addScrim').hidden) close(); });
   render();
 })();
