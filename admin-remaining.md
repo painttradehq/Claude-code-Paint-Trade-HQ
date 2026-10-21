@@ -1,4 +1,4 @@
-# Admin side — what is left to build (17 October)
+# Admin side — what is left to build (updated 21 October)
 
 Everything the admin chat has specced so far is built, except the items below. Order is a suggestion; Josh decides. One round at a time across both chats.
 
@@ -13,8 +13,13 @@ Everything the admin chat has specced so far is built, except the items below. O
 
 | Item | What it is | Needs from Josh |
 |---|---|---|
-| **Round 79 — Settings › Crew app** (`crew-app-settings-notes.md`, prototype `settings-crew-app.html`) | The admin page for the crew app: welcome video and note with a phone preview, which crew features are on, the sign-in distance (50 m, min 30, flag or refuse; moved here from the Timesheets gear), push choices; the record, routes and video stream the crew chat reads. Invites stay on the Employees page. | Upload only; one coordinated round with the crew chat (its crew spec is built against §3–§4 of the notes). "send 79" after Round 74 is done and the crew chat has its half ready. |
-| **Round 74 — Presentation pages** | Your words: "one or two pages with large photo areas, if the user wants", instead of today's small section; presentation on by default for new quotes; the public quote page shows the presentation pages (today only the PDF does). | "prototype 74" → review → "send". |
+
+## Built on preview, waiting for your publish (21 October)
+
+- **Round 78 + 78b** — contracts by email with the PDF in your storage; the signed contract listed on the Documents card.
+- **Round 74** — presentation pages as a block builder with Reviews & ratings (eleven platforms), reconciled against the prototypes.
+- **Round 79 (admin half)** — Settings › Crew app, the crew routes, the time-clock rule, the Timesheets gear pointing at the one distance. The crew half (§4 of the notes) is the crew chat's next round.
+- What's new drafts n 18, n 19, n 20 wait with them (`platform-steps.md` §1).
 
 ## Needs something to arrive first
 

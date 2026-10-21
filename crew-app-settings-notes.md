@@ -1,4 +1,4 @@
-# Round 79 — Settings › Crew app, with the crew side in the same round (SENT 18 Oct)
+# Round 79 — Settings › Crew app, with the crew side in the same round (admin half BUILT 21 Oct — suite 843 / 114 / 0, agent 153, report `memory/reports/round-79-report.md`, draft n 20; the crew half §4 is the crew chat's, not yet built)
 
 Prototype: **`settings-crew-app.html?page=crew`** (Settings rail › Crew app; Onboarding → **Preview on a phone**; the feature switches; the distance and the rule; the push choices). Open at **1440** first, then **1024**. Playwright: `tools/test_crew_settings.js`, **48/48** at both widths. Screenshots: `crew-settings-top-1440.png`, `crew-settings-1440.png`, `crew-settings-phone-1440.png`, `crew-settings-1024.png`.
 

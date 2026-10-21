@@ -1,4 +1,4 @@
-# Round 74 — Presentation pages, second design: a block builder (part 2 SENT 18 Oct)
+# Round 74 — Presentation pages, second design: a block builder (part 2 BUILT 21 Oct, RECONCILED against these prototypes 21 Oct — suite 843 / 114 / 0, agents 152 + 154, reports `round-74-part2-report.md` and `round-74-reconciled-report.md`, draft n 19 "Show your work, your way")
 
 Prototypes (both changed): **`quote-setup-presentation.html?setup=presentation`** (click **Standard residential** → the block editor → **Live preview**) and **`estimate-builder-presentation.html?pres=on`** (Review & Send → the pages at the back of the quote; Quote details › Presentation pages). Open at **1440** first, then **1024**. Playwright: `tools/test_presentation.js`, **90/90** at both widths. Screenshots: `pres-editor-1440.png`, `pres-editor-edited-1440.png`, `pres-client-1440.png`, `pres-editor-1024.png`, `pres-ratings-1440.png` (the Reviews & ratings box).
 
@@ -22,7 +22,7 @@ A presentation is a **list of blocks the admin orders freely**, printed in that 
 
 Limits: 8 photos across all photo blocks; 2 pages; 12 blocks. Every block has move up / move down and remove; **+ Add a block** opens a menu of the seven types (reviews, links and page break greyed when already in); a new block lands at the end and is moved where it is wanted. Photos come from an upload or from **Pick from a finished job** on each photo block (the strip fills that block's next empty spot). **Live preview** draws the pages from the unsaved form and follows every keystroke.
 
-Default template for a new business (residential): Hero "Our work" → Photo grid 2 × 2 → Page break → Message "A note for you" → About us "A bit about us" → Photo grid three wide → Google reviews → Links. The commercial default: Hero → Photo grid 2 × 2 (one page).
+Default template for a new business (residential): Hero "Our work" → Photo grid 2 × 2 → Page break → Message "A note for you" → About us "A bit about us" → Photo grid three wide → Reviews → Links. The commercial default: Hero → Photo grid 2 × 2 (one page).
 
 ## 2. What changes in the app (over part 1)
 
