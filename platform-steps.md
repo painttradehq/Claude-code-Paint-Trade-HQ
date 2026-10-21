@@ -7,7 +7,7 @@ None of these is code. Each is a few clicks in a dashboard you own. "Your live a
 Users see nothing in the bell until each draft is published.
 
 1. Live app → Settings › Platform › **Updates** tab.
-2. The drafts, oldest first: 12 "Crew daily reports, rebuilt", 13 "Line details, roomier", 14 "Add to the Library from the quote", 15 "Faster everywhere", 16 "Quicker pages", 17 "Prices that include GST"; after the next publish of the app (Rounds 78, 78b, 74 and 79): 18 "Signed contracts, delivered", 19 "Show your work, your way", 20 "Your crew app, your way". Open each, read the text once, press **Publish**. Leave the email option off unless you want every business emailed.
+2. The drafts, oldest first: 12 "Crew daily reports, rebuilt", 13 "Line details, roomier", 14 "Add to the Library from the quote", 15 "Faster everywhere", 16 "Quicker pages", 17 "Prices that include GST"; after the next publish of the app (Rounds 78, 78b, 74 and 79): 18 "Signed contracts, delivered", 19 "Show your work, your way", 20 "Your crew app, your way", 21 "Plans and billing, in one place", 22 "Overtime rates and reminders to sign in and out". Open each, read the text once, press **Publish**. Leave the email option off unless you want every business emailed.
 3. Order matters only for the bell's list; publish in that order. Unpublish exists if one reads wrong; tell me the words to change.
 
 ## 2. Resend: the `.com.au` sender

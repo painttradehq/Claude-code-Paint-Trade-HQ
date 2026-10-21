@@ -1,4 +1,4 @@
-# Round 80 — Billing: the plans in the app (SENT 21 Oct; BUILT the same day per the job — `tests/test_r80_billing.py`, `routes/billing_plans.py`, `services/plan_gate.py`, `services/plans.py` exist; the report is to be re-pasted and read; the Stripe flows wait for a test key and the seven price ids — `platform-steps.md` §6)
+# Round 80 — Billing: the plans in the app (BUILT 21 Oct — agent 155, suite green, draft n 21; report `memory/reports/round-80-report.md`; the Stripe flows wait for a valid test key and the seven price ids — `platform-steps.md` §6; two completion items asked for on 21 Oct, §11)
 
 Prototype: **`settings-billing.html?page=billing`** (Settings rail › Billing; the Account page keeps only a line pointing here), with `&state=trial`, `&state=tester`, `&state=past_due` for the other states. Open at **1440** first, then **1024**. Playwright: `tools/test_billing.js`, **96/96** at both widths. Screenshots: `billing-1440.png`, `billing-cards-1440.png`, `billing-drawer-1440.png`, `billing-compare-1440.png`, `billing-trial-1440.png`, `billing-tester-1440.png`, `billing-1024.png`, `billing-cards-1024.png`.
 
@@ -91,3 +91,11 @@ One component, **`PlanCard`** ("Not on your plan"): "{Feature} is on the {plan} 
 - Josh creates the seven Stripe prices in **test mode** and puts their ids in the preview secrets (`platform-steps.md` §6); the same again in live mode before publishing.
 - Josh answers §8.5 (GST) and confirms §8.1, §8.4.
 - This round comes after the crew chat's half of Round 79. It is one round in two parts built in order: part 1 the page, the plan table, seats and Stripe (§2–§5); part 2 the feature switches (§6). Part 2 ships with part 1 — the page must not say "switching drops Timesheets" while Timesheets still works on Starter.
+
+## 11. After the build (21 Oct, from Emergent's recap)
+
+Built: `services/plans.py` plan table with the legacy mapping (standard → Small business, pro → Enterprise, old Stripe price kept until a change); `/billing/plans|overview|change-plan|cancel|resume` with owner-only writes; the feature gate `403 plan_required` with trial, tester and platform-owner pass-through; `none` blocks all but Billing, Account and sign-out; sign-up trials on Enterprise; owner-only Settings › Billing with the change-plan drawer and cancel / resume; the Account page's one-line link; `/admin/pricing` → Billing; PlanCard locks on Timesheets, Performance, Training videos, Contracts, Daily reports, Equipment and the Presentation tab; sidebar plan pills; the seven `STRIPE_PRICE_*` names wired.
+
+Still owed inside the round (asked 21 Oct): the PlanCard line on the auto-invoicing switch and the SMS option, and the small card in place of the project stats and the two AI summaries (§6) — Emergent had left those on the raw API 403; the period-end cron `apply_due_plan_changes` registered as the fallback for scheduled downgrades; confirmation that the prototype arrived and the page follows it (the "Good to know" section, the computed what-if line per card).
+
+**Waits for a valid Stripe test key and the seven price ids** (the preview's key was rejected as invalid): checkout for a new subscription; upgrade with proration; customer portal / Update card; webhook-driven seat-quantity sync from the Team admins and Employees pages; past due via a failing test card; trial-end conversion; the renewal webhook applying a pending downgrade. Not taken (optional): a "Trialling" pill; blocking upgrades while past due.

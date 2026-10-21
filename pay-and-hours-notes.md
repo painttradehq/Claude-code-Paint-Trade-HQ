@@ -1,4 +1,4 @@
-# Round 81 — Pay and hours: Overtime rate · Operating hours · sign-in / sign-out reminders (prototype for Josh's review, 21 Oct)
+# Round 81 — Pay and hours: Overtime rate · Operating hours · sign-in / sign-out reminders (BUILT 21 Oct — agent 156, `test_r81_pay_hours.py` 8, suite green ~950 tests, draft n 22; report `memory/reports/round-81-report.md`; one open question on the overtime split, §11)
 
 Prototypes: **`settings-pay-hours.html?page=business`** (Business › Operating hours; then the rail › Crew app › Push notifications for the two reminder switches) and **`employee-pay-rates.html`** (the employee page's Pay rates with Overtime, the This week card, Add employee; `?daily=1` for a daily-rate employee). Open at **1440** first, then **1024**. Playwright: `tools/test_hours.js`, **46/46** at both widths. Screenshots: `hours-business-1440.png`, `hours-crew-1440.png`, `employee-pay-1440.png`, `employee-pay-add-1440.png`, `employee-pay-1024.png`, `hours-business-1024.png`, `hours-crew-1024.png`.
 
@@ -80,3 +80,8 @@ The two notification kinds in the push mapping; tapping the sign-in reminder ope
 5. Overtime defined by the operating hours (outside 7–4 = overtime) is not proposed; the 8 h / 38 h thresholds stay the rule.
 6. Builds after Round 80. Both prototypes are patches on existing pages; the employee page prototype is a mock of the real file card from the code, not a redesign of that page.
 7. The Add employee dialog's Pay section (Hourly and Daily today) is removed: one place for pay, the profile page (Josh, 21 Oct).
+
+## 11. After the build (21 Oct)
+
+- Emergent found two fixed, tenant-blind 8 am / 4 pm reminder crons already in the tree (from the Round 63 worker) and replaced them with the one per-tenant `operating_hours_reminders` job; §1 above was wrong on that point. "A job today" = assigned + status open + dates covering today. The payroll CSV's rate columns appear only for pay access. Agent 156's polish: "An 8-hour day" article; Pay rates hidden without pay access, with an error toast.
+- **Open: the overtime split.** For the week 9, 9, 8, 9, 7 the existing Round 21 rule gives **35 regular / 7 overtime**, where the spec expected 38 / 4. That reads as the daily overtime hours (3) being counted again against the 38-hour week (42 − 38 = 4). Emergent has been asked to show the arithmetic. If it double-counts, correcting it is Josh's call: it changes payroll figures for every business, and the money rule now prices those hours.
