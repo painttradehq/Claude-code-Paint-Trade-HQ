@@ -3,7 +3,7 @@
 settings-billing.html: a new rail item "Billing" and its page — Your plan (pill, status, seats, next invoice, actions),
 the three plan cards (Starter / Small business / Enterprise, the current one highlighted, what switching adds or drops
 with the real seat arithmetic), a right-hand drawer to switch or cancel, the full comparison table and the Good-to-know
-list. The Account page gets a Subscription row whose "Manage billing" opens the page. States: ?state=active (default),
+list. The Account page loses its Subscription section and keeps one line pointing here. States: ?state=active (default),
 trial, tester, past_due. Every rep() asserts the exact count."""
 import os
 os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
@@ -85,13 +85,9 @@ PAGE = """  <div class="content" id="pgBilling" data-testid="set-page-billing" h
 s = rep(s, '  <div class="content" id="pgAccount" data-testid="set-page-account" hidden>', PAGE)
 
 ACCOUNT_OLD = """    <div class="soon"><b>Next round.</b> This page keeps its current content until its own redesign round: Subscription first, then Profile, Team admins and Security (password + sessions).</div>"""
-ACCOUNT_NEW = """    <section class="sec" data-testid="sec-subscription">
-      <h3>Subscription</h3>
-      <p class="sd">Your plan at a glance. Plans, seats, invoices and the payment method live on the Billing page.</p>
-      <div class="bl-plan" id="acctSub" data-testid="account-subscription-row"></div>
-    </section>
-    <div class="soon"><b>As today.</b> Profile, Team admins and Security keep their current content.</div>"""
+ACCOUNT_NEW = """    <div class="soon"><b>Subscription moved.</b> The plan, the seats, the invoices and the payment method live on the <a href="?page=billing" data-testid="account-billing-link" style="color:var(--accent);font-weight:600">Billing page</a>. Profile, Team admins and Security keep their current content.</div>"""
 s = rep(s, ACCOUNT_OLD, ACCOUNT_NEW)
+s = rep(s, '<p class="pgs">Subscription · Profile · Team admins · Security</p>', '<p class="pgs">Profile · Team admins · Security</p>')
 
 DRAWER = """<div class="dscrim" id="blScrim" hidden><div class="drawer bl-drawer" data-testid="bl-drawer">
   <div class="dhead"><div class="t"><h2 id="blDTitle" data-testid="bl-drawer-title"></h2><div class="s" id="blDSub"></div></div><button class="dclose" id="blClose" data-testid="bl-drawer-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
@@ -150,7 +146,7 @@ JS = r"""  // ---- Billing page ----
   const joinList = (a) => a.length <= 1 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
   const cap = (t) => t.charAt(0).toUpperCase() + t.slice(1);
 
-  function planTop(forAccount){
+  function planTop(){
     const P = B.cur ? PLANS[B.cur] : null; let pill = ['', ''], title = '', line = '', lineCls = '';
     if (B.state === 'tester') { pill = ['Tester program', 'ok']; title = 'Full access · tester program'; line = `Free until ${TESTER_END} · no billing · invited by Paint Trade HQ`; }
     else if (B.state === 'trial') { pill = ['Free trial', 'warn']; title = `${P.name} · free trial`; line = `9 days left · ends ${TRIAL_END} · no card yet`; }
@@ -159,8 +155,7 @@ JS = r"""  // ---- Billing page ----
       else if (B.cancelling) line = `Cancels on ${PERIOD_END} · you keep everything until then`;
       else if (B.pending) line = `Switches to ${PLANS[B.pending].name} on ${PERIOD_END} · until then nothing changes`;
       else line = `Active · renews ${PERIOD_END} · Visa ending 4242`; }
-    const acts = forAccount ? `<button class="btn btn-ghost" id="acctManage" data-testid="account-manage-billing">${svg('card')} Manage billing ${svg('arrowr')}</button>` : actions();
-    return `<div class="top"><span class="bl-pill ${pill[1]}" data-testid="${forAccount ? 'account-plan-pill' : 'bl-plan-pill'}">${esc(pill[0])}</span><div class="t"><b data-testid="${forAccount ? 'account-plan-title' : 'bl-plan-title'}">${esc(title)}</b><span class="${lineCls}" data-testid="${forAccount ? 'account-plan-line' : 'bl-plan-line'}">${esc(line)}</span></div><div class="acts">${acts}</div></div>`;
+    return `<div class="top"><span class="bl-pill ${pill[1]}" data-testid="bl-plan-pill">${esc(pill[0])}</span><div class="t"><b data-testid="bl-plan-title">${esc(title)}</b><span class="${lineCls}" data-testid="bl-plan-line">${esc(line)}</span></div><div class="acts">${actions()}</div></div>`;
   }
   function actions(){
     if (B.state === 'tester') return '';
@@ -185,9 +180,8 @@ JS = r"""  // ---- Billing page ----
   }
   function renderPlan(){
     const ids = ['bl-seat-admins', 'bl-seat-emps', 'bl-next-invoice'];
-    $('#blPlan').innerHTML = planTop(false) + `<div class="bl-facts">${facts().map(([k, v, d], i) => `<div class="bl-fact" data-testid="${ids[i]}"><small>${esc(k)}</small><b>${esc(v)}</b><span>${esc(d)}</span></div>`).join('')}</div>` +
+    $('#blPlan').innerHTML = planTop() + `<div class="bl-facts">${facts().map(([k, v, d], i) => `<div class="bl-fact" data-testid="${ids[i]}"><small>${esc(k)}</small><b>${esc(v)}</b><span>${esc(d)}</span></div>`).join('')}</div>` +
       `<div class="bl-note">${B.state === 'tester' ? 'When your tester access ends you choose a plan here. Nothing is charged before you do.' : 'Seats follow your Team admins and Employees pages: add someone there and the seat is added here; remove them and it drops off at the next invoice.'}</div>`;
-    $('#acctSub').innerHTML = planTop(true);
   }
   function cardButton(P){
     if (B.state === 'tester') return `<button class="btn btn-ghost" disabled data-testid="bl-switch-${P.key}">Choose when your access ends</button>`;
@@ -267,7 +261,6 @@ JS = r"""  // ---- Billing page ----
   }
   document.addEventListener('click', e => {
     let x;
-    if (e.target.id === 'acctManage' || e.target.closest('#acctManage')) { $('[data-testid="set-rail-billing"]').click(); return; }
     if ((x = e.target.closest('[data-switch]'))) { openSwitch(x.dataset.switch); return; }
     if ((x = e.target.closest('[data-choose]'))) { say(`Stripe checkout for ${PLANS[x.dataset.choose].name} · POST /billing/create-checkout-session`); return; }
     if ((x = e.target.closest('[data-confirm]'))) {

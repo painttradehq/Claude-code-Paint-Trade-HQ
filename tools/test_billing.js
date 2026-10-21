@@ -16,12 +16,11 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     const toast = async () => (await p.locator('#toast').innerText().catch(() => ''));
     const txt = async (id) => (await p.locator(T(id)).innerText());
 
-    // Account page → Manage billing opens the Billing page
+    // Account page: no Subscription section any more, one line points at Billing
     await p.goto(U + '?page=account'); await p.waitForTimeout(500);
-    ok(await p.locator(T('account-subscription-row')).isVisible() && /Small business/.test(await txt('account-plan-title')) && /renews 14 Nov 2026/.test(await txt('account-plan-line')), 'Account › Subscription row shows the plan and its renewal');
-    if (W === 1440) await p.screenshot({ path: path.join(SHOTS, `account-sub-${W}.png`) });
-    await p.locator(T('account-manage-billing')).click(); await p.waitForTimeout(300);
-    ok(await p.locator(T('set-page-billing')).isVisible() && await p.locator(T('set-page-account')).isHidden() && await p.locator(T('set-rail-billing')).evaluate(el => el.classList.contains('on')), '"Manage billing" opens the Billing page inside Settings; the rail follows');
+    ok((await p.locator(T('account-subscription-row')).count()) === 0 && (await p.locator('[data-testid="sec-subscription"]').count()) === 0 && /Subscription moved/.test(await p.locator(T('set-page-account')).innerText()) && !/Subscription/.test(await p.locator(T('set-page-account') + ' .pgs').innerText()), 'Account page has no Subscription section; one line points at Billing');
+    await p.locator(T('account-billing-link')).click(); await p.waitForTimeout(600);
+    ok(await p.locator(T('set-page-billing')).isVisible() && await p.locator(T('set-page-account')).isHidden() && await p.locator(T('set-rail-billing')).evaluate(el => el.classList.contains('on')), 'the line opens the Billing page; the rail follows');
     ok((await p.locator('#pageSub').innerText()).includes('Stripe'), 'the page line changes with the page');
 
     // Your plan

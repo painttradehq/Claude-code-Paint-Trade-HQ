@@ -834,13 +834,8 @@ Three things we care about: turn up on time, keep the site tidy, and speak up ea
 
   <div class="content" id="pgAccount" data-testid="set-page-account" hidden>
     <h2 class="pg">Account</h2>
-    <p class="pgs">Subscription · Profile · Team admins · Security</p>
-    <section class="sec" data-testid="sec-subscription">
-      <h3>Subscription</h3>
-      <p class="sd">Your plan at a glance. Plans, seats, invoices and the payment method live on the Billing page.</p>
-      <div class="bl-plan" id="acctSub" data-testid="account-subscription-row"></div>
-    </section>
-    <div class="soon"><b>As today.</b> Profile, Team admins and Security keep their current content.</div>
+    <p class="pgs">Profile · Team admins · Security</p>
+    <div class="soon"><b>Subscription moved.</b> The plan, the seats, the invoices and the payment method live on the <a href="?page=billing" data-testid="account-billing-link" style="color:var(--accent);font-weight:600">Billing page</a>. Profile, Team admins and Security keep their current content.</div>
   </div>
   <div class="content" id="pgPlatform" data-testid="set-page-platform" hidden>
     <h2 class="pg">Platform</h2>
@@ -1009,7 +1004,7 @@ const params = new URLSearchParams(location.search);
   const joinList = (a) => a.length <= 1 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
   const cap = (t) => t.charAt(0).toUpperCase() + t.slice(1);
 
-  function planTop(forAccount){
+  function planTop(){
     const P = B.cur ? PLANS[B.cur] : null; let pill = ['', ''], title = '', line = '', lineCls = '';
     if (B.state === 'tester') { pill = ['Tester program', 'ok']; title = 'Full access · tester program'; line = `Free until ${TESTER_END} · no billing · invited by Paint Trade HQ`; }
     else if (B.state === 'trial') { pill = ['Free trial', 'warn']; title = `${P.name} · free trial`; line = `9 days left · ends ${TRIAL_END} · no card yet`; }
@@ -1018,8 +1013,7 @@ const params = new URLSearchParams(location.search);
       else if (B.cancelling) line = `Cancels on ${PERIOD_END} · you keep everything until then`;
       else if (B.pending) line = `Switches to ${PLANS[B.pending].name} on ${PERIOD_END} · until then nothing changes`;
       else line = `Active · renews ${PERIOD_END} · Visa ending 4242`; }
-    const acts = forAccount ? `<button class="btn btn-ghost" id="acctManage" data-testid="account-manage-billing">${svg('card')} Manage billing ${svg('arrowr')}</button>` : actions();
-    return `<div class="top"><span class="bl-pill ${pill[1]}" data-testid="${forAccount ? 'account-plan-pill' : 'bl-plan-pill'}">${esc(pill[0])}</span><div class="t"><b data-testid="${forAccount ? 'account-plan-title' : 'bl-plan-title'}">${esc(title)}</b><span class="${lineCls}" data-testid="${forAccount ? 'account-plan-line' : 'bl-plan-line'}">${esc(line)}</span></div><div class="acts">${acts}</div></div>`;
+    return `<div class="top"><span class="bl-pill ${pill[1]}" data-testid="bl-plan-pill">${esc(pill[0])}</span><div class="t"><b data-testid="bl-plan-title">${esc(title)}</b><span class="${lineCls}" data-testid="bl-plan-line">${esc(line)}</span></div><div class="acts">${actions()}</div></div>`;
   }
   function actions(){
     if (B.state === 'tester') return '';
@@ -1044,9 +1038,8 @@ const params = new URLSearchParams(location.search);
   }
   function renderPlan(){
     const ids = ['bl-seat-admins', 'bl-seat-emps', 'bl-next-invoice'];
-    $('#blPlan').innerHTML = planTop(false) + `<div class="bl-facts">${facts().map(([k, v, d], i) => `<div class="bl-fact" data-testid="${ids[i]}"><small>${esc(k)}</small><b>${esc(v)}</b><span>${esc(d)}</span></div>`).join('')}</div>` +
+    $('#blPlan').innerHTML = planTop() + `<div class="bl-facts">${facts().map(([k, v, d], i) => `<div class="bl-fact" data-testid="${ids[i]}"><small>${esc(k)}</small><b>${esc(v)}</b><span>${esc(d)}</span></div>`).join('')}</div>` +
       `<div class="bl-note">${B.state === 'tester' ? 'When your tester access ends you choose a plan here. Nothing is charged before you do.' : 'Seats follow your Team admins and Employees pages: add someone there and the seat is added here; remove them and it drops off at the next invoice.'}</div>`;
-    $('#acctSub').innerHTML = planTop(true);
   }
   function cardButton(P){
     if (B.state === 'tester') return `<button class="btn btn-ghost" disabled data-testid="bl-switch-${P.key}">Choose when your access ends</button>`;
@@ -1126,7 +1119,6 @@ const params = new URLSearchParams(location.search);
   }
   document.addEventListener('click', e => {
     let x;
-    if (e.target.id === 'acctManage' || e.target.closest('#acctManage')) { $('[data-testid="set-rail-billing"]').click(); return; }
     if ((x = e.target.closest('[data-switch]'))) { openSwitch(x.dataset.switch); return; }
     if ((x = e.target.closest('[data-choose]'))) { say(`Stripe checkout for ${PLANS[x.dataset.choose].name} · POST /billing/create-checkout-session`); return; }
     if ((x = e.target.closest('[data-confirm]'))) {
