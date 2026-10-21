@@ -62,6 +62,7 @@ The Billing page sells three plans and two kinds of extra seat, so Stripe needs 
 3. Emergent chat → Secrets: `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_SMALL`, `STRIPE_PRICE_ENTERPRISE`, `STRIPE_PRICE_SEAT_ADMIN`, `STRIPE_PRICE_SEAT_ADMIN_ENTERPRISE`, `STRIPE_PRICE_SEAT_EMPLOYEE`, `STRIPE_PRICE_SEAT_EMPLOYEE_ENTERPRISE`. The existing `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` stay; the old `STRIPE_PRICE_STANDARD_*` / `STRIPE_PRICE_PRO_*` stay too.
 4. Settings → Billing → **Customer portal**: leave payment method and invoice history on, switch plan changes off (the app owns switching).
 5. Decide GST: if the prices are to have GST added on top, turn on Stripe Tax for Australia; if 59 / 179 / 249 are the amounts charged, leave it off. Tell me which, it is §8.5 of the spec.
+6. **The test key (Emergent asked for it after Round 80):** Stripe dashboard → toggle **Test mode** on (top right) → Developers → API keys → copy the **Secret key** that starts with `sk_test_` → Emergent chat → Secrets → `STRIPE_SECRET_KEY` for the preview. Then Developers → Webhooks → add an endpoint for the preview's `/api/billing/webhook` and put its signing secret in `STRIPE_WEBHOOK_SECRET`. With a test key Emergent creates the seven test prices itself and runs checkout end to end with Stripe's test card. Never paste a key into this chat or into any message; the production key stays what it is.
 
 ## After each one
 

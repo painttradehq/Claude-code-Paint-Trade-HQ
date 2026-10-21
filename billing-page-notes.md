@@ -1,4 +1,4 @@
-# Round 80 — Billing: the plans in the app (SENT 21 Oct; Josh uploads `settings-billing.html` with "here")
+# Round 80 — Billing: the plans in the app (SENT 21 Oct; BUILT the same day per the job — `tests/test_r80_billing.py`, `routes/billing_plans.py`, `services/plan_gate.py`, `services/plans.py` exist; the report is to be re-pasted and read; the Stripe flows wait for a test key and the seven price ids — `platform-steps.md` §6)
 
 Prototype: **`settings-billing.html?page=billing`** (Settings rail › Billing; the Account page keeps only a line pointing here), with `&state=trial`, `&state=tester`, `&state=past_due` for the other states. Open at **1440** first, then **1024**. Playwright: `tools/test_billing.js`, **96/96** at both widths. Screenshots: `billing-1440.png`, `billing-cards-1440.png`, `billing-drawer-1440.png`, `billing-compare-1440.png`, `billing-trial-1440.png`, `billing-tester-1440.png`, `billing-1024.png`, `billing-cards-1024.png`.
 
