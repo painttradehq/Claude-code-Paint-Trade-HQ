@@ -118,6 +118,9 @@ input{font-family:inherit}
 .clock-off{margin-top:12px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--warning-bg);color:#5A2E0B;font-size:14px;line-height:1.4}
 .clock-off b{display:block;color:var(--warning);font-size:15px;margin-bottom:2px}
 .clock-nogps{margin-top:12px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--surface-sunken);color:var(--text-secondary);font-size:14px;line-height:1.4}
+.ask-sub{font-size:15px;line-height:1.45;color:var(--text-secondary);margin:0 0 4px}
+.sheet .btn + .btn{margin-top:10px}
+.jobcard-meta .wx{font-size:16px;line-height:1;flex-shrink:0;width:16px;text-align:center}
 .clock-legal{font-size:12.5px;color:var(--text-muted);text-align:center;margin-top:10px;line-height:1.4}
 .clock .btn{margin-top:14px}
 .btn[disabled]{opacity:.7;cursor:default}
@@ -663,6 +666,17 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
       <button class="btn btn-outline" id="pickerCancel" data-testid="crew-clock-picker-cancel">Cancel</button>
     </div>
   </div>
+
+  <!-- follow-up D: the distance question (Settings › Crew app rule "ask"), at sign-in and at sign-out -->
+  <div class="scrim hide" id="ask" data-testid="crew-clock-ask">
+    <div class="sheet" role="dialog" aria-labelledby="askTitle">
+      <div class="sheet-grab"></div>
+      <h2 id="askTitle" data-testid="crew-clock-ask-title"></h2>
+      <p class="ask-sub" id="askSub" data-testid="crew-clock-ask-sub"></p>
+      <button class="btn btn-primary" id="askAnyway" data-testid="crew-clock-ask-anyway"></button>
+      <button class="btn btn-outline" id="askCancel" data-testid="crew-clock-ask-cancel">Cancel</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -674,7 +688,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
 
   // ---- mock data (fixed so the tests are deterministic) ----
   const jobs = [
-    { id: 'j1', name: 'Wattle St repaint', client: 'Linh Nguyen', addr: '14 Wattle St, Brunswick', status: 'now', pill: 'In progress', dates: 'Mon 6 Oct → Fri 17 Oct', crew: ['Mia', 'Tom'],
+    { id: 'j1', name: 'Wattle St repaint', client: 'Linh Nguyen', addr: '14 Wattle St, Brunswick', status: 'now', pill: 'In progress', dates: 'Mon 6 Oct → Fri 17 Oct', crew: ['Mia', 'Tom'], weather: { emoji: '⛅', temp: 21, cond: 'Partly cloudy', rain: 10, wind: 18, max: 23 },
       access: 'Key under the pot plant, alarm code 4471. Biscuit the dog stays in the laundry.',
       work: [
         { area: 'Living room', meta: '5.1 × 4.2 m', lines: [['Walls · 48 m²', 'prep · 2 coats'], ['Ceiling · 21 m²', '1 coat'], ['Skirting & architraves · 19 lm', 'primer · 2 coats']] },
@@ -686,7 +700,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
       paints: [['#F3F1EA', 'Dulux Wash&Wear Low Sheen', 'Natural White · walls'], ['#FDFDFB', 'Dulux Ceiling White', 'White · ceilings'], ['#F7F7F4', 'Dulux Aquanamel Gloss', 'Vivid White · trim and doors']],
       files: [['Strata approval.pdf', 'PDF · 240 KB'], ['Colour schedule.jpg', 'Image · 1.1 MB']],
       photos: 5, reports: [['Fri 10 Oct', '7.5 h · Living room walls second coat, ceiling done', true], ['Thu 9 Oct', '8 h · Prep and first coat living room', true]] },
-    { id: 'j2', name: '2/88 Lygon St, Carlton', client: 'Harrow Strata', addr: '2/88 Lygon St, Carlton', status: 'up', pill: 'Starts Mon 20 Oct', dates: 'Mon 20 Oct → Wed 29 Oct', crew: ['Mia'], site: { name: 'Priya Raman', phone: '0412 555 018' },
+    { id: 'j2', name: '2/88 Lygon St, Carlton', client: 'Harrow Strata', addr: '2/88 Lygon St, Carlton', status: 'up', pill: 'Starts Mon 20 Oct', dates: 'Mon 20 Oct → Wed 29 Oct', crew: ['Mia'], weather: { emoji: '🌧️', temp: 14, cond: 'Light rain', rain: 80, wind: 35, max: 15 }, site: { name: 'Priya Raman', phone: '0412 555 018' },
       access: 'Strata lets us in from 7:30 am. Lift key from the concierge.',
       work: [{ area: 'Whole apartment', meta: '', lines: [['Walls · 120 m²', '2 coats'], ['Ceilings · 62 m²', '1 coat'], ['Trim · 60 lm', 'primer · 2 coats']] }],
       paints: [['#EFE9DD', 'Dulux Wash&Wear Low Sheen', 'Lexicon Quarter · walls']], files: [], photos: 0, reports: [] },
@@ -695,12 +709,17 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
       paints: [['#DCD6CB', 'Dulux Weathershield Low Sheen', 'Tranquil Retreat · boards']], files: [['Site plan.pdf', 'PDF · 90 KB']], photos: 12, reports: [['Fri 3 Oct', '6 h · Final coat eaves, clean-up', true]] },
   ];
   if (q.get('jobs') === '0') jobs.length = 0;
+  if (q.get('weather') === '0') jobs.forEach(j => { delete j.weather; });   // Open-Meteo gave nothing (no pin, or the call failed)
   const state = {
     signedIn: q.get('state') === 'in',
     job: q.get('job') || (jobs.find(x => x.status === 'now') || {}).id || 'general', // the job of the open session
     since: '7:04 am', elapsed: '2 h 35 m',
     offsite: q.get('offsite') === '1',   // the open session was flagged by the backend geofence
     nogps: q.get('nogps') === '1',       // the open session was recorded without a position
+    rule: q.get('rule') || 'flag',       // Settings › Crew app (Round 79): flag (as built) | ask | block
+    radius: 50,                          // the owner's sign-in distance (Round 79: 50 m default, 30 m minimum)
+    far: q.get('far') === '1',           // the next position the phone takes is 820 m from the job
+    gps: q.get('gps') !== '0',           // the phone gives a position (&gps=0: none within 10 s)
     last: 'Last signed out 5:12 pm yesterday · 7 h 50 m · Wattle St repaint',
     busy: false,
     seg: 'now',
@@ -784,7 +803,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
       $('#clockJobChev').classList.toggle('hide', state.job === 'general');
       $('#clockJob').dataset.job = state.job === 'general' ? '' : state.job;
       // off-site: the backend's warning (sign-in) or status.session.outside_radius; wording as the owner's Timesheets
-      $('#clockOff').innerHTML = '<b>820 m off site</b>Further than 100 m from the job. Your hours still count; your employer sees the distance.';
+      $('#clockOff').innerHTML = '<b>820 m off site</b>Further than ' + state.radius + ' m from the job. Your hours still count; your employer sees the distance.';
       $('#clockNoGps').textContent = 'No location from this phone. Your employer sees this sign-in without a position.';
       btn.textContent = state.busy ? 'Getting your location…' : 'Sign out';
       btn.className = 'btn btn-outline';
@@ -820,11 +839,39 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     const forReport = pickFor === 'report';
     closePicker();
     if (forReport) { pickFor = 'clock'; form.job = jobId; const j = jobs.find(x => x.id === jobId); form.team = j ? j.crew.slice() : []; renderReportForm(); return; } state.busy = true; renderClock();
-    setTimeout(() => { state.busy = false; state.signedIn = true; state.job = jobId; state.since = '7:04 am'; state.elapsed = '0 h 00 m'; renderClock(); renderHours(); }, 500);
+    setTimeout(() => { state.busy = false; renderClock(); gate('in', jobId); }, 500);
   }
   function startSignOut(){
     state.busy = true; renderClock();
-    setTimeout(() => { state.busy = false; state.signedIn = false; state.last = 'Last signed out 9:39 am today · ' + state.elapsed + ' · ' + jobName(state.job); state.offsite = false; state.nogps = false; renderClock(); renderHours(); }, 500);
+    setTimeout(() => { state.busy = false; renderClock(); gate('out', state.job); }, 500);
+  }
+  // Follow-up D — Settings › Crew app (Round 79): the backend measures the distance at sign-in AND at sign-out.
+  // Rule flag: record and show (as C3). Rule ask: the route answers 409 {type: off_site | no_gps, distance_m, radius_m}
+  // and nothing is written → this sheet → "anyway" re-posts the same body with confirmed: true → recorded and flagged.
+  // Rule block: the sign-in is refused (409, no "anyway"); a sign-out is never refused — it asks — so nobody is stuck on the clock.
+  const dist = '820 m';
+  let ask = null;
+  function gate(action, jobId){
+    const onJob = jobId !== 'general';                                      // General has no pin: nothing to measure
+    const kind = !state.gps ? 'nogps' : (state.far && onJob) ? 'far' : null;
+    if (!kind || state.rule === 'flag') { finish(action, jobId, kind); return; }
+    const block = state.rule === 'block' && action === 'in';
+    const verb = action === 'in' ? 'sign in' : 'sign out', noun = action === 'in' ? 'sign-in' : 'sign-out';
+    $('#askTitle').textContent = kind === 'far' ? "You're " + dist + ' from the job' : "We can't find your location";
+    $('#askSub').textContent = block
+      ? (kind === 'far' ? 'Your employer only allows sign-ins within ' + state.radius + ' m of the job. Get closer and try again.' : 'Your employer only allows sign-ins with a location. Check that location is on for this app and try again.')
+      : (kind === 'far' ? 'Your employer sees the distance if you ' + verb + ' from here.' : 'Check that location is on for this app. Your employer sees this ' + noun + ' without a position if you go on.');
+    $('#askAnyway').textContent = action === 'in' ? 'Sign in anyway' : 'Sign out anyway';
+    $('#askAnyway').classList.toggle('hide', block);
+    $('#askCancel').textContent = block ? 'OK' : 'Cancel';
+    ask = { action, jobId, kind };
+    $('#ask').classList.remove('hide');
+  }
+  function closeAsk(){ $('#ask').classList.add('hide'); ask = null; }
+  function finish(action, jobId, kind){
+    if (action === 'in') { state.signedIn = true; state.job = jobId; state.since = '7:04 am'; state.elapsed = '0 h 00 m'; state.offsite = kind === 'far'; state.nogps = kind === 'nogps'; }
+    else { state.signedIn = false; state.last = 'Last signed out 9:39 am today · ' + state.elapsed + ' · ' + jobName(state.job); state.offsite = false; state.nogps = false; }
+    renderClock(); renderHours();
   }
   // ---- My hours ----
   function renderHours(){
@@ -878,10 +925,20 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     if (state.signedIn && state.job !== 'general' && jobs.find(j => j.id === state.job)) return state.job;   // the open clock session's job
     const now = jobs.find(j => j.status === 'now'); return now ? now.id : 'general';
   }
+  // GET /projects/mine/{id}/weather → the chips a new report starts with (the crew can change them; an edit keeps what was stored)
+  function wxChips(j){
+    const w = j && j.weather; if (!w) return [];
+    const c = w.cond.toLowerCase(), out = [];
+    if (/rain|drizzle|shower|thunder|snow/.test(c)) out.push('Rainy'); else if (/cloud|overcast|fog/.test(c)) out.push('Cloudy'); else out.push('Sunny');
+    if (w.wind >= 30) out.push('Windy');
+    if (w.max >= 30) out.push('Hot'); else if (w.max <= 12) out.push('Cold');
+    return out;
+  }
   function openReportNew(projectId, editOf){
     const r = editOf ? reports.find(x => x.id === editOf) : null;
+    const jid = defaultJob(projectId);
     Object.assign(form, r ? { job: r.job, site: r.job === 'general' ? r.title : '', hours: String(r.hours ?? ''), done: r.done.length ? r.done.slice() : [''], photos: r.photos, problem: !!r.problems, problemText: r.problems, weather: r.weather.slice(), team: r.team.slice(), extra: '', tomorrow: r.tomorrow.length ? r.tomorrow.slice() : [''], checklist: Object.assign({}, r.checklist), notes: r.notes, editing: r.id, tried: false }
-      : { job: defaultJob(projectId), site: '', hours: state.signedIn ? '2.6' : '7.5', done: [''], photos: 0, problem: false, problemText: '', weather: [], team: null, extra: '', tomorrow: [''], checklist: {}, notes: '', editing: null, tried: false });
+      : { job: jid, site: '', hours: state.signedIn ? '2.6' : '7.5', done: [''], photos: 0, problem: false, problemText: '', weather: wxChips(jobs.find(x => x.id === jid)), team: null, extra: '', tomorrow: [''], checklist: {}, notes: '', editing: null, tried: false });
     if (form.team === null) { const j = jobs.find(x => x.id === form.job); form.team = j ? j.crew.slice() : []; }
     $('#rfTitle').textContent = r ? 'Edit report' : "Today's report";
     $('#rfDate').textContent = r ? r.day + ' · sent ' + r.sent : 'Saturday 11 October';
@@ -966,6 +1023,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     el.innerHTML = `
       <button class="card jobcard" data-testid="crew-today-jobcard" data-job="${j.id}">
         <div class="jobcard-top"><div><div class="jobcard-name">${esc(j.name)}</div><div class="jobcard-addr">${esc(subOf(j))}</div></div><span class="pill ${j.status === 'now' ? 'live' : 'soon'}">${esc(j.pill)}</span></div>
+        ${j.weather ? `<div class="jobcard-meta" data-testid="crew-today-weather"><span class="wx">${j.weather.emoji}</span><span>${j.weather.temp}° · ${esc(j.weather.cond)} · ${j.weather.rain}% rain</span></div>` : ''}
         <div class="jobcard-meta"><svg><use href="#i-people"/></svg><span>${others.length ? esc(others.join(', ')) + ' with you' : 'Just you on this job'}</span></div>
         ${j.access ? `<div class="jobcard-meta"><svg><use href="#i-alert"/></svg><span>${esc(j.access)}</span></div>` : ''}
         <div class="jobcard-acts"><span class="btn btn-outline btn-sm" data-testid="crew-today-directions">Directions</span><span class="btn btn-primary btn-sm">Open job</span></div>
@@ -1051,6 +1109,8 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   document.querySelectorAll('#jobsSeg button').forEach(b => b.addEventListener('click', () => { state.seg = b.dataset.seg; renderJobs(); }));
   $('#clockBtn').addEventListener('click', () => { if (state.busy) return; state.signedIn ? startSignOut() : openPicker(); });
   $('#pickerCancel').addEventListener('click', closePicker);
+  $('#askCancel').addEventListener('click', closeAsk);
+  $('#askAnyway').addEventListener('click', () => { if (!ask) return; const a = ask; closeAsk(); finish(a.action, a.jobId, a.kind); });
   $('#picker').addEventListener('click', (e) => { if (e.target === $('#picker')) closePicker(); });
   $('#hoursBack').addEventListener('click', closeHours);
   $('#reportsBack').addEventListener('click', closeReports);

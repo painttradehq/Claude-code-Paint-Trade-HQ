@@ -1,4 +1,4 @@
-// Crew shell prototype (C1 shell + C2 Jobs + C3 time clock + C4 daily report + C5 documents) — Playwright checks at 390 × 844 then 360 × 800.
+// Crew shell prototype (C1 shell + C2 Jobs + C3 time clock + C4 daily report + C5 documents + follow-up D distance question and weather) — Playwright checks at 390 × 844 then 360 × 800.
 // Run: NODE_PATH=$(npm root -g) node tools/test_c1.js [shots-dir]
 const { chromium } = require('playwright');
 const T = (id) => `[data-testid="${id}"]`;
@@ -198,7 +198,7 @@ async function run(b, W, H, tag) {
   ok('deep link: restricted error on login' + full, await p.locator(T('employee-login-error')).isVisible());
   // ---- C3 deep links ----
   await p.goto(U + '?screen=app&tab=today&state=in&offsite=1'); await p.waitForTimeout(300);
-  ok('off-site sign-in: the card says how far and that the hours still count, in the owner\'s words' + full, await p.locator(T('crew-clock-offsite')).isVisible() && (await txt(T('crew-clock-offsite'))) === '820 m off siteFurther than 100 m from the job. Your hours still count; your employer sees the distance.' && /2 h 35 m on the clock/.test(await txt('#clockBig')));
+  ok('off-site sign-in: the card says how far and that the hours still count, in the owner\'s words' + full, await p.locator(T('crew-clock-offsite')).isVisible() && (await txt(T('crew-clock-offsite'))) === '820 m off siteFurther than 50 m from the job. Your hours still count; your employer sees the distance.' && /2 h 35 m on the clock/.test(await txt('#clockBig')));
   ok('off-site card still fits: content ends above the tab bar' + full, await p.evaluate(() => { const c = document.getElementById('clock').getBoundingClientRect(); const tab = document.querySelector('.tabbar').getBoundingClientRect().top; return c.bottom <= tab; }));
   await p.screenshot({ path: OUT + `c3-today-offsite-${tag}.png` });
   await p.goto(U + '?screen=app&tab=today&state=in&nogps=1'); await p.waitForTimeout(300);
@@ -220,6 +220,69 @@ async function run(b, W, H, tag) {
   ok('deep link: the locked previous week' + full, (await txt(T('crew-hours-week-pill'))) === 'Locked' && (await txt('#wkSub')) === 'Mon 29 Sep – Sun 5 Oct');
   await p.goto(U + '?screen=app&tab=today&picker=1'); await p.waitForTimeout(300);
   ok('deep link: the job sheet open over Today' + full, await p.locator(T('crew-clock-picker')).isVisible() && (await p.locator(T('crew-clock-pick')).count()) === 3);
+  // ---- Follow-up D: the distance question (rule ask / block), and the weather line ----
+  const ASK = T('crew-clock-ask');
+  const signInFirst = async (wait) => { await p.click(T('crew-today-clock-btn')); await p.waitForTimeout(100); await p.locator(T('crew-clock-pick')).first().click(); await p.waitForTimeout(wait || 700); };
+  await p.goto(U + '?screen=app&tab=today&rule=ask&far=1'); await p.waitForTimeout(300);
+  await signInFirst();
+  ok('rule ask, 820 m away: after the location fix the question sheet opens; nothing is signed in yet' + full, await p.locator(ASK).isVisible() && (await txt(T('crew-clock-ask-title'))) === "You're 820 m from the job" && (await txt(T('crew-clock-ask-sub'))) === 'Your employer sees the distance if you sign in from here.' && (await txt(T('crew-clock-ask-anyway'))) === 'Sign in anyway' && (await txt(T('crew-clock-ask-cancel'))) === 'Cancel' && /Signed out/.test(await txt('#clockStatus')) && (await txt(T('crew-today-clock-btn'))) === 'Sign in');
+  ok('the sheet buttons are at least 44 px tall; no horizontal scroll' + full, (await box(T('crew-clock-ask-anyway'))).height >= 44 && (await box(T('crew-clock-ask-cancel'))).height >= 44 && await noHScroll());
+  await p.screenshot({ path: OUT + `d-ask-in-${tag}.png` });
+  await p.click(T('crew-clock-ask-cancel')); await p.waitForTimeout(100);
+  ok('Cancel: the sheet closes and nothing was recorded' + full, !(await p.locator(ASK).isVisible()) && /Signed out/.test(await txt('#clockStatus')) && !(await p.locator(T('crew-clock-offsite')).isVisible()));
+  await signInFirst(); await p.click(T('crew-clock-ask-anyway')); await p.waitForTimeout(100);
+  ok('Sign in anyway: signed in, the amber block with the owner\'s 50 m distance' + full, !(await p.locator(ASK).isVisible()) && /Signed in/.test(await txt('#clockStatus')) && await p.locator(T('crew-clock-offsite')).isVisible() && (await txt(T('crew-clock-offsite'))) === '820 m off siteFurther than 50 m from the job. Your hours still count; your employer sees the distance.' && (await txt(T('crew-today-clock-btn'))) === 'Sign out');
+  await p.click(T('crew-today-clock-btn')); await p.waitForTimeout(700);
+  ok('sign-out is measured too: the same question with "Sign out anyway"; still signed in behind it' + full, await p.locator(ASK).isVisible() && (await txt(T('crew-clock-ask-title'))) === "You're 820 m from the job" && (await txt(T('crew-clock-ask-sub'))) === 'Your employer sees the distance if you sign out from here.' && (await txt(T('crew-clock-ask-anyway'))) === 'Sign out anyway' && /Signed in/.test(await txt('#clockStatus')));
+  await p.screenshot({ path: OUT + `d-ask-out-${tag}.png` });
+  await p.click(T('crew-clock-ask-cancel')); await p.waitForTimeout(100);
+  ok('Cancel at sign-out: still on the clock' + full, !(await p.locator(ASK).isVisible()) && /Signed in/.test(await txt('#clockStatus')) && (await txt(T('crew-today-clock-btn'))) === 'Sign out');
+  await p.click(T('crew-today-clock-btn')); await p.waitForTimeout(700); await p.click(T('crew-clock-ask-anyway')); await p.waitForTimeout(100);
+  ok('Sign out anyway: signed out with the hours and the job, no amber block' + full, /Signed out/.test(await txt('#clockStatus')) && (await txt('#clockLine')) === 'Last signed out 9:39 am today · 0 h 00 m · Wattle St repaint' && !(await p.locator(T('crew-clock-offsite')).isVisible()));
+  await p.goto(U + '?screen=app&tab=today&rule=ask&gps=0'); await p.waitForTimeout(300);
+  await signInFirst();
+  ok('rule ask, no position: "We can\'t find your location" with Sign in anyway / Cancel' + full, await p.locator(ASK).isVisible() && (await txt(T('crew-clock-ask-title'))) === "We can't find your location" && (await txt(T('crew-clock-ask-sub'))) === 'Check that location is on for this app. Your employer sees this sign-in without a position if you go on.' && (await txt(T('crew-clock-ask-anyway'))) === 'Sign in anyway');
+  await p.screenshot({ path: OUT + `d-ask-nogps-${tag}.png` });
+  await p.click(T('crew-clock-ask-anyway')); await p.waitForTimeout(100);
+  ok('…anyway: signed in with the grey no-position line, no amber block' + full, /Signed in/.test(await txt('#clockStatus')) && await p.locator(T('crew-clock-nogps')).isVisible() && !(await p.locator(T('crew-clock-offsite')).isVisible()));
+  await p.goto(U + '?screen=app&tab=today&rule=ask&far=1'); await p.waitForTimeout(300);
+  await p.click(T('crew-today-clock-btn')); await p.waitForTimeout(100); await p.locator(T('crew-clock-pick')).nth(2).click(); await p.waitForTimeout(700);
+  ok('General has no pin: no question, signed in to General' + full, !(await p.locator(ASK).isVisible()) && /Signed in/.test(await txt('#clockStatus')) && /Job: General/.test(await txt(T('crew-today-job'))));
+  await p.goto(U + '?screen=app&tab=today&rule=flag&far=1'); await p.waitForTimeout(300);
+  await signInFirst();
+  ok('rule flag (as built): no question, signed in and flagged' + full, !(await p.locator(ASK).isVisible()) && /Signed in/.test(await txt('#clockStatus')) && await p.locator(T('crew-clock-offsite')).isVisible());
+  await p.goto(U + '?screen=app&tab=today&rule=block&far=1'); await p.waitForTimeout(300);
+  await signInFirst();
+  ok('rule block, 820 m away: the sign-in is refused — one OK button, no "anyway"' + full, await p.locator(ASK).isVisible() && (await txt(T('crew-clock-ask-title'))) === "You're 820 m from the job" && (await txt(T('crew-clock-ask-sub'))) === 'Your employer only allows sign-ins within 50 m of the job. Get closer and try again.' && !(await p.locator(T('crew-clock-ask-anyway')).isVisible()) && (await txt(T('crew-clock-ask-cancel'))) === 'OK');
+  await p.screenshot({ path: OUT + `d-block-${tag}.png` });
+  await p.click(T('crew-clock-ask-cancel')); await p.waitForTimeout(100);
+  ok('OK: still signed out' + full, !(await p.locator(ASK).isVisible()) && /Signed out/.test(await txt('#clockStatus')));
+  await p.goto(U + '?screen=app&tab=today&rule=block&gps=0'); await p.waitForTimeout(300);
+  await signInFirst();
+  ok('rule block, no position: refused with the location hint' + full, await p.locator(ASK).isVisible() && (await txt(T('crew-clock-ask-sub'))) === 'Your employer only allows sign-ins with a location. Check that location is on for this app and try again.' && !(await p.locator(T('crew-clock-ask-anyway')).isVisible()));
+  await p.goto(U + '?screen=app&tab=today&rule=block&state=in&far=1'); await p.waitForTimeout(300);
+  await p.click(T('crew-today-clock-btn')); await p.waitForTimeout(700);
+  ok('rule block never refuses a sign-out: it asks, with Sign out anyway' + full, await p.locator(ASK).isVisible() && (await txt(T('crew-clock-ask-anyway'))) === 'Sign out anyway' && (await txt(T('crew-clock-ask-cancel'))) === 'Cancel');
+  await p.click(T('crew-clock-ask-anyway')); await p.waitForTimeout(100);
+  ok('…and signs out' + full, /Signed out/.test(await txt('#clockStatus')));
+  // weather
+  await p.goto(U + '?screen=app&tab=today'); await p.waitForTimeout(300);
+  ok("today's job card: the weather line for the job's suburb" + full, await p.locator(T('crew-today-weather')).isVisible() && (await txt(T('crew-today-weather'))) === '⛅21° · Partly cloudy · 10% rain');
+  await p.screenshot({ path: OUT + `d-today-weather-${tag}.png` });
+  await p.click(T('crew-today-report')); await p.waitForTimeout(150); await p.click(T('crew-reports-new')); await p.waitForTimeout(150);
+  ok('a new report starts with the chips for today\'s weather (Cloudy), which the crew can change' + full, (await p.locator(T('crew-report-weather') + ' .chip.on').count()) === 1 && (await p.locator(T('crew-report-weather') + ' .chip.on').first().textContent()) === 'Cloudy');
+  await p.locator(T('crew-report-weather') + ' .chip').nth(0).click(); await p.waitForTimeout(80);
+  ok('…tapping Sunny adds it' + full, (await p.locator(T('crew-report-weather') + ' .chip.on').count()) === 2);
+  await p.goto(U + '?screen=report-new&project=j2'); await p.waitForTimeout(300);
+  ok('a rainy, windy forecast preselects Rainy and Windy' + full, (await p.locator(T('crew-report-weather') + ' .chip.on').count()) === 2 && /Rainy/.test(await txt(T('crew-report-weather') + ' .chip.on')) && (await p.locator(T('crew-report-weather') + ' .chip.on').nth(1).textContent()) === 'Windy');
+  await p.goto(U + '?screen=report&id=r1'); await p.waitForTimeout(300); await p.click(T('crew-report-edit')).catch(() => {}); await p.waitForTimeout(150);
+  await p.goto(U + '?screen=app&tab=today&weather=0'); await p.waitForTimeout(300);
+  ok('no forecast (no pin, or Open-Meteo failed): no weather line, and a new report starts with no chips' + full, !(await p.locator(T('crew-today-weather')).isVisible()));
+  await p.click(T('crew-today-report')); await p.waitForTimeout(150); await p.click(T('crew-reports-new')); await p.waitForTimeout(150);
+  ok('…no chips preselected' + full, (await p.locator(T('crew-report-weather') + ' .chip.on').count()) === 0);
+  await p.goto(U + '?screen=report-new&jobs=0'); await p.waitForTimeout(300);
+  ok('General: no chips preselected' + full, (await p.locator(T('crew-report-weather') + ' .chip.on').count()) === 0);
+
   // ---- C4 deep links ----
   await p.goto(U + '?screen=reports&reports=0'); await p.waitForTimeout(300);
   ok('reports empty state' + full, await p.locator(T('crew-reports-empty')).isVisible() && (await txt(T('crew-reports-empty'))) === 'No reports yet. Your first one goes here.' && await p.locator(T('crew-reports-new')).isVisible());
