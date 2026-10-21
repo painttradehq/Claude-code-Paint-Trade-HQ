@@ -42,7 +42,7 @@ Dashboard free for everyone. Starter 59 (1 admin + 3 employees), Middle 179 (2 +
 5. The middle plan's name ("Middle" in your note). "Team"? "Business"?
 6. Migration "paid add-on below Pro": a fixed price, or quoted?
 
-When these are answered, the Billing page gets a prototype and the round a spec. Nothing changes in the app before then; Check 3 of the admin checks records what the billing page does today.
+**Answered 21 October:** (1) no free tier — testers only, with everything; (2) no annual prices yet; (3) 14 days on Enterprise; (4) keep working and bill the extra seats (default, to confirm); (5) Starter / Small business / Enterprise; (6) quoted. The prototype and the Round 80 spec are in **`billing-page-notes.md`**; the Manage billing page (§6 below) is its §2.
 
 ## 6. Parked 21 October — the Manage billing page (Josh)
 

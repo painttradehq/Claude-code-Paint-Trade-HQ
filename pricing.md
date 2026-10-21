@@ -1,6 +1,6 @@
 # Paint Trade HQ — pricing (decided by Josh, 11 October 2026)
 
-All prices AUD per month. Dashboard is free for everyone. This is the decision of record; nothing in the app changes until a billing round is asked for.
+All prices AUD per month. This is the decision of record; nothing in the app changes until the billing round is built. **Updated 21 October:** there is **no free tier** — three packages only; the only free businesses are testers invited by Paint Trade HQ, with access to everything. The names are **Starter / Small business / Enterprise** ("Middle" and "Pro" below are the old names for the same two plans). The 21 October decisions are at the end.
 
 ## Josh's text, verbatim
 
@@ -50,3 +50,12 @@ All prices AUD per month. Dashboard is free for everyone. This is the decision o
 - The crew app: employee seats count crew sign-ins; Pro counts **active** employees, so "active" needs a definition in that round (suggested: an employee who is not ended and not red-flagged).
 - Marketing pages and the deck (A15), the What's new for the launch, the Terms (§ on fees) when the lawyer's text comes back.
 - The data-migration add-on price for Starter and Middle is not set yet.
+
+## Decisions, 21 October (Josh, for the billing round — `billing-page-notes.md`)
+
+1. No free tier. Three packages: Starter 59, Small business 179, Enterprise 249. Testers invited by Paint Trade HQ have full access, free, until their invite ends.
+2. No annual prices yet.
+3. Trial: 14 days on Enterprise, no card.
+4. Over the seat count after a downgrade: keep working, bill the extra seats, show the count (default; Josh to confirm).
+5. Data migration below Enterprise: quoted.
+6. Open: are the prices the amount charged (GST included) or is GST added on top?

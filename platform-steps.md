@@ -53,6 +53,16 @@ Needed before Settings › Business › Accounting › Connect can work.
 4. Emergent → Manage Publishes → **Secrets**: `XERO_CLIENT_ID`, `XERO_CLIENT_SECRET`. **Redeploy**.
 5. Live app → Settings › Business › Accounting → **Connect** → sign in to Xero → choose the organisation. Check 3 of the admin checks then confirms an invoice pushes.
 
+## 6. Stripe prices for the billing round (before "send 80")
+
+The Billing page sells three plans and two kinds of extra seat, so Stripe needs seven recurring prices. Do it in **test mode** first (the toggle at the top of the Stripe dashboard), give Emergent the test ids for the preview, and repeat in live mode before publishing.
+
+1. Stripe dashboard → Product catalogue → **Add product**, one product per line, each with one recurring monthly price in AUD: Starter 59 · Small business 179 · Enterprise 249 · Extra admin seat 25 · Extra admin seat (Enterprise) 42 · Extra employee seat 15 · Extra employee seat (Enterprise) 25.
+2. Open each price and copy its id (it starts with `price_`).
+3. Emergent chat → Secrets: `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_SMALL`, `STRIPE_PRICE_ENTERPRISE`, `STRIPE_PRICE_SEAT_ADMIN`, `STRIPE_PRICE_SEAT_ADMIN_ENTERPRISE`, `STRIPE_PRICE_SEAT_EMPLOYEE`, `STRIPE_PRICE_SEAT_EMPLOYEE_ENTERPRISE`. The existing `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` stay; the old `STRIPE_PRICE_STANDARD_*` / `STRIPE_PRICE_PRO_*` stay too.
+4. Settings → Billing → **Customer portal**: leave payment method and invoice history on, switch plan changes off (the app owns switching).
+5. Decide GST: if the prices are to have GST added on top, turn on Stripe Tax for Australia; if 59 / 179 / 249 are the amounts charged, leave it off. Tell me which, it is §8.5 of the spec.
+
 ## After each one
 
 Say which step is done, or paste the exact error. Also press **Save to GitHub** in Emergent after each publish, so the code copy stays current.
