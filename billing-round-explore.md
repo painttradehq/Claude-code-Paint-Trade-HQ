@@ -43,3 +43,15 @@ Dashboard free for everyone. Starter 59 (1 admin + 3 employees), Middle 179 (2 +
 6. Migration "paid add-on below Pro": a fixed price, or quoted?
 
 When these are answered, the Billing page gets a prototype and the round a spec. Nothing changes in the app before then; Check 3 of the admin checks records what the billing page does today.
+
+## 6. Parked 21 October — the Manage billing page (Josh)
+
+Josh: "In Settings › Account there is a Manage billing section which is not functional because it is not wired yet. It needs to become a page, Manage billing. All three tiers are on it (starter, small business, enterprise); each tier well explained with the benefits of switching to it; the one the user is on is highlighted; a bit more information, like a website."
+
+**What that section does today (Round 64 code, `components/settings/pages/AccountPage.tsx`):** one row with the plan pill (Free / Standard / Pro / Tester program), a status line (trial ends, renews, cancels, payment failed) and one button. On a paid plan the button is **Manage billing**, which opens Stripe's hosted customer portal (`POST /billing/customer-portal`); it needs a Stripe customer on the business and a configured Stripe key, otherwise the error line shows ("No Stripe customer yet" or "The billing portal is not available right now") — that is why it looks unwired. On the free plan the button is **Upgrade**, which leaves Settings for the old full-screen `/admin/pricing` page: two plans only (Standard, Pro), monthly or yearly, a 14-day trial line, Stripe checkout. Below the row: Member since · Team admins · Storage in use.
+
+**What the page becomes (to prototype when the billing round starts):** Settings › Account › **Manage billing** opens as a page in the Settings shell (not Stripe, not the old pricing screen): the current plan at the top with its renewal or trial line, seats used of included, and the add-ons; then the three plan cards side by side at 1440, each with the price, who it is for, what it includes and what switching gains ("Switching to … adds: …"), the current plan highlighted with "Your plan"; Change plan → Stripe checkout or the portal; Cancel; invoices; a monthly / yearly toggle only if annual prices exist (§5.2). Written like a pricing page on a website, with the full feature list from `pricing.md` §"The same thing as a table". Mobile stacks the cards. The old `/admin/pricing` screen is retired and the Upgrade button points at the new page.
+
+**One thing to settle before the prototype:** the plan names. `pricing.md` says Starter 59 / Middle 179 / Pro 249 (Middle's name was §5.5's open question); today's note says "starter, small business, enterprise". Josh to confirm the three names; the prices and inclusions stay as `pricing.md`.
+
+This page is part of the billing round (§4.2), not a round on its own: the cards need the plan table, the seats and the Stripe products to show true numbers.
