@@ -293,6 +293,11 @@ async function run(b, W, H, tag) {
   ok('onboarding: no business profile → "Join the team"' + full, (await txt(T('crew-onb-title'))) === 'Join the team' && (await p.locator(T('crew-onb-video')).count()) === 0);
   await p.goto(U + '?screen=onboarding&culture=0&step=3'); await p.waitForTimeout(300);
   ok('onboarding: no culture content → four steps' + full, (await txt(T('crew-onb-step'))) === 'Step 3 of 4');
+  await p.goto(U + '?screen=onboarding&step=5&agree=1&dup=1'); await p.waitForTimeout(300);
+  await p.click(T('crew-onb-join')); await p.waitForTimeout(150);
+  ok('onboarding: an email already on the team → the one card with Sign in' + full, /already on Sano Painting/.test(await txt(T('crew-onb-dup'))) && await p.locator(T('crew-onb-dup-signin')).isVisible() && (await p.locator(T('crew-onb-done')).count()) === 0);
+  await p.click(T('crew-onb-dup-signin')); await p.waitForTimeout(150);
+  ok('onboarding: that Sign in opens the crew sign-in with the email filled' + full, await p.locator(T('crew-login')).isVisible() && (await p.locator(T('employee-login-email')).inputValue()) === 'mia@example.com');
   await p.goto(U + '?screen=onboarding&finish=1'); await p.waitForTimeout(300);
   ok('finish mode: "Finish setting up", the video, no Sign in link' + full, (await txt(T('crew-onb-title'))) === 'Finish setting up' && await p.locator(T('crew-onb-video')).isVisible() && (await p.locator(T('crew-onb-signin')).count()) === 0);
   await p.click(T('crew-onb-start')); await p.waitForTimeout(150);

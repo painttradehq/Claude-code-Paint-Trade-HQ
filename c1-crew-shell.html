@@ -1224,7 +1224,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     } else if (n === 5) {
       const bn = biz ? esc(biz.business_name) : 'your employer';
       body = `<div class="sect">Before you ${onb.finish ? 'start' : 'join'}</div><div class="card facts"><div><span class="ico"><svg><use href="#i-people"/></svg></span><span><b>${bn} sees your details</b>Your name, contact details, documents, hours and reports go to ${bn}. Paint Trade HQ stores them for that business.</span></div><div><span class="ico"><svg><use href="#i-pin"/></svg></span><span><b>Location at sign-in and sign-out only</b>Your location is recorded when you sign in or out of a job, never in between.</span></div><div><span class="ico"><svg><use href="#i-file"/></svg></span><span><b>Your documents stay private</b>Your licences and signed documents are never shared by link. Only ${bn} and you can open them.</span></div></div>
-        <button class="agree ${onb.agree ? 'on' : ''} ${e.agree ? 'bad' : ''}" data-testid="crew-onb-agree" data-onb="agree" role="checkbox" aria-checked="${onb.agree}"><span class="box">${onb.agree ? '✓' : ''}</span><span class="at">I've read and agree to the <a href="#" data-testid="crew-onb-terms" data-legal="/terms">Terms of Service</a> and the <a href="#" data-testid="crew-onb-privacy" data-legal="/privacy">Privacy Policy</a>.</span></button><div class="fld">${err('agree')}</div>`;
+        <button class="agree ${onb.agree ? 'on' : ''} ${e.agree ? 'bad' : ''}" data-testid="crew-onb-agree" data-onb="agree" role="checkbox" aria-checked="${onb.agree}"><span class="box">${onb.agree ? '✓' : ''}</span><span class="at">I've read and agree to the <a href="#" data-testid="crew-onb-terms" data-legal="/terms">Terms of Service</a> and the <a href="#" data-testid="crew-onb-privacy" data-legal="/privacy">Privacy Policy</a>.</span></button><div class="fld">${err('agree')}</div>${onb.dup ? `<div class="card" style="padding:14px 16px;margin-top:12px;border-color:var(--danger)" data-testid="crew-onb-dup"><div style="font-size:15px;font-weight:600;color:var(--danger)">That email is already on ${biz ? esc(biz.business_name) : 'the team'}.</div><div class="hint" style="margin:4px 0 10px">If ${biz ? esc(biz.owner_name.split(' ')[0]) : 'your employer'} added you, sign in with the password from your email and finish setting up there.</div><button class="btn btn-outline btn-sm" style="width:auto;padding:0 18px;display:inline-flex" data-testid="crew-onb-dup-signin" data-onb="signin">Sign in</button></div>` : ''}`;
       bar = `<button class="btn btn-primary" data-testid="crew-onb-join" data-onb="next">${onb.finish ? "I'm done" : 'Join the team'}</button>`;
     } else {
       body = onb.finish
@@ -1247,6 +1247,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   function onbNext(){
     onb.tried = true; const e = onbErrors();
     if (Object.keys(e).length) { renderOnb(); const b = $('#onbBody .bad, #onbBody .ds.bad'); if (b) b.scrollIntoView({ block: 'center' }); return; }
+    if (onb.step === 5 && !onb.finish && q.get('dup') === '1') { onb.dup = true; renderOnb(); return; }
     onb.tried = false; onb.step = Math.min(nextStep(onb.step), 6); renderOnb();
   }
 
