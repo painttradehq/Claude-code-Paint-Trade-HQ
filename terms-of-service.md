@@ -4,7 +4,7 @@
 
 > Brought up to date on 22 October 2026 with the legal advice of 21 October 2026 (M & B Legal).
 
-These terms are a contract between you and **Paint Trade HQ** ("we", "us", "the developers"), of Melbourne, Victoria, for the use of the Paint Trade HQ web app, employee app, client links and related services (the "Service" or "the app").
+These terms are a contract between you and **Josh Sano Painting and Decorating**, trading as Paint Trade HQ ("we", "us", "the developers", "Paint Trade HQ"), of Melbourne, Victoria, for the use of the Paint Trade HQ web app, employee app, client links and related services (the "Service" or "the app").
 
 By creating an account and ticking the agreement box, or by using the Service, you agree to these terms. If you are creating an account for a business, you confirm you are authorised to bind that business, and "you" means that business.
 
@@ -102,6 +102,6 @@ These terms are governed by the laws of Victoria, Australia, and the courts of t
 
 ## 16. Contact
 
-Paint Trade HQ · Melbourne, Victoria · software@joshsano.com.au
+Josh Sano Painting and Decorating, trading as Paint Trade HQ · Melbourne, Victoria · software@joshsano.com.au
 
-© 2026 Paint Trade HQ. All rights reserved.
+© 2026 Josh Sano Painting and Decorating, trading as Paint Trade HQ. All rights reserved.
