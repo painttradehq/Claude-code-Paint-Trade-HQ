@@ -1,4 +1,4 @@
-# Stripe test mode — the seven prices and the preview webhook (created 22 Oct 2026)
+# Stripe test mode — the seven prices and the preview webhook (created 22 Oct 2026; prices re-created the same day for GST on top)
 
 Created through the Stripe connector in **test mode** on the "Paint Trade HQ" Stripe account. No live-mode object was touched. Price ids and product ids are not secrets; the secret key and the webhook signing secret are, and they are **not** in this file or in any chat.
 
@@ -6,15 +6,15 @@ Created through the Stripe connector in **test mode** on the "Paint Trade HQ" St
 
 | Secret name (preview) | Price id | Product | AUD a month |
 |---|---|---|---|
-| `STRIPE_PRICE_STARTER` | `price_1UTDKV0makc3HAyOilRYTlkn` | Starter (`prod_VUBhb0Kc72tVpw`) | 59 |
-| `STRIPE_PRICE_SMALL` | `price_1UTDKm0makc3HAyOU1yx4djm` | Small business (`prod_VUBi3TYvmwTdQh`) | 179 |
-| `STRIPE_PRICE_ENTERPRISE` | `price_1UTDKp0makc3HAyOzAli3eGs` | Enterprise (`prod_VUBigXmwThBxpG`) | 249 |
-| `STRIPE_PRICE_SEAT_ADMIN` | `price_1UTDLO0makc3HAyOcyItVaLN` | Extra admin seat (`prod_VUBiGrBdnfjtLw`) | 25 |
-| `STRIPE_PRICE_SEAT_ADMIN_ENTERPRISE` | `price_1UTDLb0makc3HAyOblxyA5br` | Extra admin seat, Enterprise (`prod_VUBjyF3e4RDeib`) | 42 |
-| `STRIPE_PRICE_SEAT_EMPLOYEE` | `price_1UTDLj0makc3HAyO4Ev5Kzfi` | Extra employee seat (`prod_VUBjA8EIxToibx`) | 15 |
-| `STRIPE_PRICE_SEAT_EMPLOYEE_ENTERPRISE` | `price_1UTDLq0makc3HAyOA3mISymt` | Extra employee seat, Enterprise (`prod_VUBjTwutRQoERy`) | 25 |
+| `STRIPE_PRICE_STARTER` | `price_1UTDmJ0makc3HAyOzkXxe3Uy` | Starter (`prod_VUBhb0Kc72tVpw`) | 59 + GST |
+| `STRIPE_PRICE_SMALL` | `price_1UTDmM0makc3HAyOOY9fWBym` | Small business (`prod_VUBi3TYvmwTdQh`) | 179 + GST |
+| `STRIPE_PRICE_ENTERPRISE` | `price_1UTDmR0makc3HAyOozLy4HYH` | Enterprise (`prod_VUBigXmwThBxpG`) | 249 + GST |
+| `STRIPE_PRICE_SEAT_ADMIN` | `price_1UTDnZ0makc3HAyOJvSZW6oB` | Extra admin seat (`prod_VUBiGrBdnfjtLw`) | 25 + GST |
+| `STRIPE_PRICE_SEAT_ADMIN_ENTERPRISE` | `price_1UTDmg0makc3HAyOGft7T6Vc` | Extra admin seat, Enterprise (`prod_VUBjyF3e4RDeib`) | 42 + GST |
+| `STRIPE_PRICE_SEAT_EMPLOYEE` | `price_1UTDmj0makc3HAyOhxGRJZoZ` | Extra employee seat (`prod_VUBjA8EIxToibx`) | 15 + GST |
+| `STRIPE_PRICE_SEAT_EMPLOYEE_ENTERPRISE` | `price_1UTDmm0makc3HAyOkSzefJOY` | Extra employee seat, Enterprise (`prod_VUBjTwutRQoERy`) | 25 + GST |
 
-Every price is recurring, monthly, `aud`, **`tax_behavior = inclusive`** (Josh, 22 Oct: the prices are the amounts charged, GST included; set on all seven, which Stripe does not allow to be changed again). Each product and price carries `metadata.pthq_plan` or `metadata.pthq_seat` + `metadata.pthq_tier`, and `metadata.pthq_env` names the secret it belongs to.
+Every price is recurring, monthly, `aud`, **`tax_behavior = exclusive`** — Josh, 22 Oct: the prices are **ex-GST, 10% GST is added on top** ($59 → $64.90 charged). The first seven prices had been set inclusive on a misread "yes"; Stripe does not allow that to change, so they are **retired** (`active = false`, nickname "retired - GST-inclusive, replaced 22 Oct"; ids `…KV…`, `…Km…`, `…Kp…`, `…LO…`, `…Lb…`, `…Lj…`, `…Lq…`) and each product's default price is the new one. The GST itself is a Stripe **tax rate** (10%, exclusive, AU, display name "GST") that Emergent creates through the API and stores as `STRIPE_TAX_RATE_GST`, applied as `default_tax_rates` on every checkout and subscription; the connector does not expose tax rates. Each product and price carries `metadata.pthq_plan` or `metadata.pthq_seat` + `metadata.pthq_tier`, and `metadata.pthq_env` names the secret it belongs to.
 
 ## The preview webhook endpoint
 
@@ -32,4 +32,4 @@ Every price is recurring, monthly, `aud`, **`tax_behavior = inclusive`** (Josh, 
 
 ## Live mode, later
 
-The same seven products and prices are created again in live mode (same names, amounts, metadata, `tax_behavior = inclusive`), a live webhook endpoint on the published app's address (Josh to say which), and the three live values go into the **published** app's secrets. Needs the connector widened to live mode. Not before the preview flows pass.
+The same seven products and prices are created again in live mode (same names, amounts, metadata, `tax_behavior = exclusive`, plus the GST tax rate), a live webhook endpoint on the published app's address (Josh to say which), and the three live values go into the **published** app's secrets. Needs the connector widened to live mode. Not before the preview flows pass.
