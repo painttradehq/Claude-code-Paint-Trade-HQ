@@ -1,10 +1,10 @@
 # Paint Trade HQ — Terms of Service
 
-**Reviewed for the tester program · Version 1.2-draft · 22 October 2026**
+**Reviewed for the tester program · Version 1.2 · 22 October 2026**
 
-> Brought up to date on 22 October 2026 with the legal advice of 21 October 2026 (M & B Legal). Square-bracket items must be filled in before publishing; when they are, the version becomes 1.2.
+> Brought up to date on 22 October 2026 with the legal advice of 21 October 2026 (M & B Legal).
 
-These terms are a contract between you and **[Legal entity name] (ABN [ABN])** trading as Paint Trade HQ ("we", "us", "the developers", "Paint Trade HQ"), of [registered address], for the use of the Paint Trade HQ web app, employee app, client links and related services (the "Service" or "the app").
+These terms are a contract between you and **Paint Trade HQ** ("we", "us", "the developers"), of Melbourne, Victoria, for the use of the Paint Trade HQ web app, employee app, client links and related services (the "Service" or "the app").
 
 By creating an account and ticking the agreement box, or by using the Service, you agree to these terms. If you are creating an account for a business, you confirm you are authorised to bind that business, and "you" means that business.
 
@@ -75,7 +75,7 @@ We may suspend or remove content or accounts that break these rules. We will tel
 
 ## 10. Availability, backups and support
 
-We aim to keep the Service running but do not promise any uptime during the tester program. We take regular backups for our own recovery, but those are not a substitute for your own copies (see section 2). Support is by email at [support email] during Australian business hours; response times are best-effort.
+We aim to keep the Service running but do not promise any uptime during the tester program. We take regular backups for our own recovery, but those are not a substitute for your own copies (see section 2). Support is by email at software@joshsano.com.au during Australian business hours; response times are best-effort.
 
 ## 11. Ending your account and getting your data out
 
@@ -98,10 +98,10 @@ We may change the Service at any time. We may change these terms by posting a ne
 
 ## 15. General
 
-These terms are governed by the laws of [Victoria], Australia, and the courts of that state. If any part is unenforceable, the rest still applies. Our failure to enforce a right is not a waiver. You may not assign these terms without our consent; we may assign them to a successor of the business. Notices to you go to the account owner's email. Notices to us go to [legal email].
+These terms are governed by the laws of Victoria, Australia, and the courts of that state. If any part is unenforceable, the rest still applies. Our failure to enforce a right is not a waiver. You may not assign these terms without our consent; we may assign them to a successor of the business. Notices to you go to the account owner's email. Notices to us go to software@joshsano.com.au.
 
 ## 16. Contact
 
-[Legal entity name] · ABN [ABN] · [address] · [support email] · [legal email]
+Paint Trade HQ · Melbourne, Victoria · software@joshsano.com.au
 
-© 2026 [Legal entity name]. All rights reserved.
+© 2026 Paint Trade HQ. All rights reserved.
