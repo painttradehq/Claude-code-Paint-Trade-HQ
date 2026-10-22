@@ -35,7 +35,7 @@ Everything the admin chat has specced so far is built, except the items below. O
 
 | Item | What it is | Waits for |
 |---|---|---|
-| **Round 83 — Fix Round G** (`fix-round-g-notes.md`; the items explained in `fix-round-g-open-items.md`) | Nine small fixes, no prototypes: the Terms link guard; "General" in the Timesheets drawer; the help bubble at 1024; the Billing page's "Plans open at launch" state while Stripe is unconfigured; replies to a painter's emails reaching the painter; the SSRF guard from the security audit; the two display items Emergent noticed. Items 3 and 4 need no work. | Josh's "send" (and any override of the picks 1a 2a 3a 4b 5a). |
+| **Round 83 — Fix Round G** (`fix-round-g-notes.md`; the items explained in `fix-round-g-open-items.md`) | Nine small fixes, no prototypes: the Terms link guard; "General" in the Timesheets drawer; the help bubble at 1024; the Billing page's "Plans open at launch" state while Stripe is unconfigured; replies to a painter's emails reaching the painter; the SSRF guard from the security audit; the two display items Emergent noticed. Items 3 and 4 need no work. | **SENT 22 Oct** (picks 1a 2a 3a 4b 5a stood). Report "Round 83 done". |
 
 ## Needs something to arrive first
 

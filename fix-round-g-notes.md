@@ -1,4 +1,4 @@
-# Round 83 — Fix Round G (the open items, 22 October) — DRAFT, waits for Josh's "send"
+# Round 83 — Fix Round G (the open items, 22 October) — SENT 22 Oct (the notes verbatim with the rules; picks 1a 2a 3a 4b 5a unchallenged)
 
 No prototypes: every item is a label, a guard, a rule or a line of text on an existing screen. Nothing under `app/employee/*`. Josh's live-app check rounds (`admin-check-rounds.md`, Checks 1–7) were not done; this round carries only the items already known. Anything the checks find later is a Fix Round H.
 
