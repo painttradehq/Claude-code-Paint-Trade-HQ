@@ -30,6 +30,10 @@ Every price is recurring, monthly, `aud`, **`tax_behavior = exclusive`** — Jos
 4. The seven price ids — Emergent writes them into the preview env (sent 22 Oct).
 5. Done 22 Oct: the go for the Round 80 Stripe flows is sent; Josh had put the two keys in.
 
+## Which account the preview actually uses (22 Oct, after Emergent's check)
+
+The test key Josh put into the Emergent preview belongs to the **"Paint Trade HQ sandbox"** account (`acct_1UTCoL1rbCPUqQhY`), not the main account's test mode where the seven prices above live. Decision: the preview uses the sandbox. The app's start-up bootstrap (`services/stripe_bootstrap.py`) creates the seven products and prices there by metadata, and it had already created the GST tax rate and the webhook endpoint there; the seven env ids are unset so the bootstrap takes over. The prices in this file stay in the main account's test mode, unused by the preview but the right shape; the bootstrap would find them by metadata if that account's test key were ever used. Sandboxes are Stripe's intended development environment, so this is the better arrangement. `GET /api/platform/maintenance/stripe` (platform owner) shows which account mode and where each id came from.
+
 ## Live mode, later
 
 Josh widened the connector on 22 Oct, but it came back with a **sandbox** ("Paint Trade HQ sandbox", `acct_1UTCoL1rbCPUqQhY`, test mode), not live mode; nothing was created there. Rather than depend on live-mode access, the app gets a **find-or-create at startup** (sent to Emergent 22 Oct as part of the Round 80 Stripe step): when the `STRIPE_PRICE_*` variables are unset it finds its products by metadata or creates them (same names, amounts, metadata, `tax_behavior = exclusive`), likewise the GST tax rate, and the webhook endpoint for `{APP_PUBLIC_URL}/api/billing/webhook` with the signing secret kept in the platform settings record; env values win when set; `GET /api/platform/maintenance/stripe` (platform owner) shows mode and where each id came from. **Live setup then needs only two values in the published app's secrets: the live secret key and the live publishable key.** Not before the preview flows pass.
