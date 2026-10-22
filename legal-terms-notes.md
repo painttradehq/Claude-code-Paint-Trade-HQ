@@ -1,4 +1,4 @@
-# Round 82 — Terms of Service 1.2 after the legal review (the Round 66 rerun) — DRAFT, waits for Josh's answers in §2
+# Round 82 — Terms of Service 1.2 after the legal review (the Round 66 rerun) — decisions 1A, 2A taken 22 Oct; waits for the six values in §2.3, the upload and "send"
 
 The lawyer's advice came back on 21 October 2026 in an email, not as a document (`lawyer/06-advice-2026-10-21.md`). This round puts it into the app: the amended Terms, the Terms shown and agreed at sign-up, the same click from the testers already in, and the copyright line. Nothing else changes. No prototype is needed: the pages exist (Round 17c, Round 66) and the changes are text, one box on the sign-up page and one button label.
 
@@ -7,6 +7,8 @@ The lawyer's advice came back on 21 October 2026 in an email, not as a document 
 For the testing phase, provide **only the Terms of Service**, amended in three places, on the premise that the app is free, data is not traded and users are clearly told they use it at their own risk — for example by showing the Terms at sign-up. Require an **"I agree" click**. The three amendments: remove the fees section; replace the warranties section with the lawyer's "at your own risk" text and make it **section 1**; add a section saying **we do not sell your data**. Mark the app and the Terms with **© + the legal entity name**. The Privacy Policy, the fees/subscription terms, the client-contract and employment questions wait for launch (paid work: $220 / $350 an hour inc GST). Outside the app: lodge the trade mark, put an IP clause in the contractor agreement, keep the evidence of authorship.
 
 ## 2. Josh decides / supplies before the send
+
+**Josh, 22 Oct: 1 → A, 2 → A, 3 → ok (the six values still to come), 4 → ok (the same entity name).** The spec below is written for A/A; the "if B" lines no longer apply.
 
 | # | Question | Options | Recommended |
 |---|---|---|---|
