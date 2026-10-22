@@ -1,4 +1,4 @@
-# Round 82 — Terms of Service 1.2 after the legal review (the Round 66 rerun) — SENT 22 Oct (the Terms text inside the message; `round82-message.md`)
+# Round 82 — Terms of Service 1.2 after the legal review (the Round 66 rerun) — BUILT 22 Oct (sent with the Terms text inside the message, `round82-message.md`; report `memory/reports/round82-terms-report.md`; agent iteration 164 at 1440/1024/390; suite exit 0; draft n 23; two small extras by Emergent: a compact login footer at 390 where there was none, and the legal page now scrolls to a fragment once it has rendered)
 
 The lawyer's advice came back on 21 October 2026 in an email, not as a document (`lawyer/06-advice-2026-10-21.md`). This round puts it into the app: the amended Terms, the Terms shown and agreed at sign-up, the same click from the testers already in, and the copyright line. Nothing else changes. No prototype is needed: the pages exist (Round 17c, Round 66) and the changes are text, one box on the sign-up page and one button label.
 
