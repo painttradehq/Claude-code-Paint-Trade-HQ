@@ -7,7 +7,7 @@ Every outside connection the app depends on, what I could verify from here, and 
 | Emergent (build) | Connected; reconnects by itself | Nothing |
 | Stripe (billing) | Test prices in the main account; the preview runs on your sandbox with its own prices; your account activated for live | Two live keys into the published variables, after the flows report (§2) |
 | Resend (email) | `painttradehq.co` verified and sending — but the app still sends from `painttradehq.com.au`, so every email fails | Change the sender address to `painttradehq.co` on the preview and in the published variables (§3); no DNS work |
-| Google Drive / Calendar (OAuth) | Not verifiable from here; the client secret was exposed earlier and must be reset | §4, then connect Drive on the live app (§5) |
+| Google Drive / Calendar (OAuth) | Client found; **no callback address registered** — Google refuses with redirect_uri_mismatch even on the preview; secret rotated 22 Oct | Four redirect URIs + two APIs + test users in the console (§4), publish, then connect Drive on the live app (§5) |
 | Xero | No developer app yet | §6 |
 | Google Places / geocoder key | Key present on the preview per earlier rounds | Allow the live address in the key's restrictions (§7) |
 | Claude (Anthropic key) | Present on the preview; nothing to connect | Make sure the published variables carry it (§7) |
@@ -49,20 +49,23 @@ Emergent has been asked for the exact list of which variables are set on the pre
 
 ## 4. Google — the OAuth app (Drive and Calendar sign-in)
 
-**State.** The app signs in to Google for Drive storage and Calendar with one OAuth client. Its client secret appeared in the Emergent chat weeks ago, so it must be reset. Whether the live address is allowed on it is not verifiable from here.
+**State (22 Oct, from Emergent's check).** One OAuth client serves Drive and Calendar: client id `1080562258935-00sr3209bgefheq304bmo4vckf0o73jb.apps.googleusercontent.com`, in Google Cloud project number **1080562258935**. The app's side is correct, but Google answers **"Error 400: redirect_uri_mismatch"** even on the preview, so no callback address is registered on the client at all. That is why Drive is connected nowhere. The client secret was rotated today (the exposed one ending 6uwk is to be deleted once the new one is published).
 
 **Steps:**
 
-1. console.cloud.google.com → the project that holds the client → APIs & Services → **Credentials** → the OAuth 2.0 client of type Web application.
-2. **Authorised redirect URIs**, add (keep the preview ones):
+1. console.cloud.google.com → pick project **1080562258935** (the project selector at the top shows the number under each name) → **Google Auth Platform › Clients** (or APIs & Services › Credentials) → the client whose id starts with `1080562258935-00sr`.
+2. **Authorised redirect URIs** — add all four, exactly, no trailing slash:
    ```
+   https://pthq-replica.preview.emergentagent.com/api/integrations/google-drive/callback
+   https://pthq-replica.preview.emergentagent.com/api/integrations/google-calendar/callback
    https://painttradehq.co/api/integrations/google-drive/callback
    https://painttradehq.co/api/integrations/google-calendar/callback
    ```
-   **Authorised JavaScript origins**: add `https://painttradehq.co`. (Emergent is confirming these two paths against the current code; I update this line if they differ.)
-3. Same screen → **Reset secret** (or Add secret, then delete the old one). Copy the new secret once.
-4. Emergent → Manage Publishes → Environment variables: `GOOGLE_DRIVE_CLIENT_ID` and `GOOGLE_DRIVE_CLIENT_SECRET`; `APP_PUBLIC_URL` = `https://painttradehq.co`. Publish (variables take effect on the next publish).
-5. OAuth consent screen: if it is in "Testing", add your Google accounts as test users or publish the consent screen; Google refuses sign-ins otherwise.
+   **Authorised JavaScript origins** — add `https://painttradehq.co` and `https://pthq-replica.preview.emergentagent.com`. Save.
+3. **APIs & Services › Enabled APIs**: **Google Drive API** and **Google Calendar API** must both be enabled (Enable APIs & services → search → Enable).
+4. **Google Auth Platform › Audience** (the consent screen): if it says **Testing**, add `software@joshsano.com.au`, `painting@joshsano.com.au` and any account that will connect as test users. The Calendar permission is a "sensitive" one, so in Testing only listed users can connect; publishing the consent screen lifts that but Google may ask for a verification later. Drive's permission (`drive.file`, only files the app creates) needs no verification.
+5. Variables: `GOOGLE_DRIVE_CLIENT_ID` (unchanged) and `GOOGLE_DRIVE_CLIENT_SECRET` (the new secret) on both the preview and the published app (done 22 Oct); `APP_PUBLIC_URL` = `https://painttradehq.co` on the published app — Emergent cannot see the published variables, so check it yourself. Publish.
+6. After the publish, delete the old secret ending 6uwk in the console.
 
 ## 5. Google Drive on the live app
 
