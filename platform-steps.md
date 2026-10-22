@@ -7,7 +7,7 @@ Every outside connection the app depends on, what I could verify from here, and 
 | Emergent (build) | Connected; reconnects by itself | Nothing |
 | Stripe (billing) | **Every billing flow passed on the preview** (22 Oct): checkout $64.90 with the GST line, proration, scheduled downgrade, card update, seat sync, failed card, trial conversion, cancel and resume | Two live keys into the published variables, then publish (§2) |
 | Resend (email) | `painttradehq.co` verified and sending — but the app still sends from `painttradehq.com.au`, so every email fails | Change the sender address to `painttradehq.co` on the preview and in the published variables (§3); no DNS work |
-| Google Drive / Calendar (OAuth) | Client found; **no callback address registered** — Google refuses with redirect_uri_mismatch even on the preview; secret rotated 22 Oct | Four redirect URIs + two APIs + test users in the console (§4), publish, then connect Drive on the live app (§5) |
+| Google Drive / Calendar (OAuth) | Redirect URIs registered, secret rotated, Calendar connected on live, **Drive connected 22 Oct as `painting@joshsano.com.au`** ("in use"); the published `GOOGLE_DRIVE_CLIENT_ID` was empty before the last republish — confirm it is filled | Upload one photo on the live app and find it in that Drive (§5 step 4); delete the old Google secret ending 6uwk |
 | Xero | No developer app yet; `XERO_CLIENT_ID` / `XERO_CLIENT_SECRET` unset | §6 |
 | Microsoft (OneDrive storage, Outlook calendar) | `MS_CLIENT_ID` / `MS_CLIENT_SECRET` unset; the app says "Not set up on this server yet" | §9, only if you want OneDrive or Outlook offered |
 | Google Places / geocoder key | Key present on the preview per earlier rounds | Allow the live address in the key's restrictions (§7) |
@@ -76,9 +76,10 @@ Every outside connection the app depends on, what I could verify from here, and 
 
 After §4. This is what stops new photos being stored inside the database.
 
-1. Live app → Settings › Business → **Files & storage** → "Your Google Drive" → **Connect**. Sign in as the account whose Drive should hold the files (`software@joshsano.com.au` if that is the service account you chose).
-2. Choose "Your Google Drive" as the storage in use. The screen says "Connected as …".
-3. From then on new photos, signed contracts (Round 78) and crew welcome videos (Round 79) land in a "Paint Trade HQ" folder in that Drive. Older photos stay until the Storage tool moves them (on hold). (Checked 22 Oct: the `software@joshsano.com.au` Drive has no such folder yet — only a marketing folder "Paint Trade HQ - Email Sequence" — so Drive is not connected anywhere today.)
+1. Live app → Settings › Business → **Files & storage** → "Your Google Drive" → the **Connect Google Drive** button at the right of the row (the row itself only picks the storage; the button is greyed with "Not set up on this server yet" while the server lacks `GOOGLE_DRIVE_CLIENT_ID` / `GOOGLE_DRIVE_CLIENT_SECRET`). Sign in as the account whose Drive should hold the files.
+2. Choose "Your Google Drive" as the storage in use. The row says "Connected as … · folder "Paint Trade HQ" · in use". **Done 22 Oct as `painting@joshsano.com.au`** (first as software@, then switched).
+3. From then on new photos, signed contracts (Round 78) and crew welcome videos (Round 79) land in a "Paint Trade HQ" folder in that Drive. The folder and its "Estimate Photos" sub-folder are created at the **first photo upload**, not at connect — so an empty Drive right after connecting is normal. Older photos stay until the Storage tool moves them (on hold).
+4. Proof: upload one photo to any job on the live app, then open drive.google.com as `painting@joshsano.com.au` and look for "Paint Trade HQ › Estimate Photos" (or "Estimates › <job>"). If the photo shows in the app but not in Drive, the published app is missing one of the two Drive variables and silently fell back to the built-in cloud. (I can only see the `software@joshsano.com.au` Drive from here; share the folder with that address if you want me to check.)
 
 ## 6. Xero
 
