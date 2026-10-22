@@ -21,7 +21,7 @@ Every outside connection the app depends on, what I could verify from here, and 
 ## 1. Publish the What's new drafts (not a connection, but yours)
 
 1. Live app → Settings › Platform › **Updates** tab.
-2. The drafts, oldest first: 12 "Crew daily reports, rebuilt", 13 "Line details, roomier", 14 "Add to the Library from the quote", 15 "Faster everywhere", 16 "Quicker pages", 17 "Prices that include GST"; after the next publish of the app: 18 "Signed contracts, delivered", 19 "Show your work, your way", 20 "Your crew app, your way", 21 "Plans and billing, in one place", 22 "Overtime rates and reminders to sign in and out". Open each, read the text once, press **Publish**. Leave the email option off unless you want every business emailed.
+2. The drafts, oldest first: 12 "Crew daily reports, rebuilt", 13 "Line details, roomier", 14 "Add to the Library from the quote", 15 "Faster everywhere", 16 "Quicker pages", 17 "Prices that include GST"; after the next publish of the app: 18 "Signed contracts, delivered", 19 "Show your work, your way", 20 "Your crew app, your way", 21 "Plans and billing, in one place", 22 "Overtime rates and reminders to sign in and out"; after Round 82: 23 "Our Terms, reviewed". Open each, read the text once, press **Publish**. Leave the email option off unless you want every business emailed.
 3. Publish in that order. Unpublish exists if one reads wrong; tell me the words to change.
 
 ## 2. Stripe
