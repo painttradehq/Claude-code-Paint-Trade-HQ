@@ -1,0 +1,29 @@
+# Round 83 — Fix Round G (the open items, 22 October) — DRAFT, waits for Josh's "send"
+
+No prototypes: every item is a label, a guard, a rule or a line of text on an existing screen. Nothing under `app/employee/*`. Josh's live-app check rounds (`admin-check-rounds.md`, Checks 1–7) were not done; this round carries only the items already known. Anything the checks find later is a Fix Round H.
+
+Josh's letters for items 1–5 (`fix-round-g-open-items.md`) were never given; the picks below are mine and stand unless Josh says otherwise before the send.
+
+## The items
+
+1. **Terms link inside the admin shell** (pick a). The legal links already open in a new tab from sign-up, login and welcome. Check the admin shell: if any `router.push('/terms')` or `/privacy` or `/crew` from inside `/admin` is bounced to the dashboard by `app/admin/_layout.tsx`, the guard lets those three paths through. If nothing pushes them any more, no change — say so.
+2. **Timesheets drawer: "General" shown as "On site"** (pick a). `components/timesheets/PersonDrawer.tsx` prints `sign_in_address || 'On site'`; a time entry with no job and no address therefore reads "On site". A session with no project reads **"General"**; a session with an address keeps the address; "No GPS" for admin-added entries stays.
+3. **Dashboard clock widget** (pick a): nothing to do — in the tree the old `SignInOutWidget` was only ever imported by the crew dashboard, never by the owner's. Dropped from the round.
+4. **Crew notes on the job drawer** (pick b): leave as is. Dropped from the round.
+5. **Lucy's help bubble covers the builder's bottom line at 1024** (pick a). At widths up to 1100 px the quote builder keeps enough space under the totals block that the bubble never sits on the last line; nothing changes at 1440.
+6. **Billing page while Stripe is not configured on the server.** `GET /api/billing/overview` (and `/plans`) carry `stripe_configured: true|false` (the same test the bootstrap uses: a secret key present). When false, the plan cards' buttons are disabled and one line reads **"Plans open at launch — your tester access continues"**; the Billing drawer's action button is disabled with the same line; Account's Billing pointer unchanged. No other change; the page comes back to life by itself when the keys are set. Today's live app has no Stripe key, so this is what testers see.
+7. **Replies to a painter's emails must reach the painter.** Today the quote (`routes/estimate_send.py`), invoice (`routes/invoices.py`) and variation (`routes/variations.py`) emails set their reply address to the platform-wide `RESEND_REPLY_TO`; only the photo share uses the business's address. One helper, `reply_to_for(business)` → the business profile's email, falling back to the owner's login email; every email the app sends *for a business* to its clients or crew uses it (quotes, invoices, variations, photo shares, review requests, follow-ups and automations, contracts, credit notes, completion reports). Platform emails (welcome, password reset, tester invites, the test email, Terms notices, feedback replies) keep the platform address. A test per sender type asserting the reply-to. No UI change.
+8. **SSRF guard on the material source URL** (from the 21 Oct security audit; Josh: "a later round" — this is it). The AI price refresh (`routes/ai_price_refresh.py`) and the material routes (`routes/materials.py`) fetch whatever URL an admin saved. Guard, in one helper used by both: http/https only; resolve the host and refuse private, loopback, link-local and cloud-metadata addresses (169.254.169.254, metadata.google.internal and the like), re-checked on every redirect (at most 3 followed); 10 s timeout; 5 MB cap; a refused fetch logs the reason and the item shows "Source not reachable" as it would for any failed fetch. Tests: a private address, a redirect to a private address, an oversized body — all refused; a normal https page still fetched (mocked).
+9. **The two items you noticed while fixing the no-plan gate** ("member Login email display" and "sidebar naming"). Describe each in the report in one line: screen, what shows, what should show. Fix it in this round only if it is a label or display correction with no behaviour change; otherwise leave it for the next round and say so.
+
+## Verify
+
+1440 then 1024 (and 390 for item 5's page only if the builder is used there): item 1 by pushing `/terms` from inside the admin shell; item 2 with a TS_ crew session that has no job and no address, and one with an address; item 5 scrolled to the end of a long quote at 1024 with the bubble open; item 6 on the preview with the Stripe key temporarily unset in a test (or the status mocked), then set again — the preview's sandbox key stays in place after; item 7 by the tests plus one real preview quote email to a TS_ address showing the business's reply-to in the headers; item 8 by the tests; item 9 as described. Suite before and after; tsc clean. TS_ rows only, torn down; the owner's tenant read-only; nothing published.
+
+## What's new — Draft n 24 "Little fixes, October" (never published)
+
+One card: "Replies to your quotes and invoices now come straight back to you, not to us. Time entries without a job are labelled General. Lucy's helper no longer covers the quote totals on smaller screens."
+
+## Report
+
+`memory/reports/round83-fix-g-report.md`, starting "Round 83 done": one line per item (done / no change needed / left for next, with the reason), the item 9 descriptions, the suite before and after. No code review. Do not start anything else after it. Do not offer next action items.

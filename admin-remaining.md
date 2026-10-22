@@ -31,6 +31,12 @@ Everything the admin chat has specced so far is built, except the items below. O
 
 | **Round 81 — Pay and hours** (`pay-and-hours-notes.md`, prototypes `settings-pay-hours.html` + `employee-pay-rates.html`) | (1) An Overtime rate field beside Hourly rate on the employee page and the Add dialog, and one money rule everywhere (the This week card's hidden 1.5 ×, the project labour cost, the payroll CSV). (2) Settings › Business › Operating hours (7:00 am – 4:00 pm, working days) + two reminder switches on the Crew app page + a backend job that writes the sign-in / sign-out reminders (push when C7 lands). | **BUILT 21–22 Oct** (agent 156; the overtime split corrected 22 Oct: 9,9,8,9,7 → 38/4, 10×5 → 38/12, locked weeks untouched; suite green). |
 
+## Ready to send
+
+| Item | What it is | Waits for |
+|---|---|---|
+| **Round 83 — Fix Round G** (`fix-round-g-notes.md`; the items explained in `fix-round-g-open-items.md`) | Nine small fixes, no prototypes: the Terms link guard; "General" in the Timesheets drawer; the help bubble at 1024; the Billing page's "Plans open at launch" state while Stripe is unconfigured; replies to a painter's emails reaching the painter; the SSRF guard from the security audit; the two display items Emergent noticed. Items 3 and 4 need no work. | Josh's "send" (and any override of the picks 1a 2a 3a 4b 5a). |
+
 ## Needs something to arrive first
 
 | Item | What it is | Waits for |
