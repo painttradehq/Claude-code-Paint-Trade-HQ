@@ -62,7 +62,15 @@ The Billing page sells three plans and two kinds of extra seat, so Stripe needs 
 3. Emergent chat → Secrets: `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_SMALL`, `STRIPE_PRICE_ENTERPRISE`, `STRIPE_PRICE_SEAT_ADMIN`, `STRIPE_PRICE_SEAT_ADMIN_ENTERPRISE`, `STRIPE_PRICE_SEAT_EMPLOYEE`, `STRIPE_PRICE_SEAT_EMPLOYEE_ENTERPRISE`. The existing `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` stay; the old `STRIPE_PRICE_STANDARD_*` / `STRIPE_PRICE_PRO_*` stay too.
 4. Settings → Billing → **Customer portal**: leave payment method and invoice history on, switch plan changes off (the app owns switching).
 5. Decide GST: if the prices are to have GST added on top, turn on Stripe Tax for Australia; if 59 / 179 / 249 are the amounts charged, leave it off. Tell me which, it is §8.5 of the spec.
-6. **The test key (Emergent asked for it after Round 80):** Stripe dashboard → toggle **Test mode** on (top right) → Developers → API keys → copy the **Secret key** that starts with `sk_test_` → Emergent chat → Secrets → `STRIPE_SECRET_KEY` for the preview. Then Developers → Webhooks → add an endpoint for the preview's `/api/billing/webhook` and put its signing secret in `STRIPE_WEBHOOK_SECRET`. With a test key Emergent creates the seven test prices itself and runs checkout end to end with Stripe's test card. Never paste a key into this chat or into any message; the production key stays what it is.
+6. **The test key, click by click (Emergent asked for it after Round 80; the preview's key was rejected as invalid):**
+   1. Open dashboard.stripe.com and sign in. Top right, switch **Test mode** on (the toggle turns orange and the page says "Test mode").
+   2. Left menu → **Developers** → **API keys**. Under "Standard keys", the **Secret key** row: press **Reveal test key**, then copy it. It starts with `sk_test_`. (The Publishable key, `pk_test_`, is the other row; copy it too.)
+   3. Emergent → your pthq-replica job → the chat → the **Secrets** (environment variables) panel. Set `STRIPE_SECRET_KEY` to the `sk_test_` value and `STRIPE_PUBLISHABLE_KEY` to the `pk_test_` value. Save. These are the **preview** secrets; the published app's secrets are a separate list and stay as they are.
+   4. Back in Stripe, still in Test mode: **Developers** → **Webhooks** → **Add endpoint**. Endpoint URL: `https://pthq-replica.preview.emergentagent.com/api/billing/webhook`. Events: press **Select all events** (the app ignores what it does not use). Add endpoint. On the new endpoint's page, under **Signing secret**, press **Reveal** and copy the value (starts with `whsec_`).
+   5. Emergent Secrets again: `STRIPE_WEBHOOK_SECRET` = that `whsec_` value. Save.
+   6. Tell me "stripe key in". I send Emergent the go: it creates the seven test products and prices itself, writes their ids into the preview secrets, and runs every Round 80 Stripe flow with Stripe's test card 4242 4242 4242 4242.
+   7. Never paste a key into this chat or into any message to me. If one ever lands in a chat, roll it in Stripe (Developers → API keys → the row's menu → **Roll key**) and set the new value.
+   8. Later, before publishing billing for real: the same three values from **Live mode** go into the **published** app's secrets, with a live webhook endpoint on `painttradehq.com.au`, and the seven prices are created again in live mode (§6 steps 1–3 above).
 
 ## After each one
 
