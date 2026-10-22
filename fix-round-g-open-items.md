@@ -52,3 +52,7 @@ The Drive and Calendar callback routes bounce to Settings › Business with `?dr
 
 - A team member's **Login email** display on the Account page (Emergent's words: "member Login email display") — to be looked at in the checks; exact symptom not yet described.
 - A **sidebar naming** issue under the no-plan state — same; ask for the exact words at the next stop before deciding.
+
+## Added 22 Oct — Billing page while Stripe is not configured on the server
+
+Decision (Josh, 22 Oct): the live Stripe keys wait until the launch-phase Terms exist, so the published app runs with no Stripe key. Today the Billing page still shows "Choose" on the plan cards; pressing one calls a checkout that cannot start. Fix: when the server reports Stripe unconfigured (the platform maintenance status), the plan cards' buttons are disabled with one line "Plans open at launch — your tester access continues", and the Billing drawer says the same. No other change; the page comes back to life by itself when the keys are set.

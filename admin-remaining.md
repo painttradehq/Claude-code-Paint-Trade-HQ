@@ -48,4 +48,4 @@ Everything the admin chat has specced so far is built, except the items below. O
 
 ## Yours, outside the code
 
-Publish (76 + 75b + 72 now); publish the six What's new drafts when you want users to see them; verify `painttradehq.com.au` in Resend; Google OAuth redirect URIs on the real domain and the client-secret reset; connect Drive on production; the Xero developer app; Save to GitHub after each publish.
+Published 22 Oct (Rounds 74–82 live). Left: publish the What's new drafts 18–23 when you want users to see them (`platform-steps.md` §1); `RESEND_FROM` on the published app + the live test email (§3); the ABN for the Terms (one line, no version change); send the lawyer the drafted reply (in your Gmail drafts); the trade mark and Adam's IP clause; the launch-phase legal review before any paid subscription; Save to GitHub. Done 22 Oct: Drive connected as painting@ and proven with photos; the old Google secret deleted; the unused Resend domain removed; Stripe live keys parked until the launch Terms (your "do what you recommend"). Not now: Xero, Microsoft.

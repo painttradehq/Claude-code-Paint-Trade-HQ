@@ -28,7 +28,9 @@ Every outside connection the app depends on, what I could verify from here, and 
 
 **State.** Seven products with GST-on-top prices exist in your main account's test mode (`stripe-test-prices.md`). The preview's key belongs to your **sandbox** account, so the app creates its own prices, GST rate and webhook there at start-up; the flows are being tested there now. Your account is activated for live. My connection is test mode only, which is fine.
 
-**Steps, after Emergent reports "Round 80 Stripe flows done":**
+**Decision 22 Oct (Josh: "do what you recommend"): the live keys wait until the launch-phase Terms and Privacy Policy exist** — the reviewed Terms say the app is free, so nobody may be charged under them (`legal-terms-notes.md` §7). With no Stripe key on the published app the bootstrap does not run and no checkout can start. Until then the Billing page's plan buttons lead nowhere on the live app; making them say "Plans open at launch" while Stripe is unconfigured is on the Fix Round G list.
+
+**Steps, when the launch-phase Terms are in:**
 
 1. Stripe dashboard with the **Test mode toggle off**. Developers → API keys. Copy the **Secret key** (`sk_live_…`) and the **Publishable key** (`pk_live_…`).
 2. Emergent → Manage Publishes (the deployment) → **Environment variables**: `STRIPE_SECRET_KEY` = the live secret key, `STRIPE_PUBLISHABLE_KEY` = the live publishable key. Nothing else: no price ids, no webhook secret. Check `APP_PUBLIC_URL` is `https://painttradehq.co` (no trailing slash) — the app's webhook is created on it.
@@ -38,7 +40,7 @@ Every outside connection the app depends on, what I could verify from here, and 
 
 ## 3. Resend — the sender address
 
-**State.** Your Resend account has `painttradehq.co` verified (sending on, region Tokyo) and two API keys named "PTHQ" and "PTHQ-SERVER". The app is set to send from `painttradehq.com.au`, which is not a Resend domain, so every email from the preview fails with "This API key is not authorized to send emails from painttradehq.com.au". Since the app lives at `painttradehq.co`, the sender must be on that domain. (I had registered `painttradehq.com.au` in Resend before you said which domain is the real one; it sits there unverified and unused — say the word and I remove it.)
+**State.** Your Resend account has `painttradehq.co` verified (sending on, region Tokyo) and two API keys named "PTHQ" and "PTHQ-SERVER". The app is set to send from `painttradehq.com.au`, which is not a Resend domain, so every email from the preview fails with "This API key is not authorized to send emails from painttradehq.com.au". Since the app lives at `painttradehq.co`, the sender must be on that domain. (The unused `painttradehq.com.au` domain I had registered in Resend was **removed on 22 Oct** at your word; only `painttradehq.co` remains.)
 
 **Steps:**
 

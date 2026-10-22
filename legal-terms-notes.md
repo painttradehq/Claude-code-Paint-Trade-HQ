@@ -65,6 +65,8 @@ If decision 1 is **B**, items 2 and 7 are reversed (the Privacy Policy words com
 
 ## 7. Billing and these Terms — the sequencing to keep in view
 
+**Decided 22 Oct (Josh: "do what you recommend"): the live Stripe keys wait until the launch-phase Terms and Privacy Policy exist.** The published app runs with no Stripe key, so no checkout can start; the Billing page's plan buttons get a "Plans open at launch" state in Fix Round G (`fix-round-g-open-items.md`).
+
 The reviewed Terms say the app is free. The lawyer's premise, and the reason the policies could wait, is that nobody pays. Round 80 is built and the published app can take live Stripe keys, but **nobody should be charged under these Terms**. Until the launch-phase Terms and Privacy Policy are in: sign-up stays invite-only, testers stay on the tester pass-through, and no account is moved to a paid plan. A tester who opened Settings › Billing and chose a plan with live keys in would be charged under Terms that say the app is free — so either the live keys wait for the launch Terms, or the plan-choice buttons stay off for tester accounts (a small change — say which, if either). The old §8 fees text is kept in `lawyer/01-terms-of-service-draft.md` for the lawyer to finish.
 
 ## 8. What's new — Draft n 23 "Our Terms, reviewed" (never published by Emergent)
