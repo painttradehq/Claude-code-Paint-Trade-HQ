@@ -45,3 +45,10 @@ Josh: "need to go through these to explore because I can't remember them." Each 
 ## Added 22 Oct — Google Drive connect: show the reason
 
 The Drive and Calendar callback routes bounce to Settings › Business with `?drive=connected | error | state_error | token_error` (and the Calendar equivalent) but the page ignores the flag and the route logs nothing, so a failed connect only ever reads "Not connected". Fix: the Files & storage card reads the flag once and shows one line in plain words ("Google refused the sign-in — check the consent screen's test users", "The published app's secret is wrong or old — publish again", "The address the app is published at does not match Google's — check APP_PUBLIC_URL", "Connected as …"), and the callback route logs the failure reason (never the secret). Same for the Calendar card and the Xero card.
+
+**Done 22 Oct** inside Round 80: the three cards show one reason line (`drive-connect-reason`, `gcal-connect-reason`, `xero-connect-reason`), the bounce carries `why=`, the route keeps `last_error`, the address is cleaned; retested at 1440 (iterations 162/163). Shows on the live app after the next publish.
+
+## Added 22 Oct — two pre-existing items Emergent saw while fixing the no-plan gate (not touched)
+
+- A team member's **Login email** display on the Account page (Emergent's words: "member Login email display") — to be looked at in the checks; exact symptom not yet described.
+- A **sidebar naming** issue under the no-plan state — same; ask for the exact words at the next stop before deciding.
