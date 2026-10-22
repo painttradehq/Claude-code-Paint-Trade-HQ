@@ -40,7 +40,7 @@ Every outside connection the app depends on, what I could verify from here, and 
 
 ## 3. Resend — the sender address
 
-**State.** Your Resend account has `painttradehq.co` verified (sending on, region Tokyo) and two API keys named "PTHQ" and "PTHQ-SERVER". The app is set to send from `painttradehq.com.au`, which is not a Resend domain, so every email from the preview fails with "This API key is not authorized to send emails from painttradehq.com.au". Since the app lives at `painttradehq.co`, the sender must be on that domain. (The unused `painttradehq.com.au` domain I had registered in Resend was **removed on 22 Oct** at your word; only `painttradehq.co` remains.)
+**State (22 Oct).** Your Resend account has `painttradehq.co` verified (sending on, region Tokyo) and two API keys named "PTHQ" and "PTHQ-SERVER". **The preview sends and delivers**: a test email from `Paint Trade HQ <no-reply@painttradehq.co>` to painting@joshsano.com.au reached the inbox (Resend status delivered, id `01a1630d-…`). The published app still needs its own `RESEND_FROM` (step 2) and test (step 4). **One finding:** the emails carry **Reply-To `support@painttradehq.co`** (the preview's `RESEND_REPLY_TO`), a mailbox that does not exist yet — a client or tester who replies to a quote, invoice or test email writes into a void (step 6). (The unused `painttradehq.com.au` domain I had registered in Resend was **removed on 22 Oct** at your word; only `painttradehq.co` remains.)
 
 **Steps:**
 
@@ -49,6 +49,7 @@ Every outside connection the app depends on, what I could verify from here, and 
 3. The API key: Resend keys can be limited to one domain. "PTHQ-SERVER" is the likely server key; if it was created for all domains nothing changes. If the test in step 4 fails with "not authorized", create a new key in resend.com → API keys → **Create**, permission "Sending access", domain **All domains** (or `painttradehq.co`), and set it as `RESEND_API_KEY` in the published variables (and the preview's secrets).
 4. Test from the live app after the publish: Settings › Business › Connected services › Email → **Send a test email**. A passing result is the email in your inbox from `no-reply@painttradehq.co`. If it fails, paste the message.
 5. Optional, for deliverability: in resend.com → Domains → `painttradehq.co`, check that DMARC is listed; if not, a TXT record at `_dmarc.painttradehq.co` with `v=DMARC1; p=none;` at your DNS host.
+6. **The reply address.** Two variables, on the preview and the published app: `RESEND_REPLY_TO` (where replies to quotes, invoices, variations and the test email go) and `SUPPORT_EMAIL` (where tester feedback and the welcome email's "write to us" point). Until a real support mailbox exists, set both to `software@joshsano.com.au` (recommended now: one change, replies land where you read them). Later, when you want `support@painttradehq.co`, make it real first — either add `painttradehq.co` to your Google Workspace and create the alias, or turn on Resend receiving for the domain with a forward — then switch the two variables back.
 
 ## 4. Google — the OAuth app (Drive and Calendar sign-in)
 
