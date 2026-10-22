@@ -41,3 +41,7 @@ Josh: "need to go through these to explore because I can't remember them." Each 
 
 - The contract email that says "Attached" with nothing attached: becomes its own round (Round 78) now that you have said yes.
 - Anything Checks 1–7 turn up.
+
+## Added 22 Oct — Google Drive connect: show the reason
+
+The Drive and Calendar callback routes bounce to Settings › Business with `?drive=connected | error | state_error | token_error` (and the Calendar equivalent) but the page ignores the flag and the route logs nothing, so a failed connect only ever reads "Not connected". Fix: the Files & storage card reads the flag once and shows one line in plain words ("Google refused the sign-in — check the consent screen's test users", "The published app's secret is wrong or old — publish again", "The address the app is published at does not match Google's — check APP_PUBLIC_URL", "Connected as …"), and the callback route logs the failure reason (never the secret). Same for the Calendar card and the Xero card.
