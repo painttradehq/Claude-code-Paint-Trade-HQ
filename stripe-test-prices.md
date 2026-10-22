@@ -14,22 +14,22 @@ Created through the Stripe connector in **test mode** on the "Paint Trade HQ" St
 | `STRIPE_PRICE_SEAT_EMPLOYEE` | `price_1UTDLj0makc3HAyO4Ev5Kzfi` | Extra employee seat (`prod_VUBjA8EIxToibx`) | 15 |
 | `STRIPE_PRICE_SEAT_EMPLOYEE_ENTERPRISE` | `price_1UTDLq0makc3HAyOA3mISymt` | Extra employee seat, Enterprise (`prod_VUBjTwutRQoERy`) | 25 |
 
-Every price is recurring, monthly, `aud`, with `tax_behavior` left unspecified (GST is still an open question, §8.5 of the billing spec; "inclusive" or "exclusive" cannot be changed once set, so it waits for the answer). Each product and price carries `metadata.pthq_plan` or `metadata.pthq_seat` + `metadata.pthq_tier`, and `metadata.pthq_env` names the secret it belongs to.
+Every price is recurring, monthly, `aud`, **`tax_behavior = inclusive`** (Josh, 22 Oct: the prices are the amounts charged, GST included; set on all seven, which Stripe does not allow to be changed again). Each product and price carries `metadata.pthq_plan` or `metadata.pthq_seat` + `metadata.pthq_tier`, and `metadata.pthq_env` names the secret it belongs to.
 
 ## The preview webhook endpoint
 
-- Id `we_1UTDML0makc3HAyOMSSUMIco`, URL `https://pthq-replica.preview.emergentagent.com/api/billing/webhook`, status enabled, test mode.
+- Id `we_1UTDML0makc3HAyOMSSUMIco` — **disabled 22 Oct**: Josh could not find its signing secret in the dashboard, so Emergent creates the preview's endpoint itself through the API with the test key and writes the signing secret straight into the preview env (nobody handles it). The disabled one stays as a record; the connector has no delete.
 - Events: `checkout.session.completed`; `customer.subscription.created / updated / deleted / trial_will_end`; `invoice.paid / payment_succeeded / payment_failed / upcoming`; `customer.updated`; `payment_method.attached / detached`; `subscription_schedule.created / updated / released / completed / canceled / aborted`.
-- Its **signing secret** is shown in the Stripe dashboard only: Test mode → Developers → Webhooks → this endpoint → Signing secret → Reveal. That value goes into the preview secret `STRIPE_WEBHOOK_SECRET`.
+- The new endpoint's signing secret goes into `STRIPE_WEBHOOK_SECRET` by Emergent; it never appears in a chat.
 
 ## What Josh still does (three values into Emergent's preview Secrets)
 
 1. `STRIPE_SECRET_KEY` = the test secret key (`sk_test_…`) from Test mode → Developers → API keys → Reveal test key.
 2. `STRIPE_PUBLISHABLE_KEY` = the test publishable key (`pk_test_…`) from the same page.
-3. `STRIPE_WEBHOOK_SECRET` = the signing secret above (`whsec_…`).
-4. The seven price ids above, each under its secret name — or leave them to Emergent: the go message carries the ids and Emergent writes them into the preview env itself.
-5. Say "stripe key in". The go message to Emergent then asks for the Round 80 Stripe flows end to end with the test card 4242 4242 4242 4242.
+3. ~~`STRIPE_WEBHOOK_SECRET`~~ — Emergent sets it (above).
+4. The seven price ids — Emergent writes them into the preview env (sent 22 Oct).
+5. Done 22 Oct: the go for the Round 80 Stripe flows is sent; Josh had put the two keys in.
 
 ## Live mode, later
 
-The same seven products and prices are created again in live mode (same names, amounts and metadata), a live webhook endpoint on the real domain, and the three live values go into the **published** app's secrets. Not before the GST answer, because `tax_behavior` on the live prices follows it.
+The same seven products and prices are created again in live mode (same names, amounts, metadata, `tax_behavior = inclusive`), a live webhook endpoint on the published app's address (Josh to say which), and the three live values go into the **published** app's secrets. Needs the connector widened to live mode. Not before the preview flows pass.

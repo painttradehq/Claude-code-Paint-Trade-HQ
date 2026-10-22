@@ -58,4 +58,4 @@ All prices AUD per month. This is the decision of record; nothing in the app cha
 3. Trial: 14 days on Enterprise, no card.
 4. Over the seat count after a downgrade: keep working, bill the extra seats, show the count (default; Josh to confirm).
 5. Data migration below Enterprise: quoted.
-6. Open: are the prices the amount charged (GST included) or is GST added on top?
+6. GST: the prices are the amounts charged, GST included (22 Oct).

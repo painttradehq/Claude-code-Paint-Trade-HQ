@@ -77,7 +77,7 @@ One component, **`PlanCard`** ("Not on your plan"): "{Feature} is on the {plan} 
 2. **Existing subscriptions** on the old `standard` / `pro` prices map to Small business / Enterprise for features and keep their Stripe price until they change plan or seats.
 3. **Trial** 14 days on Enterprise, no card (as today); at the end, the gate with the Billing page.
 4. **Over the seat count after a downgrade**: keep working, bill the extra seats, show the count; no one removed. (Josh: "not sure what that is" — it is what happens when a business with 7 employees moves from Small business to Starter, which includes 3.)
-5. **GST**: prices are shown as "a month · AUD". *Open question*: are 59 / 179 / 249 the amounts charged (GST included) or is GST added on top? The invoice line and Stripe's tax setting follow the answer.
+5. **GST — answered 22 Oct (Josh: yes, included).** 59 / 179 / 249 are the amounts charged, GST inside. The seven Stripe prices carry `tax_behavior = inclusive`; the app's price lines read "$59 a month · AUD · incl. GST"; no Stripe Tax, no separate GST line.
 6. **Platform owner's tenant**: the tester-style card with "Platform owner · no billing" and no actions.
 7. Downgrade mid-period gives no credit; the seat removal rule is the same. Stated on the page.
 
