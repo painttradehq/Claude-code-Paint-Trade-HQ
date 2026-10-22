@@ -5,17 +5,18 @@ Every outside connection the app depends on, what I could verify from here, and 
 | Connection | State on 22 Oct | What is left |
 |---|---|---|
 | Emergent (build) | Connected; reconnects by itself | Nothing |
-| Stripe (billing) | Test prices in the main account; the preview runs on your sandbox with its own prices; your account activated for live | Two live keys into the published variables, after the flows report (§2) |
+| Stripe (billing) | **Every billing flow passed on the preview** (22 Oct): checkout $64.90 with the GST line, proration, scheduled downgrade, card update, seat sync, failed card, trial conversion, cancel and resume | Two live keys into the published variables, then publish (§2) |
 | Resend (email) | `painttradehq.co` verified and sending — but the app still sends from `painttradehq.com.au`, so every email fails | Change the sender address to `painttradehq.co` on the preview and in the published variables (§3); no DNS work |
 | Google Drive / Calendar (OAuth) | Client found; **no callback address registered** — Google refuses with redirect_uri_mismatch even on the preview; secret rotated 22 Oct | Four redirect URIs + two APIs + test users in the console (§4), publish, then connect Drive on the live app (§5) |
-| Xero | No developer app yet | §6 |
+| Xero | No developer app yet; `XERO_CLIENT_ID` / `XERO_CLIENT_SECRET` unset | §6 |
+| Microsoft (OneDrive storage, Outlook calendar) | `MS_CLIENT_ID` / `MS_CLIENT_SECRET` unset; the app says "Not set up on this server yet" | §9, only if you want OneDrive or Outlook offered |
 | Google Places / geocoder key | Key present on the preview per earlier rounds | Allow the live address in the key's restrictions (§7) |
 | Claude (Anthropic key) | Present on the preview; nothing to connect | Make sure the published variables carry it (§7) |
 | Database | Emergent-managed, in a different cloud from the app | Optional upgrade, on hold (§8) |
 | Push to crew phones | Does not exist yet (crew chat's C7) | Crew chat |
 | GitHub copy of the code | Manual | Press Save to GitHub after each publish |
 
-Emergent has been asked for the exact list of which variables are set on the preview, the callback addresses the app expects for each provider, and the test routes; I fold its answers in when they arrive.
+**Preview variables (Emergent, 22 Oct, names only):** set — `RESEND_API_KEY`, `RESEND_FROM` (= `Paint Trade HQ <no-reply@painttradehq.co>`), `GOOGLE_DRIVE_CLIENT_ID/SECRET`, `GOOGLE_CALENDAR_CLIENT_ID/SECRET`, `GOOGLE_PLACES_API_KEY`, `ANTHROPIC_API_KEY`, `APP_PUBLIC_URL`, `STRIPE_SECRET_KEY`, `MONGO_URL`; unset — `MS_CLIENT_ID/SECRET`, `XERO_CLIENT_ID/SECRET`; the Stripe price, tax-rate and webhook variables are intentionally unset (the app resolves them itself). The published app's variables are not visible to Emergent; the same names must be there. **Callback addresses on the published app:** `https://painttradehq.co/api/integrations/{google-drive | google-calendar | onedrive | outlook-calendar | xero}/callback`, and `https://painttradehq.co/api/billing/webhook` for Stripe.
 
 ## 1. Publish the What's new drafts (not a connection, but yours)
 
@@ -41,8 +42,8 @@ Emergent has been asked for the exact list of which variables are set on the pre
 
 **Steps:**
 
-1. Emergent sets the preview's sender to `no-reply@painttradehq.co` and tells us the variable's name (asked; it also sends the app's own test email once).
-2. Emergent → Manage Publishes → Environment variables: the same variable = `no-reply@painttradehq.co`. Publish.
+1. The variable is **`RESEND_FROM`**; on the preview it now reads `Paint Trade HQ <no-reply@painttradehq.co>` and the app's test route answers ok.
+2. Emergent → Manage Publishes → Environment variables: `RESEND_FROM` = `Paint Trade HQ <no-reply@painttradehq.co>`. Publish.
 3. The API key: Resend keys can be limited to one domain. "PTHQ-SERVER" is the likely server key; if it was created for all domains nothing changes. If the test in step 4 fails with "not authorized", create a new key in resend.com → API keys → **Create**, permission "Sending access", domain **All domains** (or `painttradehq.co`), and set it as `RESEND_API_KEY` in the published variables (and the preview's secrets).
 4. Test from the live app after the publish: Settings › Business › Connected services › Email → **Send a test email**. A passing result is the email in your inbox from `no-reply@painttradehq.co`. If it fails, paste the message.
 5. Optional, for deliverability: in resend.com → Domains → `painttradehq.co`, check that DMARC is listed; if not, a TXT record at `_dmarc.painttradehq.co` with `v=DMARC1; p=none;` at your DNS host.
@@ -82,7 +83,7 @@ After §4. This is what stops new photos being stored inside the database.
 ## 6. Xero
 
 1. developer.xero.com → **My Apps** → **New app**: name "Paint Trade HQ", type **Web app**, company URL your website.
-2. Redirect URI: the app's Xero callback on `https://painttradehq.co` — Emergent is supplying the exact path; paste it exactly, Xero rejects a one-character difference.
+2. Redirect URI, exactly: `https://painttradehq.co/api/integrations/xero/callback` (Xero rejects a one-character difference).
 3. Copy the **Client ID**, generate a **Client secret**, copy it once.
 4. Emergent → Manage Publishes → Environment variables: `XERO_CLIENT_ID`, `XERO_CLIENT_SECRET`. Publish.
 5. Live app → Settings › Business › Accounting → **Connect** → sign in to Xero → choose the organisation. Check 3 of the admin checks then confirms an invoice pushes.
@@ -96,6 +97,16 @@ After §4. This is what stops new photos being stored inside the database.
 ## 8. Database (optional, on hold)
 
 The app runs in Google Cloud Iowa and its database in AWS Oregon, which is most of the remaining slowness. Option 1 from Emergent support: Manage Publishes → Database → **Upgrade** to the dedicated database add-on in the app's region. Your call, when you want it; nothing else depends on it.
+
+## 9. Microsoft — OneDrive storage and Outlook calendar (optional)
+
+Only if you want businesses to pick OneDrive or Outlook. Today those cards say "Not set up on this server yet", which is honest and harmless.
+
+1. portal.azure.com → **Microsoft Entra ID** → **App registrations** → **New registration**: name "Paint Trade HQ", supported account types "Accounts in any organizational directory and personal Microsoft accounts", redirect URI type Web: `https://painttradehq.co/api/integrations/onedrive/callback`; after creating, add a second redirect URI `https://painttradehq.co/api/integrations/outlook-calendar/callback` (and the two preview equivalents on `https://pthq-replica.preview.emergentagent.com`).
+2. **Certificates & secrets** → New client secret → copy the **Value** once (not the Secret ID).
+3. **API permissions** → Microsoft Graph, delegated: `Files.ReadWrite`, `Calendars.Read`, `offline_access`, `User.Read`.
+4. Emergent → Manage Publishes → Environment variables: `MS_CLIENT_ID` = the Application (client) ID, `MS_CLIENT_SECRET` = the secret value. Publish (and the preview's secrets for testing).
+5. Live app → Settings › Business › Files & storage → "Your Microsoft OneDrive" → Connect.
 
 ## After each one
 
