@@ -35,6 +35,8 @@ Everything the admin chat has specced so far is built, except the items below. O
 
 | Item | What it is | Waits for |
 |---|---|---|
+| **Marketing captures** (`marketing-screens-request.md`) | Emergent takes 44 real screenshots (1440 admin, 390 crew and public) and 8 walkthrough clips from the preview with demo data, into `memory/marketing/`; no code. For the website and the chat box. | Josh's "send" when the job is free (one sitting). |
+| **Website chat box knowledge** (`website-chat-knowledge.md`) | The chat box's memory: behaviour rules, what the app does module by module, plans and GST, data and security, today's honest status table, lead capture, 23 FAQs, words to use. | Josh reads it; corrections; then it goes to whoever wires the chat box. Josh keeps it current. |
 | **Round 83 — Fix Round G** (`fix-round-g-notes.md`; the items explained in `fix-round-g-open-items.md`) | Nine small fixes, no prototypes: the Terms link guard; "General" in the Timesheets drawer; the help bubble at 1024; the Billing page's "Plans open at launch" state while Stripe is unconfigured; replies to a painter's emails reaching the painter; the SSRF guard from the security audit; the two display items Emergent noticed. Items 3 and 4 need no work. | **BUILT 22 Oct** (agent 165; suite 189 s exit 0; tsc clean; draft n 24 "Little fixes, October"). Item 1 no change needed; 2, 5, 6, 7, 8, 9 done. Waits for publish. |
 
 ## Needs something to arrive first
