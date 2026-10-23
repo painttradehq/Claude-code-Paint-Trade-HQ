@@ -110,7 +110,7 @@ The owner's Crew app settings (Round 79) now hold a sign-in distance and a rule.
 7. **The weather line is on Today's job card only**, not on the job page or the Jobs list. Alternative: the job page header too.
 8. **The crew weather route shares the owner's 30-minute cache entry** per suburb. Alternative: its own cache.
 9. **No rate limit on the weather route** (employee-only, cached). Alternative: one rule in the limiter.
-10. **Ask is a third rule value** (Josh, 18 Oct: the question at sign-in and sign-out, recorded), beside Round 79's Flag it and Refuse it; the default stays Flag; the owner's page gains one radio (§7). Alternatives: (B) make the question what **Flag it** does for every business — no admin change, but every owner who chose Flag gets a question they did not ask for; (C) drop the question — Flag it and Refuse it as Round 79 built, and this follow-up shrinks to `accuracy_m`, the 409 sheet under Refuse it, and the weather line.
+10. **Ask is a third rule value** (Josh, 18 Oct: the question at sign-in and sign-out, recorded), beside Round 79's Flag it and Refuse it; the default stays Flag; the owner's page gains one radio (§7). **Josh, 23 Oct: A — decided.** Alternatives: (B) make the question what **Flag it** does for every business — no admin change, but every owner who chose Flag gets a question they did not ask for; (C) drop the question — Flag it and Refuse it as Round 79 built, and this follow-up shrinks to `accuracy_m`, the 409 sheet under Refuse it, and the weather line.
 
 ## 11. Test ids
 
