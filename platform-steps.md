@@ -115,3 +115,17 @@ Only if you want businesses to pick OneDrive or Outlook. Today those cards say "
 ## After each one
 
 Say which step is done, or paste the exact error. Press **Save to GitHub** in Emergent after each publish so the code copy stays current.
+
+## 10. GitHub — getting the app's code out of Emergent when Save to GitHub is stuck (24 Oct)
+
+**State.** Save to GitHub fails. Your GitHub account `painttradehq` has the Emergent.sh app installed with **all repositories** (`Claude-code-Paint-Trade-HQ`, `the-newest-update-of-PTHQ`, `rebending-app`), but Emergent's own sign-in link is stuck on your second GitHub account `forgaiinters-source` (the one that owns "onboarding app"), so Emergent lists that account's repo only. Revoking on `painttradehq` did nothing because the stale link is on the other account.
+
+**Fix A — the clean one (your clicks).** Sign in to GitHub as `forgaiinters-source` → Settings → Applications → **Authorized GitHub Apps** → Emergent.sh → **Revoke**; then **Installed GitHub Apps** → Emergent.sh → Configure → **Uninstall**. Sign out of GitHub. In Emergent → Home → GitHub → Connect; on GitHub's account chooser pick **painttradehq**. Hard-refresh Emergent (Ctrl+Shift+R). Save to GitHub → the three repos appear → pick `the-newest-update-of-PTHQ` and its existing branch. Never "create new".
+
+**Fix B — the one I can drive (a push token, no Emergent sign-in involved).**
+1. GitHub as `painttradehq` → Settings → **Developer settings** (bottom of the left menu) → Personal access tokens → **Fine-grained tokens** → Generate new token. Name "Emergent push", expiry 7 days, Repository access: **Only select repositories** → `the-newest-update-of-PTHQ`; Permissions → Repository permissions → **Contents: Read and write** (Metadata comes with it). Generate, copy it once.
+2. Emergent → the job → **Secrets** (where the Stripe keys went) → new secret **`GITHUB_PUSH_TOKEN`** = the token. Never paste it into any chat.
+3. Tell me "token in". I ask Emergent to push with it: the token is read from the environment through a git askpass helper, so it never appears in a command or a log; fast-forward push to the repo's existing branch, or a new branch `emergent-2026-10-24` if the histories differ; never a force push; the helper deleted after; the branch and commit reported.
+4. Delete the token in GitHub when the push is done (Fix A remains the long-term answer).
+
+**The capture files** need no GitHub: in the Emergent job, **Code → Open in browser**, find the three zips in `/app/memory/` (`marketing-captures-2026-10-23*.zip`), right-click → Download.
