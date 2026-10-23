@@ -214,3 +214,6 @@ Rules: `crew-app-handover.md` §1. Rounds are C1, C2, …; one round at a time a
 
 ## 23 Oct — C5 follow-up F prototyped (password reset by emailed code)
 `c1-crew-shell.html`: `#s-reset` + `employee-login-forgot` + `crew-pw-forgot`; `tools/test_c1.js` 454/454 at 390 and 360; `c5-followup-f-notes.md` v1. Rides with Follow-up D after C5. Not sent.
+
+## 23 Oct — C5 amendment prototyped (fourth fact + crew notice page), after the consent question
+`c1-crew-shell.html`: step 4 fourth fact, `crew-onb-notice` → `#s-notice`, Me footer `crew-me-notice`; `tools/test_c1.js` 462/462 at 390 and 360; `c5-followup-f-notes.md` §8. Rides with F/D after C5. Not sent. Legal claims checked by a 6-verifier workflow (medium confidence; lawyer to confirm).

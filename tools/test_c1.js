@@ -424,6 +424,10 @@ async function run(b, W, H, tag) {
   ok('…back on Profile' + full, await p.locator(T('crew-profile')).isVisible());
   await p.goto(U + '?screen=reset&step=2'); await p.waitForTimeout(300);
   ok('deep link: the code step' + full, (await txt(T('crew-reset-title'))) === 'Check your email' && await p.locator(T('crew-reset-code')).isVisible());
+  await p.goto(U + '?screen=app&tab=me'); await p.waitForTimeout(300); await p.click(T('crew-me-notice')); await p.waitForTimeout(150);
+  ok('Me › footer "Crew notice" opens the notice with the business name; Back returns to Me' + full, await p.locator(T('crew-notice')).isVisible() && /Sano Painting is your employer/.test(await txt(T('crew-notice-body'))) && (await go()) === '/crew-notice');
+  await p.click(T('crew-notice-back')); await p.waitForTimeout(150);
+  ok('…back on Me' + full, await p.locator(T('crew-shell')).isVisible() && !(await p.locator(T('crew-notice')).isVisible()));
 
   // ---- C5: onboarding, profile, my documents ----
   await p.goto(U + '?screen=onboarding'); await p.waitForTimeout(300);
@@ -463,7 +467,12 @@ async function run(b, W, H, tag) {
   ok('onboarding 3: the row shows Added with the expiry' + full, /Added · expires 01\/03\/2027/.test(await txt(T('crew-onb-doc-driving_licence'))));
   await p.click(T('crew-onb-doc-white_card')); await p.click(T('crew-doc-sheet-file')); await p.fill(T('crew-doc-sheet-expiry'), '28102026'); await p.click(T('crew-doc-sheet-done')); await p.waitForTimeout(150);
   await p.click(T('crew-onb-next')); await p.waitForTimeout(150);
-  ok('onboarding 4: the three facts and the agreement with both links (no team step: Round 79 has a headline, a note and a video)' + full, (await txt(T('crew-onb-step'))) === 'Step 4 of 4' && (await p.locator('#onbBody .facts > div').count()) === 3 && await p.locator(T('crew-onb-terms')).isVisible() && await p.locator(T('crew-onb-privacy')).isVisible() && (await txt(T('crew-onb-join'))) === 'Join the team');
+  ok('onboarding 4: the four facts (emails, texts and records last), the crew-notice link and the agreement with both links (no team step: Round 79 has a headline, a note and a video)' + full, (await txt(T('crew-onb-step'))) === 'Step 4 of 4' && (await p.locator('#onbBody .facts > div:not(.facts-more)').count()) === 4 && /Emails, texts and records/.test(await txt('#onbBody .facts > div:nth-child(4)')) && /may email or text you about work/.test(await txt('#onbBody .facts > div:nth-child(4)')) && (await txt(T('crew-onb-notice'))) === 'Read the full crew notice' && (await box(T('crew-onb-notice'))).height >= 44 && await p.locator(T('crew-onb-terms')).isVisible() && await p.locator(T('crew-onb-privacy')).isVisible() && (await txt(T('crew-onb-join'))) === 'Join the team');
+  await p.click(T('crew-onb-notice')); await p.waitForTimeout(150);
+  ok('the crew notice: a page with the business name filled in, eight short parts, version line, back to the step' + full, await p.locator(T('crew-notice')).isVisible() && !(await p.locator(T('crew-onb')).isVisible()) && (await go()) === '/crew-notice' && (await p.locator('#noticeBody p').count()) === 8 && /Who holds your details/.test(await txt(T('crew-notice-body'))) && /No marketing/.test(await txt(T('crew-notice-body'))) && /Sano Painting is your employer/.test(await txt(T('crew-notice-body'))) && /Version 1/.test(await txt(T('crew-notice-meta'))) && await noHScroll());
+  await p.screenshot({ path: OUT + `c5-notice-${tag}.png` });
+  await p.click(T('crew-notice-back')); await p.waitForTimeout(150);
+  ok('Back returns to step 4 with nothing lost' + full, await p.locator(T('crew-onb')).isVisible() && (await txt(T('crew-onb-step'))) === 'Step 4 of 4' && (await p.locator(T('crew-onb-agree')).getAttribute('aria-checked')) === 'false');
   await p.click(T('crew-onb-join')); await p.waitForTimeout(150);
   ok('onboarding 4: Join without the tick shows the one line' + full, (await txt(T('crew-onb-err'))) === 'Tick the agreement to continue.');
   await p.click(T('crew-onb-terms')); await p.waitForTimeout(100);

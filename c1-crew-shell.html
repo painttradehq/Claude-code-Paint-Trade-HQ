@@ -383,6 +383,10 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
 .facts div{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--border);font-size:14px;line-height:1.4;color:var(--text-secondary)}
 .facts div:first-child{border-top:0}
 .facts .ico{width:36px;height:36px;border-radius:10px}
+.facts-more{padding:2px 16px 8px;font-size:14px}
+.facts-more a{color:var(--accent);font-weight:600;display:inline-block;padding:8px 0;min-height:44px;line-height:28px}
+.notice p{font-size:15px;line-height:1.5;color:var(--text-secondary);margin:0 0 14px}
+.notice p b{color:var(--text-primary);display:block;margin-bottom:2px}
 .facts b{color:var(--text-primary);font-weight:600;display:block;font-size:15px}
 .doc-body{white-space:pre-wrap;font-family:Georgia,serif;font-size:14.5px;line-height:1.55;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);margin-top:10px}
 .doc-body mark{background:#FDF1DC;color:#6B3F0A;font-family:ui-monospace,Menlo,monospace;font-size:13px;padding:0 3px;border-radius:3px}
@@ -479,6 +483,16 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
       <div class="job-title" id="resetTitle" data-testid="crew-reset-title">Reset your password</div>
     </div>
     <div class="form-body" id="resetBody" style="padding-top:8px"></div>
+  </section>
+
+  <!-- ================= C5 amendment: CREW NOTICE (a public page like /terms and /privacy; the business name filled in) ================= -->
+  <section id="s-notice" class="hide" data-testid="crew-notice" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="noticeBack" data-testid="crew-notice-back"><svg><use href="#i-back"/></svg>Back</button></div>
+      <div class="job-title" data-testid="crew-notice-title">Crew notice</div>
+      <div class="meta" data-testid="crew-notice-meta">Version 1 · 23 October 2026</div>
+    </div>
+    <div class="form-body notice" id="noticeBody" data-testid="crew-notice-body"></div>
   </section>
 
   <!-- ================= APP ================= -->
@@ -579,7 +593,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
             <span class="row-t"><span class="row-title">Sign out</span></span>
           </button>
         </div>
-        <div class="foot-note">Paint Trade HQ Crew · <a href="#">Privacy</a> · <a href="#">Terms</a></div>
+        <div class="foot-note">Paint Trade HQ Crew · <a href="#" data-legal="/privacy">Privacy</a> · <a href="#" data-legal="/terms">Terms</a> · <a href="#" data-testid="crew-me-notice" data-legal="/crew-notice">Crew notice</a></div>
       </div>
     </div>
 
@@ -1371,7 +1385,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     { id: 'd3', name: 'Safety agreement', status: 'ended', sent: '2026-05-01', signed: '2026-05-02', countersigned: '2026-05-02', ended: '2026-09-30', content: 'SAFETY AGREEMENT\n\nReplaced by the site safety plan of 30 Sep 2026.' },
   ];
   const cStatus = (c) => c.status === 'sent' ? { cls: 'wait', txt: 'Awaiting signature' } : c.status === 'signed' ? { cls: 'live', txt: 'Signed' } : { cls: 'ended', txt: 'Ended' };
-  function hideC5(){ ['#s-onb', '#s-profile', '#s-docs', '#s-doc', '#s-reset', '#s-training', '#s-video', '#s-coaching', '#s-going', '#s-rating', '#s-equip', '#s-item'].forEach(x => $(x).classList.add('hide')); }
+  function hideC5(){ ['#s-onb', '#s-profile', '#s-docs', '#s-doc', '#s-reset', '#s-notice', '#s-training', '#s-video', '#s-coaching', '#s-going', '#s-rating', '#s-equip', '#s-item'].forEach(x => $(x).classList.add('hide')); }
   function stackOpen(id){ $('#s-app').classList.add('hide'); $('#s-login').classList.add('hide'); hideC5(); $(id).classList.remove('hide'); const b = $(id + ' .form-body'); if (b) b.scrollTop = 0; }
   const MARK = $('#s-login .mark').innerHTML;
 
@@ -1451,7 +1465,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
       bar = `<button class="btn btn-primary" data-testid="crew-onb-next" data-onb="next">Continue</button>`;
     } else if (n === 5) {
       const bn = biz ? esc(biz.business_name) : 'your employer';
-      body = `<div class="sect">Before you ${onb.finish ? 'start' : 'join'}</div><div class="card facts"><div><span class="ico"><svg><use href="#i-people"/></svg></span><span><b>${bn} sees your details</b>Your name, contact details, documents, hours and reports go to ${bn}. Paint Trade HQ stores them for that business.</span></div><div><span class="ico"><svg><use href="#i-pin"/></svg></span><span><b>Location at sign-in and sign-out only</b>Your location is recorded when you sign in or out of a job, never in between.</span></div><div><span class="ico"><svg><use href="#i-file"/></svg></span><span><b>Your documents stay private</b>Your licences and signed documents are never shared by link. Only ${bn} and you can open them.</span></div></div>
+      body = `<div class="sect">Before you ${onb.finish ? 'start' : 'join'}</div><div class="card facts"><div><span class="ico"><svg><use href="#i-people"/></svg></span><span><b>${bn} sees your details</b>Your name, contact details, documents, hours and reports go to ${bn}. Paint Trade HQ stores them for that business.</span></div><div><span class="ico"><svg><use href="#i-pin"/></svg></span><span><b>Location at sign-in and sign-out only</b>Your location is recorded when you sign in or out of a job, never in between.</span></div><div><span class="ico"><svg><use href="#i-file"/></svg></span><span><b>Your documents stay private</b>Your licences and signed documents are never shared by link. Only ${bn} and you can open them.</span></div><div><span class="ico"><svg><use href="#i-send"/></svg></span><span><b>Emails, texts and records</b>${bn} may email or text you about work: sign-in details, documents to sign, password codes. Your hours and sign-ins are kept on record.</span></div><div class="facts-more"><a href="#" data-testid="crew-onb-notice" data-legal="/crew-notice">Read the full crew notice</a></div></div>
         <button class="agree ${onb.agree ? 'on' : ''} ${e.agree ? 'bad' : ''}" data-testid="crew-onb-agree" data-onb="agree" role="checkbox" aria-checked="${onb.agree}"><span class="box">${onb.agree ? '✓' : ''}</span><span class="at">I've read and agree to the <a href="#" data-testid="crew-onb-terms" data-legal="/terms">Terms of Service</a> and the <a href="#" data-testid="crew-onb-privacy" data-legal="/privacy">Privacy Policy</a>.</span></button><div class="fld">${err('agree')}</div>${onb.dup ? `<div class="card" style="padding:14px 16px;margin-top:12px;border-color:var(--danger)" data-testid="crew-onb-dup"><div style="font-size:15px;font-weight:600;color:var(--danger)">That email is already on ${biz ? esc(biz.business_name) : 'the team'}.</div><div class="hint" style="margin:4px 0 10px">If ${biz ? esc(biz.owner_name.split(' ')[0]) : 'your employer'} added you, sign in with the password from your email and finish setting up there.</div><button class="btn btn-outline btn-sm" style="width:auto;padding:0 18px;display:inline-flex" data-testid="crew-onb-dup-signin" data-onb="signin">Sign in</button></div>` : ''}`;
       bar = `<button class="btn btn-primary" data-testid="crew-onb-join" data-onb="next">${onb.finish ? "I'm done" : 'Join the team'}</button>`;
     } else {
@@ -1763,6 +1777,22 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   $('#reqCancel').addEventListener('click', closeReq); $('#reqSend').addEventListener('click', sendReq);
   $('#reqBack').addEventListener('click', () => { req.cat = null; req.items = []; req.err = ''; renderReq(); });
 
+  // ---- C5 amendment: the crew notice page ----
+  let noticeFrom = null;   // the section to show again on Back
+  function renderNotice(bn){
+    $('#noticeBody').innerHTML = `
+      <p><b>Who holds your details</b>${bn} is your employer and decides what is collected and why. Paint Trade HQ is the app ${bn} uses. It stores your details for ${bn} and follows its own Privacy Policy.</p>
+      <p><b>What is collected</b>Your name, date of birth, phone, email and emergency contact. The licences, checks and documents you upload. When you sign in and out of a job, and where you are at those moments. Your daily reports and photos. Training you complete. Messages you send in the app.</p>
+      <p><b>Why</b>To roster you, pay you, keep the records an employer must keep by law, keep the site safe, and check you are on site when you sign in.</p>
+      <p><b>Location</b>Recorded only at the moment you sign in or out of a job, with the distance from the site, from your first sign-in for as long as you work for ${bn}. Never in between and never off shift. If your phone's location is off, the sign-in is recorded without it.</p>
+      <p><b>Emails and texts</b>${bn} and Paint Trade HQ may email or text you about work: sign-in details, documents to sign, password codes, job and shift messages. No marketing.</p>
+      <p><b>Who sees it</b>${bn}'s admin users and you. Your licences and signed documents are never shared by link. Paint Trade HQ staff only when fixing a problem ${bn} asks about.</p>
+      <p><b>How long</b>For as long as you work for ${bn}, then for as long as the law requires employers to keep records.</p>
+      <p><b>Your rights</b>Ask ${bn} for a copy of your details or to correct them. Questions about the app: <a href="#" data-legal="/privacy">Paint Trade HQ's Privacy Policy</a>.</p>`;
+  }
+  function openNotice(bn, from){ noticeFrom = from || null; renderNotice(bn || 'your employer'); hideC5(); $('#s-login').classList.add('hide'); $('#s-app').classList.add('hide'); $('#s-notice').classList.remove('hide'); if (from) $(from).classList.add('hide'); document.body.dataset.lastGo = '/crew-notice'; window.scrollTo(0, 0); }
+  $('#noticeBack').addEventListener('click', () => { $('#s-notice').classList.add('hide'); if (noticeFrom) $(noticeFrom).classList.remove('hide'); else showLogin(); });
+
   // ---- Follow-up F: reset password by email code ----
   // POST /employees/forgot-password {email} → always 200; POST /employees/reset-password {email, code, new_password}
   const rs = { step: 1, email: '', code: '', pw: '', err: {}, from: 'login' };
@@ -1806,7 +1836,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   // ---- C5 handlers ----
   document.body.addEventListener('click', (e) => {
     const t = e.target;
-    const lg0 = t.closest('[data-legal]'); if (lg0) { e.preventDefault(); e.stopPropagation(); document.body.dataset.lastGo = lg0.dataset.legal; return; }
+    const lg0 = t.closest('[data-legal]'); if (lg0) { e.preventDefault(); e.stopPropagation(); document.body.dataset.lastGo = lg0.dataset.legal; if (lg0.dataset.legal === '/crew-notice') { const inOnb = !!lg0.closest('#s-onb'); openNotice(inOnb ? (onb.biz ? onb.biz.business_name : 'your employer') : 'Sano Painting', inOnb ? '#s-onb' : '#s-app'); } return; }
     const o = t.closest('[data-onb]');
     if (o) { e.preventDefault(); const a = o.dataset.onb;
       if (a === 'next') onbNext(); else if (a === 'back') { onb.tried = false; onb.step = Math.max(prevStep(onb.step), 0); renderOnb(); }
@@ -1860,6 +1890,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   else if (q.get('screen') === 'report-new') { showApp('today'); openReportNew(q.get('project')); }
   else if (q.get('screen') === 'report') { showApp('today'); openReport(q.get('id') || 'r1'); }
   else if (q.get('screen') === 'onboarding') { openOnb(parseInt(q.get('step') || '0', 10)); }
+  else if (q.get('screen') === 'notice') { openNotice(q.get('bn') || 'Sano Painting', null); }
   else if (q.get('screen') === 'profile') { showApp('me'); openProfile(); }
   else if (q.get('screen') === 'docs') { showApp('me'); openDocs(); }
   else if (q.get('screen') === 'reset') { openReset(q.get('from') || 'login', q.get('email') || (q.get('step') ? 'mia@example.com' : '')); const st = parseInt(q.get('step') || '1', 10); if (st > 1) { rs.step = st; renderReset(); } }
