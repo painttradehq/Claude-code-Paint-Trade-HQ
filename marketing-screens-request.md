@@ -1,4 +1,4 @@
-# Marketing captures — real screens and walkthrough clips from the preview (23 October) — DRAFT, waits for Josh's "send"
+# Marketing captures — real screens and walkthrough clips from the preview (23 October) — SENT 23 Oct (sections 1–4 verbatim; report "Marketing captures done")
 
 Josh wants real pictures of the app for the website and for the chat box's gallery, and short moving clips of a user going from page to page. Only Emergent can take them (the preview is not reachable from here). This is a **capture job, no code change**; it occupies the Emergent job for one sitting, so it goes when Josh says "send" and nothing else is running.
 
