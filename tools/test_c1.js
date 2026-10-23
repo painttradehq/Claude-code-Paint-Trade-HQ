@@ -1,4 +1,4 @@
-// Crew shell prototype (C1 shell + C2 Jobs + C3 time clock + C4 daily report + C5 documents + follow-up D distance question and weather + C6 Learn and gear) — Playwright checks at 390 × 844 then 360 × 800.
+// Crew shell prototype (C1 shell + C2 Jobs + C3 time clock + C4 daily report + C5 documents + follow-up D distance question and weather + C6 Learn and gear + follow-up F password reset) — Playwright checks at 390 × 844 then 360 × 800.
 // Run: NODE_PATH=$(npm root -g) node tools/test_c1.js [shots-dir]
 const { chromium } = require('playwright');
 const T = (id) => `[data-testid="${id}"]`;
@@ -392,6 +392,38 @@ async function run(b, W, H, tag) {
   ok("Learn › How I'm going opens it; back returns to Learn" + full, await p.locator(T('crew-going')).isVisible());
   await p.click(T('crew-going-back')); await p.waitForTimeout(100);
   ok('…back on Learn' + full, await p.locator(T('crew-pane-learn')).isVisible());
+
+  // ---- Follow-up F: reset password by email code ----
+  await p.goto(U); await p.waitForTimeout(300);
+  ok('sign-in: a "Forgot password?" link under the password field, at least 44 px tall' + full, await p.locator(T('employee-login-forgot')).isVisible() && (await txt(T('employee-login-forgot'))) === 'Forgot password?' && (await box(T('employee-login-forgot'))).height >= 44);
+  await p.fill(T('employee-login-email'), 'mia@example.com'); await p.click(T('employee-login-forgot')); await p.waitForTimeout(150);
+  ok('the reset screen: back "Sign in", the title, the email prefilled from the sign-in, Send me a code' + full, await p.locator(T('crew-reset')).isVisible() && /Sign in/.test(await txt(T('crew-reset-back'))) && (await txt(T('crew-reset-title'))) === 'Reset your password' && (await p.locator(T('crew-reset-email')).inputValue()) === 'mia@example.com' && (await txt(T('crew-reset-send'))) === 'Send me a code' && !(await p.locator(T('crew-tabbar')).isVisible()) && (await go()) === '/employee/reset-password');
+  await p.fill(T('crew-reset-email'), ''); await p.click(T('crew-reset-send')); await p.waitForTimeout(100);
+  ok('Send with no email: one inline line' + full, (await txt(T('crew-reset-err'))) === 'Enter your email address.' && (await txt(T('crew-reset-title'))) === 'Reset your password');
+  await p.screenshot({ path: OUT + `f-reset-1-${tag}.png` });
+  await p.fill(T('crew-reset-email'), 'mia@example.com'); await p.click(T('crew-reset-send')); await p.waitForTimeout(150);
+  ok('Send: "Check your email" with the address and the 15-minute line; code, new password, Set new password, Send another code, Wrong email?' + full, (await txt(T('crew-reset-title'))) === 'Check your email' && /We sent a code to mia@example\.com\. It lasts 15 minutes\./.test(await txt(T('crew-reset-line'))) && await p.locator(T('crew-reset-code')).isVisible() && await p.locator(T('crew-reset-password')).isVisible() && (await txt(T('crew-reset-save'))) === 'Set new password' && await p.locator(T('crew-reset-again')).isVisible() && await p.locator(T('crew-reset-email-back')).isVisible() && (await go()) === 'POST /employees/forgot-password');
+  ok('the code and password fields and the button are at least 44 px tall; no horizontal scroll' + full, (await box(T('crew-reset-code'))).height >= 44 && (await box(T('crew-reset-save'))).height >= 44 && await noHScroll());
+  await p.click(T('crew-reset-save')); await p.waitForTimeout(100);
+  ok('Set with nothing: both lines inline' + full, (await p.locator(T('crew-reset-err')).count()) === 2 && /6-digit code/.test(await p.locator(T('crew-reset-err')).nth(0).textContent()) && /At least 8/.test(await p.locator(T('crew-reset-err')).nth(1).textContent()));
+  await p.fill(T('crew-reset-code'), '000000'); await p.fill(T('crew-reset-password'), 'painter2026'); await p.click(T('crew-reset-save')); await p.waitForTimeout(100);
+  ok('a wrong or expired code: the backend\'s one line' + full, (await p.locator(T('crew-reset-err')).count()) === 1 && (await txt(T('crew-reset-err'))) === "That code isn't right or has expired.");
+  await p.screenshot({ path: OUT + `f-reset-2-${tag}.png` });
+  await p.fill(T('crew-reset-code'), '482915'); await p.click(T('crew-reset-save')); await p.waitForTimeout(150);
+  ok('the right code: "Password changed", the one sentence, Sign in; the back button gone (the button does the same)' + full, (await txt(T('crew-reset-title'))) === 'Password changed' && !/Password changed/.test(await txt(T('crew-reset-done'))) && /Sign in with mia@example\.com and your new password/.test(await txt(T('crew-reset-done'))) && (await txt(T('crew-reset-signin'))) === 'Sign in' && !(await p.locator(T('crew-reset-back')).isVisible()) && (await go()) === 'POST /employees/reset-password');
+  await p.screenshot({ path: OUT + `f-reset-3-${tag}.png` });
+  await p.click(T('crew-reset-signin')); await p.waitForTimeout(150);
+  ok('Sign in: back on the sign-in screen with the email filled' + full, await p.locator(T('crew-login')).isVisible() && (await p.locator(T('employee-login-email')).inputValue()) === 'mia@example.com');
+  await p.goto(U + '?screen=profile'); await p.waitForTimeout(300); await p.click(T('crew-profile-password')); await p.waitForTimeout(150);
+  ok('Profile › Change password: the "Send me a code" link for a forgotten current password' + full, await p.locator(T('crew-pw-forgot')).isVisible() && (await box(T('crew-pw-forgot'))).height >= 44);
+  await p.click(T('crew-pw-forgot')); await p.waitForTimeout(150);
+  ok('…sends the code to the account email straight away: the code step, no email field, no "Wrong email?", back "Profile"' + full, await p.locator(T('crew-reset')).isVisible() && !(await p.locator(T('crew-pw-sheet')).isVisible()) && (await txt(T('crew-reset-title'))) === 'Check your email' && /mia@example\.com/.test(await txt(T('crew-reset-line'))) && (await p.locator(T('crew-reset-email')).count()) === 0 && (await p.locator(T('crew-reset-email-back')).count()) === 0 && await p.locator(T('crew-reset-again')).isVisible() && /Profile/.test(await txt(T('crew-reset-back'))) && (await go()) === 'POST /employees/forgot-password');
+  await p.fill(T('crew-reset-code'), '482915'); await p.fill(T('crew-reset-password'), 'painter2026'); await p.click(T('crew-reset-save')); await p.waitForTimeout(150);
+  ok('from Profile the done screen says the new password works and goes Back to Profile' + full, /Your new password works from now on\./.test(await txt(T('crew-reset-done'))) && (await txt(T('crew-reset-signin'))) === 'Back to Profile');
+  await p.click(T('crew-reset-signin')); await p.waitForTimeout(150);
+  ok('…back on Profile' + full, await p.locator(T('crew-profile')).isVisible());
+  await p.goto(U + '?screen=reset&step=2'); await p.waitForTimeout(300);
+  ok('deep link: the code step' + full, (await txt(T('crew-reset-title'))) === 'Check your email' && await p.locator(T('crew-reset-code')).isVisible());
 
   // ---- C5: onboarding, profile, my documents ----
   await p.goto(U + '?screen=onboarding'); await p.waitForTimeout(300);

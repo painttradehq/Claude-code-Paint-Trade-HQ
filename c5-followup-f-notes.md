@@ -1,0 +1,69 @@
+# C5 follow-up F — Reset a forgotten password by emailed code (crew)
+
+Prototype: one stack screen and two links in `c1-crew-shell.html` — the sign-in's **Forgot password?** (`employee-login-forgot`) and the Change password sheet's **Send me a code** (`crew-pw-forgot`) both open `#s-reset` (`crew-reset`). Deep links: `?screen=reset` (the email step), `?screen=reset&step=2` (the code step), `?screen=reset&from=profile` (the signed-in path). Checks: 28 of the 454 in `tools/test_c1.js` (`shots-f/f-*.png`, 390 × 844 and 360 × 800). Written 23 Oct 2026 after Josh: "changing password also needs to be done by email. like sending a code to the email and crew use that code to set a new pass."
+
+Order: after C5 is built. It is small enough to ride with Follow-up D (the distance question + weather) in one round; if D slips, it goes alone. It touches `app/employee/login.tsx` and the C5 Profile sheet, so it must land after C5, not before.
+
+## 1. Why
+
+C5 gives the crew a Change password sheet that needs the **current** password. A crew member who has forgotten it has nothing: the crew sign-in has no "Forgot password?" (the admin sign-in has had one since Round 43), and the owner cannot set a crew password from the admin app either. Today the only way back in is the owner deleting and re-adding them. The admin side already has the mechanism (`routes/password_reset.py`: a hashed single-use token emailed as a link, 60 minutes, never says whether the email exists, rate-limited). The crew version uses the same pattern with a **6-digit code typed into the app** instead of a link, because the crew app is a phone app: a link in an email opens the browser, not the app, and a code is what tradies know from their bank.
+
+## 2. What the crew member sees
+
+**Sign in** (`app/employee/login.tsx`): a right-aligned **"Forgot password?"** link under the password field, above the Sign in button, 44 px tall. It opens the reset screen with the email already typed on the sign-in carried across.
+
+**Reset your password** (`app/employee/reset-password.tsx`, a stack screen, back "Sign in"):
+
+1. **Email step** (title "Reset your password"): the line *"We'll email you a code to set a new password."*, the **Email** field (`autocomplete="username"`), **Send me a code**. Empty or not an email → the field outlined red, one inline line *"Enter your email address."*. Tap → `POST /employees/forgot-password {email}` → always the code step, whatever the server knows (§3).
+2. **Code step** (title "Check your email"): *"We sent a code to **{email}**. It lasts 15 minutes. If it isn't there, check your junk folder."*; **Code** (numeric keyboard, `autocomplete="one-time-code"` so iOS and Android offer the code from the email, max 6); **New password** with the hint *"At least 8 characters. You'll sign in with this from now on."*; **Set new password**; under it **Send another code** (left; posts forgot-password again, clears both fields) and **Wrong email?** (right; back to the email step). Client checks before the request: code not 6 digits → *"Enter the 6-digit code from your email."*; password under 8 → *"At least 8 characters."* (both can show at once, each under its field). The server's one refusal (§3) shows under the Code field: *"That code isn't right or has expired."*
+3. **Done** (title "Password changed"; the back button is hidden, the one button below does the same): the green tick, *"Sign in with **{email}** and your new password."*, **Sign in** → the sign-in screen with the email filled, password empty.
+
+**Profile › Change password** (the C5 sheet): a line under the password fields, *"Forgot your current password? **Send me a code**"*. Tap → the sheet closes, the app posts forgot-password with the signed-in account's email (the crew cannot change their email, so there is no email step) and lands on the **code step** with back "Profile", no "Wrong email?" link, Send another code kept. Done reads *"Your new password works from now on."* with **Back to Profile**. The signed-in session stays (it is the one that set the password); every other device is signed out (§3).
+
+No banner, no toast, no "we emailed you" pop-up: the code step is the confirmation. Nothing says whether the email exists (the admin rule; §3).
+
+## 3. Backend
+
+**New `routes/employee_password_reset.py`** (register in `server.py` next to `password_reset`), mirroring `routes/password_reset.py` line for line where it can:
+
+- **`POST /employees/forgot-password {email}`**, no auth. `email = body.email.strip().lower()`; `db.employees.find_one({"email": email, "deleted": {"$ne": True}})` (crew email is unique across the platform: `employee_login` looks it up by email alone and the duplicate check in `create_employee`/`register` is global). When found: a 6-digit code from `secrets.randbelow(1_000_000)` zero-padded; store **only its sha256** in `employee_reset_codes` `{_id: uuid, employee_id, owner_admin_id, email, code_hash, attempts: 0, used: false, created_at, expires_at: now + 15 min}` after `delete_many({employee_id, used: false})` (one live code per crew member, so "Send another code" invalidates the first); email the code with `send_email(to=email, subject="Your Paint Trade HQ code", html=...)` when `email_configured()`, log only `ref=code_hash[:8]` as the admin route does, never the code; a send failure is logged, not returned. Not found, or deleted: do nothing. **Always `200 {"message": "If that email is on a crew, we've sent a code."}`** in the same time either way (do the hash even when not found, so timing does not reveal existence). The email body: the heading "Your code", the six digits in 32 px monospace, "It lasts 15 minutes. If you didn't ask for it, ignore this email — your password hasn't changed.", the business name is **not** in it (the platform sends it; a crew member can only be on one business anyway). Plain `<table>` HTML like `_reset_email_html`; no links, so `_assert_safe_email` has nothing to check (the phrase list in `services/email.py:72` does not match "enter the code in the app"; keep it that way, do not write "reply with the code").
+- **`POST /employees/reset-password {email, code, new_password}`**, no auth. Look up the live code for that email (`{email, used: false}`); refuse with **400 `"That code isn't right or has expired."`** when there is none, it has expired, `attempts >= 5`, or the sha256 of the given code does not match (increment `attempts` on a mismatch; the same text for every case so nothing leaks which). `new_password` under 8 → 400 `"New password must be at least 8 characters."` (the admin's text). Success: `employees.update_one({_id}, {$set: {password_hash: hash_password(new_password), password_changed_at: now}})`, mark the code `used: true, used_at`, and sign out every other device: `revoke_all_other_sessions(admin_id=employee_id, keep_jti=<the caller's jti when the request carries a valid employee bearer, else "">, owner_admin_id=employee.owner_admin_id, reason="password_reset")` — `services/sessions.py` keys sessions by `admin_id` and already records crew logins as `source: "employee_login"`, so the same call works; if crew logins turn out not to be recorded there (check `employee_login`, it does not call `record_session` in the pre-Round-74 clone), revoke nothing and say so in the report rather than guessing. Return `{"ok": true}`.
+- The bearer on reset-password is **optional** (`HTTPBearer(auto_error=False)`, the C5 video route pattern): the Profile path sends it so its own session is kept; the sign-in path has none.
+- **Rate rules** in `rate_limiter.py`, under the admin pair: `(r"^/api/employees/forgot-password/?$", 5, 300, "ip")` and `(r"^/api/employees/reset-password/?$", 10, 300, "ip")`. Five attempts per code (above) is the second lock, so a 6-digit code cannot be brute-forced through many IPs.
+- `C5`'s `PUT /employees/password` (current + new) stays; this round does not touch it.
+- No admin route, no admin screen. The owner is not told; nothing is written to the owner's tenant except the crew member's own `password_hash` and `password_changed_at`.
+
+## 4. Frontend
+
+- `app/employee/login.tsx`: the link (`employee-login-forgot`), `router.push({pathname: '/employee/reset-password', params: {email}})`.
+- New `app/employee/reset-password.tsx`: the three steps in one file with `useState` (`step`, `email`, `code`, `pw`, `err`); `useLocalSearchParams<{email, from}>()`; `from === 'profile'` → post forgot-password on mount with `authStore` email and start at step 2. The crew `_layout.tsx` lets this route through signed out (it is outside the tab group, like `login` and `onboarding`). Styles from the C5 wizard (`fld`, `tin`, `err`, `hint`), nothing new.
+- C5's Profile sheet (`app/employee/profile.tsx`): the line and link (`crew-pw-forgot`) → close the sheet, `router.push('/employee/reset-password?from=profile')`.
+- `services/api.ts`: `forgotCrewPassword(email)`, `resetCrewPassword({email, code, new_password})`.
+
+## 5. Tests — `backend/tests/test_f_crew_password_reset.py` (Round 43 fixtures; `from seed import _db`)
+
+A helper reads the code's hash from `employee_reset_codes` and cannot read the code, so the tests set a known code by writing `code_hash = sha256("482915")` into the row the route created (the route is exercised for the send; the hash swap stands in for reading the email). `RATE_LIMIT_DISABLED=1` on the harness; the two limiter cases use `_creds.product_base()`.
+
+1. forgot-password for crew_a's email → 200 with the generic message; a row exists with `used: false`, `attempts: 0`, `expires_at` ≈ now + 15 min; the row holds no plain code.
+2. forgot-password for an unknown email → the identical 200 body; no row.
+3. forgot-password for a deleted crew member (`$set: {deleted: true}` on a `TS_` row made for the test) → 200, no row.
+4. A second forgot-password → the first row is gone, one live row.
+5. reset-password with the right code and `painter2026` → `{ok: true}`; `employees/login` with the new password → 200; with the old → 401; the row `used: true`.
+6. The same code again → 400 "That code isn't right or has expired.".
+7. A wrong code five times → each 400; `attempts` 5; then the right code → 400 (locked).
+8. An expired row (`$set: {expires_at: now - 1 min}`) → 400 the same text.
+9. `new_password: "short"` with a right code → 400 "New password must be at least 8 characters."; the code is still live afterwards (a password error must not burn the code).
+10. Cross-tenant: a code made for crew_a cannot be used with admin_b's crew email (`email` mismatch → 400); a crew bearer from crew_b on reset-password does not keep crew_b's session when the email is crew_a's (keep_jti only when the bearer's `sub` equals the row's `employee_id`).
+11. Limiter on: the sixth forgot-password from one IP within five minutes → 429; the eleventh reset-password → 429.
+
+Teardown: `employee_reset_codes.delete_many({email: /ts-pthq\.example$/})` and the `TS_` crew rows the test made; crew_a's password put back to the fixture's.
+
+## 6. What's new (Draft)
+
+**Title:** Forgot your password? Get a code by email.
+**Body:** Crew can now reset a forgotten password themselves: tap "Forgot password?" on the sign-in, get a 6-digit code by email, set a new password. The same link sits in Profile › Change password for anyone who can't remember their current one. Codes last 15 minutes and work once.
+
+## 7. Open points (for Josh)
+
+1. **Email only, or SMS too?** Every crew member has an email (it is their sign-in), so email covers all of them; SMS by Twilio costs per message and needs the phone verified first. Recommendation: email now, SMS never unless crew without working email turn up.
+2. **Should the owner see "password reset" in the crew member's history?** Not in this round. If wanted later it is one `employee_events` row, and the admin chat's.

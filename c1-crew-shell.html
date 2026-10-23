@@ -53,6 +53,16 @@ input{font-family:inherit}
 .error svg{width:18px;height:18px;flex-shrink:0;margin-top:1px}
 .login-foot{text-align:center;font-size:13.5px;color:var(--text-muted);margin-top:20px;line-height:1.5}
 .login-links{display:flex;justify-content:center;gap:18px;margin-top:10px;font-size:13px}
+.login-forgot{text-align:right;margin-top:-4px}
+.login-forgot a{display:inline-block;font-size:13.5px;font-weight:600;color:var(--accent);padding:10px 0;min-height:44px;line-height:24px}
+.reset-line{font-size:15px;color:var(--text-secondary);line-height:1.45;margin:0 4px 16px}
+.reset-done{text-align:center;padding:24px 0 8px}
+.reset-done .tick{width:64px;height:64px;border-radius:32px;background:var(--success-bg);color:var(--success);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.reset-done .tick svg{width:30px;height:30px}
+.reset-links{display:flex;justify-content:space-between;margin:4px 4px 0;font-size:13.5px}
+.reset-links a{color:var(--accent);font-weight:600;display:inline-block;padding:10px 0;min-height:44px;line-height:24px}
+.pw-forgot{font-size:13.5px;color:var(--text-secondary);margin:4px 4px 0}
+.pw-forgot a{color:var(--accent);font-weight:600;display:inline-block;padding:8px 0;min-height:44px;line-height:28px}
 .login-links a{color:var(--text-secondary);text-decoration:underline;text-underline-offset:3px}
 .login-foot-link{color:var(--accent);font-weight:600;text-decoration:underline;text-underline-offset:3px;display:inline-block;padding:4px 0}
 
@@ -451,6 +461,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
           <button type="button" id="pwToggle" data-testid="employee-login-show" aria-label="Show password">Show</button>
         </div>
       </div>
+      <div class="login-forgot"><a href="#" id="forgotLink" data-testid="employee-login-forgot">Forgot password?</a></div>
       <div class="error hide" id="loginError" data-testid="employee-login-error" role="alert">
         <svg><use href="#i-alert"/></svg><span id="loginErrorText"></span>
       </div>
@@ -459,6 +470,15 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     <div class="login-foot">Joining a crew? Scan the QR code your employer gave you.</div>
     <div class="login-foot" style="margin-top:8px">Business owner? <a href="/admin" data-testid="crew-login-admin-link" class="login-foot-link">Sign in at /admin</a></div>
     <div class="login-links"><a href="#" data-testid="crew-login-privacy">Privacy</a><a href="#" data-testid="crew-login-terms">Terms</a></div>
+  </section>
+
+  <!-- ================= Follow-up F: RESET PASSWORD BY EMAIL CODE (stack, signed out or from Profile) ================= -->
+  <section id="s-reset" class="hide" data-testid="crew-reset" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="resetBack" data-testid="crew-reset-back"><svg><use href="#i-back"/></svg><span id="resetBackLbl">Sign in</span></button></div>
+      <div class="job-title" id="resetTitle" data-testid="crew-reset-title">Reset your password</div>
+    </div>
+    <div class="form-body" id="resetBody" style="padding-top:8px"></div>
   </section>
 
   <!-- ================= APP ================= -->
@@ -787,6 +807,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
       <div class="sheet-grab"></div>
       <h2>Change password</h2>
       <div id="pwBody"></div>
+      <div class="pw-forgot">Forgot your current password? <a href="#" id="pwForgot" data-testid="crew-pw-forgot">Send me a code</a></div>
       <div style="display:flex;gap:10px;margin-top:12px"><button class="btn btn-outline" id="pwCancel" data-testid="crew-pw-cancel" style="flex:1">Cancel</button><button class="btn btn-primary" id="pwSave" data-testid="crew-pw-save" style="flex:1">Save</button></div>
     </div>
   </div>
@@ -1350,7 +1371,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     { id: 'd3', name: 'Safety agreement', status: 'ended', sent: '2026-05-01', signed: '2026-05-02', countersigned: '2026-05-02', ended: '2026-09-30', content: 'SAFETY AGREEMENT\n\nReplaced by the site safety plan of 30 Sep 2026.' },
   ];
   const cStatus = (c) => c.status === 'sent' ? { cls: 'wait', txt: 'Awaiting signature' } : c.status === 'signed' ? { cls: 'live', txt: 'Signed' } : { cls: 'ended', txt: 'Ended' };
-  function hideC5(){ ['#s-onb', '#s-profile', '#s-docs', '#s-doc', '#s-training', '#s-video', '#s-coaching', '#s-going', '#s-rating', '#s-equip', '#s-item'].forEach(x => $(x).classList.add('hide')); }
+  function hideC5(){ ['#s-onb', '#s-profile', '#s-docs', '#s-doc', '#s-reset', '#s-training', '#s-video', '#s-coaching', '#s-going', '#s-rating', '#s-equip', '#s-item'].forEach(x => $(x).classList.add('hide')); }
   function stackOpen(id){ $('#s-app').classList.add('hide'); $('#s-login').classList.add('hide'); hideC5(); $(id).classList.remove('hide'); const b = $(id + ' .form-body'); if (b) b.scrollTop = 0; }
   const MARK = $('#s-login .mark').innerHTML;
 
@@ -1742,6 +1763,46 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   $('#reqCancel').addEventListener('click', closeReq); $('#reqSend').addEventListener('click', sendReq);
   $('#reqBack').addEventListener('click', () => { req.cat = null; req.items = []; req.err = ''; renderReq(); });
 
+  // ---- Follow-up F: reset password by email code ----
+  // POST /employees/forgot-password {email} → always 200; POST /employees/reset-password {email, code, new_password}
+  const rs = { step: 1, email: '', code: '', pw: '', err: {}, from: 'login' };
+  function renderReset(){
+    $('#resetBackLbl').textContent = rs.from === 'profile' ? 'Profile' : 'Sign in';
+    $('#resetTitle').textContent = rs.step === 3 ? 'Password changed' : rs.step === 2 ? 'Check your email' : 'Reset your password';
+    $('#resetBack').style.visibility = rs.step === 3 ? 'hidden' : '';   // the one button below does the same
+    const b = $('#resetBody');
+    if (rs.step === 1) b.innerHTML = `<div class="reset-line" data-testid="crew-reset-line">We'll email you a code to set a new password.</div>
+      <div class="fld"><label for="rsEmail">Email</label><input id="rsEmail" data-testid="crew-reset-email" class="tin ${rs.err.email ? 'bad' : ''}" type="email" inputmode="email" autocapitalize="none" autocomplete="username" value="${esc(rs.email)}">${rs.err.email ? `<div class="err" data-testid="crew-reset-err">${esc(rs.err.email)}</div>` : ''}</div>
+      <button class="btn btn-primary" style="margin-top:8px" data-testid="crew-reset-send" data-reset="send">Send me a code</button>`;
+    else if (rs.step === 2) b.innerHTML = `<div class="reset-line" data-testid="crew-reset-line">We sent a code to <b>${esc(rs.email)}</b>. It lasts 15 minutes. If it isn't there, check your junk folder.</div>
+      <div class="fld"><label for="rsCode">Code</label><input id="rsCode" data-testid="crew-reset-code" class="tin ${rs.err.code ? 'bad' : ''}" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" value="${esc(rs.code)}">${rs.err.code ? `<div class="err" data-testid="crew-reset-err">${esc(rs.err.code)}</div>` : ''}</div>
+      <div class="fld"><label for="rsPw">New password</label><input id="rsPw" data-testid="crew-reset-password" class="tin ${rs.err.pw ? 'bad' : ''}" type="password" autocomplete="new-password" value="${esc(rs.pw)}"><div class="hint">At least 8 characters. You'll sign in with this from now on.</div>${rs.err.pw ? `<div class="err" data-testid="crew-reset-err">${esc(rs.err.pw)}</div>` : ''}</div>
+      <button class="btn btn-primary" style="margin-top:8px" data-testid="crew-reset-save" data-reset="save">Set new password</button>
+      <div class="reset-links"><a href="#" data-testid="crew-reset-again" data-reset="again">Send another code</a>${rs.from === 'profile' ? '' : '<a href="#" data-testid="crew-reset-email-back" data-reset="back1">Wrong email?</a>'}</div>`;
+    else b.innerHTML = `<div class="reset-done" data-testid="crew-reset-done"><div class="tick"><svg><use href="#i-check"/></svg></div><div class="onb-sub" style="font-size:16px">${rs.from === 'profile' ? 'Your new password works from now on.' : 'Sign in with <b>' + esc(rs.email) + '</b> and your new password.'}</div></div>
+      <button class="btn btn-primary" style="margin-top:12px" data-testid="crew-reset-signin" data-reset="done">${rs.from === 'profile' ? 'Back to Profile' : 'Sign in'}</button>`;
+  }
+  function openReset(from, email){ rs.step = 1; rs.email = email || ''; rs.code = ''; rs.pw = ''; rs.err = {}; rs.from = from || 'login'; hideC5(); $('#s-login').classList.add('hide'); $('#s-app').classList.add('hide'); $('#s-reset').classList.remove('hide'); document.body.dataset.lastGo = '/employee/reset-password';
+    if (rs.from === 'profile') { rs.step = 2; document.body.dataset.lastGo = 'POST /employees/forgot-password'; }   // signed in: the account email is fixed, the code is sent straight away
+    renderReset(); }
+  function closeReset(){ $('#s-reset').classList.add('hide'); if (rs.from === 'profile') { $('#s-app').classList.remove('hide'); openProfile(); } else { showLogin(); $('#email').value = rs.email || $('#email').value; } }
+  $('#resetBack').addEventListener('click', closeReset);
+  $('#forgotLink').addEventListener('click', (e) => { e.preventDefault(); openReset('login', $('#email').value.trim()); });
+  $('#pwForgot').addEventListener('click', (e) => { e.preventDefault(); closePwSheet(); openReset('profile', 'mia@example.com'); });
+  $('#resetBody').addEventListener('click', (e) => {
+    const t = e.target.closest('[data-reset]'); if (!t) return; e.preventDefault();
+    const a = t.dataset.reset;
+    if (a === 'send' || a === 'again') { if (a === 'send') rs.email = ($('#rsEmail').value || '').trim(); rs.err = {}; if (!/^\S+@\S+\.\S+$/.test(rs.email)) { rs.err.email = 'Enter your email address.'; rs.step = 1; renderReset(); return; } rs.step = 2; rs.code = ''; rs.pw = ''; renderReset(); document.body.dataset.lastGo = 'POST /employees/forgot-password'; return; }
+    if (a === 'back1') { rs.step = 1; rs.err = {}; renderReset(); return; }
+    if (a === 'save') { rs.code = ($('#rsCode').value || '').trim(); rs.pw = $('#rsPw').value || ''; rs.err = {};
+      if (!/^\d{6}$/.test(rs.code)) rs.err.code = 'Enter the 6-digit code from your email.';
+      if (rs.pw.length < 8) rs.err.pw = 'At least 8 characters.';
+      if (!Object.keys(rs.err).length && rs.code === '000000') rs.err.code = "That code isn't right or has expired.";   // the backend's one message for wrong, used, expired or too many tries
+      if (Object.keys(rs.err).length) { renderReset(); return; }
+      rs.step = 3; renderReset(); document.body.dataset.lastGo = 'POST /employees/reset-password'; return; }
+    if (a === 'done') { closeReset(); return; }
+  });
+
   // ---- C5 handlers ----
   document.body.addEventListener('click', (e) => {
     const t = e.target;
@@ -1801,6 +1862,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   else if (q.get('screen') === 'onboarding') { openOnb(parseInt(q.get('step') || '0', 10)); }
   else if (q.get('screen') === 'profile') { showApp('me'); openProfile(); }
   else if (q.get('screen') === 'docs') { showApp('me'); openDocs(); }
+  else if (q.get('screen') === 'reset') { openReset(q.get('from') || 'login', q.get('email') || (q.get('step') ? 'mia@example.com' : '')); const st = parseInt(q.get('step') || '1', 10); if (st > 1) { rs.step = st; renderReset(); } }
   else if (q.get('screen') === 'training') { showApp('learn'); openTraining(); }
   else if (q.get('screen') === 'video') { showApp('learn'); openVideo(q.get('id') || 'v3', q.get('from') || 'training'); }
   else if (q.get('screen') === 'coaching') { showApp('learn'); openCoaching(); }

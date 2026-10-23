@@ -122,3 +122,9 @@ Josh wants the crew to see as much of the job and scope as possible. Checked aga
 - **Needs the builder too** (both chats): a crew-notes box per area in the quote builder → shown under that area.
 - **Later, "Scope and progress"**: each quoted line tickable by the crew; the owner sees progress; the daily report's "what was done" starts from the ticked lines.
 - Recommended order: the first group as **C2 follow-up E** straight after C6; the rest after C7.
+
+## 23 Oct — password reset by email code (C5 follow-up F) — prototyped and specified
+Josh: "changing password also needs to be done by email. like sending a code to the email and crew use that code to set a new pass." → `c5-followup-f-notes.md`: sign-in "Forgot password?" and Profile › Change password "Send me a code" → 6-digit code by email, 15 min, single use, 5 tries, mirrors the admin reset; rides with D after C5. Open: SMS as well (recommend no); owner sees a "password reset" history row (not this round).
+
+## 23 Oct — consent between the business and its crew (Josh's question; assessed, not built)
+Josh: "do we need to create some sort of consent form in the app for the crew side that protects the admin from the crew or otherwise, like what we have between me and subscribers?" Answer given 23 Oct: the crew ↔ Paint Trade HQ layer is C5's "Before you join" step (three facts + the Terms/Privacy tick, versioned and stamped). The business ↔ crew layer is the employer's own (employment contract, policies, a location/app-use notice) and goes through Contracts as a signed document; Paint Trade HQ can supply a template ("Crew app and location notice") for the lawyer to check. Surveillance law makes the location notice real: Victoria needs consent, NSW 14 days' written notice. Parked: a platform template for Contracts (admin chat) + an "Acknowledged" document type; the lawyer's review of the template.
