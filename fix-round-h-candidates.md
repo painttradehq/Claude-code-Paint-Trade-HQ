@@ -1,0 +1,7 @@
+# Fix Round H — candidates collected after Round 83 (23 October)
+
+Observations, not decisions. Josh picks what goes in; the live-app check rounds (`admin-check-rounds.md`) feed this list too.
+
+1. **Quote email button is hard to read.** In the quote email template the "View & Accept Estimate ›" button has near-black text (`#0a0a0a`) on the purple button (`#4B3E86`). Seen in the Round 83 verification email on Resend. Fix: white text on the purple, as the app's own primary buttons have.
+2. **Business name falls back to the login email in the quote email.** The same email's header line and footer read "alpha.owner@test.pthq.local" and "Sent by alpha.owner@test.pthq.local via Paint Trade HQ" — the TS_ Alpha tenant has no business name in its profile, so the template printed the owner's login. Check whether the fallback should be the business name field's absence being impossible (sign-up requires a business name) or whether the TS_ seed simply skips it; if a real tenant can ever reach this state, the fallback should be the owner's name, never a login address.
+3. **Parked tester feedback FB-3f26b1ee.** Emergent's git log shows "Parking lot: FB-3f26b1ee parked tester feedback" during Round 83. Ask what it was at the next stop.
