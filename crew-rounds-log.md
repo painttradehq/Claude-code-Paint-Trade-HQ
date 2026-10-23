@@ -210,3 +210,4 @@ Rules: `crew-app-handover.md` §1. Rounds are C1, C2, …; one round at a time a
 ## 23 Oct — Josh: A for the Ask rule; the shell handed over; Round C5 SENT
 
 - Josh: "do a. and give me the c1 file and you can send". Follow-up D §10.10 = **A** (Ask as a third rule value; the admin chat adds one radio). `c1-crew-shell.html` sent to Josh to upload with "here". Round C5 message sent with an explicit wait: save the uploaded shell first, then start.
+- **Round C5 SENT** 23 Oct: `roundC5-message.md` (rules 1–6 + the v3 spec verbatim; the agent is told to wait for Josh's "here" upload of the shell, save it over `memory/specs/crew/c1-crew-shell.html`, then start); queued `dbdh0hmf0bhs73a36230`. Next: Josh uploads the shell; "Round C5 done" → "check".

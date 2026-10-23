@@ -114,3 +114,11 @@ C4 report → C5 (documents) → the soft-block follow-up → C6 (learn and gear
 - Nothing in the app lets two records exist for one email.
 
 **5. Connectors on the preview and the published app.** Not checkable from this chat; it is a platform check. The 14 Oct production deploy verified Resend (a real send). Unknown on production: Google Places (`GOOGLE_PLACES_API_KEY`), Google Drive / Calendar OAuth (client id, secret, redirect URIs), Twilio, Stripe, the GCS bucket for documents. **Recommendation (admin chat):** a Settings › Connections card that shows each provider as Connected / Not set up per environment, read from the server (key present + a test call), so Josh sees it without asking. Until then the admin chat asks the job for a one-off "connections status" readout on preview and production.
+
+## 23 Oct — more scope detail on the crew job page (Josh's screenshot of The work)
+
+Josh wants the crew to see as much of the job and scope as possible. Checked against the C2 route and the quote data (`models/estimate.py`, `c2-jobs-notes.md` §3):
+- **Already in the quote, not shown** (crew-only follow-up, two allow-list additions on `GET /projects/mine/{id}` + the page): the per-item `note` and `condition`; the quote photos with pins and notes tied to an area or line (`PhotoData.area_id/line_id/marks/note`); paint quantities and pack sizes; the `scope_summary` paragraph (C2 kept it off as "the quote's wording" — show behind an owner switch like `crew_visible`); planned labour hours per area (`EstimateItem.time`; owner switch). **Open for Josh:** planned hours on at all? scope summary on or off by default?
+- **Needs the builder too** (both chats): a crew-notes box per area in the quote builder → shown under that area.
+- **Later, "Scope and progress"**: each quoted line tickable by the crew; the owner sees progress; the daily report's "what was done" starts from the ticked lines.
+- Recommended order: the first group as **C2 follow-up E** straight after C6; the rest after C7.
