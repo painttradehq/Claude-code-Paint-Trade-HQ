@@ -1,4 +1,4 @@
-# Marketing captures — real screens and walkthrough clips from the preview (23 October) — SENT 23 Oct (sections 1–4 verbatim; report "Marketing captures done")
+# Marketing captures — real screens and walkthrough clips from the preview (23 October) — DONE 23 Oct (report `memory/reports/marketing-captures-report.md`: 47 screens, 8 WebM clips of 25–45 s, 31 MB in `memory/marketing/`; no .mp4 — no H.264 encoder on the box, a one-line conversion command is in the report; approximations: 33 Drive shown connected by a status mock, 36 tester state by the Round 83 mock, 44 the owner's preview of a draft report, 42 the Round 22 contract sheet, 41 the hours prefill shows the week's total; TS_ Alpha restored from a snapshot; nothing published)
 
 Josh wants real pictures of the app for the website and for the chat box's gallery, and short moving clips of a user going from page to page. Only Emergent can take them (the preview is not reachable from here). This is a **capture job, no code change**; it occupies the Emergent job for one sitting, so it goes when Josh says "send" and nothing else is running.
 
