@@ -1,6 +1,21 @@
 # Paint Trade HQ — Marketing Website Plan (v1)
 
-_Drafted 5 October 2026 from a read of the app source at `painttradehq/the-newest-update-of-pthq` (HEAD "Round 64"). Status: **draft for Joshy's decisions**. Companion fact file: `docs/app/pthq-app-briefing.md` (what is live vs planned — the website must not claim anything that file marks as not live)._
+_Drafted 5 October 2026 from a read of the app source at `painttradehq/the-newest-update-of-pthq` (HEAD "Round 64"). Status: **draft; five of seven decisions answered by Josh's 23 Oct chat-knowledge file, see the update block below**. Companion fact file: `docs/app/pthq-app-briefing.md` (what is live vs planned — the website must not claim anything that file marks as not live)._
+
+---
+
+## Update — 23 October 2026
+
+Josh supplied `docs/website/chat-knowledge.md`: the app as built at Round 83 (82 published), written as the **website chat box's** memory. It overrides this plan wherever they differ and settles D2, D3, D4, D7 and most of D5. What changed:
+
+- **Domain** is `painttradehq.co`, not `.com`.
+- **Pricing** is three monthly plans ex-GST with seats (Starter $59, Small business $179, Enterprise $249), a 14-day trial on Enterprise, billing built but not switched on.
+- **Legal:** Terms v1.2, lawyer-reviewed for the tester program; no separate Privacy Policy yet (Terms §5 covers personal data).
+- **Support:** software@joshsano.com.au.
+- **A chat box is part of v1**, answering only from that file and capturing leads by email.
+- Several features moved since the audit (presentation pages, auto-invoicing, operating hours, overtime rate, crew app at `/crew`, a Xero connect button). `docs/app/reconciliation-2026-10-23.md` lists the 25 differences; **8 need Josh's confirmation** before they go on a page.
+
+Still open: **D1** (where the site lives; recommend the static site in this repo, now with one serverless function for the chat box), **D6** (photos; recommend real), and whether the site takes the apex domain with the app moving to `app.painttradehq.co`.
 
 ---
 
@@ -34,26 +49,21 @@ Build a **separate, static marketing site** at `www.painttradehq.com` (Astro, ke
 - **"Early access / Join the tester program"** (truthful today: `TESTER_INVITES_REQUIRED=1` with per-tester invite codes and access dates) — **recommended now**.
 - "Start your free trial" — only once the invite gate is off.
 
-### D3 — Trial length (the code disagrees with itself)
-- Sign-up grants **90 days** (`SIGNUP_TRIAL_DAYS` default in `server.py` and `billing.py`).
-- Stripe Checkout grants **14 days** (`trial_period_days: 14` in `billing.py`).
-- The old marketing page says **14 days**, and "$468/year" for Standard where the code says $470.
-- **Recommendation:** during early access say "Free while you're in the tester program" and publish no number. Fix the 14 vs 90 split in the app before public launch.
+### D3 — Trial length — **answered 23 Oct**
+Josh's chat-knowledge file settles it: **14 days on Enterprise, no card needed**, once sign-up opens. During the tester program the site says "free for invited testers". (At Round 64 the code granted 90 days at sign-up and 14 in Stripe; confirm the sign-up default now matches.)
 
-### D4 — Show pricing during early access?
-Plans in code: **Standard $49/mo or $470/yr, Pro $119/mo or $1,140/yr, AUD** (`billing.py` pricing-config). That endpoint is public (verified: the router dependency passes anonymous GETs), so the site can read plans, prices and trial days live instead of hardcoding them.
-- Show it (transparency wins with tradies; filters tyre-kickers) — **recommended**, labelled "Pricing at launch · free during early access".
-- Hide it until launch.
+### D4 — Show pricing during early access? — **answered 23 Oct**
+Show it, labelled "Plans open at launch · testers use everything free". The plans are now (AUD a month, **ex-GST, +10%**): **Starter $59** (1 admin, 3 employees) · **Small business $179** (2 admins, 5 employees) · **Enterprise $249** (3 admins, 15 employees); extra admin seat $25/$25/$42, extra employee seat $15/$15/$25; monthly only, no annual; 14-day trial on Enterprise. The feature split per plan is in `chat-knowledge.md` §6. The public `pricing-config` endpoint may now return these plans; read it live if it does, otherwise hardcode from §6 and say both the ex-GST and the inc-GST figure the first time, as the file asks.
 
-### D5 — Domains
-Referenced in code: `www.painttradehq.com`, `app.painttradehq.com`, `pthq.app` (short quote/invoice links), `painttradehq.emergent.host`, `pthq-replica.preview.emergentagent.com`. Confirm which you own and where DNS is. Proposed: **www.painttradehq.com** = site, **app.painttradehq.com** = app, keep `pthq.app` for short client links only.
+### D5 — Domains — **mostly answered 23 Oct**
+The live domain is **painttradehq.co** (the admin app lives there; crew sign in at `/crew`; Terms at `/terms`). Open question: does the marketing site take the apex `painttradehq.co` with the app moving to `app.painttradehq.co`, or does the site sit at `www.painttradehq.co` while the app keeps the apex? Recommendation: site on the apex, app on `app.`, with redirects for the existing `/quote`, `/invoice`, `/report` and `/variation` links so nothing a client already holds breaks. The old code also referenced `www.painttradehq.com` and `pthq.app`; confirm whether those are still owned.
 
 ### D6 — Photos
 - **Real** job-site, crew and founder photos from Josh Sano Painting & Decorating (needs consent from anyone whose face appears) — **recommended**.
 - Stock / AI-generated (the current `frontend/public/marketing/img_*.png` are AI-style illustrations in an off-brand teal). Not recommended for a trust-driven trade market.
 
-### D7 — The AI's public name
-"Lucy" is used across the app (31 references in the UI). Keep "Lucy" on the website, with honest scope (reminders, morning brief, drafting, products refresh), or call it "AI assistant".
+### D7 — The AI's public name — **answered 23 Oct**
+"Lucy" stays; the chat-knowledge file uses it throughout and defines her scope (§4.12).
 
 ---
 
@@ -67,8 +77,9 @@ Referenced in code: `www.painttradehq.com`, `app.painttradehq.com`, `pthq.app` (
 | 3 | **Pricing** `/pricing` | Plans | Standard vs Pro cards, monthly/annual toggle, "what Pro adds" list (from the access gates in code), early-access note, billing FAQ |
 | 4 | **Story** `/about` | Trust | Josh, Melbourne, why a painter built this, the real business as customer zero, photo, timeline |
 | 5 | **Early access** `/early-access` | Lead capture | Form (business, your name, email, mobile, crew size, message) → `POST /api/signup-leads`; what happens next; link to `/signup` for people who already have a code |
-| 6 | **Terms** `/terms` | Legal | Rendered from the app's markdown (one source) |
-| 7 | **Privacy** `/privacy` | Legal | Same |
+| 6 | **Terms** `/terms` | Legal | Terms of Service v1.2 (22 Oct 2026, lawyer-reviewed for the tester program), rendered from the app's markdown (one source) |
+| 7 | **Privacy** `/privacy` | Legal | No separate policy during the tester program: this page says so and links to Terms §5 (personal data) |
+| + | **Chat box** (on every page) | Answers and lead capture | A small chat panel that answers only from `chat-knowledge.md`, in its voice and rules, and hands anything it cannot answer to Josh with an email capture (that file's §10) |
 
 Plus redirects: `/signup` → `app.painttradehq.com/signup` (pass `?code=&email=` through), `/login` → `app.painttradehq.com/admin/login`.
 
@@ -119,7 +130,8 @@ Output to `website/public/screens/`. Re-run on demand or on each app release.
 ### Website → app
 | Need | Endpoint today | Notes |
 |---|---|---|
-| Lead form | `POST /api/signup-leads` (public, no token) | Fields: `business_name`, `owner_name`, `email`, `phone`, `notes`. **No rate limit and no spam check on this route** (only `/api/auth/signup` is limited). Add a honeypot field on the site and a per-IP limit on the backend, or Cloudflare Turnstile, before going live. No auto-reply email is sent today. |
+| Lead form and chat-box leads | `POST /api/signup-leads` (public, no token) **and/or** email to software@joshsano.com.au | Josh's chat-knowledge file §10 asks for leads by email. The API puts them in Settings › Platform › Signup leads but sends no notification. Recommendation: do both (email Josh via Resend, and post to the API) so nothing is missed. Fields: `business_name`, `owner_name`, `email`, `phone`, `notes`. **No rate limit and no spam check on the API route**; add a honeypot and Cloudflare Turnstile on the site before going live. |
+| Chat box | A small serverless function beside the site (Cloudflare Pages Function or Vercel) that calls the Claude API with `chat-knowledge.md` as the system prompt, streams the reply, and posts captured leads as above | Options: **(A) serverless function beside the site, recommended**: full control, on-brand, pennies per conversation, no coupling to app deploys. (B) a public route on the app backend reusing its Claude key and audit log: couples the website to app releases and exposes the app to abuse. (C) a third-party widget (Crisp, Intercom): monthly cost, off-brand, hard to pin to one file. Needs an Anthropic API key, a per-IP rate limit and a daily spend cap. |
 | Sign-up CTA | `app.painttradehq.com/signup?code=&email=` | Invite-code gated via `SIGNUP_INVITE_CODE` / tester invites. `GET /api/auth/signup-config` (public) tells the site whether a code is required, so the CTA copy can switch automatically. |
 | Pricing | `GET /api/billing/pricing-config` | Public (verified: the router dependency passes anonymous GETs). Returns plans, AUD prices, `trial_days` and the Stripe publishable key. Read it live so prices never drift. |
 | Legal text | `GET /api/public/legal/terms` and `/privacy` (public) | Returns markdown + version. Render on the site so the app and site never drift. Docs are 1.0-draft with `[Legal entity name]` placeholders. |
@@ -159,6 +171,11 @@ Stripe (subscription billing, platform-managed) · Resend email · Google Calend
 - A sales pipeline board. (Lead statuses only.)
 - Text polish or voice notes. (Removed.)
 - Full admin on your phone. (Below 768 px the admin shell has no navigation; crew screens are phone-first, admin is desktop-first.)
+- A free plan or annual pricing. (Three monthly plans; 14-day trial on Enterprise only.)
+- Phone push notifications for the crew. (In-app notices today; Josh's file says push is "coming", so say "coming", never "live".)
+- Xero connected. ("On the list; not connected yet." No MYOB.)
+- Provider names (Emergent, Resend, Twilio, Stripe) unless a visitor asks how something works.
+- Launch dates.
 
 ---
 
