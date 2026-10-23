@@ -1,4 +1,4 @@
-# Round 83 — Fix Round G (the open items, 22 October) — SENT 22 Oct (the notes verbatim with the rules; picks 1a 2a 3a 4b 5a unchallenged)
+# Round 83 — Fix Round G (the open items, 22 October) — BUILT 22 Oct (report `memory/reports/round83-fix-g-report.md`; agent iteration 165 at 1440/1024; suite 187 s → 189 s exit 0; tsc clean; `test_r83_fix_g.py`; draft n 24). Item 1 needed no change (`/terms`, `/privacy`, `/crew` live outside the `/admin/*` layout); 2, 5, 6, 7, 8 done; 9 both display fixes done (a member's profile email, the sidebar identity); the SSRF guard is `services/safe_fetch.py`; the reply helper is `reply_to_for()`; the drawer footer's keyboard bypass found by the agent and fixed.
 
 No prototypes: every item is a label, a guard, a rule or a line of text on an existing screen. Nothing under `app/employee/*`. Josh's live-app check rounds (`admin-check-rounds.md`, Checks 1–7) were not done; this round carries only the items already known. Anything the checks find later is a Fix Round H.
 
