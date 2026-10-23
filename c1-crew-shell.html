@@ -989,14 +989,16 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   // Follow-up D — Settings › Crew app (Round 79): the backend measures the distance at sign-in AND at sign-out.
   // Rule flag: record and show (as C3). Rule ask: the route answers 409 {type: off_site | no_gps, distance_m, radius_m}
   // and nothing is written → this sheet → "anyway" re-posts the same body with confirmed: true → recorded and flagged.
-  // Rule block: the sign-in is refused (409, no "anyway"); a sign-out is never refused — it asks — so nobody is stuck on the clock.
+  // Rule block (Round 79, built): a sign-in further than the distance with an accurate fix is refused (409 outside_site, no "anyway");
+  // without a position it is recorded and flagged; a sign-out is never refused — recorded and flagged, no question.
   const dist = '820 m';
   let ask = null;
   function gate(action, jobId){
     const onJob = jobId !== 'general';                                      // General has no pin: nothing to measure
     const kind = !state.gps ? 'nogps' : (state.far && onJob) ? 'far' : null;
     if (!kind || state.rule === 'flag') { finish(action, jobId, kind); return; }
-    const block = state.rule === 'block' && action === 'in';
+    if (state.rule === 'block' && (kind === 'nogps' || action === 'out')) { finish(action, jobId, kind); return; }   // Round 79: recorded and flagged, never refused
+    const block = state.rule === 'block';
     const verb = action === 'in' ? 'sign in' : 'sign out', noun = action === 'in' ? 'sign-in' : 'sign-out';
     $('#askTitle').textContent = kind === 'far' ? "You're " + dist + ' from the job' : "We can't find your location";
     $('#askSub').textContent = block
@@ -1353,14 +1355,14 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   const MARK = $('#s-login .mark').innerHTML;
 
   // ---- onboarding (register mode: QR invite; finish mode: crew added by the owner with a temporary password) ----
-  const WELCOME = q.get('culture') === '0' ? null : { note: q.get('note') === '0' ? '' : 'Welcome aboard. We paint for people who trust us with their homes, so we do it properly and we look after each other. Any question, ask me or Dan.', title: 'The Painting Family Mentality', intro: 'At Sano Painting, we believe that great work comes from great relationships. We\'re not just a crew - we\'re a family that supports each other on and off the job.',
+  const WELCOME = { headline: q.get('headline') === '0' ? '' : 'Welcome to the crew', culture: q.get('culture') === '1', note: q.get('note') === '0' ? '' : 'Welcome aboard. We paint for people who trust us with their homes, so we do it properly and we look after each other. Any question, ask me or Dan.', title: 'The Painting Family Mentality', intro: 'At Sano Painting, we believe that great work comes from great relationships. We\'re not just a crew - we\'re a family that supports each other on and off the job.',
     sections: [ { title: 'Team building events', lines: ['Monthly team dinners', 'Quarterly BBQs', 'Social gatherings at local pubs', 'Team celebrations for milestones'] },
       { title: 'Communication', lines: ['If there\'s ever a personality clash or issue, we encourage open communication. Talk it through respectfully, and if needed, bring it to Josh. We handle conflicts professionally and fairly.'] },
       { title: 'Client interactions', lines: ['Always be polite and professional with clients. If there\'s a concern, let them know you\'ll pass it on to Josh.', '"Thanks for the feedback, I\'ll make sure Josh knows."', '"Let\'s take a moment and I\'ll call Josh to discuss this."'] } ] };
   const onb = { step: 0, name: '', dob: '', phone: '', email: '', emergency: '', password: '', tempPw: '', photo: false, docs: {}, agree: false, tried: false, watched: false, open: {},
     finish: q.get('finish') === '1',
     biz: q.get('biz') === '0' ? null : { business_name: BIZ, owner_name: 'Josh Sano', video: q.get('video') === '0' ? null : 'dQw4w9WgXcQ', welcome: WELCOME }, invalid: q.get('invalid') === '1' };
-  const hasCulture = () => !!(onb.biz && onb.biz.welcome);
+  const hasCulture = () => !!(onb.biz && onb.biz.welcome && onb.biz.welcome.culture);   // the team page: not in Round 79; kept as an option (&culture=1)
   const STEP_TOTAL = () => hasCulture() ? 5 : 4;
   // step ids: 0 welcome · 1 about you · 2 photo · 3 documents · 4 our team (only with content) · 5 agree · 6 done
   const nextStep = (n) => (n === 3 && !hasCulture()) ? 5 : n + 1;
@@ -1396,8 +1398,8 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
       body = `<div class="onb-top"><div class="mark" aria-hidden="true">${MARK}</div><div class="onb-kicker">Paint Trade HQ Crew</div><div class="onb-title" data-testid="crew-onb-invalid">This invite link isn't valid.</div><div class="onb-sub">Ask your employer for a new one. They make it in Team › Invite link.</div></div>`;
       bar = `<button class="btn btn-outline" data-testid="crew-onb-signin" data-onb="signin">Already on the team? Sign in</button>`;
     } else if (n === 0) {
-      const note = biz && biz.welcome && biz.welcome.note ? `<div class="sect">A note from ${esc(ownerFirst)}</div><div class="card" style="padding:14px 16px;font-size:15px;line-height:1.5;color:var(--text-secondary)" data-testid="crew-onb-note">${esc(biz.welcome.note)}</div>` : '';
-      const video = biz && biz.video ? `<div class="sect">${esc(ownerFirst)} has a message for you</div><button class="card vid" data-testid="crew-onb-video" data-onb="video"><div class="vid-thumb"><span class="play"><svg><use href="#i-play"/></svg></span></div><div class="vid-cap">${onb.watched ? '<span class="pill live">Watched</span> ' : ''}Welcome from ${esc(ownerFirst)} · 2 min</div></button>` : '';
+      const note = biz && biz.welcome && biz.welcome.note ? `<div class="sect">${biz.welcome.headline ? esc(biz.welcome.headline) : 'A note from ' + esc(ownerFirst)}</div><div class="card" style="padding:14px 16px;font-size:15px;line-height:1.5;color:var(--text-secondary)" data-testid="crew-onb-note">${esc(biz.welcome.note)}</div>` : '';
+      const video = biz && biz.video ? `<div class="sect">${esc(ownerFirst)} has a message for you</div><button class="card vid" data-testid="crew-onb-video" data-onb="video"><div class="vid-thumb"><span class="play"><svg><use href="#i-play"/></svg></span></div><div class="vid-cap">${onb.watched ? 'Playing…' : 'Welcome from ' + esc(ownerFirst)}</div></button>` : '';   // the owner's uploaded video, streamed from the app (Round 79), played in place
       body = `<div class="onb-top"><div class="mark" aria-hidden="true">${MARK}</div><div class="onb-kicker">Paint Trade HQ Crew</div><div class="onb-title" data-testid="crew-onb-title">${onb.finish ? 'Finish setting up' : (biz ? 'Join ' + esc(biz.business_name) : 'Join the team')}</div><div class="onb-sub">${onb.finish ? esc(biz ? biz.business_name : 'Your employer') + ' added you. Check your details, set your password and add your documents.' : ((biz ? esc(biz.owner_name) + ' has invited you.' : 'Your employer has invited you.') + ' It takes about five minutes.')}</div></div>${note}${video}
         <div class="sect">You'll need</div>
         <div class="card need"><div><span class="ico"><svg><use href="#i-file"/></svg></span>Your driving licence or photo ID</div><div><span class="ico"><svg><use href="#i-check"/></svg></span>Your white card</div><div><span class="ico"><svg><use href="#i-phone"/></svg></span>An emergency contact's name and number</div></div>`;
@@ -1749,7 +1751,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
       if (a === 'next') onbNext(); else if (a === 'back') { onb.tried = false; onb.step = Math.max(prevStep(onb.step), 0); renderOnb(); }
       else if (a === 'signin') { showLogin(); $('#email').value = onb.email || ''; } else if (a === 'photo') openPhotoSheet('onb');
       else if (a === 'agree') { onb.agree = !onb.agree; renderOnb(); } else if (a === 'showpw') { onb.showPw = !onb.showPw; renderOnb(); }
-      else if (a === 'video') { onb.watched = true; renderOnb(); document.body.dataset.lastGo = 'youtube:' + onb.biz.video; }
+      else if (a === 'video') { onb.watched = true; renderOnb(); document.body.dataset.lastGo = 'play:welcome'; }
       else if (a === 'toggle') { onb.open[o.dataset.i] = !onb.open[o.dataset.i]; renderOnb(); }
       else if (a === 'today') { showApp('today'); }
       return; }
