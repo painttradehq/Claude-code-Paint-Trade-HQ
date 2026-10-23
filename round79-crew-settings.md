@@ -22,4 +22,5 @@ Owner's decisions: sign-in distance 50 m default, 30 m minimum, rule "flag"; inv
 3. **"Refuse it" without an `accuracy_m`** (an older crew build) → recorded and flagged, as a poor reading; `accuracy_m ≤ 25` counts as accurate.
 4. **Sign-out flags** live in their own fields (`sign_out_outside_radius`, `sign_out_distance_from_site_m`); the admin "off-site sign-ins" bar keeps counting sign-ins only, as before.
 5. **Default distance moved from 100 to 50** — Iter 61's geofence test now reads the business distance from the API instead of asserting 100; a business that had set the old Operations radius keeps it until it saves a distance on the new page.
+(6 absent in the source as pasted.)
 7. **Platform-access**: members need the Settings area for the admin routes; crew reads pass the crew area check like the other `/employee/*` routes.

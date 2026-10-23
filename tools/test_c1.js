@@ -259,7 +259,7 @@ async function run(b, W, H, tag) {
   ok('OK: still signed out' + full, !(await p.locator(ASK).isVisible()) && /Signed out/.test(await txt('#clockStatus')));
   await p.goto(U + '?screen=app&tab=today&rule=block&gps=0'); await p.waitForTimeout(300);
   await signInFirst();
-  ok('rule block, no position (Round 79 as built): recorded and flagged, no refusal — the grey line' + full, !(await p.locator(ASK).isVisible()) && /Signed in/.test(await txt('#clockStatus')) && await p.locator(T('crew-clock-nogps')).isVisible());
+  ok('rule block, no position (Round 79 as built): recorded, not refused, nothing flagged — the grey line' + full, !(await p.locator(ASK).isVisible()) && /Signed in/.test(await txt('#clockStatus')) && await p.locator(T('crew-clock-nogps')).isVisible());
   await p.goto(U + '?screen=app&tab=today&rule=block&state=in&far=1'); await p.waitForTimeout(300);
   await p.click(T('crew-today-clock-btn')); await p.waitForTimeout(700);
   ok('rule block never refuses a sign-out (Round 79 as built): signed out, no question' + full, !(await p.locator(ASK).isVisible()) && /Signed out/.test(await txt('#clockStatus')));
