@@ -11,7 +11,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "qa": "node scripts/qa.mjs"
+    "qa": "node scripts/qa.mjs",
+    "test:functions": "node scripts/test-functions.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",

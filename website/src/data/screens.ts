@@ -46,7 +46,7 @@ export const screens: Record<string, Screen> = {
   'client-invoice': phone('client-invoice', '21-client-invoice-390.png', 'The invoice as the client sees it on a phone: Harbourline Painting, invoice number, due date, bill to, what it covers, Download PDF and Print', 'The client\'s invoice, with bank details below.'),
   calendar: admin('calendar', '22-calendar-1440.png', 'The calendar for October 2026 with colour categories for jobs, site visits, reminders, money due, birthdays and Google Calendar', 'Jobs, events and reminders in one view.'),
   'crm-clients': admin('crm-clients', '23-crm-clients-1440.png', 'The CRM clients list'),
-  crm: admin('crm', '24-client-page-1440.png', 'A client page in the CRM: lifetime, owed, open quotes, jobs, last touch, an AI summary written by Claude, the timeline and contact details', 'Every client on one page.'),
+  crm: admin('crm', '24-client-page-1440.png', 'A client page in the CRM: lifetime, owed, open quotes, jobs, last touch, an AI client summary, the timeline and contact details', 'Every client on one page.'),
   leads: admin('leads', '25-leads-pipeline-1440.png', 'The leads pipeline from enquiry to quoted to won or lost'),
   employees: admin('employees', '26-employees-1440.png', 'The Employees page: each crew member\'s card with hours this week, missing documents to upload and messages from the crew', 'Records, documents, pay rates, access.'),
   'pay-rates': admin('pay-rates', '27-employee-pay-rates-1440.png', 'An employee\'s pay rates: hourly, daily and overtime'),

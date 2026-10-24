@@ -5,8 +5,17 @@ compatibility_date = "2026-10-01"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "dist"
 
-# Optional per-IP rate limits for the two functions. Uncomment once the project is on Cloudflare;
-# the functions work without them (they then rely on message-size limits and Turnstile).
+# Rate limiting for the two functions. The code picks the best tier it finds:
+#   1. a Rate Limiting binding (CHAT_RATE_LIMIT / INVITE_RATE_LIMIT), if the Pages project supports one;
+#   2. a KV namespace bound as RATE_KV (create it in the dashboard, paste its id below);
+#   3. otherwise an in-memory counter per server, which is a soft floor only.
+# Whatever tier runs here, also add a WAF rate-limiting rule on /api/* (free plan includes one) and a
+# monthly spend cap in the Anthropic Console. See README → Deploy.
+#
+# [[kv_namespaces]]
+# binding = "RATE_KV"
+# id = "paste-the-namespace-id"
+#
 # [[ratelimits]]
 # name = "CHAT_RATE_LIMIT"
 # namespace_id = "1001"

@@ -6,7 +6,7 @@ const { plan } = Astro.props;
 const inc = incGst(plan.price);
 ---
 <article class={`plan card ${plan.highlight ? 'plan--highlight' : ''}`} aria-labelledby={`plan-${plan.id}`}>
-  {plan.highlight && <span class="pill plan__flag">Most crews</span>}
+  {plan.highlight && <span class="pill plan__flag">Includes Lucy</span>}
   <h3 id={`plan-${plan.id}`} class="plan__name">{plan.name}</h3>
   <p class="plan__blurb small">{plan.blurb}</p>
   <p class="plan__price">

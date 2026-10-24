@@ -35,7 +35,7 @@ import { site } from '../data/site';
     </div>
 
     <form class="chat__lead" id="chat-lead" hidden>
-      <p class="small"><strong>Leave your details</strong> and Josh will get back to you himself.</p>
+      <p class="small"><strong>Leave your details</strong> and Josh will get back to you himself. This chat goes with them so he has the context.</p>
       <div class="chat__lead-row">
         <input class="input" name="name" type="text" placeholder="Your name" autocomplete="name" required />
         <input class="input" name="email" type="email" placeholder="Email" autocomplete="email" required />
@@ -189,6 +189,7 @@ import { site } from '../data/site';
   }
 
   const LEAD_HINT = /(leave your (email|details)|what's your email|your email and josh|josh will answer|josh will be in touch|pass this to josh)/i;
+  const FALLBACK = 'The chat is having a moment. Email software@joshsano.com.au or use the invite form and Josh will answer.';
 
   async function ask(q: string) {
     if (busy) return;
@@ -210,7 +211,12 @@ import { site } from '../data/site';
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ messages: history.slice(-10), page: location.pathname }),
       });
-      if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok || !res.body) {
+        // The function answers 4xx/5xx with a short plain-text line meant for the visitor.
+        const ct = res.headers.get('content-type') || '';
+        const msg = ct.startsWith('text/plain') ? (await res.text().catch(() => '')).trim() : '';
+        throw new Error(msg || `HTTP ${res.status}`);
+      }
       out.classList.remove('chat__msg--typing');
       const reader = res.body.getReader();
       const dec = new TextDecoder();
@@ -222,11 +228,15 @@ import { site } from '../data/site';
         setText(out, text);
         log.scrollTop = log.scrollHeight;
       }
+      text += dec.decode();
+      if (!text.trim()) throw new Error('empty');
       history.push({ role: 'assistant', content: text });
       if (LEAD_HINT.test(text)) lead.hidden = false;
-    } catch {
+    } catch (e) {
       out.remove();
-      bubble('err', `The chat is having a moment. Email ${'software@joshsano.com.au'} or use the invite form and Josh will answer.`);
+      history.pop(); // keep the history valid: no visitor turn without an answer
+      const msg = e instanceof Error && e.message && !/^(HTTP \d+|empty)$/.test(e.message) ? e.message : FALLBACK;
+      bubble('err', msg);
       lead.hidden = false;
     } finally {
       busy = false; send.disabled = false; input.focus();

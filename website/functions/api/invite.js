@@ -9,13 +9,20 @@
  *   RESEND_API_KEY      required to send email
  *   INVITE_FROM         required: a sender on a domain verified in Resend, e.g. "Paint Trade HQ <website@painttradehq.co>"
  *   INVITE_TO           optional, default software@joshsano.com.au
- *   TURNSTILE_SECRET    optional; when set, a Turnstile token is required
+ *   TURNSTILE_SECRET    optional; when set, the full form needs a Turnstile token (the chat's mini form is exempt)
  *   APP_LEADS_URL       optional, e.g. https://painttradehq.co/api/signup-leads — also files the lead in the app
- *   INVITE_RATE_LIMIT   optional Rate Limiting binding (see wrangler.toml)
+ *   INVITE_RATE_LIMIT   optional Rate Limiting binding; RATE_KV optional KV namespace (see wrangler.toml)
+ *
+ * Guards, in order: Origin must be the site; body ≤ 64 KB; honeypot; 5 requests a minute per IP;
+ * Turnstile; field validation. Redirects only ever go to a path on this site.
  */
+import { sameOrigin, readLimited, rateLimit } from '../_lib/guard.js';
 
 const DEFAULT_TO = 'software@joshsano.com.au';
 const FIELDS = ['name', 'business', 'location', 'email', 'mobile', 'crew', 'software', 'source', 'transcript', 'redirect', 'website', 'cf-turnstile-response'];
+const MAX_BODY_BYTES = 64 * 1024;
+const RATE = { binding: 'INVITE_RATE_LIMIT', limit: 5, period: 60 };
+const DEFAULT_REDIRECT = '/invite?sent=1';
 
 const json = (status, body) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
@@ -23,22 +30,38 @@ const json = (status, body) =>
 const clean = (v, max = 300) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 
-async function readBody(request) {
-  const ct = request.headers.get('content-type') || '';
-  if (ct.includes('application/json')) {
-    const b = await request.json().catch(() => ({}));
-    return { data: b || {}, isForm: false };
+function parseBody(raw, contentType) {
+  if (contentType.includes('application/json')) {
+    try {
+      const b = JSON.parse(raw);
+      return { data: b && typeof b === 'object' && !Array.isArray(b) ? b : {}, isForm: false };
+    } catch {
+      return { data: {}, isForm: false };
+    }
   }
-  const fd = await request.formData().catch(() => null);
   const data = {};
-  if (fd) for (const [k, v] of fd.entries()) if (FIELDS.includes(k)) data[k] = typeof v === 'string' ? v : '';
+  if (contentType.includes('application/x-www-form-urlencoded')) {
+    for (const [k, v] of new URLSearchParams(raw)) if (FIELDS.includes(k)) data[k] = v;
+  }
   return { data, isForm: true };
 }
 
-function respond(isForm, status, payload, redirect) {
+/** A redirect target is only ever a path on this site; anything else falls back to the invite page. */
+function safeRedirect(redirect, request) {
+  if (typeof redirect !== 'string' || !/^\/(?![/\\])/.test(redirect)) return DEFAULT_REDIRECT;
+  try {
+    const base = new URL(request.url);
+    const u = new URL(redirect, base);
+    if (u.origin !== base.origin) return DEFAULT_REDIRECT;
+    return u.pathname + u.search;
+  } catch {
+    return DEFAULT_REDIRECT;
+  }
+}
+
+function respond(isForm, status, payload, redirectTo) {
   if (isForm) {
-    const to = typeof redirect === 'string' && redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/invite?sent=1';
-    const url = status < 400 ? to : `${to.split('?')[0]}?error=1`;
+    const url = status < 400 ? redirectTo : `${redirectTo.split('?')[0]}?error=1`;
     return new Response(null, { status: 303, headers: { location: url } });
   }
   return json(status, payload);
@@ -48,27 +71,33 @@ async function verifyTurnstile(secret, token, ip) {
   if (!token) return false;
   const form = new URLSearchParams({ secret, response: token });
   if (ip) form.set('remoteip', ip);
-  const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: form });
-  const j = await r.json().catch(() => ({}));
-  return !!j.success;
+  try {
+    const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: form });
+    const j = await r.json().catch(() => ({}));
+    return !!j.success;
+  } catch {
+    return false;
+  }
 }
 
 export async function onRequestPost({ request, env }) {
-  const { data, isForm } = await readBody(request);
-  const redirect = clean(data.redirect, 200);
+  const contentType = request.headers.get('content-type') || '';
+  const isFormHint = !contentType.includes('application/json');
+  if (!sameOrigin(request)) {
+    return respond(isFormHint, 403, { error: 'This form only works from the Paint Trade HQ website.' }, DEFAULT_REDIRECT);
+  }
+  const { raw, tooLarge } = await readLimited(request, MAX_BODY_BYTES);
+  if (tooLarge) return respond(isFormHint, 413, { error: 'That is too much text for the form.' }, DEFAULT_REDIRECT);
+
+  const { data, isForm } = parseBody(raw, contentType);
+  const redirectTo = safeRedirect(clean(data.redirect, 200), request);
 
   // Honeypot: bots fill the hidden "website" field; pretend it worked and drop it.
-  if (clean(data.website)) return respond(isForm, 200, { ok: true }, redirect);
+  if (clean(data.website)) return respond(isForm, 200, { ok: true }, redirectTo);
 
-  const ip = request.headers.get('cf-connecting-ip') || '';
-  if (env.INVITE_RATE_LIMIT && typeof env.INVITE_RATE_LIMIT.limit === 'function') {
-    const { success } = await env.INVITE_RATE_LIMIT.limit({ key: ip || 'unknown' });
-    if (!success) return respond(isForm, 429, { error: 'Too many requests. Try again in a minute.' }, redirect);
-  }
-
-  if (env.TURNSTILE_SECRET) {
-    const ok = await verifyTurnstile(env.TURNSTILE_SECRET, clean(data['cf-turnstile-response'], 4000), ip);
-    if (!ok) return respond(isForm, 400, { error: 'Please complete the check and try again.' }, redirect);
+  const ip = request.headers.get('cf-connecting-ip') || 'unknown';
+  if (!(await rateLimit(env, { ...RATE, key: ip }))) {
+    return respond(isForm, 429, { error: 'Too many requests. Try again in a minute.' }, redirectTo);
   }
 
   const lead = {
@@ -79,14 +108,21 @@ export async function onRequestPost({ request, env }) {
     mobile: clean(data.mobile, 40),
     crew: clean(data.crew, 40),
     software: clean(data.software, 200),
-    source: clean(data.source, 40) || 'website',
+    source: clean(data.source, 40) === 'chat' ? 'chat' : 'website',
     transcript: clean(data.transcript, 6000),
   };
-  if (!lead.email || !isEmail(lead.email)) return respond(isForm, 400, { error: 'Please enter a valid email.' }, redirect);
-  if (lead.source !== 'chat' && (!lead.name || !lead.business)) return respond(isForm, 400, { error: 'Name and business name are needed.' }, redirect);
+
+  // The chat's mini form has no Turnstile widget; it sits behind the chat's own limits instead.
+  if (env.TURNSTILE_SECRET && lead.source !== 'chat') {
+    const ok = await verifyTurnstile(env.TURNSTILE_SECRET, clean(data['cf-turnstile-response'], 4000), ip);
+    if (!ok) return respond(isForm, 400, { error: 'Please complete the check and try again.' }, redirectTo);
+  }
+
+  if (!lead.email || !isEmail(lead.email)) return respond(isForm, 400, { error: 'Please enter a valid email.' }, redirectTo);
+  if (lead.source !== 'chat' && (!lead.name || !lead.business)) return respond(isForm, 400, { error: 'Name and business name are needed.' }, redirectTo);
 
   if (!env.RESEND_API_KEY || !env.INVITE_FROM) {
-    return respond(isForm, 503, { error: `Email isn't set up yet. Please email ${DEFAULT_TO}.` }, redirect);
+    return respond(isForm, 503, { error: `Email isn't set up yet. Please email ${DEFAULT_TO}.` }, redirectTo);
   }
 
   const to = env.INVITE_TO || DEFAULT_TO;
@@ -101,20 +137,24 @@ export async function onRequestPost({ request, env }) {
     `Crew size:   ${lead.crew || '-'}`,
     `Uses today:  ${lead.software || '-'}`,
     '',
-    `Page: ${request.headers.get('referer') || '-'}`,
-    `IP: ${ip || '-'} · ${request.headers.get('user-agent') || ''}`,
+    `Page: ${clean(request.headers.get('referer'), 300) || '-'}`,
+    `IP: ${ip} · ${clean(request.headers.get('user-agent'), 300)}`,
   ];
-  if (lead.transcript) lines.push('', '--- Chat transcript ---', lead.transcript);
+  if (lead.transcript) lines.push('', '--- Chat transcript (as sent by the visitor\'s browser; unverified) ---', lead.transcript);
 
   const subject = lead.business ? `Invite request: ${lead.business} (${lead.name || lead.email})` : `Invite request: ${lead.email}`;
-  const r = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, 'content-type': 'application/json' },
-    body: JSON.stringify({ from: env.INVITE_FROM, to: [to], reply_to: lead.email, subject, text: lines.join('\n') }),
-  });
-  if (!r.ok) {
-    return respond(isForm, 502, { error: `That didn't send. Please email ${to}.` }, redirect);
+  let sent = false;
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ from: env.INVITE_FROM, to: [to], reply_to: lead.email, subject, text: lines.join('\n') }),
+    });
+    sent = r.ok;
+  } catch {
+    sent = false;
   }
+  if (!sent) return respond(isForm, 502, { error: `That didn't send. Please email ${to}.` }, redirectTo);
 
   // Optional: also file the lead in the app's Signup leads inbox (Settings › Platform). Best effort.
   if (env.APP_LEADS_URL) {
@@ -135,7 +175,7 @@ export async function onRequestPost({ request, env }) {
     }
   }
 
-  return respond(isForm, 200, { ok: true }, redirect);
+  return respond(isForm, 200, { ok: true }, redirectTo);
 }
 
 export function onRequestGet() {

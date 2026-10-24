@@ -81,7 +81,7 @@ export const plans: Plan[] = [
       'Auto-invoicing from the payment schedule',
       'Lucy, the AI assistant',
       'SMS to clients through your own number',
-      'Timesheets and the crew time clock',
+      'Timesheets page',
       'Business performance stats on the live project page',
       'AI summaries on project details and per client',
       'One hour of training for one person',
@@ -177,7 +177,7 @@ export const modules: Module[] = [
       'Add lines from the Library by category, repairs as sub-rows, custom lines, and optional lines the client can tick.',
       'Photos on areas with mark-up (arrows, circles, text). Product colours chosen on the quote flow through to the job.',
       'Quote set-up: your default terms, payment schedule (default 30% deposit, 40% progress, 30% final), warranty line, contract terms and one quote design with your logo and colours.',
-      'Presentation pages: extra pages built from blocks, about your business, your team, past job photos, reviews and ratings from eleven platforms, guarantees (Small business and up).',
+      'Presentation pages: extra pages built from blocks, about your business, your team, past job photos, reviews and ratings from eleven review sites, guarantees (Small business and up).',
       'Review & Send: one signature from the owner, an email with the link, a PDF, and a checklist of anything outstanding.',
       "The client's link: they read the quote on their phone, pick optional lines, sign by drawing or typing and tick the agreement. Acceptance creates the deposit invoice and tells you.",
       'Variations: priced changes during the job, approved by the client on a link with a typed name.',
@@ -203,12 +203,12 @@ export const modules: Module[] = [
   {
     id: 'timesheets',
     name: 'Timesheets and the time clock',
-    plan: 'Small business',
+    plan: 'Starter',
     summary: 'Sign in, sign out, pay week done.',
     points: [
       'Crew sign in and out on their phones. The app records GPS at those two moments, the address and the distance from the job site, and flags a sign-in outside the job\'s radius. No tracking in between.',
-      'Operating hours: your start and end time and working days. Crew get a reminder to sign in and out; an auto sign-out time closes forgotten sessions.',
-      'Timesheets page: a week grid per person, sessions in a drawer, overtime split by your thresholds (default 8 hours a day and 38 a week), lock a week, export the payroll CSV.',
+      'Operating hours: your start and end time and working days. Crew get a reminder in the crew app to sign in and out (phone notifications are coming); an auto sign-out time closes forgotten sessions.',
+      'Timesheets page (Small business and up): a week grid per person, sessions in a drawer, overtime split by your thresholds (default 8 hours a day and 38 a week), lock a week, export the payroll CSV.',
       'Pay rates on each employee: hourly, daily and an overtime rate. One money rule everywhere, and the project\'s labour cost uses the same rule.',
     ],
     screen: 'timesheets',
@@ -435,6 +435,22 @@ export const faqs: { q: string; a: string }[] = [
   {
     q: 'Can office staff have limited access?',
     a: 'Yes. Team admins get access page by page; crew get the crew app only.',
+  },
+  {
+    q: 'Can I import my clients from my old software?',
+    a: 'Yes: free on Enterprise, quoted on Starter and Small business.',
+  },
+  {
+    q: 'Does it send review requests?',
+    a: 'Yes, an automation sends your Google review link after a job, by email or SMS.',
+  },
+  {
+    q: 'Does it do daily site reports?',
+    a: 'Yes, on Enterprise: the crew write them with photos; you read and reply; the client gets a completion report.',
+  },
+  {
+    q: 'Can I see overtime?',
+    a: 'Yes. Overtime splits by your thresholds (default 8 hours a day, 38 a week); each person can have an overtime rate.',
   },
   {
     q: 'Is my data in Australia?',

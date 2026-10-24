@@ -99,7 +99,7 @@ try {
   }
 
   // Forbidden words and claims (knowledge file §12 and §9) must not appear on any page.
-  const banned = [/\btenant\b/i, /\bSaaS\b/, /\bplatform\b/i, /AI-powered/i, /revolutionary/i, /seamless/i, /App Store app/i, /free plan/i, /\bannual\b/i, /Stripe/, /Twilio/, /Resend/, /Emergent/, /offline/i, /Xero connected/i, /\bMYOB\b(?! \.)/];
+  const banned = [/\btenant\b/i, /\bSaaS\b/, /\bplatforms?\b/i, /AI-powered/i, /revolutionary/i, /seamless/i, /App Store app/i, /free plan/i, /\bannual\b/i, /Stripe/, /Twilio/, /Resend/, /Emergent/, /offline/i, /Xero connected/i, /\bMYOB\b(?! \.)/];
   const allow = [/no app store app/i, /no app store or play store app/i, /app store or play store apps/i, /is there a free plan\?/i, /no\. three plans/i, /annual price yet/i, /no annual price/i, /annual pricing/i, /xero or myob/i, /no myob/i, /not connected yet/i];
   for (const path of PAGES.filter((p) => p !== '/404')) {
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
