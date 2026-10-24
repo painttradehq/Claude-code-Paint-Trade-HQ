@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Button from '../components/Button.astro';
 import Screenshot from '../components/Screenshot.astro';
+import Clip from '../components/Clip.astro';
 import { site, modules } from '../data/site';
 
 const planPill = (p: string) => (p === 'Starter' ? 'pill--neutral' : p === 'Small business' ? '' : 'pill--success');
@@ -31,7 +32,11 @@ const planPill = (p: string) => (p === 'Starter' ? 'pill--neutral' : p === 'Smal
             {m.points.map((p) => <li>{p}</li>)}
           </ul>
         </div>
-        <div>{m.screen && <Screenshot id={m.screen} />}</div>
+        <div class="mod__media">
+          {m.screen && <Screenshot id={m.screen} />}
+          {m.screen2 && <Screenshot id={m.screen2} />}
+          {m.clip && <Clip id={m.clip} />}
+        </div>
       </div>
     </section>
   ))}
@@ -57,6 +62,7 @@ const planPill = (p: string) => (p === 'Starter' ? 'pill--neutral' : p === 'Smal
   }
   .toc a:hover { background: var(--accent); color: #fff; text-decoration: none; }
   .mod__title { margin-top: 12px; }
+  .mod__media { display: grid; gap: 20px; align-content: start; }
   .cta .lead { margin-left: auto; margin-right: auto; margin-bottom: 24px; }
   section[id] { scroll-margin-top: calc(var(--header-h) + 12px); }
 </style>

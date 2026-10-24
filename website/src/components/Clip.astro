@@ -1,5 +1,9 @@
 ---
-/** A silent WebM walkthrough from the builder's captures. Falls back to a placeholder when the file is absent. */
+/**
+ * A silent WebM walkthrough from the builder's captures. Click to play (no autoplay: eight clips total
+ * ~24 MB, so nothing downloads until asked). The poster is the matching screenshot. Falls back to a
+ * placeholder when the file is absent.
+ */
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { clips } from '../data/screens';
@@ -9,14 +13,26 @@ const { id, class: cls = '' } = Astro.props;
 const c = clips.find((x) => x.id === id);
 if (!c) throw new Error(`Unknown clip "${id}"`);
 const exists = existsSync(fileURLToPath(new URL(`../../public/clips/${c.file}`, import.meta.url)));
+const posterExists = existsSync(fileURLToPath(new URL(`../../public/clips/posters/${c.poster}`, import.meta.url)));
+const poster = posterExists ? `/clips/posters/${c.poster}` : undefined;
+const isPhone = c.height > c.width;
+const ratio = `${c.width} / ${c.height}`;
+const mins = Math.floor(c.seconds / 60);
+const secs = String(c.seconds % 60).padStart(2, '0');
 ---
-<figure class={`clip ${cls}`}>
-  <div class="clip__frame">
+<figure class={`clip ${isPhone ? 'clip--phone' : ''} ${cls}`} data-clip>
+  <div class="clip__frame" style={`aspect-ratio:${ratio}`}>
     {exists ? (
-      <video src={`/clips/${c.file}`} muted loop playsinline autoplay preload="metadata" aria-label={c.title}></video>
+      <>
+        <video src={`/clips/${c.file}`} poster={poster} muted loop playsinline preload="none" aria-label={c.title} data-clip-video></video>
+        <button type="button" class="clip__play" aria-label={`Play: ${c.title}`} data-clip-play>
+          <span class="clip__play-icon" aria-hidden="true"></span>
+          <span class="clip__play-text">{c.title} <span class="clip__dur mono">{mins}:{secs}</span></span>
+        </button>
+      </>
     ) : (
       <div class="clip__placeholder" role="img" aria-label={c.title}>
-        <span class="clip__play" aria-hidden="true"></span>
+        <span class="clip__play-icon" aria-hidden="true"></span>
         <span class="clip__label">{c.title}</span>
         <span class="mono small">{c.file}</span>
       </div>
@@ -28,15 +44,58 @@ const exists = existsSync(fileURLToPath(new URL(`../../public/clips/${c.file}`, 
 <style>
   .clip { margin: 0; }
   .clip__frame {
+    position: relative;
     border: 1px solid var(--border);
     border-radius: var(--r-lg);
     overflow: hidden;
-    background: var(--surface);
+    background: var(--sunken);
     box-shadow: var(--shadow-float);
   }
-  .clip video { width: 100%; display: block; }
+  .clip--phone .clip__frame { max-width: 320px; margin-inline: auto; border-radius: 28px; border: 6px solid #1e1c1a; background: #1e1c1a; }
+  .clip video { width: 100%; height: 100%; display: block; object-fit: cover; object-position: top; background: var(--sunken); }
+  .clip__play {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    border: 0;
+    background: linear-gradient(to top, rgba(30, 28, 26, 0.55), rgba(30, 28, 26, 0.08) 55%, rgba(30, 28, 26, 0));
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 20px;
+    font: inherit;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  }
+  .clip__play:hover .clip__play-icon { transform: scale(1.06); background: var(--accent-hover); }
+  .clip__play-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent);
+    position: relative;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    transition: transform 140ms ease, background-color 140ms ease;
+  }
+  .clip__play-icon::after {
+    content: '';
+    position: absolute;
+    left: 22px;
+    top: 17px;
+    border-left: 17px solid #fff;
+    border-top: 11px solid transparent;
+    border-bottom: 11px solid transparent;
+  }
+  .clip__play-text { font-size: 15px; }
+  .clip__dur { font-size: 12px; font-weight: 500; opacity: 0.85; margin-left: 6px; }
+  .clip[data-playing] .clip__play { display: none; }
   .clip__placeholder {
-    aspect-ratio: 16 / 10;
+    position: absolute;
+    inset: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -47,22 +106,22 @@ const exists = existsSync(fileURLToPath(new URL(`../../public/clips/${c.file}`, 
     text-align: center;
     padding: 24px;
   }
-  .clip__play {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: var(--accent);
-    position: relative;
-  }
-  .clip__play::after {
-    content: '';
-    position: absolute;
-    left: 20px;
-    top: 15px;
-    border-left: 16px solid #fff;
-    border-top: 11px solid transparent;
-    border-bottom: 11px solid transparent;
-  }
   .clip__label { font-family: var(--font-display); font-size: 16px; color: var(--text); }
   figcaption { margin-top: 10px; text-align: center; }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-clip]').forEach((fig) => {
+    const video = fig.querySelector<HTMLVideoElement>('[data-clip-video]');
+    const play = fig.querySelector<HTMLButtonElement>('[data-clip-play]');
+    if (!video || !play) return;
+    play.addEventListener('click', () => {
+      fig.dataset.playing = '1';
+      video.controls = true;
+      video.play().catch(() => {});
+    });
+    video.addEventListener('ended', () => {
+      delete fig.dataset.playing;
+    });
+  });
+</script>

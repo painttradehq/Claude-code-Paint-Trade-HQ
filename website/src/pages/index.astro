@@ -15,8 +15,8 @@ const homeFaqs = faqs.filter((f) =>
   <section class="hero">
     <div class="container hero__in">
       <div class="hero__copy">
-        <span class="eyebrow"><span class="pill">{site.status.pill}</span> Built in Melbourne for painting businesses</span>
-        <h1>Quote it. Run it. Get paid.</h1>
+        <span class="eyebrow"><span class="pill hero__pill">{site.status.pill}</span> Built in Melbourne for painting businesses</span>
+        <h1><span class="nowrap">Quote it.</span> <span class="nowrap">Run it.</span> <span class="nowrap">Get paid.</span></h1>
         <p class="lead">
           Paint Trade HQ runs the whole job: quotes your client signs on their phone, the live job your crew sign in to with GPS, daily reports, variations, invoices and payments, employee records, a CRM, a calendar, and Lucy, the AI assistant.
         </p>
@@ -129,12 +129,18 @@ const homeFaqs = faqs.filter((f) =>
     </div>
   </section>
 
-  <!-- Clip -->
+  <!-- Clips -->
   <section class="section section--tight">
     <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Watch it work</span>
+        <h2>Four short walkthroughs, no sound</h2>
+      </div>
       <div class="grid grid--2">
-        <Clip id="signin-to-job-drawer" />
-        <Clip id="lucy-client-to-morning-brief" />
+        <Clip id="new-quote-to-sent" />
+        <Clip id="invoice-payment-to-client-page" />
+        <Clip id="client-accepts-quote" />
+        <Clip id="crew-clock-in-and-daily-report" />
       </div>
     </div>
   </section>
@@ -222,7 +228,9 @@ const homeFaqs = faqs.filter((f) =>
     gap: clamp(28px, 5vw, 64px);
     align-items: center;
   }
-  .hero__copy .eyebrow { display: inline-flex; align-items: center; gap: 10px; }
+  .hero__copy .eyebrow { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .hero__pill { text-transform: none; letter-spacing: 0; white-space: nowrap; }
+  .nowrap { white-space: nowrap; }
   .hero__cta { margin-top: 24px; }
   .hero__status { margin-top: 16px; }
   @media (max-width: 960px) {

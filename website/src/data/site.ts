@@ -135,6 +135,8 @@ export type Module = {
   summary: string;
   points: string[];
   screen?: string; // slot id in screens.ts
+  screen2?: string; // optional second screenshot
+  clip?: string; // clip id in screens.ts
 };
 
 export const modules: Module[] = [
@@ -150,6 +152,7 @@ export const modules: Module[] = [
       'Recent activity and any one-time notices, such as a Terms update with its "I agree" button.',
     ],
     screen: 'dashboard',
+    clip: 'signin-to-job-drawer',
   },
   {
     id: 'library',
@@ -180,6 +183,7 @@ export const modules: Module[] = [
       'Variations: priced changes during the job, approved by the client on a link with a typed name.',
     ],
     screen: 'quote-builder',
+    clip: 'new-quote-to-sent',
   },
   {
     id: 'projects',
@@ -194,6 +198,7 @@ export const modules: Module[] = [
       'Crew notes on the job are for the crew; private admin notes live on the quote.',
     ],
     screen: 'project-details',
+    clip: 'project-to-completion-report',
   },
   {
     id: 'timesheets',
@@ -207,6 +212,7 @@ export const modules: Module[] = [
       'Pay rates on each employee: hourly, daily and an overtime rate. One money rule everywhere, and the project\'s labour cost uses the same rule.',
     ],
     screen: 'timesheets',
+    clip: 'timesheets-to-payroll-csv',
   },
   {
     id: 'daily-reports',
@@ -219,6 +225,7 @@ export const modules: Module[] = [
       'The client-facing completion report draws on them.',
     ],
     screen: 'daily-report',
+    clip: 'crew-clock-in-and-daily-report',
   },
   {
     id: 'invoices',
@@ -232,7 +239,8 @@ export const modules: Module[] = [
       'Paint Trade HQ does not take card payments from your clients and never holds card details.',
       'Invoice set-up: numbering, terms line, footer text.',
     ],
-    screen: 'invoice',
+    screen: 'client-invoice',
+    clip: 'invoice-payment-to-client-page',
   },
   {
     id: 'calendar',
@@ -260,6 +268,7 @@ export const modules: Module[] = [
       'Team events: a notice board for the crew.',
     ],
     screen: 'employees',
+    screen2: 'contracts',
   },
   {
     id: 'crew-app',
@@ -301,6 +310,7 @@ export const modules: Module[] = [
       'Lucy runs on Anthropic\'s Claude. Under Anthropic\'s commercial terms your data is not used to train models. The crew have no AI features.',
     ],
     screen: 'lucy',
+    clip: 'lucy-client-to-morning-brief',
   },
   {
     id: 'files',

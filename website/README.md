@@ -8,7 +8,15 @@ Every sentence traces to **`../docs/website/chat-knowledge.md`** (Josh's file: w
 
 ## Screenshots and clips
 
-Drop the builder's captures into `public/screens/` (47 PNGs) and `public/clips/` (8 WebM). Then map file names to slots in `src/data/screens.ts`. Any slot without a file renders a labelled placeholder, so the site always builds.
+The builder's captures (demo business "Harbourline Painting", 23 Oct 2026) live in `public/screens/` (47 PNGs: admin at 1440×900, some at 1024×900, crew and client pages at 780×1688) and `public/clips/` (8 silent WebM walkthroughs, 25–45 s, 1440×900 except 03 and 05 at 390×844). Slots and captions are in `src/data/screens.ts`; any slot without a file renders a labelled placeholder, so the site always builds.
+
+Clips never autoplay. Each shows a poster frame from `public/clips/posters/` with a play button, and the video loads only when clicked. To cut a new poster:
+
+```sh
+ffmpeg -nostdin -y -ss 39.5 -i public/clips/02-new-quote-to-sent.webm -frames:v 1 -q:v 3 public/clips/posters/02-new-quote-to-sent.jpg
+```
+
+When a new round changes a screen, replace the file under the same name and re-check the alt text and caption for that slot.
 
 ## Run locally
 
