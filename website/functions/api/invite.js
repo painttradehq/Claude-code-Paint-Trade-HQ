@@ -9,12 +9,14 @@
  *   RESEND_API_KEY      required to send email
  *   INVITE_FROM         required: a sender on a domain verified in Resend, e.g. "Paint Trade HQ <website@painttradehq.co>"
  *   INVITE_TO           optional, default software@joshsano.com.au
- *   TURNSTILE_SECRET    optional; when set, the full form needs a Turnstile token (the chat's mini form is exempt)
+ *   TURNSTILE_SECRET    optional; when set, the full form needs a Turnstile token. The chat's mini form is exempt
+ *                       and gets its own tighter budget (2 a minute per IP) instead.
  *   APP_LEADS_URL       optional, e.g. https://painttradehq.co/api/signup-leads — also files the lead in the app
  *   INVITE_RATE_LIMIT   optional Rate Limiting binding; RATE_KV optional KV namespace (see wrangler.toml)
  *
- * Guards, in order: Origin must be the site; body ≤ 64 KB; honeypot; 5 requests a minute per IP;
- * Turnstile; field validation. Redirects only ever go to a path on this site.
+ * Guards, in order: Origin must be the site; body ≤ 64 KB; honeypot; 5 requests a minute per IP (2 for
+ * chat-sourced leads); Turnstile; field validation. Redirects only ever go to a path on this site:
+ * /invite/sent on success, /invite/error on any failure.
  */
 import { sameOrigin, readLimited, rateLimit } from '../_lib/guard.js';
 
@@ -22,7 +24,9 @@ const DEFAULT_TO = 'software@joshsano.com.au';
 const FIELDS = ['name', 'business', 'location', 'email', 'mobile', 'crew', 'software', 'source', 'transcript', 'redirect', 'website', 'cf-turnstile-response'];
 const MAX_BODY_BYTES = 64 * 1024;
 const RATE = { binding: 'INVITE_RATE_LIMIT', limit: 5, period: 60 };
-const DEFAULT_REDIRECT = '/invite?sent=1';
+const CHAT_RATE = { binding: 'INVITE_CHAT_LIMIT', limit: 2, period: 60 };
+const DEFAULT_REDIRECT = '/invite/sent';
+const ERROR_REDIRECT = '/invite/error';
 
 const json = (status, body) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
@@ -46,14 +50,20 @@ function parseBody(raw, contentType) {
   return { data, isForm: true };
 }
 
-/** A redirect target is only ever a path on this site; anything else falls back to the invite page. */
+/**
+ * A redirect target is only ever a path on this site; anything else falls back to the thank-you page.
+ * The input AND the resolved result are checked: dot segments ("/.//evil.com") can resolve to a
+ * protocol-relative path even when the parsed origin is still ours.
+ */
 function safeRedirect(redirect, request) {
   if (typeof redirect !== 'string' || !/^\/(?![/\\])/.test(redirect)) return DEFAULT_REDIRECT;
   try {
     const base = new URL(request.url);
     const u = new URL(redirect, base);
     if (u.origin !== base.origin) return DEFAULT_REDIRECT;
-    return u.pathname + u.search;
+    const out = u.pathname + u.search;
+    if (!/^\/(?![/\\])/.test(out) || /[\\\s]/.test(out)) return DEFAULT_REDIRECT;
+    return out;
   } catch {
     return DEFAULT_REDIRECT;
   }
@@ -61,8 +71,7 @@ function safeRedirect(redirect, request) {
 
 function respond(isForm, status, payload, redirectTo) {
   if (isForm) {
-    const url = status < 400 ? redirectTo : `${redirectTo.split('?')[0]}?error=1`;
-    return new Response(null, { status: 303, headers: { location: url } });
+    return new Response(null, { status: 303, headers: { location: status < 400 ? redirectTo : ERROR_REDIRECT } });
   }
   return json(status, payload);
 }
@@ -112,7 +121,11 @@ export async function onRequestPost({ request, env }) {
     transcript: clean(data.transcript, 6000),
   };
 
-  // The chat's mini form has no Turnstile widget; it sits behind the chat's own limits instead.
+  // The chat's mini form has no Turnstile widget. Anyone can set source=chat, so instead of the check
+  // it gets a tighter budget: 2 a minute per IP on top of the 5 above.
+  if (lead.source === 'chat' && !(await rateLimit(env, { ...CHAT_RATE, key: ip }))) {
+    return respond(isForm, 429, { error: 'Too many requests. Try again in a minute.' }, redirectTo);
+  }
   if (env.TURNSTILE_SECRET && lead.source !== 'chat') {
     const ok = await verifyTurnstile(env.TURNSTILE_SECRET, clean(data['cf-turnstile-response'], 4000), ip);
     if (!ok) return respond(isForm, 400, { error: 'Please complete the check and try again.' }, redirectTo);

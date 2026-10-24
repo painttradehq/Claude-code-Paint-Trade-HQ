@@ -46,18 +46,22 @@ const BUSY_TEXT = `Lots of people are asking right now. Try again in a minute, o
 const text = (status, body) =>
   new Response(body, { status, headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' } });
 
-function sanitiseMessages(raw) {
+/**
+ * Shape-checks the conversation the browser sent. Malformed input (wrong roles, non-string content,
+ * nothing from the visitor) returns null. An over-long but well-formed window is trimmed from the oldest
+ * turn instead, so a chat with a few long answers keeps working.
+ */
+export function sanitiseMessages(raw) {
   if (!Array.isArray(raw) || raw.length === 0) return null;
   const out = [];
-  let total = 0;
   for (const m of raw.slice(-MAX_TURNS)) {
     if (!m || (m.role !== 'user' && m.role !== 'assistant') || typeof m.content !== 'string') return null;
     const content = m.content.trim().slice(0, m.role === 'user' ? MAX_USER_CHARS : MAX_ASSISTANT_CHARS);
     if (!content) continue;
-    total += content.length;
-    if (total > MAX_TOTAL_CHARS) return null;
     out.push({ role: m.role, content });
   }
+  let total = out.reduce((n, m) => n + m.content.length, 0);
+  while (out.length > 1 && total > MAX_TOTAL_CHARS) total -= out.shift().content.length;
   // First and last message must be from the visitor.
   while (out.length && out[0].role !== 'user') out.shift();
   if (!out.length || out[out.length - 1].role !== 'user') return null;
@@ -83,10 +87,10 @@ export async function onRequestPost({ request, env }) {
   try {
     body = JSON.parse(raw);
   } catch {
-    return text(400, 'Expected JSON.');
+    return text(400, 'Something went wrong with that message. Try again, or reload the page.');
   }
   const messages = sanitiseMessages(body?.messages);
-  if (!messages) return text(400, 'Bad messages.');
+  if (!messages) return text(400, 'Something went wrong with that message. Try again, or reload the page.');
   const page = typeof body?.page === 'string' ? body.page.replace(/[^\w\-/?=&.#]/g, '').slice(0, 120) || '/' : '/';
 
   const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, maxRetries: 1, timeout: 45_000 });

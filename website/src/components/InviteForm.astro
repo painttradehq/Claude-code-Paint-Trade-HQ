@@ -2,14 +2,14 @@
 /**
  * "Ask for an invite" — the site's only call to action (builder's pack §2). Collects what the
  * knowledge file §10 lists and emails Josh through /api/invite. Works without JavaScript (plain
- * POST, the function redirects back with ?sent=1) and with it (fetch + inline success).
+ * POST; the function redirects to /invite/sent or /invite/error) and with it (fetch + inline success).
  */
 import { inviteFields, site } from '../data/site';
 const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
 ---
 <form class="invite card" id="invite-form" method="post" action="/api/invite" novalidate>
   <input type="hidden" name="source" value="invite-page" />
-  <input type="hidden" name="redirect" value="/invite?sent=1" />
+  <input type="hidden" name="redirect" value="/invite/sent" />
   <!-- Honeypot: real people never see or fill this. -->
   <div class="visually-hidden" aria-hidden="true">
     <label for="invite-website">Website</label>
@@ -54,7 +54,7 @@ const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
     <p class="small">Already have access? <a href={site.signInUrl} rel="noopener">Sign in</a>.</p>
   </div>
   <p class="invite__error small" id="invite-error" hidden role="alert">
-    That didn't send. Please email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a> and Josh will get it.
+    That didn't send. Or email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a> and Josh will get it.
   </p>
 </form>
 
@@ -80,12 +80,7 @@ const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
   const done = document.getElementById('invite-done') as HTMLElement;
   const err = document.getElementById('invite-error') as HTMLElement;
   const submit = document.getElementById('invite-submit') as HTMLButtonElement;
-
-  if (new URLSearchParams(location.search).get('sent') === '1') {
-    form.querySelector('.invite__grid')?.setAttribute('hidden', '');
-    form.querySelector('.invite__foot')?.setAttribute('hidden', '');
-    done.hidden = false;
-  }
+  const SUPPORT = 'software@joshsano.com.au';
 
   form.addEventListener('submit', async (e) => {
     if (!form.checkValidity()) { form.reportValidity(); e.preventDefault(); return; }
@@ -94,14 +89,31 @@ const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
     const payload = Object.fromEntries(new FormData(form).entries());
     try {
       const res = await fetch('/api/invite', { method: 'POST', headers: { 'content-type': 'application/json', accept: 'application/json' }, body: JSON.stringify(payload) });
-      if (!res.ok) throw new Error(String(res.status));
+      if (!res.ok) {
+        // 4xx carries a short line meant for the visitor (bad email, missing name, failed check).
+        let msg = '';
+        if (res.status < 500) msg = (await res.json().catch(() => ({})))?.error || '';
+        throw new Error(msg);
+      }
       form.querySelector('.invite__grid')?.setAttribute('hidden', '');
       form.querySelector('.invite__foot')?.setAttribute('hidden', '');
       done.hidden = false;
       done.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    } catch {
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : '';
+      err.textContent = '';
+      if (msg) {
+        err.append(`${msg} `);
+      }
+      err.append('Or email ');
+      const a = document.createElement('a');
+      a.href = `mailto:${SUPPORT}`;
+      a.textContent = SUPPORT;
+      err.append(a, ' and Josh will get it.');
       err.hidden = false;
       submit.disabled = false;
+      // Turnstile tokens are single-use: get a fresh one for the retry.
+      (window as any).turnstile?.reset?.();
     }
   });
 </script>

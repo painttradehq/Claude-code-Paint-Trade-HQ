@@ -229,8 +229,9 @@ import { site } from '../data/site';
         log.scrollTop = log.scrollHeight;
       }
       text += dec.decode();
+      setText(out, text);
       if (!text.trim()) throw new Error('empty');
-      history.push({ role: 'assistant', content: text });
+      history.push({ role: 'assistant', content: text.slice(0, 2000) }); // the function keeps the same cap
       if (LEAD_HINT.test(text)) lead.hidden = false;
     } catch (e) {
       out.remove();

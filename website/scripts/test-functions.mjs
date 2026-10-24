@@ -3,7 +3,8 @@
  * the machine. Run: npm run test:functions (after npm run build, which generates _lib/knowledge.js).
  */
 import assert from 'node:assert/strict';
-import { onRequestPost as chat } from '../functions/api/chat.js';
+import { onRequestPost as chat, sanitiseMessages } from '../functions/api/chat.js';
+import { sameOrigin, readLimited, rateLimit } from '../functions/_lib/guard.js';
 import { onRequestPost as invite } from '../functions/api/invite.js';
 
 const SITE = 'https://www.painttradehq.co';
@@ -48,13 +49,12 @@ console.log('chat.js');
     { messages: [{ role: 'user', content: { nested: true } }] },
     { messages: [{ role: 'user', content: 'a' }, { role: 'assistant', content: 'b' }] },
     { messages: [{ role: 'assistant', content: 'b' }] },
-    { messages: Array.from({ length: 20 }, () => ({ role: 'user', content: 'y'.repeat(500) })) },
   ]) {
     r = await chat({ request: req('/api/chat', { body: bad }), env: live });
     assert.equal(r.status, 400, JSON.stringify(bad).slice(0, 60));
   }
-  ok('role spoofing, non-string content, assistant-last, oversize window → 400');
-  assert.equal((await r.text()).includes('at '), false); ok('error bodies carry no stack trace');
+  ok('role spoofing, non-string content, assistant-last → 400');
+  assert.equal(/Error|\n\s+at /.test(await r.text()), false); ok('error bodies carry no stack trace');
   assert.equal(r.headers.get('access-control-allow-origin'), null); ok('no CORS headers');
 
   // Rate limit floor: 20 a minute per IP, checked before the body is parsed.
@@ -85,7 +85,7 @@ console.log('invite.js');
   let r = await invite({ request: req('/api/invite', { body: lead, origin: null }), env: base });
   assert.equal(r.status, 403); ok('missing Origin → 403 (JSON)');
   r = await invite({ request: req('/api/invite', { body: lead, json: false, origin: 'https://evil.example' }), env: base });
-  assert.equal(r.status, 303); assert.equal(r.headers.get('location'), '/invite?error=1'); ok('foreign Origin on a form POST → redirect to /invite?error=1');
+  assert.equal(r.status, 303); assert.equal(r.headers.get('location'), '/invite/error'); ok('foreign Origin on a form POST → redirect to /invite/error');
 
   r = await invite({ request: req('/api/invite', { body: { ...lead, transcript: 'z'.repeat(70 * 1024) } }), env: base });
   assert.equal(r.status, 413); ok('70 KB body → 413');
@@ -97,16 +97,26 @@ console.log('invite.js');
   // Redirect safety (form POSTs).
   for (const [redirect, expect] of [
     ['/thanks?x=1', '/thanks?x=1'],
-    ['/\\evil.com', '/invite?sent=1'],
-    ['//evil.com', '/invite?sent=1'],
-    ['https://evil.com/', '/invite?sent=1'],
+    ['/a/../b', '/b'],
+    ['/\\evil.com', '/invite/sent'],
+    ['//evil.com', '/invite/sent'],
+    ['https://evil.com/', '/invite/sent'],
     ['/thanks#frag', '/thanks'],
-    ['javascript:alert(1)', '/invite?sent=1'],
+    ['javascript:alert(1)', '/invite/sent'],
+    ['/.//evil.com', '/invite/sent'],
+    ['/..//evil.com', '/invite/sent'],
+    ['/a/..//evil.com', '/invite/sent'],
+    ['/.\\\\evil.com', '/invite/sent'],
+    ['/..\\\\evil.com', '/invite/sent'],
+    ['/%2e%2e//evil.com', '/invite/sent'],
+    ['/thanks\t', '/thanks'], // trimmed before the check
   ]) {
     r = await invite({ request: req('/api/invite', { body: { ...lead, website: 'bot', redirect }, json: false, ip: '192.0.2.' + Math.floor(Math.random() * 200) }), env: base });
     assert.equal(r.status, 303); assert.equal(r.headers.get('location'), expect, redirect);
   }
-  ok('redirect only ever goes to a path on this site (backslash, //, absolute, javascript: all rejected)');
+  ok('redirect only ever goes to a path on this site (backslash, //, absolute, javascript:, dot-segment tricks all rejected)');
+  r = await invite({ request: req('/api/invite', { body: { ...lead, email: 'bad', redirect: '/.//evil.com' }, json: false, ip: '192.0.2.199' }), env: base });
+  assert.equal(r.headers.get('location'), '/invite/error'); ok('a failed form POST never echoes the redirect field');
 
   // Validation.
   r = await invite({ request: req('/api/invite', { body: { ...lead, email: 'not-an-email' }, ip: '192.0.2.201' }), env: base });
@@ -136,7 +146,7 @@ console.log('invite.js');
   r = await invite({ request: req('/api/invite', { body: lead, ip: '192.0.2.207' }), env: base });
   assert.equal(r.status, 502); ok('Resend unreachable → 502 (JSON)');
   r = await invite({ request: req('/api/invite', { body: { ...lead, redirect: '/thanks' }, json: false, ip: '192.0.2.208' }), env: base });
-  assert.equal(r.status, 303); assert.equal(r.headers.get('location'), '/thanks?error=1'); ok('Resend unreachable on a form POST → redirect with ?error=1');
+  assert.equal(r.status, 303); assert.equal(r.headers.get('location'), '/invite/error'); ok('Resend unreachable on a form POST → redirect to /invite/error');
   r = await invite({ request: req('/api/invite', { body: { ...lead, 'cf-turnstile-response': 'tok' }, ip: '192.0.2.209' }), env: { ...base, TURNSTILE_SECRET: 'ts' } });
   assert.equal(r.status, 400); ok('Turnstile unreachable → treated as failed check, 400');
 
@@ -145,6 +155,58 @@ console.log('invite.js');
   let last;
   for (let i = 0; i < 6; i++) last = await invite({ request: req('/api/invite', { body: lead, ip: '192.0.2.250' }), env: base });
   assert.equal(last.status, 429); ok('6th request in a minute from one IP → 429');
+}
+
+
+console.log('guard.js and sanitiser');
+{
+  // Chat-sourced leads: tighter budget on top of the general one.
+  fetchImpl = async () => new Response('{}', { status: 200 });
+  let last;
+  for (let i = 0; i < 3; i++) last = await invite({ request: req('/api/invite', { body: { email: 'c@example.com', source: 'chat' }, ip: '192.0.2.251' }), env: { RESEND_API_KEY: 'rk', INVITE_FROM: 'x <website@painttradehq.co>' } });
+  assert.equal(last.status, 429); ok('3rd chat-sourced lead in a minute from one IP → 429');
+
+  // Rate-limit tiers that throw fall through instead of crashing the request.
+  const throwing = { CHAT_RATE_LIMIT: { limit: async () => { throw new Error('binding down'); } } };
+  assert.equal(await rateLimit(throwing, { binding: 'CHAT_RATE_LIMIT', key: 'k1', limit: 2, period: 60 }), true);
+  const badKv = { RATE_KV: { get: async () => null, put: async () => { throw new Error('KV PUT failed: 429'); } } };
+  assert.equal(await rateLimit(badKv, { binding: 'X', key: 'k2', limit: 2, period: 60 }), true);
+  assert.equal(await rateLimit(badKv, { binding: 'X', key: 'k2', limit: 2, period: 60 }), true);
+  assert.equal(await rateLimit(badKv, { binding: 'X', key: 'k2', limit: 2, period: 60 }), false);
+  ok('a throwing binding or KV falls through to the in-memory floor');
+  let r = await chat({ request: req('/api/chat', { body: '{bad', ip: '198.51.100.9' }), env: { ANTHROPIC_API_KEY: 'k', ...throwing } });
+  assert.equal(r.status, 400); ok('a throwing binding never escapes onRequestPost');
+
+  // Origin: missing or "null" is accepted only with Sec-Fetch-Site: same-origin.
+  const mk = (h) => new Request(`${SITE}/api/x`, { method: 'POST', headers: h, body: 'x' });
+  assert.equal(sameOrigin(mk({ origin: SITE })), true);
+  assert.equal(sameOrigin(mk({ origin: 'https://evil.example' })), false);
+  assert.equal(sameOrigin(mk({})), false);
+  assert.equal(sameOrigin(mk({ 'sec-fetch-site': 'same-origin' })), true);
+  assert.equal(sameOrigin(mk({ origin: 'null', 'sec-fetch-site': 'same-origin' })), true);
+  assert.equal(sameOrigin(mk({ origin: 'null', 'sec-fetch-site': 'cross-site' })), false);
+  assert.equal(sameOrigin(mk({ 'sec-fetch-site': 'none' })), false);
+  ok('Origin check: site passes; foreign fails; absent or null passes only with Sec-Fetch-Site same-origin');
+
+  // Byte cap holds without Content-Length and for multi-byte text.
+  const big = new Request(`${SITE}/api/x`, { method: 'POST', body: 'é'.repeat(20 * 1024) }); // 40 KB in UTF-8, 20 K chars
+  assert.equal((await readLimited(big, 32 * 1024)).tooLarge, true);
+  const okBody = new Request(`${SITE}/api/x`, { method: 'POST', body: 'é'.repeat(10 * 1024) });
+  assert.equal((await readLimited(okBody, 32 * 1024)).raw.length, 10 * 1024);
+  const empty = new Request(`${SITE}/api/x`, { method: 'POST' });
+  assert.equal((await readLimited(empty, 1024)).raw, '');
+  ok('body cap counts bytes, not characters; empty body is fine');
+
+  // Sanitiser trims an over-long but well-formed window instead of rejecting it.
+  const long = [];
+  for (let i = 0; i < 5; i++) long.push({ role: 'user', content: 'q'.repeat(400) }, { role: 'assistant', content: 'a'.repeat(1900) });
+  long.push({ role: 'user', content: 'final question' });
+  const trimmed = sanitiseMessages(long);
+  assert.ok(trimmed && trimmed.length < long.length && trimmed[0].role === 'user' && trimmed.at(-1).content === 'final question');
+  assert.ok(trimmed.reduce((n, m) => n + m.content.length, 0) <= 8000);
+  assert.equal(sanitiseMessages([{ role: 'assistant', content: 'x' }]), null);
+  assert.equal(sanitiseMessages([{ role: 'user', content: 'a' }, { role: 'assistant', content: 'b' }]), null);
+  ok('sanitiser drops the oldest turns to fit, keeps the last visitor turn, still rejects malformed input');
 }
 
 console.log(`\n${passed} checks passed`);

@@ -9,7 +9,7 @@ import { setTimeout as sleep } from 'node:timers/promises';
 
 const PORT = 4399;
 const BASE = `http://127.0.0.1:${PORT}`;
-const PAGES = ['/', '/features', '/pricing', '/story', '/invite', '/404'];
+const PAGES = ['/', '/features', '/pricing', '/story', '/invite', '/invite/sent', '/invite/error', '/404'];
 const WIDTHS = [390, 768, 1024, 1440];
 const OUT = '.qa';
 mkdirSync(OUT, { recursive: true });

@@ -35,11 +35,11 @@ npx wrangler pages dev dist   # pages + functions, reads .dev.vars
 4. Put a ceiling on cost before the first visitor: a **spend limit in the Anthropic Console** for the chat key, and a **WAF rate-limiting rule** on the zone for `/api/*` (the free plan includes one; 20 requests per 10 seconds per IP is plenty). The functions also limit per IP themselves (chat 20 a minute, invite 5 a minute) using the best storage they find: a Rate Limiting binding, else a KV namespace bound as `RATE_KV`, else an in-memory counter per server. Bind the KV namespace in `wrangler.toml` for the limit to hold across servers.
 5. Optional: Turnstile on the full invite form (`TURNSTILE_SECRET` + `PUBLIC_TURNSTILE_SITE_KEY`). The chat's mini lead form is exempt; it sits behind the chat's own limits.
 
-Both functions refuse requests whose `Origin` header is not this site, cap request bodies (32 KB chat, 64 KB invite), and answer every failure with a short fixed line rather than an upstream error. Redirects after a form POST only ever go to a path on this site.
+Both functions refuse requests whose `Origin` header is not this site (a missing or `null` Origin is accepted only when the browser's `Sec-Fetch-Site` says same-origin, so never add a `no-referrer` Referrer-Policy without keeping that), cap request bodies by bytes (32 KB chat, 64 KB invite), and answer every failure with a short fixed line rather than an upstream error. A form POST without JavaScript lands on `/invite/sent` or `/invite/error`; the redirect field is checked before and after resolving, so it can only ever point at a path on this site. Chat-sourced leads skip Turnstile but get a tighter budget (2 a minute per IP); anyone can set that field, so the trade-off is spam volume, not a bypass of validation.
 
 `PUBLIC_*` values are read at build time from `.env` (Astro), not from `.dev.vars` (Wrangler); set them in both places locally, or just in the Pages project settings.
 
-`npm run test:functions` exercises both functions in Node with a stubbed network: origin and size guards, honeypot, validation, redirect safety, Turnstile exemption for chat leads, the email payload, and the chat's message sanitiser.
+`npm run test:functions` exercises both functions in Node with a stubbed network: origin and size guards (including bodies without Content-Length and multi-byte text), honeypot, validation, redirect safety (including dot-segment tricks), rate-limit tiers that throw, Turnstile exemption and budget for chat leads, the email payload, and the chat's message sanitiser.
 
 The same files deploy to Vercel or Netlify with a few lines of adapter code for the two functions; Cloudflare is the path of least resistance.
 
