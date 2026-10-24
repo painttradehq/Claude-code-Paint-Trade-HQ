@@ -1,0 +1,62 @@
+---
+import Base from '../layouts/Base.astro';
+import Button from '../components/Button.astro';
+import Screenshot from '../components/Screenshot.astro';
+import { site, modules } from '../data/site';
+
+const planPill = (p: string) => (p === 'Starter' ? 'pill--neutral' : p === 'Small business' ? '' : 'pill--success');
+---
+<Base title="Features" description="Everything Paint Trade HQ does, in the order a job runs: Library, quotes clients sign online, live jobs, crew time clock, daily reports, invoices, calendar, employees and HR, the crew app, CRM, Lucy the AI assistant, files and storage.">
+  <section class="section section--tight">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Features</span>
+        <h1>Everything, in the order a job runs</h1>
+        <p class="lead">What each part of Paint Trade HQ does today, and which plan includes it. If it isn't on this page, it isn't in the app yet.</p>
+      </div>
+      <nav class="toc" aria-label="On this page">
+        {modules.map((m) => <a href={`#${m.id}`}>{m.name}</a>)}
+      </nav>
+    </div>
+  </section>
+
+  {modules.map((m, i) => (
+    <section class={`section section--tight ${i % 2 === 1 ? 'section--sunken' : ''}`} id={m.id}>
+      <div class={`container split ${i % 2 === 1 ? 'split--reverse' : ''}`}>
+        <div>
+          <span class={`pill ${planPill(m.plan)}`}>{m.plan === 'Starter' ? 'All plans' : `${m.plan} and up`}</span>
+          <h2 class="mod__title">{m.name}</h2>
+          <p class="lead">{m.summary}</p>
+          <ul class="checklist">
+            {m.points.map((p) => <li>{p}</li>)}
+          </ul>
+        </div>
+        <div>{m.screen && <Screenshot id={m.screen} />}</div>
+      </div>
+    </section>
+  ))}
+
+  <section class="section section--ink cta">
+    <div class="container center">
+      <h2>See it on your own jobs</h2>
+      <p class="lead">Free for invited painting businesses during the tester program. Leave your details and Josh will be in touch himself.</p>
+      <Button href={site.status.ctaHref} variant="on-ink" size="lg">{site.status.cta}</Button>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .toc { display: flex; flex-wrap: wrap; gap: 8px; }
+  .toc a {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accent-ink);
+    background: var(--accent-bg);
+    padding: 6px 12px;
+    border-radius: var(--r-pill);
+  }
+  .toc a:hover { background: var(--accent); color: #fff; text-decoration: none; }
+  .mod__title { margin-top: 12px; }
+  .cta .lead { margin-left: auto; margin-right: auto; margin-bottom: 24px; }
+  section[id] { scroll-margin-top: calc(var(--header-h) + 12px); }
+</style>

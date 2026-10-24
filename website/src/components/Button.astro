@@ -1,0 +1,19 @@
+---
+/** Solid accent with white text by default (builder's pack §3). */
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'ghost' | 'on-ink';
+  size?: 'sm' | 'md' | 'lg';
+  type?: 'button' | 'submit';
+  class?: string;
+  external?: boolean;
+  id?: string;
+}
+const { href, variant = 'primary', size = 'md', type = 'button', class: cls = '', external = false, id } = Astro.props;
+const classes = ['btn', `btn--${variant}`, size !== 'md' ? `btn--${size}` : '', cls].filter(Boolean).join(' ');
+---
+{href ? (
+  <a href={href} class={classes} id={id} rel={external ? 'noopener' : undefined}><slot /></a>
+) : (
+  <button type={type} class={classes} id={id}><slot /></button>
+)}

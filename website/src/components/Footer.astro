@@ -1,0 +1,106 @@
+---
+import { site, nav } from '../data/site';
+---
+<footer class="ftr">
+  <div class="container">
+    <div class="ftr__top">
+      <div class="ftr__brand">
+        <a href="/" class="ftr__logo" aria-label="Paint Trade HQ home">
+          <img src="/brand/logo.svg" alt="" width="40" height="40" />
+          <span>Paint Trade HQ</span>
+        </a>
+        <p class="small ftr__blurb">Quotes, jobs, crew, invoices and clients in one place, built by a Melbourne painter.</p>
+        <p class="small"><span class="pill pill--neutral">{site.status.pill}</span></p>
+      </div>
+      <nav class="ftr__cols" aria-label="Footer">
+        <div>
+          <h4>Product</h4>
+          <ul>
+            {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+            <li><a href={site.status.ctaHref}>{site.status.cta}</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Account</h4>
+          <ul>
+            <li><a href={site.signInUrl} rel="noopener">Sign in</a></li>
+            <li><a href={site.crewUrl} rel="noopener">Crew sign-in</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <ul>
+            <li><a href={site.termsUrl} rel="noopener">Terms of Service</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <ul>
+            <li><a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a></li>
+            <li class="small muted">{site.location}</li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+    <div class="ftr__bottom small">
+      <span>{site.copyright}</span>
+      <span>Lucy, the AI assistant, is powered by Anthropic.</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .ftr {
+    border-top: 1px solid var(--border);
+    background: var(--sunken);
+    padding: 56px 0 28px;
+    margin-top: 0;
+  }
+  .ftr__top {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 2fr);
+    gap: 40px;
+    margin-bottom: 36px;
+  }
+  .ftr__logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 20px;
+  }
+  .ftr__logo:hover { text-decoration: none; }
+  .ftr__logo img { border-radius: 10px; }
+  .ftr__blurb { max-width: 36ch; margin: 12px 0 10px; }
+  .ftr__cols {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px;
+  }
+  .ftr__cols h4 {
+    font-family: var(--font-body);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-2);
+    margin: 0 0 12px;
+  }
+  .ftr__cols ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .ftr__cols a { color: var(--text); font-size: 15px; }
+  .ftr__cols a:hover { color: var(--accent); }
+  .ftr__bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+    color: var(--text-2);
+  }
+  @media (max-width: 860px) {
+    .ftr__top { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+    .ftr__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+</style>

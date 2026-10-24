@@ -1,0 +1,68 @@
+---
+/** A silent WebM walkthrough from the builder's captures. Falls back to a placeholder when the file is absent. */
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { clips } from '../data/screens';
+
+interface Props { id: string; class?: string }
+const { id, class: cls = '' } = Astro.props;
+const c = clips.find((x) => x.id === id);
+if (!c) throw new Error(`Unknown clip "${id}"`);
+const exists = existsSync(fileURLToPath(new URL(`../../public/clips/${c.file}`, import.meta.url)));
+---
+<figure class={`clip ${cls}`}>
+  <div class="clip__frame">
+    {exists ? (
+      <video src={`/clips/${c.file}`} muted loop playsinline autoplay preload="metadata" aria-label={c.title}></video>
+    ) : (
+      <div class="clip__placeholder" role="img" aria-label={c.title}>
+        <span class="clip__play" aria-hidden="true"></span>
+        <span class="clip__label">{c.title}</span>
+        <span class="mono small">{c.file}</span>
+      </div>
+    )}
+  </div>
+  <figcaption class="small">{c.caption}</figcaption>
+</figure>
+
+<style>
+  .clip { margin: 0; }
+  .clip__frame {
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    background: var(--surface);
+    box-shadow: var(--shadow-float);
+  }
+  .clip video { width: 100%; display: block; }
+  .clip__placeholder {
+    aspect-ratio: 16 / 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: repeating-linear-gradient(135deg, var(--sunken) 0 14px, #ebe8e1 14px 28px);
+    color: var(--text-2);
+    text-align: center;
+    padding: 24px;
+  }
+  .clip__play {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--accent);
+    position: relative;
+  }
+  .clip__play::after {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 15px;
+    border-left: 16px solid #fff;
+    border-top: 11px solid transparent;
+    border-bottom: 11px solid transparent;
+  }
+  .clip__label { font-family: var(--font-display); font-size: 16px; color: var(--text); }
+  figcaption { margin-top: 10px; text-align: center; }
+</style>

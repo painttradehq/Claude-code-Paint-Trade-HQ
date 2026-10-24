@@ -17,6 +17,21 @@ Josh supplied `docs/website/chat-knowledge.md`: the app as built at Round 83 (82
 
 Still open: **D1** (where the site lives; recommend the static site in this repo, now with one serverless function for the chat box), **D6** (photos; recommend real), and whether the site takes the apex domain with the app moving to `app.painttradehq.co`.
 
+## Update — 24 October 2026: the builder's handover pack
+
+The app's builder sent `docs/website/website-pack.md`. It closes most of what was open and changes the page list:
+
+- **Assets exist.** 47 screenshots (light theme, demo business "Harbourline Painting"; admin at 1440 and 1024, crew and client pages at 390) and 8 silent WebM walkthrough clips, in the app repo under `memory/marketing/`, zipped (~31 MB). Five screens are approximations (Drive, Billing, hours, crew contract, completion report). The Playwright capture script in §5 is no longer needed for v1; keep the idea for refreshes.
+- **Call to action: "Ask for an invite."** A form that emails software@joshsano.com.au with name, business, suburb/state, email, mobile, crew size, current software. **The site must not take sign-ups.** Lead routing (reconciliation item 19) is therefore email; posting to the app's leads inbox is optional extra.
+- **Legal:** footer link **Terms of Service → https://painttradehq.co/terms** (the app's page, no local copy); **no Privacy link or page**; footer line "© 2026 Josh Sano Painting and Decorating, trading as Paint Trade HQ"; contact software@joshsano.com.au.
+- **Links:** "Sign in" → `https://painttradehq.co/admin/login`; crew door `/crew`. No checkout, no app-store badges.
+- **Hero line** from the app's sign-in page: "Fast, accurate estimating · Invoicing and a live project tracker that follow the quote · CRM and an AI assistant that learns your workflow · Product library, employee records and calendar". The assistant is "powered by Anthropic" if named.
+- **Look:** same tokens; 12 px card radius, 8 px button radius; **solid accent buttons with white text**.
+- **Domain:** Josh owns `.co`, `.com` and `.com.au`; the site can sit on `.com`, `.com.au` or `www.painttradehq.co`. Josh's call; the build reads the final URL from one config value.
+- **The 8 confirmations** in the reconciliation are treated as true: the pack says every claim in the knowledge file is live except what its §9 lists.
+
+**v1 page list is now five pages plus the chat box:** Home · Features · Pricing · Story · Ask for an invite. Terms is an external link. **D1 is taken as recommended** (static Astro site in this repo, Cloudflare Pages Functions for the chat box and the invite email); hosting account and domain remain Josh's call.
+
 ---
 
 ## 0. The recommendation in one paragraph
@@ -76,9 +91,8 @@ The live domain is **painttradehq.co** (the admin app lives there; crew sign in 
 | 2 | **Features** `/features` | One long page with anchors (split into sub-pages in v2) | Quotes & estimates · Client quote link & e-signature · Invoices & deposits · Projects, variations, photos · Crew: time clock, timesheets, daily reports · HR: onboarding, contracts, training, performance, equipment · CRM & leads · Calendar · Library & products · Lucy AI · Settings & branding |
 | 3 | **Pricing** `/pricing` | Plans | Standard vs Pro cards, monthly/annual toggle, "what Pro adds" list (from the access gates in code), early-access note, billing FAQ |
 | 4 | **Story** `/about` | Trust | Josh, Melbourne, why a painter built this, the real business as customer zero, photo, timeline |
-| 5 | **Early access** `/early-access` | Lead capture | Form (business, your name, email, mobile, crew size, message) → `POST /api/signup-leads`; what happens next; link to `/signup` for people who already have a code |
-| 6 | **Terms** `/terms` | Legal | Terms of Service v1.2 (22 Oct 2026, lawyer-reviewed for the tester program), rendered from the app's markdown (one source) |
-| 7 | **Privacy** `/privacy` | Legal | No separate policy during the tester program: this page says so and links to Terms §5 (personal data) |
+| 5 | **Ask for an invite** `/invite` | Lead capture | Form (name, business, suburb/state, email, mobile, crew size, current software) → emails software@joshsano.com.au; "Josh reads these himself and will be in touch"; link to Sign in for people who already have access |
+| — | Terms of Service | Legal | External footer link to https://painttradehq.co/terms (no local page; no Privacy link during the tester program) |
 | + | **Chat box** (on every page) | Answers and lead capture | A small chat panel that answers only from `chat-knowledge.md`, in its voice and rules, and hands anything it cannot answer to Josh with an email capture (that file's §10) |
 
 Plus redirects: `/signup` → `app.painttradehq.com/signup` (pass `?code=&email=` through), `/login` → `app.painttradehq.com/admin/login`.

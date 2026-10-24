@@ -1,0 +1,20 @@
+# Copy to .dev.vars for local `wrangler pages dev`, or set these in Cloudflare Pages → Settings → Variables and secrets.
+# Nothing here is committed; .dev.vars is git-ignored.
+
+# Chat box (functions/api/chat.js)
+ANTHROPIC_API_KEY=
+CHAT_MODEL=claude-opus-5-5
+
+# Invite form (functions/api/invite.js) — email through Resend
+RESEND_API_KEY=
+INVITE_FROM="Paint Trade HQ website <website@painttradehq.co>"   # must be a sender on a domain verified in Resend
+INVITE_TO=software@joshsano.com.au
+# Optional: also file the lead into the app's Signup leads inbox (Settings › Platform)
+APP_LEADS_URL=
+
+# Optional spam check on the invite form (Cloudflare Turnstile)
+TURNSTILE_SECRET=
+PUBLIC_TURNSTILE_SITE_KEY=
+
+# Build-time: the site's public URL (painttradehq.com, painttradehq.com.au or www.painttradehq.co — Josh's call)
+PUBLIC_SITE_URL=https://www.painttradehq.co

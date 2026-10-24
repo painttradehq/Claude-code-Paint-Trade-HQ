@@ -32,6 +32,10 @@ _23 October 2026. Two sources now describe the app: `docs/app/pthq-app-briefing.
 | 24 | Reviews platforms | Not audited | Reviews and ratings from eleven platforms on presentation pages | Only if item 9 is confirmed | **confirm** |
 | 25 | Security bugs from the audit (password hash logged, unlimited signup-leads, plain-text Twilio token, `.tok` and `_creds.py` tracked) | Open at Round 64 | Not mentioned | Ask whether rounds 65–83 fixed them | **confirm** |
 
+## Update — 24 October 2026
+
+The builder's handover pack (`docs/website/website-pack.md`) states that every claim in the chat-knowledge file is live except what its §9 lists. On that basis items **6, 7, 8, 9, 10, 13 and 24 are treated as confirmed by the builder** (not by a code read from here). Item **19** is resolved: website leads go by email to software@joshsano.com.au. Item **1** is Josh's call among `.com`, `.com.au` and `www.painttradehq.co`. Item **25** (the security bugs) is still unanswered and belongs to the app team.
+
 ## What this means for the website
 
 - **Domain, pricing, plans, trial, legal pages, support email** come from the chat-knowledge file now. The website plan has been updated accordingly.

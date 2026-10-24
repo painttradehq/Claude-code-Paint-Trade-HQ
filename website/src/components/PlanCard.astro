@@ -1,0 +1,76 @@
+---
+import { aud, incGst, type Plan } from '../data/site';
+import Button from './Button.astro';
+interface Props { plan: Plan }
+const { plan } = Astro.props;
+const inc = incGst(plan.price);
+---
+<article class={`plan card ${plan.highlight ? 'plan--highlight' : ''}`} aria-labelledby={`plan-${plan.id}`}>
+  {plan.highlight && <span class="pill plan__flag">Most crews</span>}
+  <h3 id={`plan-${plan.id}`} class="plan__name">{plan.name}</h3>
+  <p class="plan__blurb small">{plan.blurb}</p>
+  <p class="plan__price">
+    <span class="mono plan__amount">{aud(plan.price)}</span>
+    <span class="plan__per">+ GST a month</span>
+  </p>
+  <p class="small plan__inc">{aud(inc)} a month including GST</p>
+  <dl class="plan__seats">
+    <div><dt>Admins</dt><dd class="mono">{plan.admins}</dd></div>
+    <div><dt>Employees</dt><dd class="mono">{plan.employees}</dd></div>
+    <div><dt>Extra admin</dt><dd class="mono">{aud(plan.extraAdmin)}</dd></div>
+    <div><dt>Extra employee</dt><dd class="mono">{aud(plan.extraEmployee)}</dd></div>
+  </dl>
+  {plan.inherits && <p class="small plan__inherits">{plan.inherits}</p>}
+  <ul class="checklist plan__list">
+    {plan.includes.map((f) => <li>{f}</li>)}
+  </ul>
+  <div class="plan__cta">
+    <Button href="/invite" variant={plan.highlight ? 'primary' : 'ghost'} class="plan__btn">Ask for an invite</Button>
+  </div>
+</article>
+
+<style>
+  .plan {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 28px 24px 24px;
+  }
+  .plan--highlight {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), var(--shadow-float);
+  }
+  .plan__flag {
+    position: absolute;
+    top: -13px;
+    left: 24px;
+    background: var(--accent);
+    color: #fff;
+  }
+  .plan__name { margin: 0; font-size: 24px; }
+  .plan__blurb { margin: 0 0 10px; }
+  .plan__price { margin: 0; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .plan__amount { font-size: 40px; font-weight: 600; letter-spacing: -0.02em; color: var(--text); }
+  .plan__per { color: var(--text-2); font-size: 15px; }
+  .plan__inc { margin: 0 0 14px; color: var(--muted); }
+  .plan__seats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+    margin: 0 0 16px;
+    padding: 14px;
+    background: var(--sunken);
+    border-radius: var(--r-sm);
+  }
+  .plan__seats div { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; }
+  .plan__seats dt { color: var(--text-2); }
+  .plan__seats dd { margin: 0; font-weight: 500; }
+  .plan__inherits { margin: 0 0 6px; font-weight: 600; color: var(--text); }
+  .plan__list { font-size: 15px; flex: 1; }
+  .plan__cta { margin-top: 18px; }
+  .plan__btn { width: 100%; }
+  @media (max-width: 720px) {
+    .plan__seats { grid-template-columns: 1fr; }
+  }
+</style>

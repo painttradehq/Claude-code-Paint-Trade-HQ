@@ -1,0 +1,118 @@
+---
+/**
+ * A real app screenshot in a light browser or phone frame. If the file is not in public/screens yet,
+ * renders a labelled placeholder of the same proportions so layouts hold and nothing fake is shown.
+ */
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { screens } from '../data/screens';
+
+interface Props {
+  id: keyof typeof screens | string;
+  priority?: boolean;
+  class?: string;
+  hideCaption?: boolean;
+}
+const { id, priority = false, class: cls = '', hideCaption = false } = Astro.props;
+const s = screens[id as string];
+if (!s) throw new Error(`Unknown screen slot "${id}"`);
+const exists = !!s.file && existsSync(fileURLToPath(new URL(`../../public/screens/${s.file}`, import.meta.url)));
+const ratio = `${s.width} / ${s.height}`;
+---
+<figure class={`shot shot--${s.frame} ${cls}`}>
+  <div class="shot__frame">
+    {s.frame === 'browser' && (
+      <div class="shot__bar" aria-hidden="true"><span></span><span></span><span></span></div>
+    )}
+    {exists ? (
+      <img
+        src={`/screens/${s.file}`}
+        alt={s.alt}
+        width={s.width}
+        height={s.height}
+        loading={priority ? 'eager' : 'lazy'}
+        decoding="async"
+        style={`aspect-ratio:${ratio}`}
+      />
+    ) : (
+      <div class="shot__placeholder" style={`aspect-ratio:${ratio}`} role="img" aria-label={s.alt}>
+        <span class="shot__ph-label">{s.alt}</span>
+        <span class="shot__ph-note mono">{s.file ? s.file : 'screenshot to come'}</span>
+      </div>
+    )}
+  </div>
+  {!hideCaption && s.caption && <figcaption class="small">{s.caption}</figcaption>}
+</figure>
+
+<style>
+  .shot {
+    margin: 0;
+  }
+  .shot__frame {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-float);
+    overflow: hidden;
+  }
+  .shot--phone .shot__frame {
+    border-radius: 28px;
+    max-width: 320px;
+    margin-inline: auto;
+    border-width: 6px;
+    border-color: #1e1c1a;
+    background: #1e1c1a;
+  }
+  .shot--none .shot__frame {
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+    border-radius: var(--r-md);
+  }
+  .shot__bar {
+    display: flex;
+    gap: 6px;
+    padding: 10px 12px;
+    background: var(--sunken);
+    border-bottom: 1px solid var(--border);
+  }
+  .shot__bar span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border-strong);
+  }
+  .shot img {
+    width: 100%;
+    display: block;
+  }
+  .shot__placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px;
+    text-align: center;
+    background: repeating-linear-gradient(135deg, var(--sunken) 0 14px, #ebe8e1 14px 28px);
+    color: var(--text-2);
+  }
+  .shot--phone .shot__placeholder {
+    background: repeating-linear-gradient(135deg, #f4f2ee 0 14px, #ebe8e1 14px 28px);
+  }
+  .shot__ph-label {
+    font-family: var(--font-display);
+    font-size: 16px;
+    color: var(--text);
+    max-width: 36ch;
+    text-wrap: balance;
+  }
+  .shot__ph-note {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  figcaption {
+    margin-top: 10px;
+    text-align: center;
+  }
+</style>

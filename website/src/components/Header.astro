@@ -1,0 +1,137 @@
+---
+import { site, nav } from '../data/site';
+import Button from './Button.astro';
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+<header class="hdr">
+  <div class="container hdr__in">
+    <a href="/" class="hdr__brand" aria-label="Paint Trade HQ home">
+      <img src="/brand/logo.svg" alt="" width="36" height="36" />
+      <span class="hdr__word">Paint Trade HQ</span>
+    </a>
+
+    <button class="hdr__burger" type="button" aria-expanded="false" aria-controls="site-nav" id="nav-toggle">
+      <span class="visually-hidden">Menu</span>
+      <span class="hdr__burger-bar" aria-hidden="true"></span>
+      <span class="hdr__burger-bar" aria-hidden="true"></span>
+      <span class="hdr__burger-bar" aria-hidden="true"></span>
+    </button>
+
+    <nav class="hdr__nav" id="site-nav" aria-label="Main">
+      <ul class="hdr__links">
+        {nav.map((n) => (
+          <li><a href={n.href} aria-current={path === n.href ? 'page' : undefined}>{n.label}</a></li>
+        ))}
+      </ul>
+      <div class="hdr__actions">
+        <a class="hdr__signin" href={site.signInUrl} rel="noopener">Sign in</a>
+        <Button href={site.status.ctaHref} size="sm">{site.status.cta}</Button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .hdr {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(250, 249, 246, 0.92);
+    backdrop-filter: saturate(140%) blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .hdr__in {
+    min-height: var(--header-h);
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .hdr__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 19px;
+    letter-spacing: -0.01em;
+    margin-right: auto;
+  }
+  .hdr__brand:hover { text-decoration: none; color: var(--accent-ink); }
+  .hdr__brand img { border-radius: 9px; }
+  .hdr__nav { display: flex; align-items: center; gap: 28px; }
+  .hdr__links {
+    list-style: none;
+    display: flex;
+    gap: 22px;
+    margin: 0;
+    padding: 0;
+  }
+  .hdr__links a {
+    color: var(--text-2);
+    font-weight: 500;
+    font-size: 15px;
+    padding: 6px 0;
+  }
+  .hdr__links a:hover,
+  .hdr__links a[aria-current='page'] {
+    color: var(--accent-ink);
+    text-decoration: none;
+    box-shadow: inset 0 -2px 0 var(--accent);
+  }
+  .hdr__actions { display: flex; align-items: center; gap: 16px; }
+  .hdr__signin { color: var(--accent-ink); font-weight: 600; font-size: 15px; }
+  .hdr__burger {
+    display: none;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+  }
+  .hdr__burger-bar { width: 18px; height: 2px; background: var(--text); border-radius: 2px; }
+
+  @media (max-width: 860px) {
+    .hdr__burger { display: flex; }
+    .hdr__nav {
+      display: none;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+      padding: 16px var(--gutter) 20px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-float);
+    }
+    .hdr__nav.is-open { display: flex; }
+    .hdr__links { flex-direction: column; gap: 4px; }
+    .hdr__links a { display: block; padding: 10px 0; font-size: 17px; }
+    .hdr__links a[aria-current='page'] { box-shadow: none; }
+    .hdr__actions { justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--border); }
+  }
+</style>
+
+<script>
+  const btn = document.getElementById('nav-toggle');
+  const nav = document.getElementById('site-nav');
+  btn?.addEventListener('click', () => {
+    const open = nav?.classList.toggle('is-open');
+    btn.setAttribute('aria-expanded', String(!!open));
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && nav?.classList.contains('is-open')) {
+      nav.classList.remove('is-open');
+      btn?.setAttribute('aria-expanded', 'false');
+      (btn as HTMLElement | null)?.focus();
+    }
+  });
+</script>

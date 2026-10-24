@@ -1,0 +1,18 @@
+# Cloudflare Pages config for the Paint Trade HQ marketing site.
+# Build command: npm run build · Output: dist · Functions: ./functions
+name = "pthq-website"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "dist"
+
+# Optional per-IP rate limits for the two functions. Uncomment once the project is on Cloudflare;
+# the functions work without them (they then rely on message-size limits and Turnstile).
+# [[ratelimits]]
+# name = "CHAT_RATE_LIMIT"
+# namespace_id = "1001"
+# simple = { limit = 20, period = 60 }
+#
+# [[ratelimits]]
+# name = "INVITE_RATE_LIMIT"
+# namespace_id = "1002"
+# simple = { limit = 5, period = 60 }

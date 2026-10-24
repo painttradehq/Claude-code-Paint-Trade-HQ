@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import InviteForm from '../components/InviteForm.astro';
+import { site } from '../data/site';
+---
+<Base title="Ask for an invite" description="Paint Trade HQ is in its tester program: free for invited painting businesses. Leave your details and Josh will be in touch himself.">
+  <section class="section">
+    <div class="container invite">
+      <div class="invite__copy">
+        <span class="eyebrow"><span class="pill">{site.status.pill}</span></span>
+        <h1>Ask for an invite</h1>
+        <p class="lead">Paint Trade HQ is free for invited painting businesses while it's in its tester program. Paid plans open at launch.</p>
+        <h3>What happens next</h3>
+        <ol class="steps">
+          <li>Josh reads your details himself.</li>
+          <li>Invites go out as places open, with a tester access code.</li>
+          <li>You use everything, free, until your invite ends, and tell us what to fix.</li>
+        </ol>
+        <p class="small">Already have access? <a href={site.signInUrl} rel="noopener">Sign in</a>. On the crew? <a href={site.crewUrl} rel="noopener">Crew sign-in</a>.</p>
+        <p class="small">Prefer email? <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a></p>
+      </div>
+      <div>
+        <InviteForm />
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .invite {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(28px, 5vw, 64px);
+    align-items: start;
+  }
+  .invite__copy h3 { margin-top: 24px; }
+  .steps { padding-left: 22px; color: var(--text-2); display: grid; gap: 8px; }
+  @media (max-width: 860px) {
+    .invite { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

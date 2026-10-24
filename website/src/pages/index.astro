@@ -1,0 +1,262 @@
+---
+import Base from '../layouts/Base.astro';
+import Button from '../components/Button.astro';
+import Screenshot from '../components/Screenshot.astro';
+import Clip from '../components/Clip.astro';
+import Faq from '../components/Faq.astro';
+import { site, plans, faqs, aud, incGst } from '../data/site';
+
+const homeFaqs = faqs.filter((f) =>
+  ['Is there a free plan?', 'Does the client need an account?', 'Does it track my crew?', 'Can my client pay by card on the invoice?', 'Is there an app for my phone?', 'How do I get in?'].includes(f.q),
+);
+---
+<Base title="Quotes, jobs, crew and invoices for painting businesses" fullTitle="Paint Trade HQ · Run your painting business from one place">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container hero__in">
+      <div class="hero__copy">
+        <span class="eyebrow"><span class="pill">{site.status.pill}</span> Built in Melbourne for painting businesses</span>
+        <h1>Quote it. Run it. Get paid.</h1>
+        <p class="lead">
+          Paint Trade HQ runs the whole job: quotes your client signs on their phone, the live job your crew sign in to with GPS, daily reports, variations, invoices and payments, employee records, a CRM, a calendar, and Lucy, the AI assistant.
+        </p>
+        <div class="row hero__cta">
+          <Button href={site.status.ctaHref} size="lg">{site.status.cta}</Button>
+          <Button href="#how" variant="ghost" size="lg">See how it works</Button>
+        </div>
+        <p class="small hero__status">{site.status.line} Already in? <a href={site.signInUrl} rel="noopener">Sign in</a>.</p>
+      </div>
+      <div class="hero__shot">
+        <Screenshot id="dashboard" priority hideCaption />
+      </div>
+    </div>
+  </section>
+
+  <!-- Facts strip -->
+  <section class="strip" aria-label="Key facts">
+    <div class="container strip__in">
+      <div><strong>AUD, GST on top</strong><span>From $59 + GST a month at launch</span></div>
+      <div><strong>No app store needed</strong><span>Web app for the office; add the crew app to the phone's home screen</span></div>
+      <div><strong>Your data is yours</strong><span>Each business is isolated; export it any time</span></div>
+      <div><strong>Built by a painter</strong><span>Josh Sano Painting and Decorating is customer zero</span></div>
+    </div>
+  </section>
+
+  <!-- Three pillars -->
+  <section class="section" id="how">
+    <div class="container">
+      <div class="section-head section-head--center">
+        <span class="eyebrow">In the order a job runs</span>
+        <h2>One app from the first enquiry to the final invoice</h2>
+        <p class="lead">No double entry. The quote becomes the job, the job becomes the invoices, and the crew see only what they need.</p>
+      </div>
+      <div class="grid grid--3">
+        <article class="card pillar">
+          <span class="pillar__n mono">01</span>
+          <h3>Quote it</h3>
+          <p>Build the quote from your own Library of items, tasks and products. Add rooms from a picker, exterior as four faces, photos with mark-up, optional lines the client can tick.</p>
+          <ul class="checklist">
+            <li>Your rates per item, with the minutes it takes</li>
+            <li>One quote design with your logo and colours</li>
+            <li>The client signs on a link; the deposit invoice is created for you</li>
+          </ul>
+        </article>
+        <article class="card pillar">
+          <span class="pillar__n mono">02</span>
+          <h3>Run it</h3>
+          <p>An accepted quote becomes a live job. Crew sign in and out on their phones with GPS at those two moments, write daily reports with photos, and sign their contracts in the same app.</p>
+          <ul class="checklist">
+            <li>Labour cost from the time clock, margin and close-out numbers</li>
+            <li>Variations the client approves on a link</li>
+            <li>A completion report with before-and-after photos</li>
+          </ul>
+        </article>
+        <article class="card pillar">
+          <span class="pillar__n mono">03</span>
+          <h3>Get paid</h3>
+          <p>Deposit, progress and final invoices follow the payment schedule on the quote. Each has a public page and a PDF with your bank details. Record the payment and the balance updates.</p>
+          <ul class="checklist">
+            <li>Credit notes, payment reminders, review requests</li>
+            <li>Clients pay by bank transfer; the app never takes their card</li>
+            <li>Overtime, pay rates and payroll CSV on the Timesheets page</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- What the client gets -->
+  <section class="section section--sunken">
+    <div class="container split">
+      <div>
+        <span class="eyebrow">What your client gets</span>
+        <h2>A quote they read, tick and sign on their phone</h2>
+        <p class="lead">No account, no app to install. They open the link, pick any optional extras, sign by drawing or typing, and tick the agreement.</p>
+        <ul class="checklist">
+          <li>The app records who accepted, when, and from which address</li>
+          <li>Acceptance creates the deposit invoice and tells you</li>
+          <li>Variations during the job are approved the same way, with a typed name</li>
+          <li>At the end, a completion report with photos, on a link and as a PDF</li>
+        </ul>
+        <p class="small">The signature, name, time and address are recorded. Whether it binds is between you and your client; we don't give legal advice.</p>
+      </div>
+      <div class="grid grid--2 client-shots">
+        <Screenshot id="client-quote" />
+        <Screenshot id="client-signed" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Crew -->
+  <section class="section">
+    <div class="container split split--reverse">
+      <div>
+        <span class="eyebrow">Your crew, on their phones</span>
+        <h2>Sign in on site. Sign out at knock-off. Nothing in between.</h2>
+        <p class="lead">The crew app records GPS only at sign-in and sign-out: the time, the address and the distance from the job. It flags a sign-in outside the job's radius. It does not track anyone between those moments.</p>
+        <ul class="checklist">
+          <li>Daily site report with photos, read and answered by you</li>
+          <li>Contracts to read and sign, with "Download my signed copy"</li>
+          <li>Equipment requests, training, team events, their own coaching notes</li>
+          <li>No prices, no margins, no admin pages. You choose what they see.</li>
+        </ul>
+        <p class="small">A web app: your crew add it to their home screen. Reminders show in the app today; phone notifications are coming.</p>
+      </div>
+      <div class="grid grid--2 client-shots">
+        <Screenshot id="crew-time-clock" />
+        <Screenshot id="daily-report" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Clip -->
+  <section class="section section--tight">
+    <div class="container">
+      <div class="grid grid--2">
+        <Clip id="signin-to-job-drawer" />
+        <Clip id="lucy-client-to-morning-brief" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Lucy -->
+  <section class="section section--ink">
+    <div class="container split">
+      <div>
+        <span class="eyebrow" style="color:#c9bff0">Lucy, the AI assistant</span>
+        <h2>Drafts, briefs and summaries from your own data</h2>
+        <p class="lead">Lucy writes your morning brief, drafts client messages and quote text, summarises a client's history or a job, suggests prices from your Library, and keeps the reminders and ideas you dictate.</p>
+        <ul class="checklist">
+          <li>She answers from your workspace only, never another business's</li>
+          <li>Everything she writes is a draft for you to check</li>
+          <li>Every AI call is listed in your audit log</li>
+          <li>Your data is not used to train models</li>
+        </ul>
+        <p class="small">Lucy runs on Anthropic's Claude. Included on Small business and up. The crew have no AI features.</p>
+      </div>
+      <Screenshot id="lucy" />
+    </div>
+  </section>
+
+  <!-- Pricing teaser -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head section-head--center">
+        <span class="eyebrow">Pricing</span>
+        <h2>Three plans. Monthly. AUD, GST on top.</h2>
+        <p class="lead">{site.status.line} 14-day trial on Enterprise when plans open, no card needed.</p>
+      </div>
+      <div class="grid grid--3 teaser">
+        {plans.map((p) => (
+          <a class={`card teaser__plan ${p.highlight ? 'teaser__plan--hi' : ''}`} href="/pricing">
+            <span class="teaser__name">{p.name}</span>
+            <span class="teaser__price mono">{aud(p.price)}<small> + GST</small></span>
+            <span class="small">{aud(incGst(p.price))} inc. GST a month · {p.admins} admin{p.admins > 1 ? 's' : ''}, {p.employees} employees</span>
+            <span class="small teaser__blurb">{p.blurb}</span>
+          </a>
+        ))}
+      </div>
+      <p class="center small"><a href="/pricing">See what each plan includes</a></p>
+    </div>
+  </section>
+
+  <!-- Story teaser -->
+  <section class="section section--sunken section--tight">
+    <div class="container story-teaser">
+      <div>
+        <span class="eyebrow">The people behind it</span>
+        <h2>Built by a painter, for painters</h2>
+        <p class="lead">Paint Trade HQ is built by Josh Sano, a Melbourne painter running Josh Sano Painting and Decorating, round by round to how a painting business actually works.</p>
+        <Button href="/story" variant="ghost">Read the story</Button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section">
+    <div class="container faq-wrap">
+      <div class="section-head">
+        <span class="eyebrow">Straight answers</span>
+        <h2>Questions painters ask</h2>
+      </div>
+      <Faq items={homeFaqs} openFirst />
+      <p class="small"><a href="/pricing#faq">More questions answered on the pricing page</a></p>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="section section--ink cta">
+    <div class="container center">
+      <h2>Want in?</h2>
+      <p class="lead">The app is in its tester program: free for invited painting businesses. Leave your details and Josh will be in touch himself.</p>
+      <Button href={site.status.ctaHref} variant="on-ink" size="lg">{site.status.cta}</Button>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero { padding: clamp(40px, 6vw, 88px) 0 clamp(32px, 5vw, 64px); }
+  .hero__in {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 7fr);
+    gap: clamp(28px, 5vw, 64px);
+    align-items: center;
+  }
+  .hero__copy .eyebrow { display: inline-flex; align-items: center; gap: 10px; }
+  .hero__cta { margin-top: 24px; }
+  .hero__status { margin-top: 16px; }
+  @media (max-width: 960px) {
+    .hero__in { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .strip { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .strip__in {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    padding: 22px 0;
+  }
+  .strip__in div { display: flex; flex-direction: column; gap: 2px; font-size: 14px; color: var(--text-2); }
+  .strip__in strong { color: var(--text); font-size: 15px; }
+  @media (max-width: 960px) { .strip__in { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .strip__in { grid-template-columns: minmax(0, 1fr); } }
+
+  .pillar { position: relative; padding-top: 30px; }
+  .pillar__n { color: var(--accent); font-size: 13px; letter-spacing: 0.1em; display: block; margin-bottom: 8px; }
+  .pillar .checklist { margin-top: 14px; font-size: 15px; }
+
+  .client-shots { gap: 16px; align-items: start; }
+
+  .teaser { align-items: stretch; }
+  .teaser__plan { display: flex; flex-direction: column; gap: 6px; color: var(--text); }
+  .teaser__plan:hover { text-decoration: none; border-color: var(--accent); }
+  .teaser__plan--hi { border-color: var(--accent); }
+  .teaser__name { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
+  .teaser__price { font-size: 32px; font-weight: 600; letter-spacing: -0.02em; }
+  .teaser__price small { font-size: 14px; color: var(--text-2); font-weight: 500; margin-left: 4px; }
+  .teaser__blurb { margin-top: 6px; }
+
+  .story-teaser > div { max-width: 720px; }
+  .faq-wrap { max-width: 820px; }
+  .cta .lead { margin-left: auto; margin-right: auto; margin-bottom: 24px; }
+</style>
