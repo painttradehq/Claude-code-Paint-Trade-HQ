@@ -16,5 +16,5 @@ APP_LEADS_URL=
 TURNSTILE_SECRET=
 PUBLIC_TURNSTILE_SITE_KEY=
 
-# Build-time: the site's public URL (painttradehq.com, painttradehq.com.au or www.painttradehq.co — Josh's call)
-PUBLIC_SITE_URL=https://www.painttradehq.co
+# Build-time: the site's public URL. Josh's call on 24 Oct 2026: the site on painttradehq.com, the app stays on painttradehq.co
+PUBLIC_SITE_URL=https://painttradehq.com

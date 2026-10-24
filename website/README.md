@@ -31,7 +31,7 @@ npx wrangler pages dev dist   # pages + functions, reads .dev.vars
 
 1. Create a Pages project from this repo, root directory `website`, build command `npm run build`, output `dist`.
 2. Set the variables from `.dev.vars.example` as Pages secrets. `INVITE_FROM` must be on a domain verified in Resend.
-3. Add the custom domain Josh picks. Set `PUBLIC_SITE_URL` to match so canonical and Open Graph URLs are right.
+3. Add the custom domain: `painttradehq.com` (Josh's call, 24 Oct 2026; the app stays on `painttradehq.co`), with `www.painttradehq.com` and `painttradehq.com.au` redirecting to it. Set `PUBLIC_SITE_URL` to match so canonical and Open Graph URLs are right.
 4. Put a ceiling on cost before the first visitor: a **spend limit in the Anthropic Console** for the chat key, and a **WAF rate-limiting rule** on the zone for `/api/*` (the free plan includes one; 20 requests per 10 seconds per IP is plenty). The functions also limit per IP themselves (chat 20 a minute, invite 5 a minute) using the best storage they find: a Rate Limiting binding, else a KV namespace bound as `RATE_KV`, else an in-memory counter per server. Bind the KV namespace in `wrangler.toml` for the limit to hold across servers.
 5. Optional: Turnstile on the full invite form (`TURNSTILE_SECRET` + `PUBLIC_TURNSTILE_SITE_KEY`). The chat's mini lead form is exempt; it sits behind the chat's own limits.
 

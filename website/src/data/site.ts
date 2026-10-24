@@ -203,12 +203,12 @@ export const modules: Module[] = [
   {
     id: 'timesheets',
     name: 'Timesheets and the time clock',
-    plan: 'Small business',
+    plan: 'Starter',
     summary: 'Sign in, sign out, pay week done.',
     points: [
       'Crew sign in and out on their phones. The app records GPS at those two moments, the address and the distance from the job site, and flags a sign-in outside the job\'s radius. No tracking in between.',
       'Operating hours: your start and end time and working days. Crew get a reminder in the crew app to sign in and out (phone notifications are coming); an auto sign-out time closes forgotten sessions.',
-      'Timesheets page: a week grid per person, sessions in a drawer, overtime split by your thresholds (default 8 hours a day and 38 a week), lock a week, export the payroll CSV.',
+      'Timesheets page (Small business and up): a week grid per person, sessions in a drawer, overtime split by your thresholds (default 8 hours a day and 38 a week), lock a week, export the payroll CSV.',
       'Pay rates on each employee: hourly, daily and an overtime rate. One money rule everywhere, and the project\'s labour cost uses the same rule.',
     ],
     screen: 'timesheets',
@@ -278,7 +278,7 @@ export const modules: Module[] = [
     points: [
       "Their day's jobs with the address, the time clock, the daily report with photos, contracts to read and sign, equipment requests, training, their own validations and coaching, team events, notifications, a feedback form and their profile.",
       'No prices, no margins, no admin pages, no AI assistant.',
-      'Daily reports, contracts, equipment, training and performance notes are on Enterprise; the Pricing page lists what each plan includes.',
+      'The time clock is on every plan. Daily reports, contracts, equipment, training and performance notes are on Enterprise; the Pricing page lists what each plan includes.',
       'What the crew can see is your choice in Settings › Crew app.',
       "It is a web app: add it to the phone's home screen. There is no App Store or Play Store app.",
     ],
