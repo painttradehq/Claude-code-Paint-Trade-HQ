@@ -79,6 +79,10 @@ a:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+/* Email addresses are long single words; let them wrap instead of widening the page. */
+a[href^='mailto:'] {
+  overflow-wrap: anywhere;
+}
 
 :focus-visible {
   outline: 3px solid var(--accent);
@@ -475,6 +479,10 @@ p {
 }
 
 /* Utilities */
+/* The hidden attribute must win over any display rule (flex/grid panels, chips, form states). */
+[hidden] {
+  display: none !important;
+}
 .visually-hidden {
   position: absolute !important;
   width: 1px;
