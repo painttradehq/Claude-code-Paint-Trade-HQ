@@ -1,4 +1,4 @@
-# Round 85 — Speed fixes: the six from the research, in order (25 October) — DRAFT, waits for Josh's "send"
+# Round 85 — Speed fixes: the six from the research, in order (25 October) — SENT 25 Oct (§1–§8 verbatim with the rules; TTL 10 s; report "Round 85 done")
 
 Backend and admin-frontend round; **no prototype** (nothing changes on screen; pages arrive sooner). Built on Round 84's measurements (`speed-research-notes.md` §6 and Emergent's report `memory/reports/round84-speed-research-report.md`) and the Round 77 blueprint (`dashboard-diet-notes.md`), which this round supersedes. Nothing under `app/employee/*`. The owner's real tenant is read-only; the only sanctioned write on it is the logo/signature move, which Josh triggers himself from the Storage card (§2.2).
 
