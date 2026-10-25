@@ -73,3 +73,18 @@ One card: "The dashboard and every page now load in a fraction of the time: the 
 
 ## 8. Report
 `memory/reports/round85-speed-fixes-report.md`, starting "Round 85 done": the trips and ms per route before and after (preview), the dashboard stage breakdown after, the shell's on-load call list after, the ten indexes, the suite before and after, and anything in the plan that could not be done with why. No code review. Do not start anything else after it. Do not offer next action items.
+
+
+## Live numbers after the publish (Josh, 25 Oct, 3:52 pm)
+
+| Measure | Live app |
+|---|---|
+| Database round trip (20 pings) | p50 38.9 ms · p95 40.2 ms |
+| Dashboard home, server side, Josh's tenant | **10,094 ms · 10 trips** — wave 1 10,074 ms, calendar 0, wave 2 0 |
+| `/api/admin/profile` in the browser | **1,199 kB · 1.63 s** (and again on the next page, 1.78 s) |
+| Small calls (0.1–0.4 kB) from Melbourne | 270–960 ms each |
+| Round 85's ten tenant indexes | **none present**: all ten collections "NO tenant index · 0 indexes" |
+| Jobs | all 80–130 ms except `operating_hours_reminders` 3,813 ms |
+| Pod | 1 worker · 1 vCPU · memory 1012 MB · up 22 min · regions unknown |
+
+Reading: the trips are cheap (10 × 39 ms = 0.4 s); the 10 s is data — the only heavy data in this tenant is `estimates.presentation` (14.6 MB per quote with pages, 241 MB in all, found by Check storage the same afternoon). The profile is still 1.2 MB because the brand images are not in `admin_settings`, where the Round 85 move looked. The indexes were not created on the live database. All of it is Round 86 (`presentation-images-notes.md`).
