@@ -1,4 +1,4 @@
-# Round 86 — Presentation and brand images out of the records, and the missing indexes (25 October) — DRAFT, waits for Josh's "send"
+# Round 86 — Presentation and brand images out of the records, and the missing indexes (25 October) — SENT 25 Oct (`round86-message.md`), building
 
 Backend round with two small admin touches; no prototype (nothing changes on screen). Found by Josh's **Check storage**, **Speed check** and DevTools on the live app, 25 Oct, straight after the Round 85 publish.
 
