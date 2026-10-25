@@ -64,7 +64,7 @@ Two uvicorn workers (measure after the above; the 1 vCPU limit may make it worse
 `backend/tests/test_r85_speed_fixes.py`: trip budgets per route from the counter; payload equality on the seeded tenant; `brief.pending` and the single write; revocation TTL behaviour; profile blobs and the move on `admin_settings` keys; `billing/overview` carries `plans`; the ten indexes. Suite green before and after.
 
 ## 6. Decisions
-1. **Revocation cache TTL**: Emergent proposed 30 s; I recommend **10 s** — "sign out other devices" still bites within ten seconds on the other pod and at once on the pod that handled it, and the saving is the same (one trip per call). Josh: 10 s, 30 s, or keep it instant (no cache; the floor stays).
+1. **Revocation cache TTL: 10 s** (Josh, 25 Oct). "Sign out other devices" bites at once on the pod that handled it and within ten seconds on the other; the saving is one trip per call.
 2. The logo/signature apply on the live app is Josh's click on the Storage card after the publish (as 75b); the round applies on TS_ tenants only.
 3. The database move stays a support ticket; this round's numbers are with Oregon.
 
