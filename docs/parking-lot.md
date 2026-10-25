@@ -1,0 +1,7 @@
+# Parking lot
+
+Ideas Josh wants kept, not built yet. One line per idea when parked; detail only when it comes off the lot. The rule from CLAUDE.md applies: finish the current line (website v1 live on painttradehq.com) before any of these start.
+
+| # | Parked | Idea | Why it is parked | What it would take (first look, not a plan) |
+|---|---|---|---|---|
+| 1 | 25 Oct 2026 | **Directory of subscribed painting businesses** on the website: a public page per subscriber (name, suburb, services, photos, link to their own site or quote link) and an index by area, so being on Paint Trade HQ helps a painter rank higher and be found. | Website v1 is not live yet; there are no paying subscribers yet (tester program); needs an opt-in and data from the app. | Opt-in switch and a public profile (logo, blurb, suburbs served, photos, contact or quote link) in the app's Settings; a public read endpoint listing opted-in businesses; static pages on the site built from it (`/painters/<state>/<suburb>` and `/painters/<business>`), each with LocalBusiness structured data and a real backlink to the painter's site; sitemap; an index by state and suburb; rules for what appears (plan, opt-in, verified ABN?) and moderation of photos. SEO value comes from unique, real content per profile, not from the list alone, so the profile needs to be worth reading. Check the Terms cover publishing a business's details. |
