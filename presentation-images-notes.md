@@ -66,3 +66,7 @@ Settings › Platform › Storage: **Check storage** (now with `admins` and the 
 - **Accounting.** `operating_hours_reminders`: four sequential trips per `admin_settings` document with reminders on (the default; 385 such documents for 27 admins on the preview) — 1,541 trips → 2. Shell at load: 5 calls at first paint, 5 after, one brief re-fetch at +5 s; `me` ×3 are three different routes; `unread` ×4 are two routes plus one 120 s poll each; `status` fires once at load (`legal/status`) — the other `status` routes belong to later pages. No duplicates to remove.
 - Tests: `tests/test_r86_presentation_images.py` (7); suite 894 passed / 113 skipped in chunks, the same two order-dependent daily-report tests; tsc clean; the testing agent's frontend pass at 1440 and 1024; TS_ rows torn down; the owner's tenant read only; Draft n 25 amended, still a draft. The `test_r84` shape test gained the `index_run` key.
 - Also in the log: "Parking lot: FB-36b69c40 parked tester feedback" (→ `fix-round-h-candidates.md` item 6); the testing agent's first pass hit a stale Metro bundle on the preview (item 7).
+
+## Live, 25 Oct 5:54 pm — published and applied by Josh ("all done")
+
+Speed check on the live app: dashboard home **270 ms · 10 trips** (from 10,094 ms); `w1.estimates~17kB` 83 ms; the ten collections 10 of 10 with a tenant index, "startup index run 06:41:20 · 24 ok · 0 failed"; `operating_hours_reminders` 130 ms (from 3,813). Still to paste: the Check storage after Apply (`estimates` should read about 1 MB) and the `profile` row size. Detail in `speed-fixes-notes.md`.

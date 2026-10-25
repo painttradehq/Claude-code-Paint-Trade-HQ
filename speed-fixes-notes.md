@@ -88,3 +88,17 @@ One card: "The dashboard and every page now load in a fraction of the time: the 
 | Pod | 1 worker · 1 vCPU · memory 1012 MB · up 22 min · regions unknown |
 
 Reading: the trips are cheap (10 × 39 ms = 0.4 s); the 10 s is data — the only heavy data in this tenant is `estimates.presentation` (14.6 MB per quote with pages, 241 MB in all, found by Check storage the same afternoon). The profile is still 1.2 MB because the brand images are not in `admin_settings`, where the Round 85 move looked. The indexes were not created on the live database. All of it is Round 86 (`presentation-images-notes.md`).
+
+
+## Live, after the Round 86 publish and Josh's Apply (25 Oct, 5:54 pm; pod up 13 min)
+
+| Measure | 3:52 pm (Round 85 live) | 5:54 pm (Round 86 live, media moved) |
+|---|---|---|
+| Dashboard home, server side, Josh's tenant | 10,094 ms · 10 trips | **270 ms · 10 trips** |
+| Slowest wave-1 stages | wave 1 as a whole 10,074 ms | `w1.reminders` 266 ms, `w1.events` 266 ms; the other eight 39–85 ms |
+| `operating_hours_reminders` job | 3,813 ms | 130 ms |
+| Indexes on the ten collections | "NO tenant index · 0 indexes" (a false reading) | 10 of 10 with a tenant index · "startup index run 06:41:20 · 24 ok · 0 failed" |
+| Database round trip | 38.9 ms | 41.7 ms |
+| Pod memory | 1012 MB | 510 MB |
+
+Josh: "it seems like the speed has been improved." Open question, small: `reminders` (2 records) and `events` (12 records) took 266 ms while the other eight stages took 39–85 ms on the same link; on collections that small it is not a scan. A second Speed check on the same pod tells whether it was connection warm-up (the stages drop to ~40–80 ms) or something in those two queries (they stay at ~266 ms). Not pasted yet: the Check storage after Apply (the `estimates` line) and the `profile` row's size in DevTools.
