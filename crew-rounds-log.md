@@ -217,3 +217,6 @@ Rules: `crew-app-handover.md` §1. Rounds are C1, C2, …; one round at a time a
 
 ## 23 Oct — C5 amendment prototyped (fourth fact + crew notice page), after the consent question
 `c1-crew-shell.html`: step 4 fourth fact, `crew-onb-notice` → `#s-notice`, Me footer `crew-me-notice`; `tools/test_c1.js` 462/462 at 390 and 360; `c5-followup-f-notes.md` §8. Rides with F/D after C5. Not sent. Legal claims checked by a 6-verifier workflow (medium confidence; lawyer to confirm).
+
+## 25 Oct — Round C5 RESENT (v2) after Josh's "send out the first wave"
+The 23 Oct send never reached the agent (the job went marketing captures → Round 85 → Round 86; no C5 turn). `roundC5-message-v2.md` = the 23 Oct message + the step-4 amendment (fourth fact, `/crew-notice` page, `notice_version`, tests 11–12) and the shell size (180 KB); spec body byte-identical to the 23 Oct send. Josh given `c1-crew-shell.html` to upload with "here"; Josh said "done".
