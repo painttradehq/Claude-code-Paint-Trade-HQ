@@ -12,6 +12,23 @@ Josh, 24 Oct: the app's loading time is getting worse — about 10 s now, better
 - **Workers**: one uvicorn worker per pod on a 500m CPU limit; the two-workers change (Round 76 §3) was Josh's decision via support and is still open.
 - `maxPoolSize` was raised to 50 by Josh (Round 75 §4).
 
+
+## 0b. Josh's own measurements (DevTools Network, live app, dashboard, 25 Oct, Melbourne)
+
+| | Plain reload | Hard refresh |
+|---|---|---|
+| Requests / transferred / resources | 38 / 2.1 MB / 8.9 MB | 26 / 2.6 MB / 8.9 MB |
+| DOMContentLoaded / Finish | 1.0 s / 4.05 s | 1.4 s / 4.46 s |
+| `GET /api/dashboard/home` | **still pending at 18 s** (cards "—", activity spinner) | **still pending at 17 s** |
+| `GET /api/admin/profile` | **1,219 kB · 2.03 s** | 1,219 kB · 2.60 s |
+| `GET /api/billing/overview` | 1.73 s (0.4 kB) | 1.51 s |
+| `plans` / `status` / `version` | 431 / 382 / 340 ms | 365 / 444 / 332 ms |
+| `me` ×3 · `unread` ×2 · `unseen` | 368–583 · 462–601 · 471 ms | 362–706 · 412–498 · 478 ms |
+| Fonts (Fraunces, Inter ×3, IBM Plex Mono ×2, Ionicons ≈ 900 kB) | re-fetched over the network through the service worker, 480–920 ms each | from disk cache, 6–57 ms |
+| JS bundle `entry-65b8e9a….js` | memory cache, 0 ms | network |
+
+What it says: the shell is up in about 1.4 s; **the 10+ s is `/api/dashboard/home` alone** (the briefing is off for this tenant, so not the AI brief); the profile call drags **1.2 MB** on every page (the logo and signature as data: URLs, most likely — Round 75 moved estimate photos only); `billing/overview` costs 1.5 s on load (Round 80 addition); a dozen tiny calls cost 330–700 ms each (the production floor: browser → Iowa → Oregon database → back); `me` fires three times and `unread` twice (Round 76's dedupe not holding, or new callers); the service worker fetches hashed fonts over the network on a plain reload. Sent to Emergent as the Round 84 addendum on 25 Oct.
+
 ## 1. The hypotheses, ranked by expected share of the 10 s
 
 | # | Cause | Why it fits "getting worse" | How the round proves or clears it |
