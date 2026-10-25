@@ -38,7 +38,7 @@ No banner, no toast, no "we emailed you" pop-up: the code step is the confirmati
 - `app/employee/login.tsx`: the link (`employee-login-forgot`), `router.push({pathname: '/employee/reset-password', params: {email}})`.
 - New `app/employee/reset-password.tsx`: the three steps in one file with `useState` (`step`, `email`, `code`, `pw`, `err`); `useLocalSearchParams<{email, from}>()`; `from === 'profile'` → post forgot-password on mount with `authStore` email and start at step 2. The crew `_layout.tsx` lets this route through signed out (it is outside the tab group, like `login` and `onboarding`). Styles from the C5 wizard (`fld`, `tin`, `err`, `hint`), nothing new.
 - C5's Profile sheet (`app/employee/profile.tsx`): the line and link (`crew-pw-forgot`) → close the sheet, `router.push('/employee/reset-password?from=profile')`.
-- `services/api.ts`: `forgotCrewPassword(email)`, `resetCrewPassword({email, code, new_password})`.
+- No new API module: the two calls go through the axios instance in `utils/api.ts` that `login.tsx` already imports (`api.post('/employees/forgot-password', {email})`, `api.post('/employees/reset-password', {...})`), with no bearer on the sign-in path and the stored bearer on the Profile path.
 
 ## 5. Tests — `backend/tests/test_f_crew_password_reset.py` (Round 43 fixtures; `from seed import _db`)
 
