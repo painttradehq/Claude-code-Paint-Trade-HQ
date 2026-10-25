@@ -1,4 +1,4 @@
-# Round 84 — Speed research: why the app loads in 10 s and what to fix first (24 October) — DRAFT, waits for Josh's "send"
+# Round 84 — Speed research: why the app loads in 10 s and what to fix first (24 October) — SENT 25 Oct (§0–§2 and §5 verbatim with the rules; report "Round 84 done")
 
 Josh, 24 Oct: the app's loading time is getting worse — about 10 s now, better a month ago; the Emergent "grow" compute upgrade did not help. This round **measures before it fixes**: read-only on production, a small owner-only "Speed check" card so real numbers can be read off the live app, and a ranked list of causes with a fix plan. No feature work. Nothing under `app/employee/*`.
 
