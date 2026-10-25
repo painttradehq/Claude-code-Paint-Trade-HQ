@@ -136,3 +136,7 @@ Josh: a tick "that says we have a right to store, use your details such as sendi
 - Admin chat: 101 `private_files` rows whose `owner_admin_id` is no longer an admin (estimate_media / update_picture, 14–25 Oct tester runs) — a cleanup for the platform's storage tools.
 - D round carries: draft n 26 card title → the draft's own title; its body's `{business_name}` → "your business"; verify the switches via `PUT /admin/crew-app-settings` and the welcome video via the admin upload route (C5 items 10 and 11).
 - C5 silence 1 (invite link opened while signed in as someone else runs the public wizard): leave. Silence 6 (pre-C5 crew with no temporary password): follow-up F.
+
+## 25 Oct — after D (from the report)
+- C6 carries (two one-liners): `utils/crewLocation.ts` → `getCurrentPositionAsync({accuracy: High, maximumAge: 0})`; the reset screen shows "Too many tries. Wait a few minutes and try again." on a 429 (today "No connection. Try again.").
+- Platform (later): record crew logins as sessions so a password reset can sign out other devices (`employee_login` never calls `create_session`); the drawer string for a confirmed no-position sign-in (admin chat, with the two distance strings).
