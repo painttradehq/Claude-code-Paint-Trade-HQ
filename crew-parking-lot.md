@@ -131,3 +131,8 @@ Josh: "do we need to create some sort of consent form in the app for the crew si
 
 ## 23 Oct — crew consent tick (Josh's proposal) — answered, prototyped as a C5 amendment
 Josh: a tick "that says we have a right to store, use your details such as sending email or text, record keeping" + "a link that you can have the writing in a template page". Decision: the one tick stays; a fourth fact ("Emails, texts and records") + "Read the full crew notice" → `/crew-notice`, a platform page with the business name filled in, also in Me's footer; `notice_version` stored. Spec in `c5-followup-f-notes.md` §8. Lawyer items: the notice text (v1 draft), the IP in the acceptance record, NSW s 10 coverage, privacy.md crew gaps (listed in §8). Admin/platform: SMS Sender ID Register for Twilio before any branded crew SMS.
+
+## 25 Oct — after C5 (from the report)
+- Admin chat: 101 `private_files` rows whose `owner_admin_id` is no longer an admin (estimate_media / update_picture, 14–25 Oct tester runs) — a cleanup for the platform's storage tools.
+- D round carries: draft n 26 card title → the draft's own title; its body's `{business_name}` → "your business"; verify the switches via `PUT /admin/crew-app-settings` and the welcome video via the admin upload route (C5 items 10 and 11).
+- C5 silence 1 (invite link opened while signed in as someone else runs the public wizard): leave. Silence 6 (pre-C5 crew with no temporary password): follow-up F.
