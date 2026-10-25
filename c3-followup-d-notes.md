@@ -97,7 +97,7 @@ The owner's Crew app settings (Round 79) now hold a sign-in distance and a rule.
 
 **Title:** Sign in and out, checked against the job
 
-**Body:** Your crew app now follows your Crew app settings when someone signs in or out. With the rule set to Ask, a crew member further than your distance from the job is asked "Sign in anyway?" before anything is recorded — and the same when they sign out — and what they confirm shows in Timesheets with the distance. With Block, a sign-in from too far away is refused; a sign-out is always allowed, so nobody is left stuck on the clock. Today's job card on their phone also shows the weather for the job's suburb, and their daily report starts with the weather already ticked.
+**Body:** Your crew app now follows your Crew app settings when someone signs in or out. With the rule set to Ask them first, a crew member further than your distance from the job is asked "Sign in anyway?" before anything is recorded — and the same when they sign out — and what they confirm shows in Timesheets with the distance. With Refuse it, a sign-in from too far away is refused; a sign-out is always allowed, so nobody is left stuck on the clock. Today's job card on their phone also shows the weather for the job's suburb, and their daily report starts with the weather already ticked.
 
 ## 10. Decisions in this spec Josh can reverse in one line
 
