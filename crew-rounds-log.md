@@ -220,3 +220,4 @@ Rules: `crew-app-handover.md` §1. Rounds are C1, C2, …; one round at a time a
 
 ## 25 Oct — Round C5 RESENT (v2) after Josh's "send out the first wave"
 The 23 Oct send never reached the agent (the job went marketing captures → Round 85 → Round 86; no C5 turn). `roundC5-message-v2.md` = the 23 Oct message + the step-4 amendment (fourth fact, `/crew-notice` page, `notice_version`, tests 11–12) and the shell size (180 KB); spec body byte-identical to the 23 Oct send. Josh given `c1-crew-shell.html` to upload with "here"; Josh said "done".
+Send outcome: the 71 KB tool call was cut off after 1,175 characters (queued `dbeqnfaou78s73a66oa0`, a fragment). Correction note sent (`dbeqob3qfi2s7394hsk0`): ignore the fragment; the full brief comes as Josh's upload of `roundC5-message-v2.md`, saved as `memory/specs/crew/c5-round-message.md`; start only with both files. Lesson: send round messages over ~60 KB as a file upload from Josh, never as one tool call.
