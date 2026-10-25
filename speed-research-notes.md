@@ -1,4 +1,4 @@
-# Round 84 — Speed research: why the app loads in 10 s and what to fix first (24 October) — SENT 25 Oct (§0–§2 and §5 verbatim with the rules; report "Round 84 done")
+# Round 84 — Speed research: why the app loads in 10 s and what to fix first (24 October) — DONE 25 Oct (report `memory/reports/round84-speed-research-report.md`; findings in §6 below)
 
 Josh, 24 Oct: the app's loading time is getting worse — about 10 s now, better a month ago; the Emergent "grow" compute upgrade did not help. This round **measures before it fixes**: read-only on production, a small owner-only "Speed check" card so real numbers can be read off the live app, and a ranked list of causes with a fix plan. No feature work. Nothing under `app/employee/*`.
 
@@ -75,3 +75,17 @@ The report's ranked list becomes the fix order. Likely shape, to be confirmed by
 ## 5. What's new
 
 None (instruments and a report; nothing for users). Say so in the report.
+
+## 6. Findings (Emergent, 25 Oct) — "Round 84 done"
+
+- **Instruments built**: every Motor call counted per request (`services/db_trips.py`); `Server-Timing: app;dur, trips;dur, s1…s15` with the dashboard stage names; a per-request debug line; `job_runs` bookkeeping; the **Speed check** card (platform owner only, next to Storage; others 404); `tests/test_r84_speed_instruments.py`; tsc clean.
+- **H2 confirmed and bigger than thought**: `/dashboard/home` makes **60 sequential database trips** (not 35–45) → at the 200–300 ms Oregon round trip 12–18 s; the production 24 h logs show **p50 18.3 s** for the owner's tenant. (A 30-day trend is not retrievable: the platform's log tooling keeps 24 h and no timestamps.)
+- **`/admin/profile` is 1.2 MB** because the logo and the owner signature are inline data URLs in `admin_settings` (`utils/image_upload.py` falls back to base64 when no bucket is configured — the same fallback Round 75 removed for estimate photos).
+- **The shell fires `dashboard/home` and `legal/status` twice** on load, plus the Round 80/82 calls (billing overview, plans, Terms status).
+- **Every tiny call pays an uncached revocation trip** (Round 76 kept `is_jti_revoked` live by design) — the 330–700 ms floor.
+- **The service worker is network-first**, so hashed fonts are refetched on a plain reload.
+- **None of the ten newer collections has a tenant index.**
+- **Cleared**: background jobs and the compute tier are not the cause (the "grow" upgrade could not help).
+- Preview Speed check: DB ping p50 0.2 ms; 1 worker; CPU limit 2 vCPU; dashboard 728 ms for the same 60 trips — the trips are cheap next to the database and ruinous across clouds.
+- **Ranked fix plan** (Emergent's, savings estimated): 1 gather the dashboard reads (≈18 s → ~2 s); 2 logo and signature to files (−1.2 MB, −2 s on every page); 3 cache the revocation check and the plan-gate read; 4 dedupe the shell's calls; 5 cache-first service worker for hashed assets; 6 tenant indexes on the newer collections; and the **database in the app's region** as the structural lever (support, Josh).
+- Suite: before pass 189 s; the full after-run hit port exhaustion in the pod (the Code tab now occupies port 8011); every affected file re-run green except the known daily-report fixture-order test. TS_ rows cleaned; owner tenant timings only; nothing published; no What's new.
