@@ -89,3 +89,17 @@ None (instruments and a report; nothing for users). Say so in the report.
 - Preview Speed check: DB ping p50 0.2 ms; 1 worker; CPU limit 2 vCPU; dashboard 728 ms for the same 60 trips — the trips are cheap next to the database and ruinous across clouds.
 - **Ranked fix plan** (Emergent's, savings estimated): 1 gather the dashboard reads (≈18 s → ~2 s); 2 logo and signature to files (−1.2 MB, −2 s on every page); 3 cache the revocation check and the plan-gate read; 4 dedupe the shell's calls; 5 cache-first service worker for hashed assets; 6 tenant indexes on the newer collections; and the **database in the app's region** as the structural lever (support, Josh).
 - Suite: before pass 189 s; the full after-run hit port exhaustion in the pod (the Code tab now occupies port 8011); every affected file re-run green except the known daily-report fixture-order test. TS_ rows cleaned; owner tenant timings only; nothing published; no What's new.
+
+## 7. The pasted detail (25 Oct)
+
+- Production 24 h (only requests over 500 ms are logged, 17 lines): `dashboard/home` n 7 **p50 18,340 ms, p95 ~50 s**; `admin/profile` p50 1,160 ms, p95 5.5 s; `billing/overview` p50 816 ms. No 30-day trend (tooling keeps 24 h, no timestamps, old pods gone).
+- Trips per route (preview counter): dashboard/home **60–64**; projects 12; admin/profile 10; updates/unseen 5; billing/overview 4; legal/status 2–3; feedback/unread 3; auth/me, estimates, platform/me, login 2; customers, billing/plans 1; version 0.
+- Dashboard stages (preview): calendar fan-out the largest trip count (`entries_for_range`); `brief_v2` re-reads admin_settings, reminders, leads, messages, admins, lucy_ideas and the calendar range again; **the AI morning brief is generated inside the request when today's headline is not cached — 9.6 s on a cold day** (off for Josh's tenant, on for others).
+- Profile: `utils/image_upload.persist_image` writes the logo and signature as inline base64 when no bucket is configured; the preview copy is 3 KB without them.
+- Request path: PlanFeatureGate makes 1 uncached `admins.find_one` on gated routes; `principal.resolve()` runs the revocation check uncached on every call (+ the caller doc on a 30 s miss); two Motor clients (`database.py` and `server.py`), two pools.
+- Shell on a cold load: `admin/login → auth/me → legal/status → dashboard/home → billing/overview → billing/plans → legal/status (again) → dashboard/home (again) → admin/profile → platform/me → version → feedback/unread → updates/unseen` (+ `billing/me` after first paint and on every tab focus; two unread polls every 120 s). The duplicates come from a remount after `access.load()` resolves; `billing/overview` + `plans` (80) and `legal/status` (82) are new since Round 76. `billing/overview` = 4 trips, no Stripe HTTP call.
+- Service worker `public/sw.js`: network-first for everything, cache only as fallback.
+- No tenant index on timeclock, messages, ai_audit_log, notifications, updates, employee_sessions, daily_reports, leads, reminders, events.
+- Jobs: all milliseconds on the preview (operating_hours_reminders 385 ms); they run in the worker process → H5 cleared.
+- Revocation cache at 30 s: a revoked token could work up to 30 s on the other pod (two pods, no shared cache).
+→ Round 85 written: `speed-fixes-notes.md`.
