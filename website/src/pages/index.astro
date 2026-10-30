@@ -161,7 +161,7 @@ const homeFaqs = faqs.filter((f) =>
           {quotes.map((t) => (
             <figure class="card quote">
               {t.sample && <span class="pill pill--neutral quote__sample">Sample</span>}
-              <blockquote><p>{t.quote}</p></blockquote>
+              <blockquote class={t.sample ? 'quote__text quote__text--badged' : 'quote__text'}><p>{t.quote}</p></blockquote>
               <figcaption class="small"><strong>{t.who}</strong><br />{t.where}</figcaption>
             </figure>
           ))}
@@ -282,6 +282,7 @@ const homeFaqs = faqs.filter((f) =>
   .quote blockquote p { margin: 0; }
   .quote figcaption { margin-top: auto; color: var(--text-2); }
   .quote__sample { position: absolute; top: 14px; right: 14px; }
+  .quote__text--badged { padding-right: 76px; }
   .vid { margin: 0; }
   .vid__frame { position: relative; aspect-ratio: 16 / 10; border-radius: var(--r-lg); overflow: hidden; border: 1px solid var(--border); background: var(--sunken); box-shadow: var(--shadow-float); }
   .vid__frame video { width: 100%; height: 100%; object-fit: cover; display: block; }

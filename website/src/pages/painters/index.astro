@@ -21,7 +21,7 @@ const byState = Object.entries(STATES)
         )}
       </div>
 
-      {byState.length === 0 && (
+      {visibleListings.length === 0 && (
         <div class="card empty">
           <h2>Listings open to painting businesses on Paint Trade HQ</h2>
           <p>The first real listings appear here as painters join. If that's you, start your free trial.</p>
@@ -29,15 +29,23 @@ const byState = Object.entries(STATES)
         </div>
       )}
 
-      {byState.map((g) => (
-        <section class="state" id={g.code.toLowerCase()}>
-          <h2>{g.name} <span class="muted small">{g.items.length}</span></h2>
-          <div class="grid grid--3">
-            {g.items.map((l) => (
-              <a class="card listing" href={`/painters/${l.slug}`}>
-                {l.sample && <span class="pill pill--neutral listing__sample">Sample</span>}
+      {visibleListings.length > 0 && (
+        <>
+          <div class="filter" role="group" aria-label="Filter by state" id="state-filter">
+            <button type="button" class="filter__btn is-on" data-state="">All <span class="muted">{visibleListings.length}</span></button>
+            {byState.map((g) => (
+              <button type="button" class="filter__btn" data-state={g.code}>{g.name} <span class="muted">{g.items.length}</span></button>
+            ))}
+          </div>
+          <div class="grid grid--3 listings" id="listings">
+            {visibleListings.map((l) => (
+              <a class="card listing" href={`/painters/${l.slug}`} data-state={l.state}>
+                <div class="listing__top">
+                  <span class="pill pill--neutral">{l.state}</span>
+                  {l.sample && <span class="pill pill--neutral">Sample</span>}
+                </div>
                 <h3>{l.name}</h3>
-                <p class="small listing__where">{l.suburb}, {l.state} · {l.areas.join(' · ')}</p>
+                <p class="small listing__where">{l.suburb} · {l.areas.join(' · ')}</p>
                 <ul class="listing__services">
                   {l.services.slice(0, 3).map((s) => <li>{s}</li>)}
                 </ul>
@@ -45,8 +53,9 @@ const byState = Object.entries(STATES)
               </a>
             ))}
           </div>
-        </section>
-      ))}
+          <p class="small center empty-filter" id="empty-filter" hidden>No listings in that state yet.</p>
+        </>
+      )}
     </div>
   </section>
 
@@ -61,12 +70,16 @@ const byState = Object.entries(STATES)
 
 <style>
   .sample-banner { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--text-2); }
-  .state { margin-top: 36px; }
-  .state h2 { display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px; }
-  .listing { position: relative; display: flex; flex-direction: column; gap: 8px; color: inherit; }
+  .filter { display: flex; flex-wrap: wrap; gap: 8px; margin: 28px 0 20px; }
+  .filter__btn { font: inherit; font-size: 14px; font-weight: 500; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-pill); padding: 6px 14px; cursor: pointer; }
+  .filter__btn:hover { border-color: var(--accent); }
+  .filter__btn.is-on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .filter__btn.is-on .muted { color: rgba(255, 255, 255, 0.75); }
+  .listing { display: flex; flex-direction: column; gap: 8px; color: inherit; }
   .listing:hover { text-decoration: none; border-color: var(--accent); }
-  .listing h3 { margin: 0; padding-right: 70px; }
-  .listing__sample { position: absolute; top: 14px; right: 14px; }
+  .listing__top { display: flex; gap: 6px; flex-wrap: wrap; }
+  .listing h3 { margin: 4px 0 0; }
+  .listing[hidden] { display: none; }
   .listing__where { color: var(--text-2); margin: 0; }
   .listing__services { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
   .listing__services li { font-size: 13px; background: var(--sunken); border: 1px solid var(--border); border-radius: var(--r-pill); padding: 3px 10px; }
@@ -76,3 +89,18 @@ const byState = Object.entries(STATES)
   .empty .btn { margin-top: 12px; }
   .cta .lead { margin-left: auto; margin-right: auto; margin-bottom: 24px; }
 </style>
+
+<script>
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('#state-filter .filter__btn'));
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('#listings .listing'));
+  const empty = document.getElementById('empty-filter');
+  function apply(state: string) {
+    buttons.forEach((b) => b.classList.toggle('is-on', (b.dataset.state || '') === state));
+    let shown = 0;
+    cards.forEach((c) => { const on = !state || c.dataset.state === state; c.hidden = !on; if (on) shown++; });
+    if (empty) empty.hidden = shown > 0;
+  }
+  buttons.forEach((b) => b.addEventListener('click', () => { const st = b.dataset.state || ''; apply(st); history.replaceState(null, '', st ? `#${st.toLowerCase()}` : location.pathname); }));
+  const fromHash = location.hash.replace('#', '').toUpperCase();
+  if (buttons.some((b) => b.dataset.state === fromHash)) apply(fromHash);
+</script>
