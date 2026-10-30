@@ -4,7 +4,7 @@ import Button from '../components/Button.astro';
 import Screenshot from '../components/Screenshot.astro';
 import Clip from '../components/Clip.astro';
 import Faq from '../components/Faq.astro';
-import { site, plans, faqs, aud, incGst, testimonials, videoFeedback } from '../data/site';
+import { site, faqs, testimonials, videoFeedback } from '../data/site';
 import { showSamples } from '../data/directory';
 const quotes = testimonials.filter((t) => showSamples || !t.sample);
 const videos = videoFeedback.filter((v) => showSamples || !v.sample);
@@ -219,28 +219,6 @@ const homeFaqs = faqs.filter((f) =>
     </div>
   </section>
 
-  <!-- Pricing teaser -->
-  <section class="section">
-    <div class="container">
-      <div class="section-head section-head--center">
-        <span class="eyebrow">Pricing</span>
-        <h2>Three plans. Monthly. AUD, GST on top.</h2>
-        <p class="lead">{site.status.line}</p>
-      </div>
-      <div class="grid grid--3 teaser">
-        {plans.map((p) => (
-          <a class={`card teaser__plan ${p.highlight ? 'teaser__plan--hi' : ''}`} href="/pricing">
-            <span class="teaser__name">{p.name}</span>
-            <span class="teaser__price mono">{aud(p.price)}<small> + GST</small></span>
-            <span class="small">{aud(incGst(p.price))} inc. GST a month · {p.admins} admin{p.admins > 1 ? 's' : ''}, {p.employees} employees</span>
-            <span class="small teaser__blurb">{p.blurb}</span>
-          </a>
-        ))}
-      </div>
-      <p class="center small"><a href="/pricing">See what each plan includes</a></p>
-    </div>
-  </section>
-
   <!-- Story teaser -->
   <section class="section section--sunken section--tight">
     <div class="container story-teaser">
@@ -324,14 +302,6 @@ const homeFaqs = faqs.filter((f) =>
 
   .client-shots { gap: 16px; align-items: start; }
 
-  .teaser { align-items: stretch; }
-  .teaser__plan { display: flex; flex-direction: column; gap: 6px; color: var(--text); }
-  .teaser__plan:hover { text-decoration: none; border-color: var(--accent); }
-  .teaser__plan--hi { border-color: var(--accent); }
-  .teaser__name { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
-  .teaser__price { font-size: 32px; font-weight: 600; letter-spacing: -0.02em; }
-  .teaser__price small { font-size: 14px; color: var(--text-2); font-weight: 500; margin-left: 4px; }
-  .teaser__blurb { margin-top: 6px; }
 
   .story-teaser > div { max-width: 720px; }
   .faq-wrap { max-width: 820px; }
