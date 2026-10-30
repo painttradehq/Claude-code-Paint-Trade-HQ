@@ -43,7 +43,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
 <Base title="Paint Trade HQ" fullTitle="Paint Trade HQ · Quote it. Run it. Get paid." description={site.description} noindex>
   <!-- Hero: white page, one ribbon -->
   <section class="nh" id="top">
-    <div class="ribbon" aria-hidden="true"><i class="ribbon__a"></i><i class="ribbon__b"></i><i class="ribbon__c"></i></div>
+    <div class="ribbon" aria-hidden="true"><i class="ribbon__a"></i><i class="ribbon__b"></i><i class="ribbon__c"></i><i class="ribbon__d"></i></div>
     <div class="container nh__in">
       <p class="nh__kicker">Built in Melbourne for painting businesses</p>
       <h1 class="nh__h1">
@@ -229,7 +229,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
 
   <!-- Closing on a soft ribbon -->
   <section class="nend">
-    <div class="ribbon ribbon--end" aria-hidden="true"><i class="ribbon__a"></i><i class="ribbon__b"></i></div>
+    <div class="ribbon ribbon--end" aria-hidden="true"><i class="ribbon__a"></i><i class="ribbon__b"></i><i class="ribbon__d"></i></div>
     <div class="container nend__in">
       <h2 class="bento__h"><span class="nh__dark">Try it on your own jobs.</span> <span class="nh__light">30 days free on every plan. No card. Your login arrives by email.</span></h2>
       <Button href={site.status.ctaHref} size="lg">{site.status.cta} <span aria-hidden="true">›</span></Button>
@@ -253,25 +253,26 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
 <style>
   /* ---------- hero ---------- */
   .nh { position: relative; overflow: hidden; padding: clamp(56px, 9vw, 128px) 0 clamp(56px, 8vw, 112px); background: var(--bg); }
-  .nh__in { position: relative; max-width: 880px; }
+  .nh__in { position: relative; max-width: 740px; }
   .nh__kicker { font-size: 14px; font-weight: 600; color: var(--text-2); margin: 0 0 18px; letter-spacing: 0.01em; }
   .nh__h1 { font-size: clamp(34px, 5.2vw, 64px); line-height: 1.08; letter-spacing: -0.015em; margin: 0 0 32px; font-weight: 600; }
   .nh__dark { color: var(--text); }
-  .nh__light { color: #6a5f93; font-weight: 500; }
+  .nh__light { color: #5c4c9e; font-weight: 500; }
   .nh__cta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
   .nh__ghostbtn { background: rgba(255, 255, 255, 0.75); }
   .nh__fine { margin-top: 18px; font-size: 14px; color: var(--text-2); }
 
-  /* the ribbon: one crisp folded band plus two thinner ones, sweeping from top-centre to bottom-right */
+  /* the ribbon: bold, purple only, several shades folded into one band plus three thinner ones */
   .ribbon { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-  .ribbon i { position: absolute; display: block; filter: blur(2.5px) saturate(1.1); will-change: transform; }
-  .ribbon__a { left: 54%; top: -40%; width: 34vw; min-width: 320px; height: 190%; border-radius: 48% 52% 40% 60% / 20% 18% 82% 80%; background: linear-gradient(100deg, #4b3e86 0%, #6b5bb5 18%, #a593e0 36%, #e9a5c8 56%, #f3b58e 74%, #f8d8b0 100%); transform: rotate(27deg); animation: driftA 22s ease-in-out infinite alternate; box-shadow: inset -40px 0 80px rgba(255, 255, 255, 0.25), inset 40px 0 80px rgba(52, 41, 94, 0.18); }
-  .ribbon__b { left: 71%; top: -30%; width: 13vw; min-width: 120px; height: 170%; border-radius: 50% 50% 50% 50% / 15% 15% 85% 85%; background: linear-gradient(180deg, #f8d8b0 0%, #f0a97a 45%, #e9a5c8 100%); transform: rotate(24deg); opacity: 0.95; animation: driftB 26s ease-in-out infinite alternate; }
-  .ribbon__c { left: 47%; top: -20%; width: 7vw; min-width: 70px; height: 160%; border-radius: 50% / 10% 10% 90% 90%; background: linear-gradient(180deg, #cfc6f0 0%, #8a79d6 55%, #4b3e86 100%); transform: rotate(31deg); opacity: 0.8; animation: driftC 30s ease-in-out infinite alternate; }
+  .ribbon i { position: absolute; display: block; filter: blur(1.2px) saturate(1.15); will-change: transform; }
+  .ribbon__a { left: 56%; top: -40%; width: 40vw; min-width: 360px; height: 190%; border-radius: 48% 52% 40% 60% / 20% 18% 82% 80%; background: linear-gradient(100deg, #2a2150 0%, #34295e 12%, #4b3e86 28%, #6b5bb5 44%, #9a8cd8 58%, #cfc3f3 68%, #8a5fb8 80%, #5c4c9e 92%, #2f2560 100%); transform: rotate(27deg); animation: driftA 22s ease-in-out infinite alternate; box-shadow: inset -60px 0 90px rgba(255, 255, 255, 0.18), inset 60px 0 90px rgba(42, 33, 80, 0.35); }
+  .ribbon__b { left: 73%; top: -30%; width: 14vw; min-width: 130px; height: 170%; border-radius: 50% 50% 50% 50% / 15% 15% 85% 85%; background: linear-gradient(180deg, #e6dffa 0%, #b7a8ea 35%, #7a63c9 70%, #34295e 100%); transform: rotate(24deg); animation: driftB 26s ease-in-out infinite alternate; }
+  .ribbon__c { left: 49%; top: -20%; width: 8vw; min-width: 80px; height: 160%; border-radius: 50% / 10% 10% 90% 90%; background: linear-gradient(180deg, #cfc3f3 0%, #8a79d6 45%, #4b3e86 75%, #1f183d 100%); transform: rotate(31deg); opacity: 0.95; animation: driftC 30s ease-in-out infinite alternate; }
+  .ribbon__d { left: 67%; top: -30%; width: 2.2vw; min-width: 18px; height: 180%; border-radius: 50% / 8% 8% 92% 92%; background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #efe9ff 30%, #ffffff 50%, #efe9ff 70%, rgba(255, 255, 255, 0) 100%); transform: rotate(27deg); opacity: 0.75; mix-blend-mode: soft-light; animation: driftA 22s ease-in-out infinite alternate; }
   @keyframes driftA { to { transform: rotate(25deg) translate(-2%, 3%); } }
   @keyframes driftB { to { transform: rotate(27deg) translate(3%, -2%); } }
   @keyframes driftC { to { transform: rotate(34deg) translate(2%, 4%); } }
-  .nh::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, var(--bg) 0%, var(--bg) 34%, rgba(250, 249, 246, 0) 56%); pointer-events: none; }
+  .nh::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, var(--bg) 0%, var(--bg) 36%, rgba(250, 249, 246, 0) 58%); pointer-events: none; }
   .nh__in { z-index: 1; }
 
   /* ---------- facts ---------- */
@@ -379,6 +380,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   .ribbon--end .ribbon__a { left: -12%; top: -50%; transform: rotate(-27deg); }
   .ribbon--end .ribbon__b { left: 14%; transform: rotate(-24deg); }
   .ribbon--end .ribbon__c { display: none; }
+  .ribbon--end .ribbon__d { left: 4%; transform: rotate(-27deg); }
   .nend::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(250, 249, 246, 0) 30%, var(--bg) 62%); pointer-events: none; }
   .nend__in { position: relative; z-index: 1; max-width: 760px; margin-left: auto; text-align: left; }
   .nend .bento__h { margin-bottom: 24px; }
@@ -404,9 +406,10 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
     .bcard--c, .bcard--d, .bcard--e { grid-column: span 6; }
   }
   @media (max-width: 860px) {
-    .ribbon__a { left: 40%; width: 60vw; }
-    .ribbon__b { left: 78%; }
-    .ribbon__c { left: 30%; }
+    .ribbon__a { left: 38%; width: 64vw; }
+    .ribbon__b { left: 80%; }
+    .ribbon__c { left: 28%; }
+    .ribbon__d { left: 56%; }
     .nh::after { background: linear-gradient(180deg, rgba(250, 249, 246, 0.2), var(--bg) 85%); }
     .bcard--f { flex-direction: column; align-items: stretch; }
     .bcard__text { flex-basis: auto; }
