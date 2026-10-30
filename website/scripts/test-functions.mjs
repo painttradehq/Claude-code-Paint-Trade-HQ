@@ -85,7 +85,7 @@ console.log('invite.js');
   let r = await invite({ request: req('/api/invite', { body: lead, origin: null }), env: base });
   assert.equal(r.status, 403); ok('missing Origin → 403 (JSON)');
   r = await invite({ request: req('/api/invite', { body: lead, json: false, origin: 'https://evil.example' }), env: base });
-  assert.equal(r.status, 303); assert.equal(r.headers.get('location'), '/invite/error'); ok('foreign Origin on a form POST → redirect to /invite/error');
+  assert.equal(r.status, 303); assert.equal(r.headers.get('location'), '/trial/error'); ok('foreign Origin on a form POST → redirect to /trial/error');
 
   r = await invite({ request: req('/api/invite', { body: { ...lead, transcript: 'z'.repeat(70 * 1024) } }), env: base });
   assert.equal(r.status, 413); ok('70 KB body → 413');
@@ -98,17 +98,17 @@ console.log('invite.js');
   for (const [redirect, expect] of [
     ['/thanks?x=1', '/thanks?x=1'],
     ['/a/../b', '/b'],
-    ['/\\evil.com', '/invite/sent'],
-    ['//evil.com', '/invite/sent'],
-    ['https://evil.com/', '/invite/sent'],
+    ['/\\evil.com', '/trial/sent'],
+    ['//evil.com', '/trial/sent'],
+    ['https://evil.com/', '/trial/sent'],
     ['/thanks#frag', '/thanks'],
-    ['javascript:alert(1)', '/invite/sent'],
-    ['/.//evil.com', '/invite/sent'],
-    ['/..//evil.com', '/invite/sent'],
-    ['/a/..//evil.com', '/invite/sent'],
-    ['/.\\\\evil.com', '/invite/sent'],
-    ['/..\\\\evil.com', '/invite/sent'],
-    ['/%2e%2e//evil.com', '/invite/sent'],
+    ['javascript:alert(1)', '/trial/sent'],
+    ['/.//evil.com', '/trial/sent'],
+    ['/..//evil.com', '/trial/sent'],
+    ['/a/..//evil.com', '/trial/sent'],
+    ['/.\\\\evil.com', '/trial/sent'],
+    ['/..\\\\evil.com', '/trial/sent'],
+    ['/%2e%2e//evil.com', '/trial/sent'],
     ['/thanks\t', '/thanks'], // trimmed before the check
   ]) {
     r = await invite({ request: req('/api/invite', { body: { ...lead, website: 'bot', redirect }, json: false, ip: '192.0.2.' + Math.floor(Math.random() * 200) }), env: base });
@@ -116,7 +116,7 @@ console.log('invite.js');
   }
   ok('redirect only ever goes to a path on this site (backslash, //, absolute, javascript:, dot-segment tricks all rejected)');
   r = await invite({ request: req('/api/invite', { body: { ...lead, email: 'bad', redirect: '/.//evil.com' }, json: false, ip: '192.0.2.199' }), env: base });
-  assert.equal(r.headers.get('location'), '/invite/error'); ok('a failed form POST never echoes the redirect field');
+  assert.equal(r.headers.get('location'), '/trial/error'); ok('a failed form POST never echoes the redirect field');
 
   // Validation.
   r = await invite({ request: req('/api/invite', { body: { ...lead, email: 'not-an-email' }, ip: '192.0.2.201' }), env: base });
@@ -146,7 +146,7 @@ console.log('invite.js');
   r = await invite({ request: req('/api/invite', { body: lead, ip: '192.0.2.207' }), env: base });
   assert.equal(r.status, 502); ok('Resend unreachable → 502 (JSON)');
   r = await invite({ request: req('/api/invite', { body: { ...lead, redirect: '/thanks' }, json: false, ip: '192.0.2.208' }), env: base });
-  assert.equal(r.status, 303); assert.equal(r.headers.get('location'), '/invite/error'); ok('Resend unreachable on a form POST → redirect to /invite/error');
+  assert.equal(r.status, 303); assert.equal(r.headers.get('location'), '/trial/error'); ok('Resend unreachable on a form POST → redirect to /trial/error');
   r = await invite({ request: req('/api/invite', { body: { ...lead, 'cf-turnstile-response': 'tok' }, ip: '192.0.2.209' }), env: { ...base, TURNSTILE_SECRET: 'ts' } });
   assert.equal(r.status, 400); ok('Turnstile unreachable → treated as failed check, 400');
 

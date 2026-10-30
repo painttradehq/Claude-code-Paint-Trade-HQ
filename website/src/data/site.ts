@@ -1,7 +1,9 @@
 /**
- * Every word on the site traces back to docs/website/chat-knowledge.md (Josh's file, 23 Oct 2026)
- * and docs/website/website-pack.md (the builder's pack, 24 Oct 2026). Section numbers below
- * refer to the knowledge file. If it is not in those two files, it does not go on a page.
+ * Page copy. Feature facts trace back to docs/website/chat-knowledge.md (Josh's file, 23 Oct 2026)
+ * and docs/website/website-pack.md (the builder's pack, 24 Oct 2026); section numbers below refer
+ * to the knowledge file. Posture, prices and the trial follow Josh's instructions of 30 Oct 2026
+ * (30-day free trial on every plan, $98 / $178 / $249, no tester wording), which supersede the
+ * file's §0, §6, §9, §10 and §11 until he updates it.
  */
 
 export const site = {
@@ -19,18 +21,21 @@ export const site = {
   copyright: '© 2026 Josh Sano Painting and Decorating, trading as Paint Trade HQ',
   location: 'Melbourne, Victoria',
   // §0 "Today's status" — the one posture the whole site takes.
+  // The one posture the whole site takes (Josh, 30 Oct 2026).
   status: {
-    pill: 'Tester program',
-    line: 'Free for invited painting businesses. Paid plans open at launch.',
-    cta: 'Ask for an invite',
-    ctaHref: '/invite',
+    pill: '30-day free trial',
+    line: 'Every plan comes with a 30-day free trial. No card needed.',
+    cta: 'Start free trial',
+    ctaHref: '/trial',
   },
+  trialDays: 30,
 };
 
 export const nav = [
   { label: 'Features', href: '/features' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Story', href: '/story' },
+  { label: 'Find a painter', href: '/painters' },
 ];
 
 /** §6 — plans, AUD a month, ex-GST; 10% GST is added. */
@@ -52,7 +57,7 @@ export const plans: Plan[] = [
   {
     id: 'starter',
     name: 'Starter',
-    price: 59,
+    price: 98,
     admins: 1,
     employees: 3,
     extraAdmin: 25,
@@ -69,7 +74,7 @@ export const plans: Plan[] = [
   {
     id: 'small-business',
     name: 'Small business',
-    price: 179,
+    price: 178,
     admins: 2,
     employees: 5,
     extraAdmin: 25,
@@ -112,15 +117,11 @@ export const plans: Plan[] = [
 
 export const pricingNotes = [
   'Prices are AUD a month, ex-GST; 10% GST is added.',
-  'Trial: 14 days on Enterprise, no card needed. Then pick a plan.',
-  'Testers invited by Paint Trade HQ use everything free until their invite ends.',
+  'Free trial: 30 days on any plan, no card needed. Then pick a plan, or walk away.',
   'Monthly only, no annual price yet. Cancel any time and keep access to the end of the paid month. Upgrades apply at once, pro-rated; downgrades at the end of the month.',
   'Seats: admins are the people on the Team admins list including the owner; employees are the people on the Employees page who have not been removed. Going over the included number adds a seat at the prices above, and the app asks before it adds one.',
   'Data migration from old software: free on Enterprise, quoted on the other two.',
 ];
-
-export const pricingToday =
-  'Billing is built but not switched on. Plans open at launch; your tester access continues until then.';
 
 /** Format AUD like the knowledge file does: $59 and $64.90. */
 export const aud = (n: number) =>
@@ -327,21 +328,6 @@ export const modules: Module[] = [
 ];
 
 /** §9 — status today, said honestly. Shown on the pricing page and used by the chat box. */
-export const statusToday: { thing: string; status: string; say: string }[] = [
-  { thing: 'Paid plans', status: 'Built, not switched on', say: 'Plans open at launch; testers use everything free for now.' },
-  { thing: 'Sign-up', status: 'Invite only', say: 'Leave your details and Josh will send an invite.' },
-  { thing: 'Google Drive storage', status: 'Live', say: 'Keep your files in your own Drive.' },
-  { thing: 'Google Calendar', status: 'Live', say: 'See it alongside your jobs.' },
-  { thing: 'Xero', status: 'Button exists, not set up', say: 'On the list; not connected yet.' },
-  { thing: 'Microsoft OneDrive and Outlook', status: 'Options shown, not set up', say: 'Not yet.' },
-  { thing: 'SMS', status: 'Built; needs your own number connected', say: 'Yes, through your own SMS number, on Small business and up.' },
-  { thing: 'Crew phone notifications', status: 'In-app notices today', say: 'Reminders show in the crew app; phone notifications are coming.' },
-  { thing: 'App Store or Play Store apps', status: 'None', say: "It's a web app; add it to your home screen." },
-  { thing: 'Client card payments through the app', status: 'None, by design', say: 'Clients pay you by bank transfer; the app never takes their card.' },
-  { thing: 'Website enquiry forms into your CRM', status: 'None', say: 'Leads come in by email or you enter them.' },
-  { thing: 'Annual pricing', status: 'None', say: 'Monthly only for now.' },
-];
-
 /** §7 — your data, security and leaving. */
 export const trust: { title: string; body: string }[] = [
   {
@@ -366,7 +352,7 @@ export const trust: { title: string; body: string }[] = [
   },
   {
     title: 'Clear terms',
-    body: 'Terms of Service version 1.2, reviewed by a lawyer for the tester program. Section 5 covers personal data; there is no separate privacy policy during the tester program.',
+    body: 'Terms of Service version 1.2, reviewed by a lawyer. Section 5 covers personal data; a separate privacy policy is on the way.',
   },
 ];
 
@@ -374,7 +360,7 @@ export const trust: { title: string; body: string }[] = [
 export const faqs: { q: string; a: string }[] = [
   {
     q: 'Is there a free plan?',
-    a: 'No. Three plans, from $59 + GST a month. There is a 14-day trial on Enterprise with no card. Right now the app is in a tester program and testers use everything free.',
+    a: 'No. Three plans, from $98 + GST a month, and every plan starts with a 30-day free trial with no card.',
   },
   { q: 'Do I need a card to try it?', a: 'No.' },
   {
@@ -455,15 +441,15 @@ export const faqs: { q: string; a: string }[] = [
   },
   {
     q: 'Is my data in Australia?',
-    a: "The app is built and run from Australia; hosting is cloud-based (ask Josh for the current region); AI runs on Anthropic's service.",
+    a: "The app is built and run from Australia; hosting is cloud-based (ask us for the current region); AI runs on Anthropic's service.",
   },
   {
-    q: 'How do I get in?',
-    a: 'Leave your details; invites go out as places open.',
+    q: 'How do I start?',
+    a: 'Start your free trial from any page: leave your details and your login arrives by email, usually the same business day.',
   },
 ];
 
-/** §10 — what the invite form collects. Never passwords, card numbers or an ABN. */
+/** §10 — what the free-trial form collects. Never passwords, card numbers or an ABN. */
 export const inviteFields = [
   { name: 'name', label: 'Your name', type: 'text', required: true, autocomplete: 'name' },
   { name: 'business', label: 'Business name', type: 'text', required: true, autocomplete: 'organization' },
@@ -478,8 +464,28 @@ export const inviteFields = [
 export const story = {
   heading: 'Built by a painter, for painters',
   paragraphs: [
-    'Paint Trade HQ is built by Josh Sano, a Melbourne painter running Josh Sano Painting and Decorating.',
+    'Paint Trade HQ is built by Josh Sano, a Melbourne painter who runs Josh Sano Painting and Decorating and got tired of running the business out of five apps and a notebook.',
     'The app is designed round by round to how a painting business actually works: the quote a client can read and sign on their phone, the deposit invoice that follows it, the crew signing in on site, the daily report, the completion report at the end.',
     'Each business has its own private workspace; nobody else can see your clients, quotes or crew. Built in Australia, priced in AUD, GST on top.',
   ],
 };
+
+/**
+ * Feedback on the home page. Entries marked `sample` show the layout only and carry a visible
+ * "Sample" badge; they are left out of the build when PUBLIC_SHOW_SAMPLES=0. Replace them with real
+ * words from real painters, with their permission, as they come in.
+ */
+export type Testimonial = { quote: string; who: string; where: string; sample?: boolean };
+export const testimonials: Testimonial[] = [
+  { quote: 'Sample quote. A real painter\'s words go here once they have used the app on a few jobs and told us what changed.', who: 'Owner, crew of four', where: 'Sample · Melbourne, VIC', sample: true },
+  { quote: 'Sample quote. Something specific: the quote they sent from the ute, the deposit that landed before they got home.', who: 'Sole trader', where: 'Sample · Brisbane, QLD', sample: true },
+  { quote: 'Sample quote. Short and plain beats polished. Two sentences is plenty.', who: 'Owner, crew of nine', where: 'Sample · Perth, WA', sample: true },
+];
+
+/** Video feedback: a short clip per painter, click to play. `file` lives in public/feedback/. */
+export type VideoFeedback = { title: string; who: string; file?: string; poster?: string; seconds?: number; sample?: boolean };
+export const videoFeedback: VideoFeedback[] = [
+  { title: 'Sample: how quoting changed', who: 'A painter, on their phone, 40 seconds', sample: true },
+  { title: 'Sample: the crew and the time clock', who: 'An owner with a crew of six', sample: true },
+  { title: 'Sample: getting paid faster', who: 'A sole trader', sample: true },
+];

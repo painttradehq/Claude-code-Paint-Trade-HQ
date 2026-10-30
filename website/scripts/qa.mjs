@@ -9,7 +9,7 @@ import { setTimeout as sleep } from 'node:timers/promises';
 
 const PORT = 4399;
 const BASE = `http://127.0.0.1:${PORT}`;
-const PAGES = ['/', '/features', '/pricing', '/story', '/invite', '/invite/sent', '/invite/error', '/404'];
+const PAGES = ['/', '/features', '/pricing', '/story', '/trial', '/trial/sent', '/trial/error', '/painters', '/painters/harbourline-painting', '/404'];
 const WIDTHS = [390, 768, 1024, 1440];
 const OUT = '.qa';
 mkdirSync(OUT, { recursive: true });
@@ -27,7 +27,8 @@ for (let i = 0; i < 40; i++) {
 
 const browser = await chromium.launch();
 try {
-  const builtFiles = new Set(readdirSync('dist').filter((f) => f.endsWith('.html')).map((f) => '/' + f.replace(/\.html$/, '').replace(/^index$/, '')));
+  const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? walk(`${dir}/${d.name}`) : [`${dir}/${d.name}`]));
+  const builtFiles = new Set(walk('dist').filter((f) => f.endsWith('.html')).map((f) => f.replace(/^dist/, '').replace(/\.html$/, '').replace(/\/index$/, '') || '/'));
 
   for (const path of PAGES) {
     console.log(`\n${path}`);
@@ -75,7 +76,7 @@ try {
       }
 
       // Invite form: required fields block submit; honeypot present.
-      if (path === '/invite') {
+      if (path === '/trial') {
         const hasHoney = await page.$('input[name="website"]');
         if (!hasHoney) fail('invite: honeypot missing');
         await page.click('#invite-submit');
@@ -86,7 +87,7 @@ try {
       // Pricing: every price shows + GST and an inc-GST figure.
       if (path === '/pricing' && width === 1440) {
         const txt = await page.textContent('body');
-        for (const [ex, inc] of [['$59', '$64.90'], ['$179', '$196.90'], ['$249', '$273.90']]) {
+        for (const [ex, inc] of [['$98', '$107.80'], ['$178', '$195.80'], ['$249', '$273.90']]) {
           if (!txt.includes(ex) || !txt.includes(inc)) fail(`pricing: missing ${ex} / ${inc}`);
         }
         ok('prices ex and inc GST present');
@@ -99,7 +100,7 @@ try {
   }
 
   // Forbidden words and claims (knowledge file §12 and §9) must not appear on any page.
-  const banned = [/\btenant\b/i, /\bSaaS\b/, /\bplatforms?\b/i, /AI-powered/i, /revolutionary/i, /seamless/i, /App Store app/i, /free plan/i, /\bannual\b/i, /Stripe/, /Twilio/, /Resend/, /Emergent/, /offline/i, /Xero connected/i, /\bMYOB\b(?! \.)/];
+  const banned = [/\btenant\b/i, /\btester/i, /plans open at launch/i, /ask for an invite/i, /14-day/i, /\bSaaS\b/, /\bplatforms?\b/i, /AI-powered/i, /revolutionary/i, /seamless/i, /App Store app/i, /free plan/i, /\bannual\b/i, /Stripe/, /Twilio/, /Resend/, /Emergent/, /offline/i, /Xero connected/i, /\bMYOB\b(?! \.)/];
   const allow = [/no app store app/i, /no app store or play store app/i, /app store or play store apps/i, /is there a free plan\?/i, /no\. three plans/i, /annual price yet/i, /no annual price/i, /annual pricing/i, /xero or myob/i, /no myob/i, /not connected yet/i];
   for (const path of PAGES.filter((p) => p !== '/404')) {
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });

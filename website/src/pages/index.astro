@@ -4,10 +4,13 @@ import Button from '../components/Button.astro';
 import Screenshot from '../components/Screenshot.astro';
 import Clip from '../components/Clip.astro';
 import Faq from '../components/Faq.astro';
-import { site, plans, faqs, aud, incGst } from '../data/site';
+import { site, plans, faqs, aud, incGst, testimonials, videoFeedback } from '../data/site';
+import { showSamples } from '../data/directory';
+const quotes = testimonials.filter((t) => showSamples || !t.sample);
+const videos = videoFeedback.filter((v) => showSamples || !v.sample);
 
 const homeFaqs = faqs.filter((f) =>
-  ['Is there a free plan?', 'Does the client need an account?', 'Does it track my crew?', 'Can my client pay by card on the invoice?', 'Is there an app for my phone?', 'How do I get in?'].includes(f.q),
+  ['Is there a free plan?', 'Does the client need an account?', 'Does it track my crew?', 'Can my client pay by card on the invoice?', 'Is there an app for my phone?', 'How do I start?'].includes(f.q),
 );
 ---
 <Base title="Quotes, jobs, crew and invoices for painting businesses" fullTitle="Paint Trade HQ · Run your painting business from one place">
@@ -35,10 +38,10 @@ const homeFaqs = faqs.filter((f) =>
   <!-- Facts strip -->
   <section class="strip" aria-label="Key facts">
     <div class="container strip__in">
-      <div><strong>AUD, GST on top</strong><span>From $59 + GST a month at launch</span></div>
+      <div><strong>AUD, GST on top</strong><span>From $98 + GST a month, after a 30-day free trial</span></div>
       <div><strong>No app store needed</strong><span>Web app for the office; add the crew app to the phone's home screen</span></div>
       <div><strong>Your data is yours</strong><span>Each business is isolated; export it any time</span></div>
-      <div><strong>Built by a painter</strong><span>Josh Sano runs Josh Sano Painting and Decorating in Melbourne</span></div>
+      <div><strong>Built by a painter</strong><span>Designed in Melbourne by a working painting business</span></div>
     </div>
   </section>
 
@@ -145,6 +148,58 @@ const homeFaqs = faqs.filter((f) =>
     </div>
   </section>
 
+  <!-- Feedback -->
+  {quotes.length > 0 && (
+    <section class="section section--sunken" id="feedback">
+      <div class="container">
+        <div class="section-head section-head--center">
+          <span class="eyebrow">Feedback</span>
+          <h2>What painters say</h2>
+          {quotes.some((t) => t.sample) && <p class="small sample-note">Sample quotes, to show the layout. Real feedback replaces them as it comes in.</p>}
+        </div>
+        <div class="grid grid--3">
+          {quotes.map((t) => (
+            <figure class="card quote">
+              {t.sample && <span class="pill pill--neutral quote__sample">Sample</span>}
+              <blockquote><p>{t.quote}</p></blockquote>
+              <figcaption class="small"><strong>{t.who}</strong><br />{t.where}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Video feedback -->
+  {videos.length > 0 && (
+    <section class="section" id="video-feedback">
+      <div class="container">
+        <div class="section-head section-head--center">
+          <span class="eyebrow">Video feedback</span>
+          <h2>In their own words, on their own phones</h2>
+          {videos.some((v) => v.sample) && <p class="small sample-note">Sample cards. Each becomes a short clip from a painter, click to play.</p>}
+        </div>
+        <div class="grid grid--3">
+          {videos.map((v) => (
+            <figure class="vid">
+              <div class="vid__frame">
+                {v.file ? (
+                  <video src={`/feedback/${v.file}`} poster={v.poster ? `/feedback/${v.poster}` : undefined} controls preload="none" playsinline aria-label={v.title}></video>
+                ) : (
+                  <div class="vid__placeholder" role="img" aria-label={v.title}>
+                    <span class="vid__play" aria-hidden="true"></span>
+                    {v.sample && <span class="pill pill--neutral">Sample</span>}
+                  </div>
+                )}
+              </div>
+              <figcaption class="small"><strong>{v.title}</strong><br />{v.who}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
   <!-- Lucy -->
   <section class="section section--ink">
     <div class="container split">
@@ -170,7 +225,7 @@ const homeFaqs = faqs.filter((f) =>
       <div class="section-head section-head--center">
         <span class="eyebrow">Pricing</span>
         <h2>Three plans. Monthly. AUD, GST on top.</h2>
-        <p class="lead">{site.status.line} 14-day trial on Enterprise when plans open, no card needed.</p>
+        <p class="lead">{site.status.line}</p>
       </div>
       <div class="grid grid--3 teaser">
         {plans.map((p) => (
@@ -192,7 +247,7 @@ const homeFaqs = faqs.filter((f) =>
       <div>
         <span class="eyebrow">The people behind it</span>
         <h2>Built by a painter, for painters</h2>
-        <p class="lead">Paint Trade HQ is built by Josh Sano, a Melbourne painter running Josh Sano Painting and Decorating, round by round to how a painting business actually works.</p>
+        <p class="lead">Paint Trade HQ is built by a Melbourne painting contractor, round by round, to how a painting business actually works.</p>
         <Button href="/story" variant="ghost">Read the story</Button>
       </div>
     </div>
@@ -213,14 +268,27 @@ const homeFaqs = faqs.filter((f) =>
   <!-- Final CTA -->
   <section class="section section--ink cta">
     <div class="container center">
-      <h2>Want in?</h2>
-      <p class="lead">The app is in its tester program: free for invited painting businesses. Leave your details and Josh will be in touch himself.</p>
+      <h2>Try it on your own jobs</h2>
+      <p class="lead">Every plan comes with a 30-day free trial, no card needed. Leave your details and your login arrives by email.</p>
       <Button href={site.status.ctaHref} variant="on-ink" size="lg">{site.status.cta}</Button>
     </div>
   </section>
 </Base>
 
 <style>
+  .sample-note { color: var(--muted); }
+  .quote { position: relative; display: flex; flex-direction: column; gap: 14px; margin: 0; }
+  .quote blockquote { margin: 0; font-family: var(--font-display); font-size: 19px; line-height: 1.45; color: var(--text); }
+  .quote blockquote p { margin: 0; }
+  .quote figcaption { margin-top: auto; color: var(--text-2); }
+  .quote__sample { position: absolute; top: 14px; right: 14px; }
+  .vid { margin: 0; }
+  .vid__frame { position: relative; aspect-ratio: 16 / 10; border-radius: var(--r-lg); overflow: hidden; border: 1px solid var(--border); background: var(--sunken); box-shadow: var(--shadow-float); }
+  .vid__frame video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .vid__placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: repeating-linear-gradient(135deg, var(--sunken) 0 14px, #ebe8e1 14px 28px); }
+  .vid__play { width: 56px; height: 56px; border-radius: 50%; background: var(--accent); position: relative; opacity: 0.85; }
+  .vid__play::after { content: ''; position: absolute; left: 22px; top: 17px; border-left: 17px solid #fff; border-top: 11px solid transparent; border-bottom: 11px solid transparent; }
+  .vid figcaption { margin-top: 10px; text-align: center; color: var(--text-2); }
   .hero { padding: clamp(40px, 6vw, 88px) 0 clamp(32px, 5vw, 64px); }
   .hero__in {
     display: grid;

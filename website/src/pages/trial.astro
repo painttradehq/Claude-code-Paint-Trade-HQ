@@ -3,18 +3,18 @@ import Base from '../layouts/Base.astro';
 import InviteForm from '../components/InviteForm.astro';
 import { site } from '../data/site';
 ---
-<Base title="Ask for an invite" description="Paint Trade HQ is in its tester program: free for invited painting businesses. Leave your details and Josh will be in touch himself.">
+<Base title="Start your free trial" description="Try every part of Paint Trade HQ free for 30 days, no card needed. Leave your details and your login arrives by email.">
   <section class="section">
     <div class="container invite">
       <div class="invite__copy">
         <span class="eyebrow"><span class="pill">{site.status.pill}</span></span>
-        <h1>Ask for an invite</h1>
-        <p class="lead">Paint Trade HQ is free for invited painting businesses while it's in its tester program. Paid plans open at launch.</p>
+        <h1>Start your free trial</h1>
+        <p class="lead">Every plan comes with a 30-day free trial. No card, no lock-in: use everything, then pick a plan or walk away.</p>
         <h3>What happens next</h3>
         <ol class="steps">
-          <li>Josh reads your details himself.</li>
-          <li>Invites go out as places open, with a tester access code.</li>
-          <li>You use everything, free, until your invite ends, and tell us what to fix.</li>
+          <li>Leave your details below.</li>
+          <li>We set up your account and email your login, usually the same business day.</li>
+          <li>Use everything for 30 days. Then pick a plan, or walk away with your data.</li>
         </ol>
         <p class="small">Already have access? <a href={site.signInUrl} rel="noopener">Sign in</a>. On the crew? <a href={site.crewUrl} rel="noopener">Crew sign-in</a>.</p>
         <p class="small">Prefer email? <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a></p>

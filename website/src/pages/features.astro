@@ -13,7 +13,7 @@ const planPill = (p: string) => (p === 'Starter' ? 'pill--neutral' : p === 'Smal
       <div class="section-head">
         <span class="eyebrow">Features</span>
         <h1>Everything, in the order a job runs</h1>
-        <p class="lead">What each part of Paint Trade HQ does today, and which plan includes it. Not sure about something? Ask the chat box, or ask Josh. The screens show Harbourline Painting, a demo business: real screens, made-up people and jobs.</p>
+        <p class="lead">What each part of Paint Trade HQ does today, and which plan includes it. Not sure about something? Ask the chat box, or email us. The screens show Harbourline Painting, a demo business: real screens, made-up people and jobs.</p>
       </div>
       <nav class="toc" aria-label="On this page">
         {modules.map((m) => <a href={`#${m.id}`}>{m.name}</a>)}
@@ -44,7 +44,7 @@ const planPill = (p: string) => (p === 'Starter' ? 'pill--neutral' : p === 'Smal
   <section class="section section--ink cta">
     <div class="container center">
       <h2>See it on your own jobs</h2>
-      <p class="lead">Free for invited painting businesses during the tester program. Leave your details and Josh will be in touch himself.</p>
+      <p class="lead">Every plan starts with a 30-day free trial, no card needed. Leave your details and your login arrives by email.</p>
       <Button href={site.status.ctaHref} variant="on-ink" size="lg">{site.status.cta}</Button>
     </div>
   </section>

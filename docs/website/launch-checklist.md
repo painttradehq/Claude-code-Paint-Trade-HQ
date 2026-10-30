@@ -38,7 +38,7 @@ In the Pages project, **Settings → Variables and secrets**, add these as **sec
 
 Leave `APP_LEADS_URL` and the Turnstile keys unset for now. Redeploy once after adding secrets (Deployments → Retry) so the functions pick them up. If the chat box should stay off the pages until its key exists, add the plain variable `PUBLIC_CHAT_ENABLED` = `0` and remove it later.
 
-Test on the preview link: open the chat box and ask "What does it cost?"; fill in the invite form with your own email and check it arrives.
+Test on the preview link: fill in the free-trial form with your own email and check it arrives (and, once the knowledge file is updated and the chat is on, ask the chat box "What does it cost?"). Set `PUBLIC_SHOW_SAMPLES` = `0` for the live site unless you want the sample feedback cards and sample painter listings showing.
 
 ## 3. Domain (5 min, then wait on DNS)
 
@@ -52,7 +52,7 @@ Test on the preview link: open the chat box and ask "What does it cost?"; fill i
 
 ## 5. The knowledge file (2 min)
 
-Add one line to §6 of `website-chat-knowledge.md` saying crew sign-in and sign-out are included on every plan, and send the file again. The pages already say it; the chat box only knows what the file says.
+The pages changed on 30 Oct (30-day free trial on every plan, $98 / $178 / $249, no tester wording) but the chat box still answers from `website-chat-knowledge.md`, which says tester program, $59 / $179 and a 14-day trial on Enterprise. Update §0, §6, §9, §10 and §11 (and add that crew sign-in is on every plan) and send the file again. Until then keep `PUBLIC_CHAT_ENABLED` = `0` so the chat box stays off the pages.
 
 ## After launch
 

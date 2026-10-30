@@ -1,0 +1,90 @@
+---
+import Base from '../../layouts/Base.astro';
+import Button from '../../components/Button.astro';
+import { site } from '../../data/site';
+import { visibleListings, STATES } from '../../data/directory';
+import type { Listing } from '../../data/directory';
+
+export function getStaticPaths() {
+  return visibleListings.map((l) => ({ params: { slug: l.slug }, props: { listing: l } }));
+}
+interface Props { listing: Listing }
+const { listing: l } = Astro.props;
+const title = `${l.name}, painters in ${l.suburb}`;
+const jsonLd = l.sample
+  ? null
+  : {
+      '@context': 'https://schema.org',
+      '@type': 'HousePainter',
+      name: l.name,
+      address: { '@type': 'PostalAddress', addressLocality: l.suburb, addressRegion: l.state, addressCountry: 'AU' },
+      areaServed: l.areas,
+      url: l.website,
+      telephone: l.phone,
+    };
+---
+<Base title={title} description={`${l.name}: ${l.services.join(', ').toLowerCase()} in ${l.suburb} and ${l.areas.join(', ')}. Runs on Paint Trade HQ.`} noindex={!!l.sample}>
+  {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+  <section class="section section--tight">
+    <div class="container profile">
+      <p class="small crumbs"><a href="/painters">Find a painter</a> › <a href={`/painters#${l.state.toLowerCase()}`}>{STATES[l.state]}</a></p>
+      <div class="profile__head">
+        <div>
+          {l.sample && <span class="pill pill--neutral">Sample listing</span>}
+          <h1>{l.name}</h1>
+          <p class="lead">{l.suburb}, {STATES[l.state]}. Painting businesses on Paint Trade HQ since {l.since}.</p>
+        </div>
+        <div class="profile__contact card card--sunken">
+          <h3>Get a quote</h3>
+          {l.phone ? <p><a href={`tel:${l.phone.replace(/\s/g, '')}`}>{l.phone}</a></p> : <p class="small">Phone and website appear here once the business fills in its listing.</p>}
+          {l.website && <p><a href={l.website} rel="noopener">{l.website.replace(/^https?:\/\//, '')}</a></p>}
+          <p class="small">Quotes from this business arrive as a link you can read, tick and sign on your phone.</p>
+        </div>
+      </div>
+
+      <div class="profile__body">
+        <div>
+          <h2>About</h2>
+          <p>{l.blurb}</p>
+          <h2>Services</h2>
+          <ul class="checklist">{l.services.map((s) => <li>{s}</li>)}</ul>
+          <h2>Areas served</h2>
+          <ul class="areas">{l.areas.map((a) => <li>{a}</li>)}</ul>
+        </div>
+        <aside class="card">
+          <h3>What a Paint Trade HQ quote looks like</h3>
+          <ul class="checklist">
+            <li>Every line priced, by room or by face of the house</li>
+            <li>Optional extras you can tick on or off</li>
+            <li>Sign on your phone; the deposit invoice follows</li>
+            <li>Daily reports and a completion report with photos</li>
+          </ul>
+          <p class="small"><a href="/features">How the app works</a></p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--sunken section--tight">
+    <div class="container center">
+      <p class="lead">Run a painting business? <a href={site.status.ctaHref}>Start your 30-day free trial</a> and get a page like this one.</p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .crumbs { color: var(--text-2); margin-bottom: 8px; }
+  .profile__head { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(20px, 4vw, 48px); align-items: start; }
+  .profile__head h1 { margin-top: 10px; }
+  .profile__contact h3 { margin-top: 0; }
+  .profile__contact p { margin: 6px 0; }
+  .profile__body { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(20px, 4vw, 48px); margin-top: 36px; align-items: start; }
+  .profile__body h2 { margin-top: 24px; font-size: 22px; }
+  .profile__body h2:first-child { margin-top: 0; }
+  .areas { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .areas li { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-pill); padding: 4px 12px; font-size: 14px; }
+  aside h3 { margin-top: 0; }
+  @media (max-width: 860px) {
+    .profile__head, .profile__body { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

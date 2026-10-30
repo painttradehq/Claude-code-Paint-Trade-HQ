@@ -1,5 +1,5 @@
 /**
- * POST /api/invite — "Ask for an invite" (Cloudflare Pages Function).
+ * POST /api/invite — the "Start free trial" form (Cloudflare Pages Function). The path is internal.
  *
  * Takes the invite form (or the chat box's mini lead form), checks the honeypot and, if configured,
  * Cloudflare Turnstile, then emails Josh through Resend. Optionally also posts the lead into the app's
@@ -16,7 +16,7 @@
  *
  * Guards, in order: Origin must be the site; body ≤ 64 KB; honeypot; 5 requests a minute per IP (2 for
  * chat-sourced leads); Turnstile; field validation. Redirects only ever go to a path on this site:
- * /invite/sent on success, /invite/error on any failure.
+ * /trial/sent on success, /trial/error on any failure.
  */
 import { sameOrigin, readLimited, rateLimit } from '../_lib/guard.js';
 
@@ -25,8 +25,8 @@ const FIELDS = ['name', 'business', 'location', 'email', 'mobile', 'crew', 'soft
 const MAX_BODY_BYTES = 64 * 1024;
 const RATE = { binding: 'INVITE_RATE_LIMIT', limit: 5, period: 60 };
 const CHAT_RATE = { binding: 'INVITE_CHAT_LIMIT', limit: 2, period: 60 };
-const DEFAULT_REDIRECT = '/invite/sent';
-const ERROR_REDIRECT = '/invite/error';
+const DEFAULT_REDIRECT = '/trial/sent';
+const ERROR_REDIRECT = '/trial/error';
 
 const json = (status, body) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
@@ -140,7 +140,7 @@ export async function onRequestPost({ request, env }) {
 
   const to = env.INVITE_TO || DEFAULT_TO;
   const lines = [
-    `Invite request from the website (${lead.source})`,
+    `Free trial request from the website (${lead.source})`,
     '',
     `Name:        ${lead.name || '-'}`,
     `Business:    ${lead.business || '-'}`,
@@ -155,7 +155,7 @@ export async function onRequestPost({ request, env }) {
   ];
   if (lead.transcript) lines.push('', '--- Chat transcript (as sent by the visitor\'s browser; unverified) ---', lead.transcript);
 
-  const subject = lead.business ? `Invite request: ${lead.business} (${lead.name || lead.email})` : `Invite request: ${lead.email}`;
+  const subject = lead.business ? `Free trial request: ${lead.business} (${lead.name || lead.email})` : `Free trial request: ${lead.email}`;
   let sent = false;
   try {
     const r = await fetch('https://api.resend.com/emails', {

@@ -37,7 +37,7 @@ npx wrangler pages dev dist   # pages + functions, reads .dev.vars
 
 Both functions refuse requests whose `Origin` header is not this site (a missing or `null` Origin is accepted only when the browser's `Sec-Fetch-Site` says same-origin, so never add a `no-referrer` Referrer-Policy without keeping that), cap request bodies by bytes (32 KB chat, 64 KB invite), and answer every failure with a short fixed line rather than an upstream error. A form POST without JavaScript lands on `/invite/sent` or `/invite/error`; the redirect field is checked before and after resolving, so it can only ever point at a path on this site. Chat-sourced leads skip Turnstile but get a tighter budget (2 a minute per IP); anyone can set that field, so the trade-off is spam volume, not a bypass of validation.
 
-`PUBLIC_CHAT_ENABLED=0` at build time leaves the chat box off every page (for a launch before the Anthropic key exists). `PUBLIC_*` values are read at build time from `.env` (Astro), not from `.dev.vars` (Wrangler); set them in both places locally, or just in the Pages project settings.
+`PUBLIC_CHAT_ENABLED=0` at build time leaves the chat box off every page (for a launch before the Anthropic key exists, or while the knowledge file still describes the tester program). `PUBLIC_SHOW_SAMPLES=0` hides the sample feedback cards and the sample directory listings; with samples shown, the directory pages carry `noindex`. `PUBLIC_*` values are read at build time from `.env` (Astro), not from `.dev.vars` (Wrangler); set them in both places locally, or just in the Pages project settings.
 
 `npm run test:functions` exercises both functions in Node with a stubbed network: origin and size guards (including bodies without Content-Length and multi-byte text), honeypot, validation, redirect safety (including dot-segment tricks), rate-limit tiers that throw, Turnstile exemption and budget for chat leads, the email payload, and the chat's message sanitiser.
 
@@ -45,8 +45,8 @@ The same files deploy to Vercel or Netlify with a few lines of adapter code for 
 
 ## Rules baked in
 
-- Call to action is always "Ask for an invite". The site never takes sign-ups or payments.
-- Prices are AUD a month, ex-GST, with the inc-GST figure shown.
+- Call to action is always "Start free trial" (30 days, every plan, no card; Josh, 30 Oct 2026). The site never takes sign-ups or payments itself: the form emails the owner, who sets the account up.
+- Prices are AUD a month, ex-GST, with the inc-GST figure shown: $98 / $178 / $249 (Josh, 30 Oct 2026).
 - No Privacy link (Terms §5 covers data during the tester program). Footer: "© 2026 Josh Sano Painting and Decorating, trading as Paint Trade HQ".
 - "Sign in" goes to https://painttradehq.co/admin/login; crew to /crew.
 - Buttons are solid accent with white text. Tokens mirror the app's `theme/tokens.ts`.

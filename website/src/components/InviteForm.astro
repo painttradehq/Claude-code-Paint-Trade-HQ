@@ -1,15 +1,15 @@
 ---
 /**
- * "Ask for an invite" — the site's only call to action (builder's pack §2). Collects what the
- * knowledge file §10 lists and emails Josh through /api/invite. Works without JavaScript (plain
- * POST; the function redirects to /invite/sent or /invite/error) and with it (fetch + inline success).
+ * "Start free trial" — the site's only call to action (Josh, 30 Oct 2026). Collects what the
+ * knowledge file §10 lists and emails the owner through /api/invite. Works without JavaScript (plain
+ * POST; the function redirects to /trial/sent or /trial/error) and with it (fetch + inline success).
  */
 import { inviteFields, site } from '../data/site';
 const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
 ---
 <form class="invite card" id="invite-form" method="post" action="/api/invite" novalidate>
-  <input type="hidden" name="source" value="invite-page" />
-  <input type="hidden" name="redirect" value="/invite/sent" />
+  <input type="hidden" name="source" value="trial-page" />
+  <input type="hidden" name="redirect" value="/trial/sent" />
   <!-- Honeypot: real people never see or fill this. -->
   <div class="visually-hidden" aria-hidden="true">
     <label for="invite-website">Website</label>
@@ -44,17 +44,17 @@ const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
   {turnstileKey && <div class="cf-turnstile" data-sitekey={turnstileKey} data-theme="light"></div>}
 
   <div class="invite__foot">
-    <button class="btn btn--primary btn--lg" type="submit" id="invite-submit">Ask for an invite</button>
-    <p class="small invite__note">Josh reads these himself and will be in touch. No passwords, card numbers or ABN needed.</p>
+    <button class="btn btn--primary btn--lg" type="submit" id="invite-submit">{site.status.cta}</button>
+    <p class="small invite__note">No card needed. Your login arrives by email, usually the same business day. No passwords or ABN needed.</p>
   </div>
 
   <div class="invite__done card--sunken" id="invite-done" hidden role="status">
-    <h3>Thanks, you're on the list.</h3>
-    <p>Josh reads these himself and will be in touch. Invites go out as places open.</p>
+    <h3>Thanks, your trial is on its way.</h3>
+    <p>We set up your account and email your login, usually the same business day.</p>
     <p class="small">Already have access? <a href={site.signInUrl} rel="noopener">Sign in</a>.</p>
   </div>
   <p class="invite__error small" id="invite-error" hidden role="alert">
-    That didn't send. Or email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a> and Josh will get it.
+    That didn't send. Or email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a> and we will get it.
   </p>
 </form>
 
@@ -109,7 +109,7 @@ const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
       const a = document.createElement('a');
       a.href = `mailto:${SUPPORT}`;
       a.textContent = SUPPORT;
-      err.append(a, ' and Josh will get it.');
+      err.append(a, ' and we will get it.');
       err.hidden = false;
       submit.disabled = false;
       // Turnstile tokens are single-use: get a fresh one for the retry.

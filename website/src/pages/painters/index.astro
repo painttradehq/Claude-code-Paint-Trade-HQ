@@ -1,0 +1,78 @@
+---
+import Base from '../../layouts/Base.astro';
+import Button from '../../components/Button.astro';
+import { site } from '../../data/site';
+import { visibleListings, showSamples, STATES } from '../../data/directory';
+
+const hasSamples = visibleListings.some((l) => l.sample);
+const byState = Object.entries(STATES)
+  .map(([code, name]) => ({ code, name, items: visibleListings.filter((l) => l.state === code) }))
+  .filter((g) => g.items.length > 0);
+---
+<Base title="Find a painter" description="Painting businesses that run on Paint Trade HQ, by state and suburb: who they are, where they work and what they do best." noindex={hasSamples}>
+  <section class="section section--tight">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Directory</span>
+        <h1>Find a painter</h1>
+        <p class="lead">Painting businesses that run their jobs on Paint Trade HQ, by state. Each one has a page of its own: who they are, where they work and what they do best.</p>
+        {hasSamples && (
+          <p class="small sample-banner"><span class="pill pill--neutral">Sample listings</span> These show what a listing looks like. Real businesses replace them as painters join.</p>
+        )}
+      </div>
+
+      {byState.length === 0 && (
+        <div class="card empty">
+          <h2>Listings open to painting businesses on Paint Trade HQ</h2>
+          <p>The first real listings appear here as painters join. If that's you, start your free trial.</p>
+          <Button href={site.status.ctaHref}>{site.status.cta}</Button>
+        </div>
+      )}
+
+      {byState.map((g) => (
+        <section class="state" id={g.code.toLowerCase()}>
+          <h2>{g.name} <span class="muted small">{g.items.length}</span></h2>
+          <div class="grid grid--3">
+            {g.items.map((l) => (
+              <a class="card listing" href={`/painters/${l.slug}`}>
+                {l.sample && <span class="pill pill--neutral listing__sample">Sample</span>}
+                <h3>{l.name}</h3>
+                <p class="small listing__where">{l.suburb}, {l.state} · {l.areas.join(' · ')}</p>
+                <ul class="listing__services">
+                  {l.services.slice(0, 3).map((s) => <li>{s}</li>)}
+                </ul>
+                <span class="small listing__more">See the listing</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  </section>
+
+  <section class="section section--ink cta">
+    <div class="container center">
+      <h2>Run a painting business?</h2>
+      <p class="lead">A listing here comes with Paint Trade HQ. Start your 30-day free trial and your page is yours to fill in.</p>
+      <Button href={site.status.ctaHref} variant="on-ink" size="lg">{site.status.cta}</Button>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .sample-banner { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--text-2); }
+  .state { margin-top: 36px; }
+  .state h2 { display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px; }
+  .listing { position: relative; display: flex; flex-direction: column; gap: 8px; color: inherit; }
+  .listing:hover { text-decoration: none; border-color: var(--accent); }
+  .listing h3 { margin: 0; padding-right: 70px; }
+  .listing__sample { position: absolute; top: 14px; right: 14px; }
+  .listing__where { color: var(--text-2); margin: 0; }
+  .listing__services { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .listing__services li { font-size: 13px; background: var(--sunken); border: 1px solid var(--border); border-radius: var(--r-pill); padding: 3px 10px; }
+  .listing__more { margin-top: auto; color: var(--accent-ink); font-weight: 600; }
+  .empty { max-width: 640px; }
+  .empty h2 { margin-top: 0; }
+  .empty .btn { margin-top: 12px; }
+  .cta .lead { margin-left: auto; margin-right: auto; margin-bottom: 24px; }
+</style>

@@ -4,7 +4,7 @@ import Button from '../components/Button.astro';
 import Screenshot from '../components/Screenshot.astro';
 import { site, story } from '../data/site';
 ---
-<Base title="Story" description="Paint Trade HQ is built by Josh Sano, a Melbourne painter running Josh Sano Painting and Decorating, round by round to how a painting business actually works.">
+<Base title="Story" description="Paint Trade HQ is built by a Melbourne painter, round by round, to how a painting business actually works.">
   <section class="section">
     <div class="container story">
       <span class="eyebrow">The people behind it</span>
@@ -18,13 +18,13 @@ import { site, story } from '../data/site';
       <div>
         <span class="eyebrow">How it gets built</span>
         <h2>Round by round, with real painters</h2>
-        <p>Paint Trade HQ is in its tester program. Invited painting businesses use everything free until their invite ends, and what they say shapes the next round.</p>
+        <p>Paint Trade HQ is built with painting businesses using it on real jobs. What they say shapes the next round, and there is a new round most weeks.</p>
         <ul class="checklist">
-          <li>A feedback form inside the app goes straight to Josh</li>
+          <li>A feedback form inside the app goes straight to the people who build it</li>
           <li>"What's new" notes appear in the app when something ships</li>
           <li>Quick-start guides in the Help hub, and training videos for the crew on Enterprise</li>
         </ul>
-        <p class="small">Paid plans open at launch. The Terms of Service (version 1.2) were reviewed by a lawyer for the tester program; during testing the app is free and used at your own risk, as is.</p>
+        <p class="small">The Terms of Service (version 1.2) were reviewed by a lawyer.</p>
       </div>
       <Screenshot id="quote-builder" />
     </div>
@@ -32,8 +32,8 @@ import { site, story } from '../data/site';
 
   <section class="section">
     <div class="container contact">
-      <h2>Talk to Josh</h2>
-      <p class="lead">Questions, ideas, a job that doesn't fit the mould: email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>. Josh reads these himself.</p>
+      <h2>Talk to us</h2>
+      <p class="lead">Questions, ideas, a job that doesn't fit the mould: email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>. A painter reads these, not a ticket queue.</p>
       <p class="small">Josh Sano Painting and Decorating, trading as Paint Trade HQ · {site.location}</p>
       <Button href={site.status.ctaHref} size="lg">{site.status.cta}</Button>
     </div>

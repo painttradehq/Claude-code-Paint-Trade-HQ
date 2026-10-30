@@ -24,26 +24,26 @@ import { site } from '../data/site';
 
     <div class="chat__log" id="chat-log" aria-live="polite" aria-relevant="additions">
       <div class="chat__msg chat__msg--bot">
-        <p>G'day. Ask me how Paint Trade HQ handles quotes, jobs, crew sign-in, invoices or pricing. If I don't know, I'll take your email and Josh will answer.</p>
+        <p>G'day. Ask me how Paint Trade HQ handles quotes, jobs, crew sign-in, invoices or pricing. If I don't know, I'll take your email and we'll answer.</p>
       </div>
       <div class="chat__starters" id="chat-starters">
         <button type="button" class="chat__starter">How does the client sign a quote?</button>
         <button type="button" class="chat__starter">What does it cost?</button>
         <button type="button" class="chat__starter">Does it track my crew?</button>
-        <button type="button" class="chat__starter">How do I get an invite?</button>
+        <button type="button" class="chat__starter">How does the free trial work?</button>
       </div>
     </div>
 
     <form class="chat__lead" id="chat-lead" hidden>
-      <p class="small"><strong>Leave your details</strong> and Josh will get back to you himself. This chat goes with them so he has the context.</p>
+      <p class="small"><strong>Leave your details</strong> and we'll get back to you. This chat goes with them for context.</p>
       <div class="chat__lead-row">
         <input class="input" name="name" type="text" placeholder="Your name" autocomplete="name" required />
         <input class="input" name="email" type="email" placeholder="Email" autocomplete="email" required />
       </div>
       <input type="text" name="website" class="visually-hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
       <div class="row">
-        <button class="btn btn--primary btn--sm" type="submit">Send to Josh</button>
-        <a class="small" href={site.status.ctaHref}>Or fill in the full invite form</a>
+        <button class="btn btn--primary btn--sm" type="submit">Send</button>
+        <a class="small" href={site.status.ctaHref}>Or start your free trial</a>
       </div>
     </form>
 
@@ -188,15 +188,15 @@ import { site } from '../data/site';
     }
   }
 
-  const LEAD_HINT = /(leave your (email|details)|what's your email|your email and josh|josh will answer|josh will be in touch|pass this to josh)/i;
-  const FALLBACK = 'The chat is having a moment. Email software@joshsano.com.au or use the invite form and Josh will answer.';
+  const LEAD_HINT = /(leave your (email|details)|what's your email|your email and josh|josh will answer|josh will be in touch|pass this to josh|we'll be in touch|we will be in touch)/i;
+  const FALLBACK = 'The chat is having a moment. Email software@joshsano.com.au or use the free trial form and we\'ll answer.';
 
   async function ask(q: string) {
     if (busy) return;
     const question = q.trim();
     if (!question) return;
     if (history.filter((m) => m.role === 'user').length >= MAX_TURNS) {
-      bubble('bot', "That's a lot of questions for one chat, which is a good sign. Leave your email and Josh will pick it up from here.");
+      bubble('bot', "That's a lot of questions for one chat, which is a good sign. Leave your email and we'll pick it up from here.");
       lead.hidden = false;
       return;
     }
@@ -260,9 +260,9 @@ import { site } from '../data/site';
       });
       if (!res.ok) throw new Error(String(res.status));
       lead.hidden = true;
-      bubble('bot', 'Thanks. Josh reads these himself and will be in touch.');
+      bubble('bot', 'Thanks. We\'ll be in touch.');
     } catch {
-      bubble('err', 'That didn\'t send. Email software@joshsano.com.au and Josh will get it.');
+      bubble('err', 'That didn\'t send. Email software@joshsano.com.au and we\'ll get it.');
     }
   });
 </script>

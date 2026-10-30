@@ -6,6 +6,8 @@
 ANTHROPIC_API_KEY=
 CHAT_MODEL=claude-opus-5-5
 PUBLIC_CHAT_ENABLED=1
+# Build-time: 1 shows the sample feedback cards and sample directory listings (marked "Sample"); 0 hides them for launch.
+PUBLIC_SHOW_SAMPLES=1
 
 # Invite form (functions/api/invite.js) — email through Resend
 RESEND_API_KEY=

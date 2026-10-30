@@ -1,0 +1,19 @@
+---
+import Base from '../../layouts/Base.astro';
+import Button from '../../components/Button.astro';
+import { site } from '../../data/site';
+---
+<Base title="That didn't send" description="Your free trial request for Paint Trade HQ did not go through. Try again or email us." noindex>
+  <section class="section">
+    <div class="container narrow center">
+      <h1>That didn't send.</h1>
+      <p class="lead">Something went wrong on our side, or a detail was missing. Try the form again, or email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a> and we will get it.</p>
+      <Button href="/trial" variant="primary">Back to the form</Button>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .narrow { max-width: 620px; }
+  .narrow .lead { margin-bottom: 24px; }
+</style>

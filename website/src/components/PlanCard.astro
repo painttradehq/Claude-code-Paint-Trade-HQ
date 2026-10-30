@@ -1,5 +1,5 @@
 ---
-import { aud, incGst, type Plan } from '../data/site';
+import { aud, incGst, type Plan, site } from '../data/site';
 import Button from './Button.astro';
 interface Props { plan: Plan }
 const { plan } = Astro.props;
@@ -25,7 +25,7 @@ const inc = incGst(plan.price);
     {plan.includes.map((f) => <li>{f}</li>)}
   </ul>
   <div class="plan__cta">
-    <Button href="/invite" variant={plan.highlight ? 'primary' : 'ghost'} class="plan__btn">Ask for an invite</Button>
+    <Button href={site.status.ctaHref} variant={plan.highlight ? 'primary' : 'ghost'} class="plan__btn">{site.status.cta}</Button>
   </div>
 </article>
 
