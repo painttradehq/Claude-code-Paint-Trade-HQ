@@ -1,11 +1,14 @@
 ---
 /**
- * /new — a second home page, built as a prototype beside the current one (which is untouched).
- * Direction: the long-scroll product site with one animated gradient, big type, real product UI floating
- * in cards, a modular product grid and very few words per screen. Our palette and type throughout.
- * Every claim is the same as on the existing pages; the screens are the demo business's real screens
- * (served as WebP from public/screens/webp). Nothing autoplays except the gradient, which stops for
- * reduced-motion and when it scrolls out of view.
+ * /new — a second home page, built beside the current one (which is untouched).
+ * Pattern from Josh's reference screenshots (30 Oct 2026): a white page with one vivid ribbon sweeping
+ * through the hero, a two-tone sentence headline, then a bento grid of cards with real product UI
+ * composed inside each, a soft colour wash in one corner and an expand button that opens the full
+ * screen. Our palette (purple, lavender, peach) and our type (Fraunces, Inter) throughout.
+ * Claims are the same as on the existing pages. Screens are the demo business's, served as WebP.
+ * The ribbon drifts slowly in CSS and stops under reduced motion; nothing else moves on its own
+ * except the quote→sign→run→paid stage in the first card, which pauses on hover, focus, tap or
+ * when it scrolls out of view.
  */
 import Base from '../layouts/Base.astro';
 import Button from '../components/Button.astro';
@@ -23,173 +26,165 @@ const steps = [
   { id: 'paid', label: 'Paid', caption: 'Invoices follow the payment schedule on the quote.', browser: `${W}/02-dashboard-1440.webp`, phone: `${W}/21-client-invoice-390.webp` },
 ];
 
-const icons: Record<string, string> = {
-  dashboard: 'M4 5h7v6H4zM13 5h7v4h-7zM13 11h7v8h-7zM4 13h7v6H4z',
-  library: 'M4 5h5v14H4zM10 5h5v14h-5zM16 6l4-1v14l-4 1z',
-  quotes: 'M6 3h9l4 4v14H6zM15 3v4h4M9 12h7M9 16h7',
-  projects: 'M12 21s-6-5.5-6-10a6 6 0 0 1 12 0c0 4.5-6 10-6 10zM12 13a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
-  timesheets: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2',
-  'daily-reports': 'M5 4h14v16H5zM8 9h8M8 13h8M8 17h5',
-  invoices: 'M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6',
-  calendar: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
-  employees: 'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20a6 6 0 0 1 12 0M16 11a3 3 0 1 0 0-6M21 20a6 6 0 0 0-5-5.9',
-  'crew-app': 'M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM11 18h2',
-  crm: 'M4 5h16v11H9l-5 4zM8 9h8M8 12h5',
-  lucy: 'M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z',
-  files: 'M3 7h6l2 2h10v10H3zM3 7V5h6',
-};
-const defaultIcon = 'M4 4h16v16H4z';
+/** Bento cards. `full` is the screen the expand button opens. */
+const cards = [
+  { id: 'crew', title: 'Crew sign in on site, sign out at knock-off', line: 'GPS at those two moments only. Never prices.', href: '/features#timesheets', full: `${W}/40-crew-time-clock-390.webp`, fullAlt: 'The crew time clock on a phone', plan: '' },
+  { id: 'invoices', title: 'Invoices that follow the quote', line: 'Deposit, progress, final. Bank transfer, never a card.', href: '/features#invoices', full: `${W}/21-client-invoice-390.webp`, fullAlt: 'The invoice as the client sees it on a phone', plan: '' },
+  { id: 'lucy', title: 'Lucy, the AI assistant', line: 'Drafts, briefs and summaries from your own data.', href: '/features#lucy', full: `${W}/32-lucy-on-quote-1440.webp`, fullAlt: 'Lucy open beside a quote, answering with her sources', plan: 'Small business+' },
+  { id: 'timesheets', title: 'Timesheets to payroll', line: 'Approve the week, lock it, export the CSV.', href: '/features#timesheets', full: `${W}/17-timesheets-week-1440.webp`, fullAlt: 'Timesheets: a pay-week grid with regular and overtime hours', plan: 'Small business+' },
+  { id: 'jobs', title: 'Every live job on one page', line: 'Site on a map, crew, photos, variations, the completion report.', href: '/features#projects', full: `${W}/16-job-drawer-1440.webp`, fullAlt: 'A live job: the site on a map, the client, the crew and the project drawer', plan: '' },
+];
+const more = modules.filter((m) => !['dashboard', 'quotes', 'timesheets', 'invoices', 'lucy', 'projects'].includes(m.id));
 
-const tiles = modules.filter((m) => m.id !== 'dashboard');
 const homeFaqs = faqs.filter((f) => ['Does it track my crew?', 'Does the client need an account?', 'Is there an app for my phone?', 'Is there a free plan?'].includes(f.q));
 const quotes = testimonials.filter((t) => showSamples || !t.sample).slice(0, 3);
 const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote', 'crew-clock-in-and-daily-report', 'invoice-payment-to-client-page'].includes(c.id));
 ---
 <Base title="Paint Trade HQ" fullTitle="Paint Trade HQ · Quote it. Run it. Get paid." description={site.description} noindex>
-  <!-- Hero on the gradient -->
+  <!-- Hero: white page, one ribbon -->
   <section class="nh" id="top">
-    <div class="nh__bg" aria-hidden="true"><canvas id="nh-canvas"></canvas></div>
+    <div class="ribbon" aria-hidden="true"><i class="ribbon__a"></i><i class="ribbon__b"></i><i class="ribbon__c"></i></div>
     <div class="container nh__in">
-      <div class="nh__copy">
-        <span class="nh__pill">30-day free trial · no card</span>
-        <h1 class="nh__h1"><span class="nh__w">Quote it.</span> <span class="nh__w">Run it.</span> <span class="nh__w">Get paid.</span></h1>
-        <p class="nh__lead">The quote your client signs on their phone becomes the live job your crew sign in to, and the invoices follow.</p>
-        <div class="nh__cta">
-          <Button href={site.status.ctaHref} size="lg">{site.status.cta}</Button>
-          <a class="nh__ghost" href="#watch">Watch it work <span aria-hidden="true">→</span></a>
-        </div>
-        <p class="nh__fine">Built in Melbourne for painting businesses. Already in? <a href={site.signInUrl} rel="noopener">Sign in</a>.</p>
+      <p class="nh__kicker">Built in Melbourne for painting businesses</p>
+      <h1 class="nh__h1">
+        <span class="nh__dark">Quote it. Run it. Get paid.</span>
+        <span class="nh__light">The quote your client signs on their phone becomes the job your crew sign in to, and the invoices follow.</span>
+      </h1>
+      <div class="nh__cta">
+        <Button href={site.status.ctaHref} size="lg">{site.status.cta} <span aria-hidden="true">›</span></Button>
+        <a class="btn btn--ghost btn--lg nh__ghostbtn" href="#watch">Watch it work</a>
       </div>
-
-      <div class="stage" id="stage" data-step="0">
-        <div class="stage__tabs" role="tablist" aria-label="How a job runs">
-          {steps.map((s, i) => (
-            <button type="button" role="tab" class="stage__tab" id={`tab-${s.id}`} aria-selected={i === 0 ? 'true' : 'false'} aria-controls={`panel-${s.id}`} data-i={i}>
-              <span class="stage__bar"><span class="stage__fill"></span></span>
-              <span class="stage__label">{s.label}</span>
-            </button>
-          ))}
-        </div>
-        <div class="stage__frames">
-          {steps.map((s, i) => (
-            <div class="stage__panel" role="tabpanel" id={`panel-${s.id}`} aria-labelledby={`tab-${s.id}`} data-i={i} hidden={i !== 0}>
-              <figure class="stage__browser">
-                <span class="stage__dots" aria-hidden="true"><i></i><i></i><i></i></span>
-                <img src={s.browser} alt={`${s.label} step in the app`} width="1200" height="750" loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
-              </figure>
-              {s.phone && (
-                <figure class="stage__phone">
-                  <img src={s.phone} alt="" width="560" height="1212" loading="lazy" decoding="async" />
-                </figure>
-              )}
-            </div>
-          ))}
-        </div>
-        <p class="stage__caption small" id="stage-caption">{steps[0].caption}</p>
-        <button type="button" class="stage__pause" id="stage-pause" aria-pressed="false" aria-label="Pause the demo">Pause</button>
-      </div>
+      <p class="nh__fine">30 days free on every plan. No card. Already in? <a href={site.signInUrl} rel="noopener">Sign in</a>.</p>
     </div>
   </section>
 
-  <!-- Fact line -->
+  <!-- Fact strip where the reference has its logo row -->
   <section class="facts" aria-label="Key facts">
     <div class="container facts__in">
       <span>From <strong>$98 + GST</strong> a month</span>
-      <span><strong>30-day</strong> free trial, no card</span>
-      <span><strong>No app store.</strong> Add it to the home screen</span>
-      <span><strong>AUD</strong>, built in Melbourne</span>
+      <span><strong>30-day</strong> free trial</span>
+      <span><strong>No app store</strong> needed</span>
+      <span><strong>AUD</strong>, GST on top</span>
+      <span>Built by a <strong>painter</strong></span>
     </div>
   </section>
 
-  <!-- Modular grid -->
-  <section class="section mod" id="modules">
+  <!-- Bento -->
+  <section class="section bento" id="how">
     <div class="container">
-      <div class="section-head section-head--center reveal">
-        <span class="eyebrow">One app, in the order a job runs</span>
-        <h2>Everything a painting business runs on</h2>
-        <p class="lead">Each part feeds the next. Tap one to see what it does.</p>
+      <h2 class="bento__h reveal"><span class="nh__dark">Everything a painting business runs on.</span> <span class="nh__light">Each part feeds the next, so nothing is typed twice.</span></h2>
+
+      <div class="grid12">
+        <!-- A: the stage -->
+        <article class="bcard bcard--a reveal" id="stage" data-step="0">
+          <div class="bcard__head">
+            <h3>From quote to signed, on their phone</h3>
+            <button type="button" class="expand" data-full={`${W}/09-review-and-send-1440.webp`} data-alt="Review & Send: the email beside the quote the client sees" aria-label="Open the full screen"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" /></svg></button>
+          </div>
+          <div class="bcard__wash bcard__wash--a" aria-hidden="true"></div>
+          <div class="stage__tabs" role="tablist" aria-label="How a job runs">
+            {steps.map((s, i) => (
+              <button type="button" role="tab" class="stage__tab" id={`tab-${s.id}`} aria-selected={i === 0 ? 'true' : 'false'} aria-controls={`panel-${s.id}`} data-i={i}>
+                <span class="stage__bar"><span class="stage__fill"></span></span>
+                <span class="stage__label">{s.label}</span>
+              </button>
+            ))}
+          </div>
+          <div class="stage__frames">
+            {steps.map((s, i) => (
+              <div class="stage__panel" role="tabpanel" id={`panel-${s.id}`} aria-labelledby={`tab-${s.id}`} data-i={i} hidden={i !== 0}>
+                <figure class="mock mock--browser">
+                  <span class="mock__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                  <img src={s.browser} alt={`${s.label} step in the app`} width="1200" height="750" loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
+                </figure>
+                {s.phone && <figure class="mock mock--phone stage__phone"><img src={s.phone} alt="" width="560" height="1212" loading="lazy" decoding="async" /></figure>}
+              </div>
+            ))}
+          </div>
+          <p class="stage__caption small" id="stage-caption">{steps[0].caption}</p>
+          <button type="button" class="stage__pause" id="stage-pause" aria-pressed="false" aria-label="Pause the demo">Pause</button>
+        </article>
+
+        <!-- B: crew, tall -->
+        <article class="bcard bcard--b reveal">
+          <div class="bcard__head">
+            <h3>{cards[0].title}</h3>
+            <button type="button" class="expand" data-full={cards[0].full} data-alt={cards[0].fullAlt} aria-label="Open the full screen"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" /></svg></button>
+          </div>
+          <p class="bcard__line">{cards[0].line}</p>
+          <div class="bcard__wash bcard__wash--b" aria-hidden="true"></div>
+          <figure class="mock mock--phone bcard__phone"><img src={`${W}/40-crew-time-clock-390.webp`} alt="The crew time clock: signed in since 9:16 am, with the job and a Sign out button" width="560" height="1212" loading="lazy" decoding="async" /></figure>
+          <a class="bcard__more" href={cards[0].href}>How the crew app works <span aria-hidden="true">→</span></a>
+        </article>
+
+        <!-- C: invoices -->
+        <article class="bcard bcard--c reveal">
+          <div class="bcard__head">
+            <h3>{cards[1].title}</h3>
+            <button type="button" class="expand" data-full={cards[1].full} data-alt={cards[1].fullAlt} aria-label="Open the full screen"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" /></svg></button>
+          </div>
+          <p class="bcard__line">{cards[1].line}</p>
+          <div class="bcard__wash bcard__wash--c" aria-hidden="true"></div>
+          <figure class="mock mock--phone bcard__phone bcard__phone--low"><img src={`${W}/21-client-invoice-390.webp`} alt="The invoice as the client sees it on a phone" width="560" height="1212" loading="lazy" decoding="async" /></figure>
+        </article>
+
+        <!-- D: Lucy with a particle halo -->
+        <article class="bcard bcard--d reveal">
+          <div class="bcard__head">
+            <h3>{cards[2].title}</h3>
+            <button type="button" class="expand" data-full={cards[2].full} data-alt={cards[2].fullAlt} aria-label="Open the full screen"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" /></svg></button>
+          </div>
+          <p class="bcard__line">{cards[2].line} <span class="bcard__plan">{cards[2].plan}</span></p>
+          <canvas class="halo" width="320" height="320" aria-hidden="true"></canvas>
+          <div class="chat">
+            <p class="chat__q">What is the total of this quote and when was it sent?</p>
+            <p class="chat__a">EST-0008 is $1,107.17 and it hasn't been sent — it's still a draft, created this morning at 8:25. The only quote sent to Mia is EST-0001 ($2,640.00), emailed yesterday 22 October.</p>
+            <p class="chat__src small">Sources: Estimates · Client status</p>
+          </div>
+          <p class="bcard__fine small">Her words from the demo screen, not invented. Your data only; every call in your audit log.</p>
+        </article>
+
+        <!-- E: timesheets -->
+        <article class="bcard bcard--e reveal">
+          <div class="bcard__head">
+            <h3>{cards[3].title}</h3>
+            <button type="button" class="expand" data-full={cards[3].full} data-alt={cards[3].fullAlt} aria-label="Open the full screen"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" /></svg></button>
+          </div>
+          <p class="bcard__line">{cards[3].line} <span class="bcard__plan">{cards[3].plan}</span></p>
+          <div class="bcard__wash bcard__wash--e" aria-hidden="true"></div>
+          <figure class="mock mock--browser bcard__crop"><img src={`${W}/17-timesheets-week-1440.webp`} alt="Timesheets: a pay-week grid with regular and overtime hours" width="1200" height="750" loading="lazy" decoding="async" /></figure>
+        </article>
+
+        <!-- F: live jobs, wide -->
+        <article class="bcard bcard--f reveal">
+          <div class="bcard__text">
+            <div class="bcard__head">
+              <h3>{cards[4].title}</h3>
+            </div>
+            <p class="bcard__line">{cards[4].line}</p>
+            <ul class="checklist small">
+              <li>Labour cost straight from the time clock</li>
+              <li>Variations the client approves on a link</li>
+              <li>Daily reports with photos (Enterprise)</li>
+            </ul>
+            <a class="bcard__more" href={cards[4].href}>More about live jobs <span aria-hidden="true">→</span></a>
+          </div>
+          <div class="bcard__media">
+            <button type="button" class="expand" data-full={cards[4].full} data-alt={cards[4].fullAlt} aria-label="Open the full screen"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" /></svg></button>
+            <div class="bcard__wash bcard__wash--f" aria-hidden="true"></div>
+            <figure class="mock mock--browser bcard__crop bcard__crop--f"><img src={`${W}/16-job-drawer-1440.webp`} alt="A live job: the site on a map, the client, the crew and the project drawer" width="1200" height="750" loading="lazy" decoding="async" /></figure>
+          </div>
+        </article>
       </div>
-      <div class="tiles">
-        {tiles.map((m, i) => (
-          <a class="tile reveal" href={`/features#${m.id}`} style={`--d:${(i % 4) * 40}ms`}>
-            <span class="tile__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d={icons[m.id] || defaultIcon} /></svg></span>
-            <span class="tile__name">{m.name}</span>
-            <span class="tile__sum small">{m.summary}</span>
-            {m.plan !== 'Starter' && <span class="tile__plan">{m.plan}+</span>}
-          </a>
-        ))}
-      </div>
+
+      <p class="also reveal"><span>And also:</span> {more.map((m) => <a href={`/features#${m.id}`}>{m.name.replace(/:.*$/, '')}</a>)}</p>
     </div>
   </section>
 
-  <!-- Three product moments, alternating -->
-  <section class="section section--sunken moment" id="how">
-    <div class="container split">
-      <div class="reveal">
-        <span class="eyebrow">Quote</span>
-        <h2>A quote they read, tick and sign on their phone</h2>
-        <p class="lead">Built from your own Library, sent as a link. No account, no app, no printer.</p>
-        <ul class="checklist">
-          <li>Optional extras the client can tick on</li>
-          <li>Sign by drawing or typing; the deposit invoice is created for you</li>
-          <li>Variations approved the same way, mid-job</li>
-        </ul>
-        <a class="more" href="/features#quotes">More about quotes <span aria-hidden="true">→</span></a>
-      </div>
-      <div class="floaters reveal">
-        <figure class="float float--browser"><img src={`${W}/09-review-and-send-1440.webp`} alt="Review & Send: the email beside the quote the client sees" width="1200" height="750" loading="lazy" decoding="async" /></figure>
-        <figure class="float float--phone"><img src={`${W}/11-client-quote-signature-390.webp`} alt="The Accept this quote dialog with a drawn signature" width="560" height="1212" loading="lazy" decoding="async" /></figure>
-      </div>
-    </div>
-  </section>
-
-  <section class="section moment" id="run">
-    <div class="container split split--reverse">
-      <div class="reveal">
-        <span class="eyebrow">Run</span>
-        <h2>Sign in on site. Sign out at knock-off. Nothing in between.</h2>
-        <p class="lead">GPS only at those two moments: time, address, distance from the job. The crew see jobs, the clock and reports. Never prices.</p>
-        <ul class="checklist">
-          <li>Labour cost from the time clock flows into the job</li>
-          <li>Daily reports with photos, read and answered by you (Enterprise)</li>
-          <li>A completion report the client receives, with photos</li>
-        </ul>
-        <a class="more" href="/features#projects">More about live jobs <span aria-hidden="true">→</span></a>
-      </div>
-      <div class="floaters floaters--left reveal">
-        <figure class="float float--browser"><img src={`${W}/16-job-drawer-1440.webp`} alt="A live job: the site on a map, the client, the crew and the project drawer" width="1200" height="750" loading="lazy" decoding="async" /></figure>
-        <figure class="float float--phone"><img src={`${W}/40-crew-time-clock-390.webp`} alt="The crew time clock on a phone, signed in since 9:16 am" width="560" height="1212" loading="lazy" decoding="async" /></figure>
-      </div>
-    </div>
-  </section>
-
-  <section class="section section--sunken moment" id="paid">
-    <div class="container split">
-      <div class="reveal">
-        <span class="eyebrow">Get paid</span>
-        <h2>Invoices that follow the quote</h2>
-        <p class="lead">Deposit, progress and final, each with a public page and a PDF with your bank details. Record the payment and the balance updates.</p>
-        <ul class="checklist">
-          <li>Credit notes, payment reminders, review requests</li>
-          <li>Overtime and payroll CSV from the Timesheets page (Small business and up)</li>
-          <li>Clients pay by bank transfer; the app never takes their card</li>
-        </ul>
-        <a class="more" href="/features#invoices">More about invoices <span aria-hidden="true">→</span></a>
-      </div>
-      <div class="floaters reveal">
-        <figure class="float float--browser"><img src={`${W}/17-timesheets-week-1440.webp`} alt="Timesheets: a pay-week grid with regular and overtime hours" width="1200" height="750" loading="lazy" decoding="async" /></figure>
-        <figure class="float float--phone"><img src={`${W}/21-client-invoice-390.webp`} alt="The invoice as the client sees it on a phone" width="560" height="1212" loading="lazy" decoding="async" /></figure>
-      </div>
-    </div>
-  </section>
-
-  <!-- Watch it work: one player, four chapters -->
-  <section class="section watch" id="watch">
+  <!-- Watch it work -->
+  <section class="section section--sunken watch" id="watch">
     <div class="container">
-      <div class="section-head reveal">
-        <span class="eyebrow">Watch it work</span>
-        <h2>Four short walkthroughs, no sound</h2>
-      </div>
+      <h2 class="bento__h reveal"><span class="nh__dark">Watch it work.</span> <span class="nh__light">Four short walkthroughs, no sound.</span></h2>
       <div class="watch__in">
         <ol class="chapters" id="chapters">
           {chapters.map((c, i) => (
@@ -205,32 +200,11 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
     </div>
   </section>
 
-  <!-- Lucy -->
-  <section class="section section--ink lucy">
-    <div class="container split">
-      <div class="reveal">
-        <span class="eyebrow" style="color:#c9bff0">Lucy, the AI assistant</span>
-        <h2>Drafts, briefs and summaries from your own data</h2>
-        <div class="pills">
-          <span class="lpill">Your data only</span>
-          <span class="lpill">Drafts you check</span>
-          <span class="lpill">Never trains models</span>
-        </div>
-        <p class="small lucy__fine">Runs on Anthropic's Claude. Every call in your audit log. Small business and up; the crew have no AI features.</p>
-      </div>
-      <figure class="float float--browser reveal"><img src={`${W}/32-lucy-on-quote-1440.webp`} alt="Lucy open beside a quote, answering with her sources" width="1200" height="750" loading="lazy" decoding="async" /></figure>
-    </div>
-  </section>
-
   <!-- Feedback (samples until real ones exist) -->
   {quotes.length > 0 && (
     <section class="section fb" id="feedback">
       <div class="container">
-        <div class="section-head section-head--center reveal">
-          <span class="eyebrow">From painters</span>
-          <h2>What painters say</h2>
-          {quotes.some((t) => t.sample) && <p class="small">Sample quotes, to show the layout. Real feedback replaces them as it comes in.</p>}
-        </div>
+        <h2 class="bento__h reveal"><span class="nh__dark">What painters say.</span> {quotes.some((t) => t.sample) && <span class="nh__light">Sample quotes for now; real ones replace them as they come in.</span>}</h2>
         <div class="fb__row">
           {quotes.map((t) => (
             <figure class="fb__card reveal">
@@ -247,24 +221,27 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   <!-- FAQ, four only -->
   <section class="section section--sunken">
     <div class="container faq-wrap">
-      <div class="section-head reveal">
-        <span class="eyebrow">Straight answers</span>
-        <h2>Questions painters ask</h2>
-      </div>
+      <h2 class="bento__h reveal"><span class="nh__dark">Questions painters ask.</span></h2>
       <Faq items={homeFaqs} openFirst />
       <p class="small"><a href="/pricing#faq">More answers on the pricing page</a></p>
     </div>
   </section>
 
-  <!-- Closing CTA on the gradient -->
+  <!-- Closing on a soft ribbon -->
   <section class="nend">
-    <div class="nend__bg" aria-hidden="true"></div>
-    <div class="container center nend__in">
-      <h2>Try it on your own jobs</h2>
-      <p class="lead">30 days free on every plan. No card. Leave your details and your login arrives by email.</p>
-      <Button href={site.status.ctaHref} size="lg">{site.status.cta}</Button>
+    <div class="ribbon ribbon--end" aria-hidden="true"><i class="ribbon__a"></i><i class="ribbon__b"></i></div>
+    <div class="container nend__in">
+      <h2 class="bento__h"><span class="nh__dark">Try it on your own jobs.</span> <span class="nh__light">30 days free on every plan. No card. Your login arrives by email.</span></h2>
+      <Button href={site.status.ctaHref} size="lg">{site.status.cta} <span aria-hidden="true">›</span></Button>
     </div>
   </section>
+
+  <!-- Full-screen viewer for the expand buttons -->
+  <dialog class="viewer" id="viewer">
+    <button type="button" class="viewer__close" id="viewer-close" aria-label="Close">×</button>
+    <img id="viewer-img" src="" alt="" />
+    <p class="small viewer__cap" id="viewer-cap"></p>
+  </dialog>
 
   <!-- Sticky phone bar -->
   <div class="sticky" id="sticky" hidden>
@@ -275,71 +252,107 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
 
 <style>
   /* ---------- hero ---------- */
-  .nh { position: relative; overflow: hidden; padding: clamp(36px, 6vw, 84px) 0 clamp(120px, 14vw, 180px); color: var(--text); }
-  .nh__bg { position: absolute; inset: 0; clip-path: polygon(0 0, 100% 0, 100% 82%, 0 100%); background: linear-gradient(135deg, #f1eefa, #e4ddf7 45%, #f6e4d6); }
-  .nh__bg canvas { width: 100%; height: 100%; display: block; }
-  .nh__in { position: relative; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(28px, 5vw, 56px); align-items: center; }
-  .nh__pill { display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.01em; color: var(--accent-ink); background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(75, 62, 134, 0.18); border-radius: var(--r-pill); padding: 6px 12px; backdrop-filter: blur(6px); }
-  .nh__h1 { font-size: clamp(44px, 6.6vw, 84px); line-height: 0.98; letter-spacing: -0.02em; margin: 18px 0 18px; }
-  .nh__w { display: inline-block; white-space: nowrap; animation: rise 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-  .nh__w:nth-child(2) { animation-delay: 120ms; }
-  .nh__w:nth-child(3) { animation-delay: 240ms; }
-  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-  .nh__lead { font-size: clamp(17px, 1.6vw, 21px); color: var(--text-2); max-width: 34ch; margin: 0 0 24px; }
-  .nh__cta { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
-  .nh__ghost { font-weight: 600; color: var(--accent-ink); }
-  .nh__ghost:hover { text-decoration: none; color: var(--accent); }
+  .nh { position: relative; overflow: hidden; padding: clamp(56px, 9vw, 128px) 0 clamp(56px, 8vw, 112px); background: var(--bg); }
+  .nh__in { position: relative; max-width: 880px; }
+  .nh__kicker { font-size: 14px; font-weight: 600; color: var(--text-2); margin: 0 0 18px; letter-spacing: 0.01em; }
+  .nh__h1 { font-size: clamp(34px, 5.2vw, 64px); line-height: 1.08; letter-spacing: -0.015em; margin: 0 0 32px; font-weight: 600; }
+  .nh__dark { color: var(--text); }
+  .nh__light { color: #6a5f93; font-weight: 500; }
+  .nh__cta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .nh__ghostbtn { background: rgba(255, 255, 255, 0.75); }
   .nh__fine { margin-top: 18px; font-size: 14px; color: var(--text-2); }
 
-  /* ---------- stage ---------- */
-  .stage { position: relative; }
-  .stage__tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
-  .stage__tab { font: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; color: var(--text-2); display: grid; gap: 8px; }
-  .stage__tab[aria-selected='true'] { color: var(--accent-ink); }
-  .stage__bar { display: block; height: 3px; border-radius: 3px; background: rgba(75, 62, 134, 0.18); overflow: hidden; }
-  .stage__fill { display: block; height: 100%; width: 0; background: var(--accent); }
-  .stage__tab[aria-selected='true'] .stage__fill { width: 100%; transition: width var(--stage-ms, 4000ms) linear; }
-  .stage[data-paused] .stage__tab[aria-selected='true'] .stage__fill { transition: none; width: 100%; }
-  .stage__label { font-size: 13px; font-weight: 600; letter-spacing: 0.02em; }
-  .stage__frames { position: relative; }
-  .stage__panel { position: relative; }
-  .stage__browser { margin: 0; background: #fff; border: 1px solid rgba(30, 28, 26, 0.08); border-radius: 14px; overflow: hidden; box-shadow: 0 30px 60px -20px rgba(52, 41, 94, 0.35), 0 10px 24px -12px rgba(0, 0, 0, 0.2); }
-  .stage__dots { display: flex; gap: 6px; padding: 10px 12px; background: var(--sunken); border-bottom: 1px solid var(--border); }
-  .stage__dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--border-strong); }
-  .stage__browser img { display: block; width: 100%; height: auto; }
-  .stage__phone { position: absolute; right: -4%; bottom: -10%; width: 26%; margin: 0; border-radius: 22px; border: 5px solid #1e1c1a; background: #1e1c1a; overflow: hidden; box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.45); aspect-ratio: 9 / 19.5; }
-  .stage__phone img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
-  .stage__panel:not([hidden]) { animation: fadein 400ms ease both; }
-  @keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-  .stage__caption { margin: 22px 0 0; color: var(--text-2); min-height: 1.4em; }
-  .stage__pause { position: absolute; top: -34px; right: 0; font: inherit; font-size: 12px; font-weight: 600; color: var(--accent-ink); background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(75, 62, 134, 0.18); border-radius: var(--r-pill); padding: 3px 10px; cursor: pointer; }
-  .stage__pause[aria-pressed='true']::after { content: 'd'; }
+  /* the ribbon: one crisp folded band plus two thinner ones, sweeping from top-centre to bottom-right */
+  .ribbon { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .ribbon i { position: absolute; display: block; filter: blur(2.5px) saturate(1.1); will-change: transform; }
+  .ribbon__a { left: 54%; top: -40%; width: 34vw; min-width: 320px; height: 190%; border-radius: 48% 52% 40% 60% / 20% 18% 82% 80%; background: linear-gradient(100deg, #4b3e86 0%, #6b5bb5 18%, #a593e0 36%, #e9a5c8 56%, #f3b58e 74%, #f8d8b0 100%); transform: rotate(27deg); animation: driftA 22s ease-in-out infinite alternate; box-shadow: inset -40px 0 80px rgba(255, 255, 255, 0.25), inset 40px 0 80px rgba(52, 41, 94, 0.18); }
+  .ribbon__b { left: 71%; top: -30%; width: 13vw; min-width: 120px; height: 170%; border-radius: 50% 50% 50% 50% / 15% 15% 85% 85%; background: linear-gradient(180deg, #f8d8b0 0%, #f0a97a 45%, #e9a5c8 100%); transform: rotate(24deg); opacity: 0.95; animation: driftB 26s ease-in-out infinite alternate; }
+  .ribbon__c { left: 47%; top: -20%; width: 7vw; min-width: 70px; height: 160%; border-radius: 50% / 10% 10% 90% 90%; background: linear-gradient(180deg, #cfc6f0 0%, #8a79d6 55%, #4b3e86 100%); transform: rotate(31deg); opacity: 0.8; animation: driftC 30s ease-in-out infinite alternate; }
+  @keyframes driftA { to { transform: rotate(25deg) translate(-2%, 3%); } }
+  @keyframes driftB { to { transform: rotate(27deg) translate(3%, -2%); } }
+  @keyframes driftC { to { transform: rotate(34deg) translate(2%, 4%); } }
+  .nh::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, var(--bg) 0%, var(--bg) 34%, rgba(250, 249, 246, 0) 56%); pointer-events: none; }
+  .nh__in { z-index: 1; }
 
   /* ---------- facts ---------- */
-  .facts { background: var(--surface); border-bottom: 1px solid var(--border); margin-top: calc(-1 * clamp(60px, 8vw, 100px)); position: relative; }
-  .facts__in { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 22px 0; font-size: 15px; color: var(--text-2); }
+  .facts { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface); }
+  .facts__in { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; padding: 18px 0; font-size: 15px; color: var(--text-2); }
   .facts__in strong { color: var(--text); }
 
-  /* ---------- tiles ---------- */
-  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 8px; }
-  .tile { position: relative; display: grid; gap: 8px; align-content: start; padding: 18px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); color: inherit; transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease; }
-  .tile:hover { text-decoration: none; transform: translateY(-3px); box-shadow: var(--shadow-float); border-color: rgba(75, 62, 134, 0.35); }
-  .tile__icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--accent-bg); color: var(--accent); }
-  .tile__name { font-family: var(--font-display); font-weight: 600; font-size: 18px; line-height: 1.2; }
-  .tile__sum { color: var(--text-2); }
-  .tile__plan { position: absolute; top: 14px; right: 14px; font-size: 11px; font-weight: 600; color: var(--accent-ink); background: var(--accent-bg); border-radius: var(--r-pill); padding: 2px 8px; }
+  /* ---------- bento ---------- */
+  .bento__h { font-size: clamp(26px, 3.4vw, 40px); line-height: 1.15; letter-spacing: -0.01em; max-width: 24ch; margin: 0 0 28px; font-weight: 600; }
+  .bento__h .nh__light { display: block; font-size: 0.72em; margin-top: 6px; }
+  .grid12 { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+  .bcard { position: relative; overflow: hidden; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 24px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 10px; min-height: 300px; }
+  .bcard__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .bcard h3 { margin: 0; font-size: clamp(20px, 1.8vw, 26px); line-height: 1.2; max-width: 22ch; }
+  .bcard__line { margin: 0; color: var(--text-2); max-width: 36ch; }
+  .bcard__plan { display: inline-block; font-size: 11px; font-weight: 600; color: var(--accent-ink); background: var(--accent-bg); border-radius: var(--r-pill); padding: 2px 8px; vertical-align: middle; margin-left: 6px; }
+  .bcard__more { margin-top: auto; font-weight: 600; color: var(--accent-ink); position: relative; z-index: 1; }
+  .bcard__fine { color: var(--muted); margin: auto 0 0; position: relative; z-index: 1; }
+  .expand { flex: none; width: 34px; height: 34px; border-radius: 10px; border: 0; background: var(--accent); color: #fff; display: grid; place-items: center; cursor: pointer; transition: background-color 140ms ease, transform 140ms ease; position: relative; z-index: 2; }
+  .expand:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  .bcard__wash { position: absolute; border-radius: 50%; filter: blur(28px); pointer-events: none; z-index: 0; }
+  .bcard__wash--a { right: -8%; bottom: -30%; width: 55%; height: 80%; background: radial-gradient(closest-side, rgba(246, 201, 162, 0.9), rgba(233, 165, 200, 0.55) 55%, transparent); }
+  .bcard__wash--b { left: -20%; bottom: -20%; width: 120%; height: 60%; background: radial-gradient(closest-side, rgba(138, 121, 214, 0.55), rgba(233, 165, 200, 0.35) 60%, transparent); }
+  .bcard__wash--c { right: -30%; top: 30%; width: 100%; height: 90%; background: radial-gradient(closest-side, rgba(246, 201, 162, 0.85), rgba(240, 180, 142, 0.35) 60%, transparent); }
+  .bcard__wash--e { left: -10%; bottom: -40%; width: 90%; height: 90%; background: radial-gradient(closest-side, rgba(154, 140, 216, 0.5), transparent 70%); }
+  .bcard__wash--f { right: -10%; top: -20%; width: 70%; height: 120%; background: radial-gradient(closest-side, rgba(233, 165, 200, 0.55), rgba(246, 201, 162, 0.45) 50%, transparent); }
 
-  /* ---------- moments ---------- */
-  .moment h2 { max-width: 16ch; }
-  .more { display: inline-block; margin-top: 14px; font-weight: 600; color: var(--accent-ink); }
-  .floaters { position: relative; padding: 6% 10% 10% 0; }
-  .floaters--left { padding: 6% 0 10% 10%; }
-  .floaters::before { content: ''; position: absolute; inset: 10% 0 0 10%; border-radius: 40px; background: radial-gradient(60% 60% at 50% 40%, rgba(75, 62, 134, 0.18), transparent 70%); filter: blur(10px); z-index: 0; }
-  .float { position: relative; z-index: 1; margin: 0; background: #fff; border: 1px solid rgba(30, 28, 26, 0.08); border-radius: 14px; overflow: hidden; box-shadow: 0 30px 60px -20px rgba(52, 41, 94, 0.35), 0 10px 24px -12px rgba(0, 0, 0, 0.2); }
-  .float img { display: block; width: 100%; height: auto; }
-  .floaters .float--phone { position: absolute; right: 0; bottom: 0; width: 26%; border-radius: 22px; border: 5px solid #1e1c1a; background: #1e1c1a; aspect-ratio: 9 / 19.5; }
-  .floaters--left .float--phone { right: auto; left: 0; }
-  .float--phone img { height: 100%; object-fit: cover; object-position: top; }
+  .mock { position: relative; z-index: 1; margin: 0; background: #fff; border: 1px solid rgba(30, 28, 26, 0.08); border-radius: 12px; overflow: hidden; box-shadow: 0 24px 48px -18px rgba(52, 41, 94, 0.35), 0 8px 20px -10px rgba(0, 0, 0, 0.18); }
+  .mock img { display: block; width: 100%; height: auto; }
+  .mock--browser .mock__dots { display: flex; gap: 5px; padding: 8px 10px; background: var(--sunken); border-bottom: 1px solid var(--border); }
+  .mock__dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--border-strong); }
+  .mock--phone { border-radius: 22px; border: 5px solid #1e1c1a; background: #1e1c1a; aspect-ratio: 9 / 19.5; }
+  .mock--phone img { height: 100%; object-fit: cover; object-position: top; }
+  .bcard__crop { aspect-ratio: 16 / 9; }
+  .bcard__crop img { height: 100%; object-fit: cover; object-position: 0 0; transform: scale(1.35); transform-origin: 18% 30%; }
+  .bcard__crop--f img { transform-origin: 0% 18%; transform: scale(1.12); }
+
+  /* card A: the stage */
+  .bcard--a { grid-column: span 8; }
+  .stage__tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 4px; position: relative; z-index: 1; }
+  .stage__tab { font: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; color: var(--text-2); display: grid; gap: 7px; }
+  .stage__tab[aria-selected='true'] { color: var(--accent-ink); }
+  .stage__bar { display: block; height: 3px; border-radius: 3px; background: rgba(75, 62, 134, 0.16); overflow: hidden; }
+  .stage__fill { display: block; height: 100%; width: 0; background: var(--accent); }
+  .stage__label { font-size: 13px; font-weight: 600; letter-spacing: 0.02em; }
+  .stage__frames { position: relative; margin-top: 6px; padding: 0 12% 6% 0; }
+  .stage__panel { position: relative; }
+  .stage__panel:not([hidden]) { animation: fadein 400ms ease both; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .stage__phone { position: absolute; right: -2%; bottom: -8%; width: 24%; }
+  .stage__caption { margin: 4px 0 0; color: var(--text-2); min-height: 1.4em; position: relative; z-index: 1; }
+  .stage__pause { position: absolute; left: 24px; bottom: 22px; font: inherit; font-size: 12px; font-weight: 600; color: var(--accent-ink); background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(75, 62, 134, 0.18); border-radius: var(--r-pill); padding: 3px 10px; cursor: pointer; z-index: 2; }
+  .stage__pause[aria-pressed='true']::after { content: 'd'; }
+  #stage .stage__caption { padding-left: 84px; }
+
+  /* card B: crew, tall */
+  .bcard--b { grid-column: span 4; grid-row: span 2; }
+  .bcard__phone { width: min(62%, 240px); margin: 18px auto 0; }
+  .bcard__phone--low { width: min(58%, 220px); margin-top: 8px; }
+  /* card C, D, E */
+  .bcard--c { grid-column: span 4; }
+  .bcard--d { grid-column: span 4; }
+  .bcard--e { grid-column: span 4; }
+  /* card F wide */
+  .bcard--f { grid-column: span 12; flex-direction: row; gap: 28px; align-items: center; }
+  .bcard__text { flex: 0 0 38%; display: flex; flex-direction: column; gap: 10px; }
+  .bcard__media { position: relative; flex: 1 1 auto; min-width: 0; }
+  .bcard__media .expand { position: absolute; top: 0; right: 0; }
+  .bcard__media .mock { margin-top: 44px; }
+
+  /* Lucy card: particle halo and a chat */
+  .halo { position: absolute; right: -40px; top: -20px; width: 260px; height: 260px; opacity: 0.9; pointer-events: none; z-index: 0; }
+  .chat { position: relative; z-index: 1; display: grid; gap: 8px; margin-top: 8px; }
+  .chat p { margin: 0; padding: 10px 12px; border-radius: 12px; font-size: 14px; line-height: 1.45; max-width: 92%; }
+  .chat__q { background: var(--accent-bg); color: var(--accent-ink); justify-self: end; border-bottom-right-radius: 4px; }
+  .chat__a { background: var(--sunken); color: var(--text); border-bottom-left-radius: 4px; }
+  .chat__src { background: none !important; padding: 0 2px !important; color: var(--muted); }
+
+  .also { margin: 22px 0 0; display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; color: var(--text-2); font-size: 14px; }
+  .also a { font-weight: 600; color: var(--accent-ink); background: var(--accent-bg); border-radius: var(--r-pill); padding: 5px 11px; }
+  .also a:hover { background: var(--accent); color: #fff; text-decoration: none; }
 
   /* ---------- watch ---------- */
   .watch__in { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(20px, 4vw, 40px); align-items: start; }
@@ -352,61 +365,71 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   .chapter__d { font-size: 12px; color: var(--text-2); }
   .player__slot[hidden] { display: none; }
 
-  /* ---------- lucy ---------- */
-  .pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
-  .lpill { font-size: 14px; font-weight: 600; padding: 8px 14px; border-radius: var(--r-pill); background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.25); color: #fff; }
-  .lucy__fine { color: rgba(255, 255, 255, 0.72); }
-  .lucy .float { border-color: rgba(255, 255, 255, 0.12); }
-
-  /* ---------- feedback ---------- */
+  /* ---------- feedback / faq ---------- */
   .fb__row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .fb__card { margin: 0; display: grid; gap: 12px; padding: 22px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); }
+  .fb__card { margin: 0; display: grid; gap: 12px; padding: 22px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; }
   .fb__card .pill { justify-self: start; }
   .fb__card blockquote { margin: 0; font-family: var(--font-display); font-size: 19px; line-height: 1.4; }
   .fb__card blockquote p { margin: 0; }
   .faq-wrap { max-width: 820px; }
 
   /* ---------- closing ---------- */
-  .nend { position: relative; overflow: hidden; padding: clamp(72px, 10vw, 128px) 0; }
-  .nend__bg { position: absolute; inset: 0; clip-path: polygon(0 18%, 100% 0, 100% 100%, 0 100%); background: linear-gradient(120deg, #f6e4d6, #e4ddf7 50%, #f1eefa); }
-  .nend__in { position: relative; }
-  .nend .lead { margin: 10px auto 24px; }
+  .nend { position: relative; overflow: hidden; padding: clamp(64px, 9vw, 120px) 0; background: var(--bg); }
+  .ribbon--end { opacity: 0.85; }
+  .ribbon--end .ribbon__a { left: -12%; top: -50%; transform: rotate(-27deg); }
+  .ribbon--end .ribbon__b { left: 14%; transform: rotate(-24deg); }
+  .ribbon--end .ribbon__c { display: none; }
+  .nend::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(250, 249, 246, 0) 30%, var(--bg) 62%); pointer-events: none; }
+  .nend__in { position: relative; z-index: 1; max-width: 760px; margin-left: auto; text-align: left; }
+  .nend .bento__h { margin-bottom: 24px; }
+
+  /* ---------- viewer ---------- */
+  .viewer { border: 0; border-radius: 16px; padding: 12px; max-width: min(1200px, 94vw); background: var(--surface); box-shadow: var(--shadow-float); }
+  .viewer::backdrop { background: rgba(30, 28, 26, 0.6); backdrop-filter: blur(4px); }
+  .viewer img { display: block; max-width: 100%; max-height: 80vh; margin: 0 auto; border-radius: 10px; }
+  .viewer__cap { margin: 10px 4px 0; color: var(--text-2); }
+  .viewer__close { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--accent); color: #fff; font-size: 22px; line-height: 1; cursor: pointer; }
 
   /* ---------- sticky bar ---------- */
   .sticky { display: none; }
   :global(body[data-sticky] .chat) { bottom: 76px; }
 
   /* ---------- reveal ---------- */
-  html.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity 500ms ease var(--d, 0ms), transform 500ms ease var(--d, 0ms); }
+  html.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity 500ms ease, transform 500ms ease; }
   html.js .reveal.is-in { opacity: 1; transform: none; }
 
   @media (max-width: 1024px) {
-    .tiles { grid-template-columns: repeat(3, 1fr); }
-    .facts__in { grid-template-columns: repeat(2, 1fr); }
+    .bcard--a { grid-column: span 12; }
+    .bcard--b { grid-column: span 6; grid-row: auto; }
+    .bcard--c, .bcard--d, .bcard--e { grid-column: span 6; }
   }
   @media (max-width: 860px) {
-    .nh { padding-bottom: 96px; }
-    .nh__in { grid-template-columns: minmax(0, 1fr); }
-    .nh__bg { clip-path: polygon(0 0, 100% 0, 100% 92%, 0 100%); }
-    .stage__phone { width: 30%; right: 2%; bottom: -8%; }
-    .stage__pause { top: auto; bottom: -4px; }
-    .facts { margin-top: -40px; }
+    .ribbon__a { left: 40%; width: 60vw; }
+    .ribbon__b { left: 78%; }
+    .ribbon__c { left: 30%; }
+    .nh::after { background: linear-gradient(180deg, rgba(250, 249, 246, 0.2), var(--bg) 85%); }
+    .bcard--f { flex-direction: column; align-items: stretch; }
+    .bcard__text { flex-basis: auto; }
     .watch__in { grid-template-columns: minmax(0, 1fr); }
     .chapters { grid-template-columns: 1fr 1fr; }
     .fb__row { grid-template-columns: minmax(0, 1fr); }
+    .nend__in { text-align: left; margin-left: 0; }
     .sticky { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px max(16px, env(safe-area-inset-left, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-right, 0px)); background: rgba(255, 255, 255, 0.92); border-top: 1px solid var(--border); backdrop-filter: blur(8px); }
     .sticky[hidden] { display: none; }
   }
   @media (max-width: 600px) {
-    .tiles { grid-template-columns: repeat(2, 1fr); }
+    .bcard--b, .bcard--c, .bcard--d, .bcard--e { grid-column: span 12; }
+    .bcard { min-height: 0; }
+    .stage__frames { padding-right: 18%; }
+    .stage__phone { width: 30%; }
     .chapters { grid-template-columns: 1fr; }
-    .facts__in { grid-template-columns: 1fr; gap: 8px; }
+    .facts__in { justify-content: flex-start; gap: 6px 18px; font-size: 14px; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .nh__w, .stage__panel:not([hidden]) { animation: none; }
-    .stage__tab[aria-selected='true'] .stage__fill { transition: none; }
+    .ribbon i { animation: none; }
+    .stage__panel:not([hidden]) { animation: none; }
     html.js .reveal { opacity: 1; transform: none; transition: none; }
-    .tile { transition: none; }
+    .expand { transition: none; }
   }
 </style>
 
@@ -414,43 +437,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   document.documentElement.classList.add('js');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // ---- animated gradient (2D canvas, tiny buffer scaled up; stops offscreen and under reduced motion)
-  (() => {
-    const canvas = document.getElementById('nh-canvas') as HTMLCanvasElement | null;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const W = 64, H = 40;
-    canvas.width = W; canvas.height = H;
-    const blobs = [
-      { c: [75, 62, 134], r: 26, x: 0.75, y: 0.35, dx: 0.18, dy: 0.12, p: 0 },
-      { c: [154, 140, 216], r: 30, x: 0.3, y: 0.7, dx: 0.14, dy: 0.1, p: 2 },
-      { c: [246, 214, 184], r: 24, x: 0.2, y: 0.2, dx: 0.12, dy: 0.16, p: 4 },
-      { c: [233, 223, 255], r: 34, x: 0.6, y: 0.85, dx: 0.1, dy: 0.08, p: 1 },
-    ];
-    let t = 0, running = true, raf = 0;
-    const draw = () => {
-      ctx.fillStyle = '#f1eefa';
-      ctx.fillRect(0, 0, W, H);
-      for (const b of blobs) {
-        const x = (b.x + Math.sin(t * b.dx + b.p) * 0.18) * W;
-        const y = (b.y + Math.cos(t * b.dy + b.p) * 0.18) * H;
-        const g = ctx.createRadialGradient(x, y, 0, x, y, b.r);
-        g.addColorStop(0, `rgba(${b.c[0]},${b.c[1]},${b.c[2]},0.85)`);
-        g.addColorStop(1, `rgba(${b.c[0]},${b.c[1]},${b.c[2]},0)`);
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, W, H);
-      }
-    };
-    const loop = () => { if (!running) return; t += 0.016; draw(); raf = requestAnimationFrame(loop); };
-    draw();
-    if (reduced) return;
-    const io = new IntersectionObserver(([e]) => { running = e.isIntersecting && !document.hidden; if (running) { cancelAnimationFrame(raf); loop(); } });
-    io.observe(canvas);
-    document.addEventListener('visibilitychange', () => { running = !document.hidden; if (running) { cancelAnimationFrame(raf); loop(); } });
-  })();
-
-  // ---- the four-step stage
+  // ---- the four-step stage inside the first card
   (() => {
     const stage = document.getElementById('stage');
     if (!stage) return;
@@ -460,27 +447,70 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
     const pauseBtn = document.getElementById('stage-pause') as HTMLButtonElement | null;
     const captions = ['Built from your Library, room by room.', 'Signed on their phone. No account, no app.', 'The accepted quote becomes the live job; crew sign in with GPS.', 'Invoices follow the payment schedule on the quote.'];
     const MS = 4000;
-    let i = 0, timer = 0, paused = reduced, userPaused = false;
+    let i = 0, timer = 0, paused = reduced, userPaused = false, visible = true, hovered = false;
     const show = (n: number) => {
       i = (n + tabs.length) % tabs.length;
-      tabs.forEach((t, k) => { t.setAttribute('aria-selected', String(k === i)); const f = t.querySelector<HTMLElement>('.stage__fill'); if (f) { f.style.transition = 'none'; f.style.width = k < i ? '100%' : '0'; void f.offsetWidth; if (k === i && !paused) { f.style.transition = `width ${MS}ms linear`; f.style.width = '100%'; } } });
+      tabs.forEach((t, k) => {
+        t.setAttribute('aria-selected', String(k === i));
+        const f = t.querySelector<HTMLElement>('.stage__fill');
+        if (!f) return;
+        f.style.transition = 'none'; f.style.width = k < i ? '100%' : '0'; void f.offsetWidth;
+        if (k === i && !paused) { f.style.transition = `width ${MS}ms linear`; f.style.width = '100%'; }
+        if (k === i && paused) f.style.width = '100%';
+      });
       panels.forEach((p, k) => { p.hidden = k !== i; });
       if (caption) caption.textContent = captions[i];
     };
     const schedule = () => { clearTimeout(timer); if (!paused) timer = window.setTimeout(() => { show(i + 1); schedule(); }, MS); };
-    const setPaused = (v: boolean) => { paused = v || userPaused || reduced; stage.toggleAttribute('data-paused', paused); if (paused) clearTimeout(timer); else { show(i); schedule(); } };
-    tabs.forEach((t) => t.addEventListener('click', () => { userPaused = true; if (pauseBtn) { pauseBtn.setAttribute('aria-pressed', 'true'); } setPaused(true); show(Number(t.dataset.i)); }));
-    stage.addEventListener('mouseenter', () => setPaused(true));
-    stage.addEventListener('mouseleave', () => setPaused(false));
-    stage.addEventListener('focusin', () => setPaused(true));
-    stage.addEventListener('focusout', () => setPaused(false));
+    const recompute = () => { const was = paused; paused = reduced || userPaused || hovered || !visible || document.hidden; stage.toggleAttribute('data-paused', paused); if (paused) clearTimeout(timer); else if (was) { show(i); schedule(); } };
+    tabs.forEach((t) => t.addEventListener('click', () => { userPaused = true; pauseBtn?.setAttribute('aria-pressed', 'true'); recompute(); show(Number(t.dataset.i)); }));
+    stage.addEventListener('mouseenter', () => { hovered = true; recompute(); });
+    stage.addEventListener('mouseleave', () => { hovered = false; recompute(); });
+    stage.addEventListener('focusin', () => { hovered = true; recompute(); });
+    stage.addEventListener('focusout', () => { hovered = false; recompute(); });
     stage.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') { userPaused = true; show(i + 1); } if (e.key === 'ArrowLeft') { userPaused = true; show(i - 1); } });
-    pauseBtn?.addEventListener('click', () => { userPaused = !userPaused; pauseBtn.setAttribute('aria-pressed', String(userPaused)); setPaused(userPaused); });
-    document.addEventListener('visibilitychange', () => setPaused(document.hidden));
-    const io = new IntersectionObserver(([e]) => setPaused(!e.isIntersecting));
-    io.observe(stage);
-    // Still for the first beat so the headline reads before anything moves.
-    window.setTimeout(() => { if (!paused) { show(0); schedule(); } }, 1200);
+    pauseBtn?.addEventListener('click', () => { userPaused = !userPaused; pauseBtn.setAttribute('aria-pressed', String(userPaused)); recompute(); });
+    document.addEventListener('visibilitychange', recompute);
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; recompute(); }, { threshold: 0.3 }).observe(stage);
+    window.setTimeout(() => { recompute(); if (!paused) { show(0); schedule(); } }, 900);
+  })();
+
+  // ---- Lucy's particle halo: an arc of soft dots that twinkle slowly
+  (() => {
+    const c = document.querySelector<HTMLCanvasElement>('.halo');
+    const ctx = c?.getContext('2d');
+    if (!c || !ctx) return;
+    const N = 260, dots: { a: number; r: number; s: number; p: number }[] = [];
+    for (let k = 0; k < N; k++) dots.push({ a: Math.PI * 0.9 + Math.random() * Math.PI * 1.1, r: 90 + Math.random() * 60 + (Math.random() < 0.2 ? Math.random() * 30 : 0), s: 0.6 + Math.random() * 1.3, p: Math.random() * Math.PI * 2 });
+    let t = 0, raf = 0, on = true;
+    const draw = () => {
+      ctx.clearRect(0, 0, c.width, c.height);
+      for (const d of dots) {
+        const x = 160 + Math.cos(d.a) * d.r, y = 160 + Math.sin(d.a) * d.r;
+        const al = 0.25 + 0.55 * (0.5 + 0.5 * Math.sin(t * 0.9 + d.p));
+        ctx.fillStyle = d.r > 125 ? `rgba(233,165,200,${al})` : `rgba(75,62,134,${al})`;
+        ctx.beginPath(); ctx.arc(x, y, d.s, 0, Math.PI * 2); ctx.fill();
+      }
+    };
+    const loop = () => { if (!on) return; t += 0.03; draw(); raf = requestAnimationFrame(loop); };
+    draw();
+    if (reduced) return;
+    new IntersectionObserver(([e]) => { on = e.isIntersecting && !document.hidden; cancelAnimationFrame(raf); if (on) loop(); }).observe(c);
+    document.addEventListener('visibilitychange', () => { on = !document.hidden; cancelAnimationFrame(raf); if (on) loop(); });
+  })();
+
+  // ---- expand buttons open the full screen in a dialog
+  (() => {
+    const dlg = document.getElementById('viewer') as HTMLDialogElement | null;
+    const img = document.getElementById('viewer-img') as HTMLImageElement | null;
+    const cap = document.getElementById('viewer-cap');
+    if (!dlg || !img || !cap) return;
+    document.querySelectorAll<HTMLButtonElement>('.expand').forEach((b) => b.addEventListener('click', () => {
+      img.src = b.dataset.full || ''; img.alt = b.dataset.alt || ''; cap.textContent = b.dataset.alt || '';
+      dlg.showModal();
+    }));
+    document.getElementById('viewer-close')?.addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
   })();
 
   // ---- scroll reveals
