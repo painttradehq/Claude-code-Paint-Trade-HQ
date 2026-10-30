@@ -1,6 +1,18 @@
 # Website launch checklist (Josh's side)
 
-What has to happen for painttradehq.com to be live with the chat box and the invite form working. Everything in the code is done, reviewed and pushed on branch `claude/sleepy-meitner-rg5ugj`. Allow about an hour, mostly waiting on DNS.
+What has to happen for painttradehq.com to be live. Everything in the code is done, reviewed and pushed on branch `claude/sleepy-meitner-rg5ugj`.
+
+## What the three services are for
+
+| Service | What it does on the website | Needed to go live? | Without it |
+|---|---|---|---|
+| **Cloudflare** (free plan) | The shelf the site sits on: serves the pages, pictures and clips, and runs the two small programs behind the chat box and the invite form. | **Yes.** Nothing is public without a host. | No website. |
+| **Resend** | The postman for the "Ask for an invite" form: a web page cannot send email by itself, so a program on the host sends it through Resend to software@joshsano.com.au. The app already uses this account and the domain is verified. | No. Add it any time. | The form shows "Email isn't set up yet, please email software@joshsano.com.au". |
+| **Anthropic** | The brain behind the chat box, the same service that powers Lucy. Each visitor question is sent to Claude with the knowledge file. | No. Add it any time. | The chat box says "not switched on yet" and points to email, or set `PUBLIC_CHAT_ENABLED=0` and the box is left off the pages entirely. |
+
+So the minimum is Cloudflare. The two keys are a two-minute paste each, with no code change, whenever you make them. They are new keys on accounts you already have, so the website's spending can be capped separately from the app's.
+
+Allow about an hour for the Cloudflare part, mostly waiting on DNS.
 
 ## 0. Branch (say the word)
 
@@ -24,7 +36,7 @@ In the Pages project, **Settings → Variables and secrets**, add these as **sec
 | `INVITE_FROM` | `Paint Trade HQ website <website@painttradehq.co>` | the domain is already verified in Resend |
 | `INVITE_TO` | `software@joshsano.com.au` | optional; this is the default anyway |
 
-Leave `APP_LEADS_URL` and the Turnstile keys unset for now. Redeploy once after adding secrets (Deployments → Retry) so the functions pick them up.
+Leave `APP_LEADS_URL` and the Turnstile keys unset for now. Redeploy once after adding secrets (Deployments → Retry) so the functions pick them up. If the chat box should stay off the pages until its key exists, add the plain variable `PUBLIC_CHAT_ENABLED` = `0` and remove it later.
 
 Test on the preview link: open the chat box and ask "What does it cost?"; fill in the invite form with your own email and check it arrives.
 

@@ -37,7 +37,7 @@ npx wrangler pages dev dist   # pages + functions, reads .dev.vars
 
 Both functions refuse requests whose `Origin` header is not this site (a missing or `null` Origin is accepted only when the browser's `Sec-Fetch-Site` says same-origin, so never add a `no-referrer` Referrer-Policy without keeping that), cap request bodies by bytes (32 KB chat, 64 KB invite), and answer every failure with a short fixed line rather than an upstream error. A form POST without JavaScript lands on `/invite/sent` or `/invite/error`; the redirect field is checked before and after resolving, so it can only ever point at a path on this site. Chat-sourced leads skip Turnstile but get a tighter budget (2 a minute per IP); anyone can set that field, so the trade-off is spam volume, not a bypass of validation.
 
-`PUBLIC_*` values are read at build time from `.env` (Astro), not from `.dev.vars` (Wrangler); set them in both places locally, or just in the Pages project settings.
+`PUBLIC_CHAT_ENABLED=0` at build time leaves the chat box off every page (for a launch before the Anthropic key exists). `PUBLIC_*` values are read at build time from `.env` (Astro), not from `.dev.vars` (Wrangler); set them in both places locally, or just in the Pages project settings.
 
 `npm run test:functions` exercises both functions in Node with a stubbed network: origin and size guards (including bodies without Content-Length and multi-byte text), honeypot, validation, redirect safety (including dot-segment tricks), rate-limit tiers that throw, Turnstile exemption and budget for chat leads, the email payload, and the chat's message sanitiser.
 

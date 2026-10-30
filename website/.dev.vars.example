@@ -1,9 +1,11 @@
 # Copy to .dev.vars for local `wrangler pages dev`, or set these in Cloudflare Pages → Settings → Variables and secrets.
 # Nothing here is committed; .dev.vars is git-ignored.
 
-# Chat box (functions/api/chat.js)
+# Chat box (functions/api/chat.js). Without ANTHROPIC_API_KEY the box says "not switched on yet" and points to email.
+# Set PUBLIC_CHAT_ENABLED=0 (build-time) to leave the chat box off the pages entirely until the key exists.
 ANTHROPIC_API_KEY=
 CHAT_MODEL=claude-opus-5-5
+PUBLIC_CHAT_ENABLED=1
 
 # Invite form (functions/api/invite.js) — email through Resend
 RESEND_API_KEY=

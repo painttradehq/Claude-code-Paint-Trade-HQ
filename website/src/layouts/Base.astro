@@ -5,6 +5,9 @@ import Footer from '../components/Footer.astro';
 import ChatBox from '../components/ChatBox.astro';
 import { site } from '../data/site';
 
+/** PUBLIC_CHAT_ENABLED=0 at build time leaves the chat box off every page (launch before the Anthropic key exists). */
+const chatEnabled = import.meta.env.PUBLIC_CHAT_ENABLED !== '0';
+
 interface Props {
   title: string;
   description?: string;
@@ -61,7 +64,7 @@ const ogImage = new URL('/brand/logo-1024.png', Astro.site).toString();
       <slot />
     </main>
     <Footer />
-    <ChatBox />
+    {chatEnabled && <ChatBox />}
   </body>
 </html>
 
