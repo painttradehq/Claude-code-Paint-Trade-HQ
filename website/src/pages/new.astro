@@ -253,9 +253,10 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
 <style>
   /* ---------- hero ---------- */
   .nh { position: relative; overflow: hidden; padding: clamp(56px, 9vw, 128px) 0 clamp(56px, 8vw, 112px); background: var(--bg); }
-  .nh__in { position: relative; max-width: 740px; }
+  .nh__in { position: relative; }
+  .nh__in > * { max-width: 640px; }
   .nh__kicker { font-size: 14px; font-weight: 600; color: var(--text-2); margin: 0 0 18px; letter-spacing: 0.01em; }
-  .nh__h1 { font-size: clamp(34px, 5.2vw, 64px); line-height: 1.08; letter-spacing: -0.015em; margin: 0 0 32px; font-weight: 600; }
+  .nh__h1 { font-size: clamp(34px, 4.6vw, 58px); line-height: 1.08; letter-spacing: -0.015em; margin: 0 0 32px; font-weight: 600; }
   .nh__dark { color: var(--text); }
   .nh__light { color: #5c4c9e; font-weight: 500; }
   .nh__cta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
@@ -265,10 +266,10 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   /* the ribbon: bold, purple only, several shades folded into one band plus three thinner ones */
   .ribbon { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
   .ribbon i { position: absolute; display: block; filter: blur(1.2px) saturate(1.15); will-change: transform; }
-  .ribbon__a { left: 56%; top: -40%; width: 40vw; min-width: 360px; height: 190%; border-radius: 48% 52% 40% 60% / 20% 18% 82% 80%; background: linear-gradient(100deg, #2a2150 0%, #34295e 12%, #4b3e86 28%, #6b5bb5 44%, #9a8cd8 58%, #cfc3f3 68%, #8a5fb8 80%, #5c4c9e 92%, #2f2560 100%); transform: rotate(27deg); animation: driftA 22s ease-in-out infinite alternate; box-shadow: inset -60px 0 90px rgba(255, 255, 255, 0.18), inset 60px 0 90px rgba(42, 33, 80, 0.35); }
+  .ribbon__a { left: 58%; top: -40%; width: 40vw; min-width: 360px; height: 190%; border-radius: 48% 52% 40% 60% / 20% 18% 82% 80%; background: linear-gradient(100deg, #2a2150 0%, #34295e 12%, #4b3e86 28%, #6b5bb5 44%, #9a8cd8 58%, #cfc3f3 68%, #8a5fb8 80%, #5c4c9e 92%, #2f2560 100%); transform: rotate(27deg); animation: driftA 22s ease-in-out infinite alternate; box-shadow: inset -60px 0 90px rgba(255, 255, 255, 0.18), inset 60px 0 90px rgba(42, 33, 80, 0.35); }
   .ribbon__b { left: 73%; top: -30%; width: 14vw; min-width: 130px; height: 170%; border-radius: 50% 50% 50% 50% / 15% 15% 85% 85%; background: linear-gradient(180deg, #e6dffa 0%, #b7a8ea 35%, #7a63c9 70%, #34295e 100%); transform: rotate(24deg); animation: driftB 26s ease-in-out infinite alternate; }
-  .ribbon__c { left: 49%; top: -20%; width: 8vw; min-width: 80px; height: 160%; border-radius: 50% / 10% 10% 90% 90%; background: linear-gradient(180deg, #cfc3f3 0%, #8a79d6 45%, #4b3e86 75%, #1f183d 100%); transform: rotate(31deg); opacity: 0.95; animation: driftC 30s ease-in-out infinite alternate; }
-  .ribbon__d { left: 67%; top: -30%; width: 2.2vw; min-width: 18px; height: 180%; border-radius: 50% / 8% 8% 92% 92%; background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #efe9ff 30%, #ffffff 50%, #efe9ff 70%, rgba(255, 255, 255, 0) 100%); transform: rotate(27deg); opacity: 0.75; mix-blend-mode: soft-light; animation: driftA 22s ease-in-out infinite alternate; }
+  .ribbon__c { left: 52%; top: -20%; width: 8vw; min-width: 80px; height: 160%; border-radius: 50% / 10% 10% 90% 90%; background: linear-gradient(180deg, #cfc3f3 0%, #8a79d6 45%, #4b3e86 75%, #1f183d 100%); transform: rotate(31deg); opacity: 0.95; animation: driftC 30s ease-in-out infinite alternate; }
+  .ribbon__d { left: 69%; top: -30%; width: 2.2vw; min-width: 18px; height: 180%; border-radius: 50% / 8% 8% 92% 92%; background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #efe9ff 30%, #ffffff 50%, #efe9ff 70%, rgba(255, 255, 255, 0) 100%); transform: rotate(27deg); opacity: 0.75; mix-blend-mode: soft-light; animation: driftA 22s ease-in-out infinite alternate; }
   @keyframes driftA { to { transform: rotate(25deg) translate(-2%, 3%); } }
   @keyframes driftB { to { transform: rotate(27deg) translate(3%, -2%); } }
   @keyframes driftC { to { transform: rotate(34deg) translate(2%, 4%); } }
