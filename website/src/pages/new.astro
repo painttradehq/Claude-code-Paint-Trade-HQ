@@ -111,7 +111,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
       </div>
       <div class="tiles">
         {tiles.map((m, i) => (
-          <a class="tile reveal" href={`/features#${m.id}`} style={`--d:${(i % 4) * 60}ms`}>
+          <a class="tile reveal" href={`/features#${m.id}`} style={`--d:${(i % 4) * 40}ms`}>
             <span class="tile__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d={icons[m.id] || defaultIcon} /></svg></span>
             <span class="tile__name">{m.name}</span>
             <span class="tile__sum small">{m.summary}</span>
@@ -374,6 +374,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
 
   /* ---------- sticky bar ---------- */
   .sticky { display: none; }
+  :global(body[data-sticky] .chat) { bottom: 76px; }
 
   /* ---------- reveal ---------- */
   html.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity 500ms ease var(--d, 0ms), transform 500ms ease var(--d, 0ms); }
@@ -486,7 +487,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   (() => {
     const els = Array.from(document.querySelectorAll<HTMLElement>('.reveal'));
     if (reduced || !('IntersectionObserver' in window)) { els.forEach((e) => e.classList.add('is-in')); return; }
-    const io = new IntersectionObserver((entries) => { entries.forEach((e) => { if (e.isIntersecting) { (e.target as HTMLElement).classList.add('is-in'); io.unobserve(e.target); } }); }, { rootMargin: '-8% 0px' });
+    const io = new IntersectionObserver((entries) => { entries.forEach((e) => { if (e.isIntersecting) { (e.target as HTMLElement).classList.add('is-in'); io.unobserve(e.target); } }); }, { rootMargin: '0px 0px -4% 0px' });
     els.forEach((e) => io.observe(e));
   })();
 
@@ -508,7 +509,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
     const end = document.querySelector('.nend');
     if (!bar || !hero || !end) return;
     let pastHero = false, nearEnd = false;
-    const update = () => { bar.hidden = !(pastHero && !nearEnd); };
+    const update = () => { const on = pastHero && !nearEnd; bar.hidden = !on; document.body.toggleAttribute('data-sticky', on && matchMedia('(max-width: 860px)').matches); };
     new IntersectionObserver(([e]) => { pastHero = !e.isIntersecting && e.boundingClientRect.top < 0; update(); }).observe(hero);
     new IntersectionObserver(([e]) => { nearEnd = e.isIntersecting; update(); }).observe(end);
   })();
