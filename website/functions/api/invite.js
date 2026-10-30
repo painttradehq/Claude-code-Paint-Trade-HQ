@@ -117,22 +117,22 @@ export async function onRequestPost({ request, env }) {
     mobile: clean(data.mobile, 40),
     crew: clean(data.crew, 40),
     software: clean(data.software, 200),
-    source: clean(data.source, 40) === 'chat' ? 'chat' : 'website',
+    source: ['chat', 'newsletter'].includes(clean(data.source, 40)) ? clean(data.source, 40) : 'website',
     transcript: clean(data.transcript, 6000),
   };
 
   // The chat's mini form has no Turnstile widget. Anyone can set source=chat, so instead of the check
   // it gets a tighter budget: 2 a minute per IP on top of the 5 above.
-  if (lead.source === 'chat' && !(await rateLimit(env, { ...CHAT_RATE, key: ip }))) {
+  if (lead.source !== 'website' && !(await rateLimit(env, { ...CHAT_RATE, key: ip }))) {
     return respond(isForm, 429, { error: 'Too many requests. Try again in a minute.' }, redirectTo);
   }
-  if (env.TURNSTILE_SECRET && lead.source !== 'chat') {
+  if (env.TURNSTILE_SECRET && lead.source === 'website') {
     const ok = await verifyTurnstile(env.TURNSTILE_SECRET, clean(data['cf-turnstile-response'], 4000), ip);
     if (!ok) return respond(isForm, 400, { error: 'Please complete the check and try again.' }, redirectTo);
   }
 
   if (!lead.email || !isEmail(lead.email)) return respond(isForm, 400, { error: 'Please enter a valid email.' }, redirectTo);
-  if (lead.source !== 'chat' && (!lead.name || !lead.business)) return respond(isForm, 400, { error: 'Name and business name are needed.' }, redirectTo);
+  if (lead.source === 'website' && (!lead.name || !lead.business)) return respond(isForm, 400, { error: 'Name and business name are needed.' }, redirectTo);
 
   if (!env.RESEND_API_KEY || !env.INVITE_FROM) {
     return respond(isForm, 503, { error: `Email isn't set up yet. Please email ${DEFAULT_TO}.` }, redirectTo);
@@ -140,7 +140,7 @@ export async function onRequestPost({ request, env }) {
 
   const to = env.INVITE_TO || DEFAULT_TO;
   const lines = [
-    `Free trial request from the website (${lead.source})`,
+    lead.source === 'newsletter' ? 'Updates sign-up from the website' : `Free trial request from the website (${lead.source})`,
     '',
     `Name:        ${lead.name || '-'}`,
     `Business:    ${lead.business || '-'}`,
@@ -155,7 +155,7 @@ export async function onRequestPost({ request, env }) {
   ];
   if (lead.transcript) lines.push('', '--- Chat transcript (as sent by the visitor\'s browser; unverified) ---', lead.transcript);
 
-  const subject = lead.business ? `Free trial request: ${lead.business} (${lead.name || lead.email})` : `Free trial request: ${lead.email}`;
+  const subject = lead.source === 'newsletter' ? `Updates sign-up: ${lead.email}` : lead.business ? `Free trial request: ${lead.business} (${lead.name || lead.email})` : `Free trial request: ${lead.email}`;
   let sent = false;
   try {
     const r = await fetch('https://api.resend.com/emails', {
@@ -169,8 +169,8 @@ export async function onRequestPost({ request, env }) {
   }
   if (!sent) return respond(isForm, 502, { error: `That didn't send. Please email ${to}.` }, redirectTo);
 
-  // Optional: also file the lead in the app's Signup leads inbox (Settings › Platform). Best effort.
-  if (env.APP_LEADS_URL) {
+  // Optional: also file the lead in the app's Signup leads inbox (Settings › Platform). Best effort. Not for updates sign-ups.
+  if (env.APP_LEADS_URL && lead.source !== 'newsletter') {
     try {
       await fetch(env.APP_LEADS_URL, {
         method: 'POST',

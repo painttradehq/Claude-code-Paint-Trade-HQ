@@ -1,0 +1,41 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { site } from '../../data/site';
+
+const posts = (await getCollection('blog')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const fmt = (d: Date) => d.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
+const anyDraft = posts.some((p) => p.data.draft);
+---
+<Base title="From the workshop" description="Notes from Paint Trade HQ on quoting, running the crew and getting paid, written by the people building the app." noindex={anyDraft}>
+  <section class="section section--tight">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">From the workshop</span>
+        <h1>Notes on running a painting business</h1>
+        <p class="lead">Short, practical pieces on quoting, the crew and getting paid, from the people building the app.</p>
+        {anyDraft && <p class="small"><span class="pill pill--neutral">Drafts</span> These posts are drafts awaiting the owner's approval before launch.</p>}
+      </div>
+      <div class="grid grid--3 posts">
+        {posts.map((p) => (
+          <a class="card post" href={`/blog/${p.id}`}>
+            {p.data.cover && <img class="post__cover" src={p.data.cover} alt={p.data.coverAlt || ''} loading="lazy" decoding="async" />}
+            <div class="post__meta small">{p.data.tag} · {fmt(p.data.date)} {p.data.draft && <span class="pill pill--neutral">Draft</span>}</div>
+            <h2>{p.data.title}</h2>
+            <p class="small">{p.data.summary}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .posts { align-items: stretch; margin-top: 8px; }
+  .post { display: flex; flex-direction: column; gap: 10px; color: inherit; padding: 0; overflow: hidden; }
+  .post:hover { text-decoration: none; border-color: var(--accent); }
+  .post__cover { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: top; display: block; border-bottom: 1px solid var(--border); }
+  .post__meta { padding: 14px 20px 0; color: var(--text-2); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .post h2 { font-size: 20px; margin: 0; padding: 0 20px; }
+  .post p { padding: 0 20px 20px; margin: 0; }
+</style>

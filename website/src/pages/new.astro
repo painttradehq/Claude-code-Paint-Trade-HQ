@@ -14,7 +14,8 @@ import Base from '../layouts/Base.astro';
 import Button from '../components/Button.astro';
 import Clip from '../components/Clip.astro';
 import Faq from '../components/Faq.astro';
-import { site, modules, faqs, testimonials } from '../data/site';
+import { site, modules, faqs, testimonials, plans, aud, incGst } from '../data/site';
+import { getCollection } from 'astro:content';
 import { clips } from '../data/screens';
 import { showSamples } from '../data/directory';
 
@@ -38,6 +39,8 @@ const more = modules.filter((m) => !['dashboard', 'quotes', 'timesheets', 'invoi
 
 const homeFaqs = faqs.filter((f) => ['Does it track my crew?', 'Does the client need an account?', 'Is there an app for my phone?', 'Is there a free plan?'].includes(f.q));
 const quotes = testimonials.filter((t) => showSamples || !t.sample).slice(0, 3);
+const posts = (await getCollection('blog')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()).slice(0, 3);
+const fmt = (d: Date) => d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
 const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote', 'crew-clock-in-and-daily-report', 'invoice-payment-to-client-page'].includes(c.id));
 ---
 <Base title="Paint Trade HQ" fullTitle="Paint Trade HQ · Quote it. Run it. Get paid." description={site.description} noindex>
@@ -181,6 +184,24 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
     </div>
   </section>
 
+  <!-- For every size of crew -->
+  <section class="section sizes" id="sizes">
+    <div class="container">
+      <h2 class="bento__h reveal"><span class="nh__dark">For every size of crew.</span> <span class="nh__light">Three plans, picked by headcount. Every one starts with 30 days free.</span></h2>
+      <div class="sizes__grid">
+        {plans.map((p) => (
+          <a class="size reveal" href="/pricing">
+            <span class="size__who">{p.id === 'starter' ? 'Just you, or you and a mate' : p.id === 'small-business' ? 'A crew with an office' : 'A bigger outfit with HR to run'}</span>
+            <span class="size__name">{p.name}</span>
+            <span class="size__price"><strong class="mono">{aud(p.price)}</strong> + GST a month · {aud(incGst(p.price))} inc.</span>
+            <span class="size__seats small">{p.admins} admin{p.admins > 1 ? 's' : ''} and {p.employees} employees included</span>
+            <span class="size__more">See what's included <span aria-hidden="true">→</span></span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
   <!-- Watch it work -->
   <section class="section section--sunken watch" id="watch">
     <div class="container">
@@ -196,6 +217,46 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
             <div class="player__slot" data-i={i} hidden={i !== 0}><Clip id={c.id} /></div>
           ))}
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Connects to what you already use (dark band) -->
+  <section class="section ink" id="connect">
+    <div class="container">
+      <h2 class="bento__h ink__h reveal"><span>Connects to what you already use.</span> <span class="ink__light">Your calendar, your Drive, your mailbox, your own SMS number. And, said plainly, what isn't connected yet.</span></h2>
+
+      <div class="hub reveal" aria-label="What Paint Trade HQ connects to">
+        <ul class="hub__col hub__col--l">
+          <li class="node is-live"><span>Google Calendar</span><em>Live</em></li>
+          <li class="node is-live"><span>Google Drive</span><em>Live</em></li>
+          <li class="node is-live"><span>Email: Gmail, Microsoft 365 or IMAP</span><em>Live</em></li>
+        </ul>
+        <div class="hub__core"><img src="/brand/logo.svg" alt="" width="40" height="40" /><span>Paint Trade HQ</span><small>one workspace per business</small></div>
+        <ul class="hub__col hub__col--r">
+          <li class="node is-live"><span>Your own SMS number</span><em>Small business and up</em></li>
+          <li class="node is-live"><span>Your Google review link</span><em>Live</em></li>
+          <li class="node is-soon"><span>Xero</span><em>On the list, not yet</em></li>
+          <li class="node is-soon"><span>OneDrive and Outlook mail</span><em>Not yet</em></li>
+        </ul>
+      </div>
+
+      <div class="ink__grid">
+        <article class="ink__card reveal">
+          <h3>Bring your clients across.</h3>
+          <p>Your client list and price list come in when you set up. Free on Enterprise, quoted on Starter and Small business.</p>
+          <a href="/pricing">How plans compare <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="ink__card reveal">
+          <h3>On every phone, no app store.</h3>
+          <p>The crew app and the client's pages are web pages. Add them to the home screen and they open like an app.</p>
+          <a href="/features#crew-app">The crew app <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="ink__card reveal">
+          <h3>Your data stays yours.</h3>
+          <p>Each business is its own isolated workspace, tested on every release. Export it any time. Closed accounts are deleted after 30 days.</p>
+          <a href="/pricing#faq">Data and privacy <span aria-hidden="true">→</span></a>
+        </article>
       </div>
     </div>
   </section>
@@ -218,12 +279,60 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
     </section>
   )}
 
+  <!-- From the workshop (blog) -->
+  {posts.length > 0 && (
+    <section class="section wshop" id="workshop">
+      <div class="container">
+        <div class="wshop__head">
+          <h2 class="bento__h reveal"><span class="nh__dark">From the workshop.</span> <span class="nh__light">Short notes on quoting, the crew and getting paid.</span></h2>
+          <a class="more" href="/blog">All posts <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="wshop__grid">
+          {posts.map((post, i) => (
+            <a class={`wpost reveal ${i === 0 ? 'wpost--lead' : ''}`} href={`/blog/${post.id}`}>
+              {i === 0 ? (
+                <div class="wpost__ribbon" aria-hidden="true"><i></i><i></i></div>
+              ) : (
+                post.data.cover && <img class="wpost__cover" src={post.data.cover} alt="" loading="lazy" decoding="async" />
+              )}
+              <div class="wpost__body">
+                <span class="wpost__meta small">{post.data.tag} · {fmt(post.data.date)} {post.data.draft && <span class="pill pill--neutral">Draft</span>}</span>
+                <span class="wpost__title">{post.data.title}</span>
+                {i === 0 && <span class="wpost__sum">{post.data.summary}</span>}
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
   <!-- FAQ, four only -->
   <section class="section section--sunken">
     <div class="container faq-wrap">
       <h2 class="bento__h reveal"><span class="nh__dark">Questions painters ask.</span></h2>
       <Faq items={homeFaqs} openFirst />
       <p class="small"><a href="/pricing#faq">More answers on the pricing page</a></p>
+    </div>
+  </section>
+
+  <!-- Updates by email -->
+  <section class="section updates" id="updates">
+    <div class="container updates__in">
+      <div>
+        <h2 class="bento__h"><span class="nh__dark">Get the notes by email.</span> <span class="nh__light">One email when something ships or a note goes up. Nothing else.</span></h2>
+      </div>
+      <form class="updates__form" id="updates-form" method="post" action="/api/invite" novalidate>
+        <input type="hidden" name="source" value="newsletter" />
+        <input type="hidden" name="redirect" value="/trial/sent" />
+        <input type="text" name="website" class="visually-hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <label class="visually-hidden" for="updates-email">Your email</label>
+        <div class="updates__row">
+          <input class="input" id="updates-email" name="email" type="email" placeholder="you@yourbusiness.com.au" autocomplete="email" required />
+          <button class="btn btn--primary" type="submit" id="updates-submit">Keep me posted <span aria-hidden="true">›</span></button>
+        </div>
+        <p class="small updates__note" id="updates-note">We read every reply ourselves. Unsubscribe by replying "stop".</p>
+      </form>
     </div>
   </section>
 
@@ -401,6 +510,86 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   html.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity 500ms ease, transform 500ms ease; }
   html.js .reveal.is-in { opacity: 1; transform: none; }
 
+
+  /* ---------- sizes ---------- */
+  .sizes__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .size { display: grid; gap: 6px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; color: inherit; transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease; }
+  .size:hover { text-decoration: none; transform: translateY(-3px); box-shadow: var(--shadow-float); border-color: rgba(75, 62, 134, 0.35); }
+  .size__who { font-size: 13px; font-weight: 600; color: var(--accent-ink); letter-spacing: 0.02em; }
+  .size__name { font-family: var(--font-display); font-weight: 600; font-size: 28px; line-height: 1.1; }
+  .size__price { color: var(--text-2); }
+  .size__price strong { color: var(--text); font-size: 20px; }
+  .size__seats { color: var(--muted); }
+  .size__more { margin-top: 10px; font-weight: 600; color: var(--accent-ink); }
+
+  /* ---------- dark connect band ---------- */
+  .ink { background: #1f183d; color: #fff; position: relative; overflow: hidden; }
+  .ink::before { content: ''; position: absolute; inset: 0; background: radial-gradient(60% 50% at 80% 10%, rgba(138, 121, 214, 0.25), transparent 70%); pointer-events: none; }
+  .ink__h, .ink__h .nh__dark { color: #fff; }
+  .ink__light { color: #c3b7ec; font-weight: 500; display: block; font-size: 0.72em; margin-top: 6px; }
+  .hub { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 28px; align-items: center; padding: 28px; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 18px; background-color: rgba(255, 255, 255, 0.02); background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px); background-size: 18px 18px; }
+  .hub__col { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .node { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-radius: 10px; background: #4b3e86; border: 1px solid rgba(255, 255, 255, 0.18); font-size: 14px; font-weight: 600; }
+  .node em { font-style: normal; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: var(--r-pill); background: rgba(255, 255, 255, 0.16); white-space: nowrap; }
+  .node.is-soon { background: rgba(255, 255, 255, 0.05); border-style: dashed; color: #c3b7ec; }
+  .node.is-soon em { background: rgba(195, 183, 236, 0.15); }
+  .node::after { content: ''; position: absolute; top: 50%; width: 28px; border-top: 1px dashed rgba(195, 183, 236, 0.55); }
+  .hub__col--l .node::after { left: 100%; }
+  .hub__col--r .node::after { right: 100%; }
+  .hub__core { display: grid; justify-items: center; gap: 6px; padding: 22px 26px; border-radius: 16px; background: #fff; color: var(--text); font-family: var(--font-display); font-weight: 600; font-size: 18px; box-shadow: 0 20px 40px -16px rgba(0, 0, 0, 0.5); text-align: center; }
+  .hub__core small { font-family: var(--font-body); font-weight: 400; font-size: 12px; color: var(--text-2); }
+  .ink__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
+  .ink__card { padding: 22px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.04); }
+  .ink__card h3 { margin: 0 0 8px; font-size: 20px; color: #fff; }
+  .ink__card p { margin: 0 0 12px; color: #d6cff0; }
+  .ink__card a { font-weight: 600; color: #e6dffa; }
+
+  /* ---------- workshop ---------- */
+  .wshop__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .wshop__head .bento__h { margin-bottom: 20px; }
+  .wshop__head .more { margin: 0 0 24px; }
+  .wshop__grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 3fr) minmax(0, 3fr); gap: 16px; }
+  .wpost { position: relative; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); color: inherit; min-height: 320px; transition: transform 160ms ease, box-shadow 160ms ease; }
+  .wpost:hover { text-decoration: none; transform: translateY(-3px); box-shadow: var(--shadow-float); }
+  .wpost__cover { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: top; display: block; border-bottom: 1px solid var(--border); }
+  .wpost__body { display: grid; gap: 8px; padding: 18px 20px 20px; }
+  .wpost__meta { color: var(--text-2); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .wpost__title { font-family: var(--font-display); font-weight: 600; font-size: 20px; line-height: 1.25; }
+  .wpost--lead { background: #2a2150; color: #fff; justify-content: flex-end; }
+  .wpost--lead .wpost__meta { color: #c3b7ec; }
+  .wpost--lead .wpost__title { font-size: clamp(24px, 2.4vw, 32px); }
+  .wpost--lead .wpost__sum { color: #d6cff0; max-width: 46ch; }
+  .wpost__ribbon { position: absolute; inset: 0; overflow: hidden; }
+  .wpost__ribbon i { position: absolute; display: block; filter: blur(1.5px); }
+  .wpost__ribbon i:first-child { left: 45%; top: -50%; width: 50%; height: 200%; border-radius: 50% / 15% 15% 85% 85%; background: linear-gradient(170deg, #34295e, #6b5bb5 40%, #9a8cd8 65%, #cfc3f3); transform: rotate(28deg); opacity: 0.9; }
+  .wpost__ribbon i:last-child { left: 70%; top: -40%; width: 14%; height: 180%; border-radius: 50% / 10% 10% 90% 90%; background: linear-gradient(180deg, #e6dffa, #8a79d6 60%, #34295e); transform: rotate(24deg); opacity: 0.8; }
+  .wpost--lead .wpost__body { position: relative; z-index: 1; padding: 36px 28px 28px; background: linear-gradient(180deg, rgba(42, 33, 80, 0), rgba(42, 33, 80, 0.82) 40%); }
+
+  /* ---------- updates ---------- */
+  .updates { background: var(--sunken); }
+  .updates__in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; align-items: center; }
+  .updates .bento__h { margin: 0; }
+  .updates__row { display: flex; gap: 10px; }
+  .updates__row .input { flex: 1 1 auto; min-width: 0; }
+  .updates__note { margin: 10px 0 0; color: var(--text-2); }
+
+  @media (max-width: 1024px) {
+    .sizes__grid, .ink__grid { grid-template-columns: 1fr; }
+    .wshop__grid { grid-template-columns: 1fr 1fr; }
+    .wpost--lead { grid-column: span 2; min-height: 260px; }
+  }
+  @media (max-width: 860px) {
+    .hub { grid-template-columns: minmax(0, 1fr); }
+    .hub__core { order: -1; justify-self: start; }
+    .node::after { display: none; }
+    .updates__in { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .wshop__grid { grid-template-columns: 1fr; }
+    .wpost--lead { grid-column: auto; }
+    .updates__row { flex-direction: column; }
+  }
+
   @media (max-width: 1024px) {
     .bcard--a { grid-column: span 12; }
     .bcard--b { grid-column: span 6; grid-row: auto; }
@@ -546,5 +735,27 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
     const update = () => { const on = pastHero && !nearEnd; bar.hidden = !on; document.body.toggleAttribute('data-sticky', on && matchMedia('(max-width: 860px)').matches); };
     new IntersectionObserver(([e]) => { pastHero = !e.isIntersecting && e.boundingClientRect.top < 0; update(); }).observe(hero);
     new IntersectionObserver(([e]) => { nearEnd = e.isIntersecting; update(); }).observe(end);
+  })();
+
+  // ---- updates sign-up: same function as the trial form, source=newsletter
+  (() => {
+    const form = document.getElementById('updates-form') as HTMLFormElement | null;
+    const note = document.getElementById('updates-note');
+    const btn = document.getElementById('updates-submit') as HTMLButtonElement | null;
+    if (!form || !note || !btn) return;
+    form.addEventListener('submit', async (e) => {
+      if (!form.checkValidity()) { form.reportValidity(); e.preventDefault(); return; }
+      e.preventDefault();
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/invite', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(form).entries())) });
+        if (!res.ok) throw new Error(String(res.status));
+        note.textContent = "Thanks. You'll hear from us when something ships.";
+        form.querySelector<HTMLElement>('.updates__row')?.setAttribute('hidden', '');
+      } catch {
+        note.textContent = "That didn't send. Email software@joshsano.com.au and we'll add you.";
+        btn.disabled = false;
+      }
+    });
   })();
 </script>

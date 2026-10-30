@@ -141,6 +141,14 @@ console.log('invite.js');
   assert.deepEqual(sent.to, ['software@joshsano.com.au']); assert.equal(sent.from, base.INVITE_FROM); assert.equal(sent.reply_to, 'x@example.com');
   assert.ok(sent.text.includes('unverified')); assert.equal(sent.html, undefined); ok('email goes only to the owner, plain text, transcript labelled unverified');
 
+  // Updates (newsletter) sign-up: email only, tighter budget, no app copy.
+  fetchImpl = async () => new Response('{}', { status: 200 });
+  calls.length = 0;
+  r = await invite({ request: req('/api/invite', { body: { email: 'n@example.com', source: 'newsletter' }, ip: '192.0.2.230' }), env: { ...base, APP_LEADS_URL: 'https://app.example/api/signup-leads' } });
+  assert.equal(r.status, 200);
+  const nl = JSON.parse(calls.find((c) => c.url.includes('resend')).init.body);
+  assert.ok(nl.subject.startsWith('Updates sign-up')); assert.ok(!calls.some((c) => c.url.includes('app.example'))); ok('updates sign-up emails the owner only, never the app inbox');
+
   // Upstream failures become fixed answers, never a Cloudflare error page.
   fetchImpl = async () => { throw new TypeError('fetch failed'); };
   r = await invite({ request: req('/api/invite', { body: lead, ip: '192.0.2.207' }), env: base });
