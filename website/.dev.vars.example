@@ -2,10 +2,11 @@
 # Nothing here is committed; .dev.vars is git-ignored.
 
 # Chat box (functions/api/chat.js). Without ANTHROPIC_API_KEY the box says "not switched on yet" and points to email.
-# Set PUBLIC_CHAT_ENABLED=0 (build-time) to leave the chat box off the pages entirely until the key exists.
+# PUBLIC_CHAT_ENABLED=0 (build-time) leaves the chat box off the pages. Keep it 0 until BOTH the key exists AND the
+# knowledge file has been updated for the 30-day trial and the new prices (launch checklist step 5).
 ANTHROPIC_API_KEY=
 CHAT_MODEL=claude-opus-5-5
-PUBLIC_CHAT_ENABLED=1
+PUBLIC_CHAT_ENABLED=0
 # Build-time: 1 shows the sample feedback cards and sample directory listings (marked "Sample"); 0 hides them for launch.
 PUBLIC_SHOW_SAMPLES=1
 

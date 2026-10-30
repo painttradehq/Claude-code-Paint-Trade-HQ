@@ -58,7 +58,7 @@ export const screens: Record<string, Screen> = {
   files: admin('files', '33-settings-files-storage-1440.png', 'Settings: Files & storage with Paint Trade HQ cloud in use, a connected Google Drive, OneDrive not set up yet, and the Xero connect button not set up yet', 'Our cloud, or your own Google Drive.'),
   'operating-hours': admin('operating-hours', '34-settings-operating-hours-1440.png', 'Settings: operating hours, working days and auto sign-out'),
   'crew-app-settings': admin('crew-app-settings', '35-settings-crew-app-1440.png', 'Settings: which pages and notifications the crew app shows'),
-  billing: admin('billing', '36-settings-billing-launch-1440.png', 'Settings: Billing, with "Plans open at launch" and the tester access note'),
+  billing: admin('billing', '36-settings-billing-launch-1440.png', 'Settings: Billing'),
   terms: admin('terms', '37-terms-1440.png', 'The Terms of Service page'),
   'crew-signin': phone('crew-signin', '38-crew-signin-390.png', 'The crew app sign-in on a phone'),
   'crew-today': phone('crew-today', '39-crew-today-390.png', 'The crew app Today screen: the time clock, today\'s job with the address, and the inbox'),

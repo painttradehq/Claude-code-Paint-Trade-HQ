@@ -10,7 +10,11 @@ export function getStaticPaths() {
 }
 interface Props { listing: Listing }
 const { listing: l } = Astro.props;
-const title = `${l.name}, painters in ${l.suburb}`;
+const title = l.sample ? `Sample listing: ${l.name}` : `${l.name}, painters in ${l.suburb}`;
+const description = l.sample
+  ? `A sample listing showing what a painting business's page on Paint Trade HQ looks like. ${l.name} is not a real business.`
+  : `${l.name}: ${l.services.join(', ').toLowerCase()} in ${l.suburb} and ${l.areas.join(', ')}. Runs on Paint Trade HQ.`;
+const website = l.website ? (/^https?:\/\//i.test(l.website) ? l.website : `https://${l.website}`) : undefined;
 const jsonLd = l.sample
   ? null
   : {
@@ -19,11 +23,11 @@ const jsonLd = l.sample
       name: l.name,
       address: { '@type': 'PostalAddress', addressLocality: l.suburb, addressRegion: l.state, addressCountry: 'AU' },
       areaServed: l.areas,
-      url: l.website,
+      url: website,
       telephone: l.phone,
     };
 ---
-<Base title={title} description={`${l.name}: ${l.services.join(', ').toLowerCase()} in ${l.suburb} and ${l.areas.join(', ')}. Runs on Paint Trade HQ.`} noindex={!!l.sample}>
+<Base title={title} description={description} noindex={!!l.sample}>
   {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   <section class="section section--tight">
     <div class="container profile">
@@ -32,13 +36,14 @@ const jsonLd = l.sample
         <div>
           {l.sample && <span class="pill pill--neutral">Sample listing</span>}
           <h1>{l.name}</h1>
-          <p class="lead">{l.suburb}, {STATES[l.state]}. On Paint Trade HQ since {l.since}.</p>
+          <p class="lead">{l.suburb}, {STATES[l.state]}. {l.sample ? 'A sample page: a real listing shows the year the business joined.' : `On Paint Trade HQ since ${l.since}.`}</p>
         </div>
         <div class="profile__contact card card--sunken">
           <h3>Get a quote</h3>
-          {l.phone ? <p><a href={`tel:${l.phone.replace(/\s/g, '')}`}>{l.phone}</a></p> : <p class="small">Phone and website appear here once the business fills in its listing.</p>}
-          {l.website && <p><a href={l.website} rel="noopener">{l.website.replace(/^https?:\/\//, '')}</a></p>}
-          <p class="small">Quotes from this business arrive as a link you can read, tick and sign on your phone.</p>
+          {l.phone && <p><a href={`tel:${l.phone.replace(/\s/g, '')}`}>{l.phone}</a></p>}
+          {website && <p><a href={website} rel="noopener">{website.replace(/^https?:\/\//, '')}</a></p>}
+          {!l.phone && !website && (l.sample ? <p class="small">Sample listing, so no contact details. A real listing shows the business's phone and website here.</p> : <p class="small">No phone or website on this listing yet.</p>)}
+          <p class="small">Quotes from businesses on Paint Trade HQ arrive as a link you can read, tick and sign on your phone.</p>
         </div>
       </div>
 
@@ -57,7 +62,7 @@ const jsonLd = l.sample
             <li>Every line priced, by room or by face of the house</li>
             <li>Optional extras you can tick on or off</li>
             <li>Sign on your phone; the deposit invoice follows</li>
-            <li>Daily reports and a completion report with photos</li>
+            <li>A completion report with photos at the end of the job</li>
           </ul>
           <p class="small"><a href="/features">How the app works</a></p>
         </aside>
@@ -67,7 +72,7 @@ const jsonLd = l.sample
 
   <section class="section section--sunken section--tight">
     <div class="container center">
-      <p class="lead">Run a painting business? <a href={site.status.ctaHref}>Start your 30-day free trial</a> and get a page like this one.</p>
+      <p class="lead">Run a painting business on Paint Trade HQ? Email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a> and we add a page like this one. Not on it yet? <a href={site.status.ctaHref}>Start your 30-day free trial</a>.</p>
     </div>
   </section>
 </Base>

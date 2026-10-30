@@ -1,7 +1,7 @@
 ---
 import { site, nav } from '../data/site';
 import Button from './Button.astro';
-const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '').replace(/\/$/, '') || '/';
 ---
 <header class="hdr">
   <div class="container hdr__in">

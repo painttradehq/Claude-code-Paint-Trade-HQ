@@ -24,7 +24,7 @@ const byState = Object.entries(STATES)
       {visibleListings.length === 0 && (
         <div class="card empty">
           <h2>Listings open to painting businesses on Paint Trade HQ</h2>
-          <p>The first real listings appear here as painters join. If that's you, start your free trial.</p>
+          <p>The first real listings appear here as painters join. Using the app? Email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a> and we add your page.</p>
           <Button href={site.status.ctaHref}>{site.status.cta}</Button>
         </div>
       )}
@@ -32,9 +32,9 @@ const byState = Object.entries(STATES)
       {visibleListings.length > 0 && (
         <>
           <div class="filter" role="group" aria-label="Filter by state" id="state-filter">
-            <button type="button" class="filter__btn is-on" data-state="">All <span class="muted">{visibleListings.length}</span></button>
+            <button type="button" class="filter__btn is-on" data-state="" aria-pressed="true">All <span class="muted">{visibleListings.length}</span></button>
             {byState.map((g) => (
-              <button type="button" class="filter__btn" data-state={g.code}>{g.name} <span class="muted">{g.items.length}</span></button>
+              <button type="button" class="filter__btn" data-state={g.code} aria-pressed="false">{g.name} <span class="muted">{g.items.length}</span></button>
             ))}
           </div>
           <div class="grid grid--3 listings" id="listings">
@@ -61,8 +61,8 @@ const byState = Object.entries(STATES)
 
   <section class="section section--ink cta">
     <div class="container center">
-      <h2>Run a painting business?</h2>
-      <p class="lead">A listing here comes with Paint Trade HQ. Start your 30-day free trial and your page is yours to fill in.</p>
+      <h2>Run a painting business on Paint Trade HQ?</h2>
+      <p class="lead">Listings are free for businesses using the app. Email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a> with your business name, suburb, areas and services, and we add your page.</p>
       <Button href={site.status.ctaHref} variant="on-ink" size="lg">{site.status.cta}</Button>
     </div>
   </section>
@@ -95,7 +95,7 @@ const byState = Object.entries(STATES)
   const cards = Array.from(document.querySelectorAll<HTMLElement>('#listings .listing'));
   const empty = document.getElementById('empty-filter');
   function apply(state: string) {
-    buttons.forEach((b) => b.classList.toggle('is-on', (b.dataset.state || '') === state));
+    buttons.forEach((b) => { const on = (b.dataset.state || '') === state; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', String(on)); });
     let shown = 0;
     cards.forEach((c) => { const on = !state || c.dataset.state === state; c.hidden = !on; if (on) shown++; });
     if (empty) empty.hidden = shown > 0;

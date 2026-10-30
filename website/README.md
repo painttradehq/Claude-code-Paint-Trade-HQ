@@ -1,10 +1,10 @@
 # Paint Trade HQ — marketing website
 
-Static Astro site plus two small Cloudflare Pages Functions: `/api/chat` (the chat box) and `/api/invite` (the "Ask for an invite" form). Five pages: Home, Features, Pricing, Story, Ask for an invite. Terms of Service is an external link to the app.
+Static Astro site plus two small Cloudflare Pages Functions: `/api/chat` (the chat box) and `/api/invite` (the "Start free trial" form; the path is internal). Pages: Home, Features, Pricing, Story, Find a painter (one page per listing), Start your free trial. Terms of Service is an external link to the app.
 
 ## Where the words come from
 
-Every sentence traces to **`../docs/website/chat-knowledge.md`** (Josh's file: what the app does today, plans, prices, FAQ, what is *not* live) and **`../docs/website/website-pack.md`** (the builder's handover: assets, legal lines, links, look). Page copy lives in `src/data/site.ts`. The chat box gets the knowledge file verbatim as its system prompt via `scripts/sync-knowledge.mjs`, which runs before every build. **When Josh updates the knowledge file, re-build; never edit `functions/_lib/knowledge.js` by hand.**
+Feature facts trace to **`../docs/website/chat-knowledge.md`** (Josh's file: what the app does today, plans, prices, FAQ, what is *not* live) and **`../docs/website/website-pack.md`** (the builder's handover: assets, legal lines, links, look). Page copy lives in `src/data/site.ts`. The chat box gets the knowledge file verbatim as its system prompt via `scripts/sync-knowledge.mjs`, which runs before every build. **When Josh updates the knowledge file, re-build; never edit `functions/_lib/knowledge.js` by hand.**
 
 ## Screenshots and clips
 
@@ -47,6 +47,6 @@ The same files deploy to Vercel or Netlify with a few lines of adapter code for 
 
 - Call to action is always "Start free trial" (30 days, every plan, no card; Josh, 30 Oct 2026). The site never takes sign-ups or payments itself: the form emails the owner, who sets the account up.
 - Prices are AUD a month, ex-GST, with the inc-GST figure shown: $98 / $178 / $249 (Josh, 30 Oct 2026).
-- No Privacy link (Terms §5 covers data during the tester program). Footer: "© 2026 Josh Sano Painting and Decorating, trading as Paint Trade HQ".
+- No Privacy link (Terms §5 covers data). Footer: "© 2026 Josh Sano Painting and Decorating, trading as Paint Trade HQ".
 - "Sign in" goes to https://painttradehq.co/admin/login; crew to /crew.
 - Buttons are solid accent with white text. Tokens mirror the app's `theme/tokens.ts`.

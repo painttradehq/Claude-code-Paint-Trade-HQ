@@ -188,7 +188,7 @@ import { site } from '../data/site';
     }
   }
 
-  const LEAD_HINT = /(leave your (email|details)|what's your email|your email and josh|josh will answer|josh will be in touch|pass this to josh|we'll be in touch|we will be in touch)/i;
+  const LEAD_HINT = /(leave your (email|details)|what's your email|your email and (josh|we)|josh will answer|we'll answer|josh will be in touch|we'll be in touch|we will be in touch|pass this (to josh|on))/i;
   const FALLBACK = 'The chat is having a moment. Email software@joshsano.com.au or use the free trial form and we\'ll answer.';
 
   async function ask(q: string) {

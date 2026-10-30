@@ -31,6 +31,9 @@ export const site = {
   trialDays: 30,
 };
 
+/** PUBLIC_CHAT_ENABLED=0 at build time leaves the chat box off every page. */
+export const chatEnabled = import.meta.env.PUBLIC_CHAT_ENABLED !== '0';
+
 export const nav = [
   { label: 'Features', href: '/features' },
   { label: 'Pricing', href: '/pricing' },
@@ -261,7 +264,7 @@ export const modules: Module[] = [
     plan: 'Starter',
     summary: 'Records, pay rates, contracts, performance, gear.',
     points: [
-      "Employees page: each person's profile, documents (licences, IDs), pay rates, start and end, access to the crew app, an invite code or QR for onboarding, and who is on which job.",
+      "Employees page: each person's profile, documents (licences, IDs), pay rates, start and end, access to the crew app, an onboarding code or QR, and who is on which job.",
       'Contracts: your own employment-agreement templates (the app points you to the business.gov.au Employment Contract Tool and never supplies legal wording), a wizard that fills the fields, the crew member signs on the phone, you countersign, and the signed PDF is emailed to both and saved. Nothing signed is ever edited or deleted (Enterprise).',
       'Performance: validations and coaching notes, a score trend over time; the crew see their own (Enterprise).',
       "Equipment: the business's tools and gear, who has what, and requests from the crew (Enterprise).",
@@ -352,7 +355,7 @@ export const trust: { title: string; body: string }[] = [
   },
   {
     title: 'Clear terms',
-    body: 'Terms of Service version 1.2, reviewed by a lawyer. Section 5 covers personal data; a separate privacy policy is on the way.',
+    body: 'Terms of Service reviewed by a lawyer. Section 5 of the Terms covers personal data.',
   },
 ];
 

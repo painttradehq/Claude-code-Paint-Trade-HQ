@@ -3,10 +3,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import ChatBox from '../components/ChatBox.astro';
-import { site } from '../data/site';
-
-/** PUBLIC_CHAT_ENABLED=0 at build time leaves the chat box off every page (launch before the Anthropic key exists). */
-const chatEnabled = import.meta.env.PUBLIC_CHAT_ENABLED !== '0';
+import { site, chatEnabled } from '../data/site';
 
 interface Props {
   title: string;
@@ -17,7 +14,8 @@ interface Props {
 }
 const { title, description = site.description, fullTitle, noindex = false } = Astro.props;
 const pageTitle = fullTitle ?? `${title} · ${site.name}`;
-const canonical = new URL(Astro.url.pathname, Astro.site).toString().replace(/\/$/, '') || Astro.site?.toString();
+const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '').replace(/\/$/, '') || '/';
+const canonical = new URL(path, Astro.site).toString().replace(/\/$/, '') || Astro.site?.toString();
 const ogImage = new URL('/brand/logo-1024.png', Astro.site).toString();
 ---
 <!doctype html>
@@ -54,7 +52,7 @@ const ogImage = new URL('/brand/logo-1024.png', Astro.site).toString();
       operatingSystem: 'Web',
       description: site.description,
       url: Astro.site?.toString(),
-      publisher: { '@type': 'Organization', name: 'Josh Sano Painting and Decorating, trading as Paint Trade HQ', email: site.supportEmail, address: { '@type': 'PostalAddress', addressLocality: 'Melbourne', addressRegion: 'VIC', addressCountry: 'AU' } },
+      publisher: { '@type': 'Organization', name: site.name, email: site.supportEmail, address: { '@type': 'PostalAddress', addressLocality: 'Melbourne', addressRegion: 'VIC', addressCountry: 'AU' } },
     })} />
   </head>
   <body>
