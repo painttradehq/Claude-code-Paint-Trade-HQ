@@ -38,6 +38,7 @@ export const nav = [
   { label: 'Features', href: '/features' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Story', href: '/story' },
+  { label: 'Blog', href: '/blog' },
   { label: 'Find a painter', href: '/painters' },
 ];
 
