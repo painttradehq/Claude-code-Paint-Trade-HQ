@@ -5,7 +5,7 @@ summary: "The Employees page holds each crew member's profile, documents, pay ra
 cover: /screens/webp/26-employees-1440.webp
 coverAlt: "The Employees page: each crew member's card with hours this week, missing documents to upload and messages from the crew"
 tag: Crew
-draft: true
+draft: false
 order: 3
 ---
 

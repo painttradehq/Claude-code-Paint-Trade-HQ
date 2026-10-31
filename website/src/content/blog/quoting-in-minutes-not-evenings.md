@@ -5,7 +5,7 @@ summary: "How a quote gets built in Paint Trade HQ, why it comes out accurate wi
 cover: /screens/webp/04-quote-builder-1440.webp
 coverAlt: "The quote builder: Living Room and Hallway areas with lines from the Library, measurements and the quote total"
 tag: Quoting
-draft: true
+draft: false
 order: 1
 ---
 

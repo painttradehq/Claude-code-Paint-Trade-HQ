@@ -5,7 +5,7 @@ summary: "Lucy is the AI assistant inside Paint Trade HQ. She writes your mornin
 cover: /screens/webp/32-lucy-on-quote-1440.webp
 coverAlt: "Lucy, the AI assistant, open beside a quote, answering what the quote total is and when it was sent, with the sources it used"
 tag: Lucy
-draft: true
+draft: false
 order: 4
 ---
 

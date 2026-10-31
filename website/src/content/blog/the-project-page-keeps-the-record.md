@@ -5,7 +5,7 @@ summary: "Once a quote is accepted it becomes a job with its own page: the quote
 cover: /screens/webp/16-job-drawer-1440.webp
 coverAlt: "A live job: the job site on a map with the geofence radius, the client, the crew, linked records and the Project details drawer with progress"
 tag: Running the job
-draft: true
+draft: false
 order: 2
 ---
 

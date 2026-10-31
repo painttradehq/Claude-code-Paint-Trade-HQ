@@ -5,7 +5,7 @@ summary: "Job photos, quote and invoice PDFs, signed contracts and completion re
 cover: /screens/webp/33-settings-files-storage-1440.webp
 coverAlt: "Settings: Files & storage with Paint Trade HQ cloud in use, a connected Google Drive, OneDrive not set up yet"
 tag: Files
-draft: true
+draft: false
 order: 5
 ---
 

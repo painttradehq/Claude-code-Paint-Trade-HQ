@@ -5,7 +5,7 @@ summary: "Validations and coaching notes with a score over time, employment agre
 cover: /screens/webp/30-performance-1440.webp
 coverAlt: "The Performance page with validations and score trends"
 tag: Crew
-draft: true
+draft: false
 order: 6
 ---
 
