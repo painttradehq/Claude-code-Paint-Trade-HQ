@@ -97,7 +97,7 @@ const decisions = [
   .facts strong { color: var(--text); }
 
   /* rail */
-  .rail { list-style: none; margin: 8px 0 0; padding: 0; position: relative; display: grid; gap: 18px; max-width: 860px; }
+  .rail { list-style: none; margin: 8px 0 0; padding: 0; position: relative; display: grid; gap: 18px; max-width: 960px; }
   .rail::before { content: ''; position: absolute; left: 21px; top: 24px; bottom: 24px; width: 2px; background: linear-gradient(180deg, var(--accent), var(--border-strong)); }
   .rail__item { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 16px; align-items: start; }
   .rail__dot { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 14px; font-weight: 500; box-shadow: 0 0 0 5px var(--bg); position: relative; z-index: 1; }
@@ -115,7 +115,7 @@ const decisions = [
   .built__card p { margin: 0; color: #d6cff0; }
   .built__note { margin: 22px 0 0; color: #c9bff0; max-width: 70ch; }
 
-  .talk { max-width: 760px; }
+  .talk { max-width: 840px; }
   .talk .lead { margin-bottom: 10px; }
   .talk .btn { margin-top: 12px; }
   section[id] { scroll-margin-top: calc(var(--header-h) + 12px); }

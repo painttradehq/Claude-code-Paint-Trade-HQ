@@ -386,7 +386,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   /* ---------- hero ---------- */
   .nh { position: relative; overflow: hidden; padding: clamp(56px, 9vw, 128px) 0 clamp(56px, 8vw, 112px); background: var(--bg); }
   .nh__in { position: relative; }
-  .nh__in > * { max-width: 640px; }
+  .nh__in > * { max-width: min(720px, 62%); }
   .nh__kicker { font-size: 14px; font-weight: 600; color: var(--text-2); margin: 0 0 18px; letter-spacing: 0.01em; }
   .nh__h1 { font-size: clamp(34px, 4.6vw, 58px); line-height: 1.08; letter-spacing: -0.015em; margin: 0 0 32px; font-weight: 600; }
   .nh__dark { color: var(--text); }
@@ -516,7 +516,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   .vid__play { width: 56px; height: 56px; border-radius: 50%; background: var(--accent); position: relative; opacity: 0.85; }
   .vid__play::after { content: ''; position: absolute; left: 22px; top: 17px; border-left: 17px solid #fff; border-top: 11px solid transparent; border-bottom: 11px solid transparent; }
   .vid figcaption { margin-top: 10px; text-align: center; color: var(--text-2); }
-  .faq-wrap { max-width: 820px; }
+  .faq-wrap { max-width: 920px; }
 
   /* ---------- closing ---------- */
   .nend { position: relative; overflow: hidden; padding: clamp(64px, 9vw, 120px) 0; background: var(--bg); }
@@ -526,7 +526,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   .ribbon--end .ribbon__c { display: none; }
   .ribbon--end .ribbon__d { left: 4%; transform: rotate(-27deg); }
   .nend::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(250, 249, 246, 0) 30%, var(--bg) 62%); pointer-events: none; }
-  .nend__in { position: relative; z-index: 1; max-width: 760px; margin-left: auto; text-align: left; }
+  .nend__in { position: relative; z-index: 1; max-width: 840px; margin-left: auto; text-align: left; }
   .nend .bento__h { margin-bottom: 24px; }
 
   /* ---------- viewer ---------- */

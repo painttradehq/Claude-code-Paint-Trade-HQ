@@ -31,11 +31,12 @@ const fmt = (d: Date) => d.toLocaleDateString('en-AU', { day: 'numeric', month: 
 </Base>
 
 <style>
-  .article { max-width: 760px; }
+  .article { max-width: 880px; }
+  .prose :global(p), .prose :global(ul), .prose :global(ol), .prose :global(h2), .prose :global(h3), .prose :global(blockquote), .prose :global(.scenario), .prose :global(.plan-note) { max-width: 76ch; }
   .crumbs { color: var(--text-2); }
   .meta { color: var(--text-2); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: -6px; }
   .cover { width: 100%; max-height: 420px; object-fit: cover; object-position: top; border-radius: var(--r-lg); border: 1px solid var(--border); margin: 8px 0 24px; display: block; }
-  .prose :global(p) { font-size: 17px; line-height: 1.65; }
+  .prose :global(p) { font-size: 18px; line-height: 1.65; }
   .prose :global(ul) { padding-left: 22px; display: grid; gap: 8px; margin: 12px 0 18px; }
   .prose :global(strong) { color: var(--text); }
   .prose :global(h2) { font-size: clamp(22px, 2.4vw, 28px); margin: 36px 0 10px; }
