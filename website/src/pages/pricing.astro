@@ -1,40 +1,140 @@
 ---
+/**
+ * Pricing in the home page's language (31 Oct 2026). What this page has that the others don't: a seat
+ * calculator. Count the people in the office and on the tools and each plan shows its monthly figure with
+ * extra seats, ex-GST and including GST, from the seat prices in site.ts (knowledge file §6). Then the three
+ * plan cards, a fold-away full comparison, the data cards, the FAQs and the closing call.
+ * No plan is "recommended" by seat count alone: the plans differ by features, so the calculator only says
+ * which ones fit without extra seats.
+ */
 import Base from '../layouts/Base.astro';
 import Button from '../components/Button.astro';
 import PlanCard from '../components/PlanCard.astro';
 import Faq from '../components/Faq.astro';
-import { site, plans, pricingNotes, faqs, trust } from '../data/site';
+import Reveal from '../components/Reveal.astro';
+import { site, plans, pricingNotes, faqs, trust, aud, incGst } from '../data/site';
 
 const pricingFaqs = faqs.filter((f) =>
   ['Is there a free plan?', 'Do I need a card to try it?', 'Does it do GST?', 'How many people can use it?', 'What happens if I stop paying?', 'Can I import my clients from my old software?', 'Can office staff have limited access?', 'Who sees my data?', 'Is my data in Australia?', 'Does it connect to Xero or MYOB?', 'How do I start?'].includes(f.q),
 );
+
+/** Calculator defaults (rendered server-side so the figures are right without JavaScript). */
+const DEF = { admins: 1, employees: 3 };
+const tally = (p: (typeof plans)[number], admins: number, employees: number) => {
+  const xa = Math.max(0, admins - p.admins);
+  const xe = Math.max(0, employees - p.employees);
+  return { ex: p.price + xa * p.extraAdmin + xe * p.extraEmployee, xa, xe };
+};
+
+/** Comparison rows: each feature with the first plan that includes it; higher plans include it too. */
+const rows = plans.flatMap((p, i) => p.includes.map((f) => ({ f, from: i })));
 ---
 <Base title="Pricing" description="Paint Trade HQ plans: Starter $98, Small business $178, Enterprise $249 a month, AUD, ex-GST with 10% GST added. Seats included, extra seats from $15. Every plan starts with a 30-day free trial, no card needed.">
-  <section class="section section--tight">
+  <!-- Hero -->
+  <section class="phero">
     <div class="container">
-      <div class="section-head section-head--center">
-        <span class="eyebrow">Pricing</span>
-        <h1>Three plans. Monthly. AUD, GST on top.</h1>
-        <p class="lead">Prices are a month, ex-GST; 10% GST is added. Monthly only, cancel any time. Every plan starts with a 30-day free trial, no card needed.</p>
-      </div>
-      <div class="grid grid--3 plans">
+      <h1 class="tone tone--h1 phero__h"><span class="tone__dark">Three plans. Monthly. AUD, GST on top.</span> <span class="tone__light">Every plan starts with a 30-day free trial, no card needed.</span></h1>
+      <ul class="facts" aria-label="Key facts">
+        <li><strong>30 days</strong> free on every plan</li>
+        <li><strong>No card</strong> to start</li>
+        <li><strong>Monthly</strong>, cancel any time</li>
+        <li><strong>Ex-GST</strong>, 10% added</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- The three plans -->
+  <section class="section section--tight" id="plans">
+    <div class="container">
+      <div class="grid grid--3 plans reveal">
         {plans.map((p) => <PlanCard plan={p} />)}
       </div>
+    </div>
+  </section>
+
+  <!-- The calculator: this page's own element -->
+  <section class="section section--sunken" id="calculator">
+    <div class="container">
+      <div class="calc reveal">
+        <div class="calc__ask">
+          <h2 class="tone calc__h"><span class="tone__dark">What would it cost for your crew?</span> <span class="tone__light">Count the people. Each plan shows its month with seats, before and after GST.</span></h2>
+          <div class="steppers">
+            <div class="stepper">
+              <span class="stepper__label" id="lab-admins">In the office, including you</span>
+              <div class="stepper__ctl" role="group" aria-labelledby="lab-admins">
+                <button type="button" class="stepper__btn" data-step="admins" data-d="-1" aria-label="One fewer admin">−</button>
+                <output class="stepper__n mono" id="n-admins" data-min="1" data-max="12">{DEF.admins}</output>
+                <button type="button" class="stepper__btn" data-step="admins" data-d="1" aria-label="One more admin">+</button>
+              </div>
+              <span class="small stepper__hint">Admins: the Team admins list, owner included</span>
+            </div>
+            <div class="stepper">
+              <span class="stepper__label" id="lab-employees">On the tools</span>
+              <div class="stepper__ctl" role="group" aria-labelledby="lab-employees">
+                <button type="button" class="stepper__btn" data-step="employees" data-d="-1" aria-label="One fewer employee">−</button>
+                <output class="stepper__n mono" id="n-employees" data-min="0" data-max="40">{DEF.employees}</output>
+                <button type="button" class="stepper__btn" data-step="employees" data-d="1" aria-label="One more employee">+</button>
+              </div>
+              <span class="small stepper__hint">Employees: the people on your Employees page</span>
+            </div>
+          </div>
+          <p class="small calc__note">Going over a plan's included seats adds a seat at that plan's price, and the app asks before it adds one. The plans differ by features too, so pick by what you need, then check the figure here.</p>
+        </div>
+        <div class="calc__plans" id="calc-plans">
+          {plans.map((p) => {
+            const t = tally(p, DEF.admins, DEF.employees);
+            return (
+              <article class={`cplan ${p.highlight ? 'cplan--hi' : ''}`} data-plan={p.id} data-price={p.price} data-admins={p.admins} data-employees={p.employees} data-xa={p.extraAdmin} data-xe={p.extraEmployee}>
+                <h3 class="cplan__name">{p.name}</h3>
+                <p class="cplan__total"><span class="mono cplan__ex" data-out="ex">{aud(t.ex)}</span> <span class="cplan__per">+ GST a month</span></p>
+                <p class="small cplan__inc"><span data-out="inc">{aud(incGst(t.ex))}</span> including GST</p>
+                <p class="small cplan__seats" data-out="seats">{p.admins} admin{p.admins > 1 ? 's' : ''} and {p.employees} employees included{t.xa || t.xe ? `; ${t.xa ? `${t.xa} extra admin${t.xa > 1 ? 's' : ''} at ${aud(p.extraAdmin)}` : ''}${t.xa && t.xe ? ', ' : ''}${t.xe ? `${t.xe} extra employee${t.xe > 1 ? 's' : ''} at ${aud(p.extraEmployee)}` : ''}` : ''}</p>
+                <span class={`pill ${t.xa || t.xe ? 'pill--neutral' : 'pill--success'} cplan__fit`} data-out="fit">{t.xa || t.xe ? `${t.xa + t.xe} extra seat${t.xa + t.xe > 1 ? 's' : ''}` : 'Fits without extra seats'}</span>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Everything, side by side -->
+  <section class="section section--tight" id="compare">
+    <div class="container">
+      <details class="compare reveal">
+        <summary><span class="compare__sum">Compare every feature, side by side</span><span class="small compare__hint">Opens a table</span></summary>
+        <div class="table-wrap">
+          <table class="cmp">
+            <thead>
+              <tr><th scope="col">Included</th>{plans.map((p) => <th scope="col">{p.name}</th>)}</tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">A month, ex-GST</th>{plans.map((p) => <td class="mono">{aud(p.price)}</td>)}</tr>
+              <tr><th scope="row">A month, including GST</th>{plans.map((p) => <td class="mono">{aud(incGst(p.price))}</td>)}</tr>
+              <tr><th scope="row">Admins included</th>{plans.map((p) => <td class="mono">{p.admins}</td>)}</tr>
+              <tr><th scope="row">Employees included</th>{plans.map((p) => <td class="mono">{p.employees}</td>)}</tr>
+              <tr><th scope="row">Extra admin seat, a month</th>{plans.map((p) => <td class="mono">{aud(p.extraAdmin)}</td>)}</tr>
+              <tr><th scope="row">Extra employee seat, a month</th>{plans.map((p) => <td class="mono">{aud(p.extraEmployee)}</td>)}</tr>
+              {rows.map((r) => (
+                <tr><th scope="row">{r.f}</th>{plans.map((_, i) => <td class={i >= r.from ? 'yes' : 'no'}>{i >= r.from ? <span aria-label="Included">✓</span> : <span aria-label="Not included">–</span>}</td>)}</tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
       <ul class="notes small">
         {pricingNotes.map((n) => <li>{n}</li>)}
       </ul>
     </div>
   </section>
 
-  <section class="section">
+  <!-- Your data -->
+  <section class="section section--sunken">
     <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">Your data</span>
-        <h2>Yours, isolated, exportable</h2>
-      </div>
+      <h2 class="tone reveal"><span class="tone__dark">Your data: yours, isolated, exportable.</span></h2>
       <div class="grid grid--3">
         {trust.map((t) => (
-          <article class="card">
+          <article class="card reveal">
             <h3>{t.title}</h3>
             <p>{t.body}</p>
           </article>
@@ -44,30 +144,130 @@ const pricingFaqs = faqs.filter((f) =>
     </div>
   </section>
 
-  <section class="section section--sunken" id="faq">
+  <!-- FAQ -->
+  <section class="section" id="faq">
     <div class="container faq-wrap">
-      <div class="section-head">
-        <span class="eyebrow">Questions</span>
-        <h2>Pricing, data and your trial</h2>
-      </div>
+      <h2 class="tone reveal"><span class="tone__dark">Pricing, data and your trial.</span> <span class="tone__light">The questions painters ask before they start.</span></h2>
       <Faq items={pricingFaqs} />
     </div>
   </section>
 
   <section class="section section--ink cta">
     <div class="container center">
-      <h2>Thirty days on us</h2>
-      <p class="lead">Every plan starts with a 30-day free trial, no card needed. Leave your details and your login arrives by email.</p>
+      <h2 class="tone cta__h"><span class="cta__dark">Thirty days on us.</span> <span class="cta__light">Every plan starts with a 30-day free trial, no card needed. Leave your details and your login arrives by email.</span></h2>
       <Button href={site.status.ctaHref} variant="on-ink" size="lg">{site.status.cta}</Button>
     </div>
   </section>
+
+  <Reveal />
 </Base>
 
 <style>
-  .plans { align-items: stretch; margin-top: 28px; }
-  .notes { max-width: 820px; margin: 32px auto 0; padding-left: 20px; display: grid; gap: 8px; }
+  .phero { padding: clamp(36px, 5vw, 64px) 0 8px; background: var(--bg); }
+  .phero__h { font-size: clamp(30px, 3.8vw, 46px); margin-bottom: 18px; max-width: 24ch; }
+  .facts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; color: var(--text-2); font-size: 15px; }
+  .facts strong { color: var(--text); }
+  .plans { align-items: stretch; margin-top: 8px; }
+
+  /* calculator */
+  .calc { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 28px; align-items: start; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; box-shadow: var(--shadow-card); }
+  .calc__h { margin-bottom: 20px; }
+  .steppers { display: grid; gap: 16px; }
+  .stepper { display: grid; gap: 6px; }
+  .stepper__label { font-weight: 600; }
+  .stepper__ctl { display: inline-flex; align-items: center; gap: 0; border: 1px solid var(--border-strong); border-radius: 12px; overflow: hidden; width: max-content; background: var(--bg); }
+  .stepper__btn { width: 44px; height: 44px; border: 0; background: var(--accent); color: #fff; font-size: 22px; line-height: 1; cursor: pointer; }
+  .stepper__btn:hover { background: var(--accent-hover); }
+  .stepper__btn:disabled { background: var(--border-strong); cursor: default; }
+  .stepper__n { min-width: 64px; text-align: center; font-size: 22px; font-weight: 500; }
+  .stepper__hint { color: var(--text-2); }
+  .calc__note { color: var(--text-2); margin: 18px 0 0; }
+  .calc__plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .cplan { border: 1px solid var(--border); border-radius: 16px; padding: 18px 16px; background: var(--bg); display: grid; gap: 6px; align-content: start; }
+  .cplan--hi { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .cplan__name { margin: 0; font-size: 18px; }
+  .cplan__total { margin: 6px 0 0; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+  .cplan__ex { font-size: 32px; font-weight: 600; letter-spacing: -0.02em; transition: color 160ms ease; }
+  .cplan__ex.is-bump { color: var(--accent); }
+  .cplan__per { color: var(--text-2); font-size: 14px; }
+  .cplan__inc { margin: 0; color: var(--muted); }
+  .cplan__seats { margin: 6px 0 0; color: var(--text-2); min-height: 2.6em; }
+  .cplan__fit { justify-self: start; }
+
+  /* comparison */
+  .compare { border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+  .compare summary { list-style: none; cursor: pointer; padding: 18px 22px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .compare summary::-webkit-details-marker { display: none; }
+  .compare__sum { font-family: var(--font-display); font-weight: 600; font-size: 20px; }
+  .compare__sum::before { content: '+'; display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--accent-bg); color: var(--accent-ink); margin-right: 10px; font-family: var(--font-body); font-size: 18px; }
+  .compare[open] .compare__sum::before { content: '–'; }
+  .compare__hint { color: var(--text-2); }
+  .table-wrap { overflow-x: auto; padding: 0 22px 22px; }
+  .cmp { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 560px; }
+  .cmp th, .cmp td { padding: 10px 12px; border-top: 1px solid var(--border); text-align: left; vertical-align: top; }
+  .cmp thead th { border-top: 0; font-family: var(--font-display); font-size: 17px; }
+  .cmp th[scope='row'] { font-weight: 500; color: var(--text); }
+  .cmp td { text-align: center; width: 16%; }
+  .cmp td.yes { color: var(--success); font-weight: 600; }
+  .cmp td.no { color: var(--muted); }
+  .notes { max-width: 820px; margin: 24px auto 0; padding-left: 20px; display: grid; gap: 8px; color: var(--text-2); }
   .terms { margin-top: 20px; }
   .faq-wrap { max-width: 820px; }
-  .cta .lead { margin-left: auto; margin-right: auto; margin-bottom: 24px; }
+
+  .cta__h { margin-left: auto; margin-right: auto; margin-bottom: 24px; max-width: 26ch; }
+  .cta__dark { color: #fff; }
+  .cta__light { display: block; color: #c9bff0; font-weight: 500; font-size: 0.6em; margin-top: 10px; line-height: 1.4; }
   section[id] { scroll-margin-top: calc(var(--header-h) + 12px); }
+
+  @media (max-width: 1024px) {
+    .calc { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 720px) {
+    .calc { padding: 20px; }
+    .calc__plans { grid-template-columns: minmax(0, 1fr); }
+    .cplan__seats { min-height: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { .cplan__ex { transition: none; } }
 </style>
+
+<script>
+  // The seat calculator: the prices come from the data attributes PlanCard and site.ts share.
+  (() => {
+    const outs = { admins: document.getElementById('n-admins') as HTMLOutputElement | null, employees: document.getElementById('n-employees') as HTMLOutputElement | null };
+    const plansEl = Array.from(document.querySelectorAll<HTMLElement>('#calc-plans .cplan'));
+    if (!outs.admins || !outs.employees || !plansEl.length) return;
+    const aud = (n: number) => (Number.isInteger(n) ? `$${n}` : `$${n.toFixed(2)}`);
+    const inc = (n: number) => Math.round(n * 110) / 100;
+    const state = { admins: Number(outs.admins.value || outs.admins.textContent), employees: Number(outs.employees.value || outs.employees.textContent) };
+    const render = () => {
+      outs.admins!.textContent = String(state.admins);
+      outs.employees!.textContent = String(state.employees);
+      document.querySelectorAll<HTMLButtonElement>('.stepper__btn').forEach((b) => {
+        const k = b.dataset.step as 'admins' | 'employees'; const d = Number(b.dataset.d);
+        const o = outs[k]!; const min = Number(o.dataset.min), max = Number(o.dataset.max);
+        b.disabled = (d < 0 && state[k] <= min) || (d > 0 && state[k] >= max);
+      });
+      plansEl.forEach((el) => {
+        const price = Number(el.dataset.price), ia = Number(el.dataset.admins), ie = Number(el.dataset.employees), xa$ = Number(el.dataset.xa), xe$ = Number(el.dataset.xe);
+        const xa = Math.max(0, state.admins - ia), xe = Math.max(0, state.employees - ie);
+        const ex = price + xa * xa$ + xe * xe$;
+        const q = (k: string) => el.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+        const exEl = q('ex'); if (exEl.textContent !== aud(ex)) { exEl.textContent = aud(ex); exEl.classList.add('is-bump'); setTimeout(() => exEl.classList.remove('is-bump'), 260); }
+        q('inc').textContent = aud(inc(ex));
+        const parts = [] as string[];
+        if (xa) parts.push(`${xa} extra admin${xa > 1 ? 's' : ''} at ${aud(xa$)}`);
+        if (xe) parts.push(`${xe} extra employee${xe > 1 ? 's' : ''} at ${aud(xe$)}`);
+        q('seats').textContent = `${ia} admin${ia > 1 ? 's' : ''} and ${ie} employees included${parts.length ? '; ' + parts.join(', ') : ''}`;
+        const fit = q('fit'); const n = xa + xe;
+        fit.textContent = n ? `${n} extra seat${n > 1 ? 's' : ''}` : 'Fits without extra seats';
+        fit.classList.toggle('pill--success', n === 0); fit.classList.toggle('pill--neutral', n > 0);
+      });
+    };
+    document.querySelectorAll<HTMLButtonElement>('.stepper__btn').forEach((b) => b.addEventListener('click', () => {
+      const k = b.dataset.step as 'admins' | 'employees'; const o = outs[k]!;
+      state[k] = Math.min(Number(o.dataset.max), Math.max(Number(o.dataset.min), state[k] + Number(b.dataset.d)));
+      render();
+    }));
+    render();
+  })();
+</script>
