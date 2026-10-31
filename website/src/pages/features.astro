@@ -1,13 +1,14 @@
 ---
 /**
- * Features: every module in the order a job runs, in the home page's language (31 Oct 2026).
- * What this page has that the others don't: a "map of the app", a bento of one card per module that jumps
- * to its section, and a row of module tabs that sticks under the header and follows you down.
- * Each module section keeps its screens (with the expand button into the full-screen viewer) and its clip.
+ * Features, second cut (31 Oct 2026, after Josh's review of the first): "fewer photos, a better map, highlights
+ * not a full explanation, keep the sticky tabs". The page follows the order a job runs: a job-flow map with
+ * icons (Quote → Run → Paid, plus the office tools that are always on), the sticky module tabs, then one band per
+ * stage with a card per module: three highlights, one visual at most (a cropped screen or a clip) on the big
+ * modules and an icon on the small ones, and "Everything it does" folded away for anyone who wants the full list.
+ * Facts come from site.ts (the knowledge file's module copy); the highlights are shortened, never added to.
  */
 import Base from '../layouts/Base.astro';
 import Button from '../components/Button.astro';
-import Screenshot from '../components/Screenshot.astro';
 import Clip from '../components/Clip.astro';
 import Viewer from '../components/Viewer.astro';
 import Reveal from '../components/Reveal.astro';
@@ -19,55 +20,118 @@ import { screens } from '../data/screens';
 const planLabel = (p: string) => (p === 'Starter' ? 'All plans' : p === 'Enterprise' ? 'Enterprise' : `${p} and up`);
 const planPill = (p: string) => (p === 'Starter' ? 'pill--neutral' : p === 'Small business' ? '' : 'pill--success');
 const short = (name: string) => name.split(':')[0];
-const span: Record<string, number> = { quotes: 6, lucy: 6, files: 6 };
-/** Thumbnail for the map: the module's main screen, WebP where it exists. */
-const thumb = (id?: string) => {
-  if (!id) return null;
+const byId = Object.fromEntries(modules.map((m) => [m.id, m]));
+
+/** Line icons, one per module. */
+const icons: Record<string, string> = {
+  dashboard: 'M3 3h8v8H3zM13 3h8v5h-8zM13 10h8v11h-8zM3 13h8v8H3z',
+  library: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5V5a2 2 0 0 1 2-2h14v14H6.5A2.5 2.5 0 0 0 4 19.5z',
+  quotes: 'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 13h8M8 17h5',
+  projects: 'M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10zM12 13a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
+  timesheets: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2',
+  'daily-reports': 'M4 7h3l2-3h6l2 3h3v12H4zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
+  invoices: 'M6 2h12v20l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6M9 16h4',
+  calendar: 'M3 5h18v16H3zM3 10h18M8 3v4M16 3v4',
+  employees: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8',
+  'crew-app': 'M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM11 18h2',
+  crm: 'M2 5h20v14H2zM6 10a2 2 0 1 0 4 0 2 2 0 0 0-4 0M5 16a3 3 0 0 1 6 0M14 9h5M14 13h5',
+  lucy: 'M12 2l2.2 5.8L20 10l-5.8 2.2L12 18l-2.2-5.8L4 10l5.8-2.2zM19 16l.9 2.1L22 19l-2.1.9L19 22l-.9-2.1L16 19l2.1-.9z',
+  files: 'M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z',
+};
+
+/** The job-flow map: stages in the order a job runs, then the tools that are always on. */
+const flow = [
+  { n: '1', title: 'Quote', line: 'Price it from your Library; the client signs on their phone.', ids: ['library', 'quotes'] },
+  { n: '2', title: 'Run', line: 'The job page, the crew on site, the day written up.', ids: ['projects', 'daily-reports', 'timesheets', 'crew-app'] },
+  { n: '3', title: 'Paid', line: 'Deposit, progress, final. Bank transfer.', ids: ['invoices'] },
+  { n: '∞', title: 'Always on', line: 'The office side, open every day.', ids: ['employees', 'dashboard', 'lucy', 'crm', 'calendar', 'files'] },
+];
+
+/** Three highlights per module: shortened from site.ts, nothing added. */
+const highlights: Record<string, string[]> = {
+  dashboard: ['Quotes out, jobs on, money owed', "Today's jobs, the weather and a map", "Lucy's morning brief (Small business and up)"],
+  library: ['Items with a rate and the minutes they take', 'Tasks for repairs; products with your price', 'Add to it straight from a quote'],
+  quotes: ['Rooms from a picker, lines from your Library', 'Optional extras the client ticks on themselves', 'Signed on their phone; the deposit invoice follows'],
+  projects: ['Every job in flight: status, crew, money so far', 'Photos, variations, labour cost from the time clock', 'A completion report the client gets on a link'],
+  timesheets: ['Sign in and out on the phone; GPS at those two moments only', 'Overtime split by your thresholds', 'Lock the week, export the payroll CSV (Small business and up)'],
+  'daily-reports': ['What was done, photos, issues, materials used', 'You read the feed and reply in a thread', "Feeds the client's completion report"],
+  invoices: ['Deposit, progress and final, from the quote', 'A public page and a PDF with your bank details', 'Bank transfer; the app never takes a card'],
+  calendar: ['Jobs, events and reminders in colour', 'Reminders tied to a client', 'Google Calendar alongside your jobs'],
+  employees: ['One page per person: documents, pay rates, access', 'Onboarding by code or QR', 'Contracts, performance, equipment and training (Enterprise)'],
+  'crew-app': ["Today's job, the time clock, the daily report", 'No prices, no margins, no admin pages', 'A web app: add it to the home screen'],
+  crm: ["Every client's quotes, invoices, jobs and messages", 'Leads from enquiry to quoted to won', 'Follow-ups, payment reminders, review requests'],
+  lucy: ['A morning brief from your own data', 'Drafts client messages and quote text', 'Every call in your audit log; nothing trains a model'],
+  files: ['Our cloud by default', 'Or your own Google Drive, a folder per job', 'Yours to keep if you ever leave'],
+};
+
+/** The few visuals the page keeps: a cropped screen or a clip. Everything else opens on demand from the viewer. */
+type Visual = { kind: 'crop'; screen: string; pos: string; ratio: string } | { kind: 'phone'; screen: string } | { kind: 'clip'; clip: string };
+const visuals: Record<string, Visual> = {
+  quotes: { kind: 'clip', clip: 'new-quote-to-sent' },
+  projects: { kind: 'crop', screen: 'project-details', pos: 'right top', ratio: '16 / 10' },
+  invoices: { kind: 'phone', screen: 'client-invoice' },
+  employees: { kind: 'crop', screen: 'employees', pos: 'left top', ratio: '16 / 10' },
+  lucy: { kind: 'crop', screen: 'lucy', pos: 'right top', ratio: '16 / 10' },
+  timesheets: { kind: 'crop', screen: 'timesheets', pos: 'left top', ratio: '4 / 3' },
+  'daily-reports': { kind: 'phone', screen: 'daily-report' },
+  'crew-app': { kind: 'phone', screen: 'crew-time-clock' },
+};
+/** Card widths on the 12-column grid, chosen so every band's rows fill. */
+const spans: Record<string, number> = { library: 4, quotes: 8, projects: 8, 'daily-reports': 4, timesheets: 6, 'crew-app': 6, invoices: 8, employees: 8, dashboard: 4, lucy: 8, crm: 4, calendar: 6, files: 6 };
+
+const src = (id: string) => {
   const s = screens[id];
-  if (!s) return null;
   const webp = s.file.replace(/\.png$/, '.webp');
   const has = existsSync(fileURLToPath(new URL(`../../public/screens/webp/${webp}`, import.meta.url)));
-  return { src: has ? `/screens/webp/${webp}` : `/screens/${s.file}`, alt: s.alt, tall: s.height > s.width };
+  return { src: has ? `/screens/webp/${webp}` : `/screens/${s.file}`, alt: s.alt };
 };
 ---
 <Base title="Features" description="Everything Paint Trade HQ does, in the order a job runs: Library, quotes clients sign online, live jobs, crew time clock, daily reports, invoices, calendar, employees and HR, the crew app, CRM, Lucy the AI assistant, files and storage.">
-  <!-- Compact hero: two-tone headline, the plan legend, the demo note -->
+  <!-- Hero -->
   <section class="fhero">
     <div class="container">
-      <h1 class="tone tone--h1"><span class="tone__dark">Everything, in the order a job runs.</span> <span class="tone__light">What each part of Paint Trade HQ does today, and which plan includes it.</span></h1>
+      <h1 class="tone tone--h1 fhero__h"><span class="tone__dark">Everything, in the order a job runs.</span> <span class="tone__light">The highlights of each part, and which plan includes it.</span></h1>
       <div class="legend" aria-label="Plan legend">
         <span class="pill pill--neutral">All plans</span>
         <span class="pill">Small business and up</span>
         <span class="pill pill--success">Enterprise</span>
-        <span class="small legend__note">The screens show Harbourline Painting, a demo business: real screens, made-up people and jobs. {chatEnabled ? 'Not sure about something? Ask the chat box, or email us.' : 'Not sure about something? Email us.'}</span>
+        <span class="small legend__note">Screens show Harbourline Painting, a demo business: real screens, made-up people and jobs. {chatEnabled ? 'Questions? Ask the chat box or email us.' : 'Questions? Email us.'}</span>
       </div>
     </div>
   </section>
 
-  <!-- The map of the app: one card per module, jumps to its section -->
-  <section class="section section--tight fmap" aria-label="Map of the app">
+  <!-- The map: the order a job runs -->
+  <section class="section section--tight jmap-wrap" aria-label="Map of the app">
     <div class="container">
-      <div class="grid12">
-        {modules.map((m) => {
-          const t = thumb(m.screen);
-          return (
-            <a class={`mcard reveal span-${span[m.id] || 3}`} href={`#${m.id}`}>
-              <div class={`mcard__thumb ${t?.tall ? 'mcard__thumb--tall' : ''}`}>
-                {t && <img src={t.src} alt="" loading="lazy" decoding="async" />}
+      <ol class="jmap reveal">
+        {flow.map((st) => (
+          <li class={`jstage ${st.n === '∞' ? 'jstage--always' : ''}`}>
+            <div class="jstage__head">
+              <span class="jstage__n mono" aria-hidden="true">{st.n}</span>
+              <div>
+                <h2 class="jstage__t">{st.title}</h2>
+                <p class="jstage__l small">{st.line}</p>
               </div>
-              <div class="mcard__body">
-                <span class={`pill ${planPill(m.plan)}`}>{planLabel(m.plan)}</span>
-                <h2>{m.name}</h2>
-                <p class="small">{m.summary}</p>
-              </div>
-            </a>
-          );
-        })}
-      </div>
+            </div>
+            <ul class="jchips">
+              {st.ids.map((id) => (
+                <li>
+                  <a class="jchip" href={`#${id}`}>
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={icons[id]} /></svg>
+                    <span>{short(byId[id].name)}</span>
+                    {byId[id].plan !== 'Starter' && <i class={`jchip__dot ${byId[id].plan === 'Enterprise' ? 'is-ent' : 'is-sb'}`} title={planLabel(byId[id].plan)}></i>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ol>
+      <p class="small jmap__key"><i class="jchip__dot is-sb"></i> Small business and up <i class="jchip__dot is-ent"></i> Enterprise. No dot: every plan.</p>
     </div>
   </section>
 
-  <!-- Module tabs that stick under the header -->
+  <!-- Sticky module tabs -->
   <nav class="mtabs" id="mtabs" aria-label="Modules">
     <div class="container">
       <ul class="mtabs__list">
@@ -76,20 +140,54 @@ const thumb = (id?: string) => {
     </div>
   </nav>
 
-  {modules.map((m, i) => (
-    <section class={`section section--tight mod ${i % 2 === 1 ? 'section--sunken' : ''}`} id={m.id} data-mod={m.id}>
-      <div class={`container split ${i % 2 === 1 ? 'split--reverse' : ''}`}>
-        <div class="mod__text reveal">
-          <span class={`pill ${planPill(m.plan)}`}>{planLabel(m.plan)}</span>
-          <h2 class="tone mod__title"><span class="tone__dark">{m.name}</span> <span class="tone__light">{m.summary}</span></h2>
-          <ul class="checklist">
-            {m.points.map((p) => <li>{p}</li>)}
-          </ul>
-        </div>
-        <div class="mod__media reveal">
-          {m.screen && <Screenshot id={m.screen} expand />}
-          {m.screen2 && <Screenshot id={m.screen2} expand />}
-          {m.clip && <Clip id={m.clip} />}
+  <!-- One band per stage, a card per module -->
+  {flow.map((st, k) => (
+    <section class={`section section--tight band ${k % 2 === 1 ? 'section--sunken' : ''}`} aria-labelledby={`band-${k}`}>
+      <div class="container">
+        <h2 class="tone band__h reveal" id={`band-${k}`}><span class="tone__dark">{st.n === '∞' ? 'Always on.' : `${st.n}. ${st.title}.`}</span> <span class="tone__light">{st.line}</span></h2>
+        <div class="cards">
+          {st.ids.map((id) => {
+            const m = byId[id];
+            const v = visuals[id];
+            const main = m.screen ? src(m.screen) : null;
+            return (
+              <article class={`fcard reveal span-${spans[id] || 4} ${st.ids.length === 1 ? 'fcard--lone' : ''} ${v && (spans[id] || 4) >= 6 ? 'fcard--wide' : ''} ${v ? `fcard--${v.kind}` : 'fcard--icon'}`} id={id} data-mod={id}>
+                <div class="fcard__text">
+                  <div class="fcard__top">
+                    <span class="fcard__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d={icons[id]} /></svg></span>
+                    <span class={`pill ${planPill(m.plan)}`}>{planLabel(m.plan)}</span>
+                  </div>
+                  <h3 class="fcard__h">{m.name}</h3>
+                  <p class="fcard__sum">{m.summary}</p>
+                  <ul class="hl">
+                    {highlights[id].map((h) => <li>{h}</li>)}
+                  </ul>
+                  <div class="fcard__actions">
+                    {main && !v && (
+                      <button type="button" class="seebtn expand" data-full={main.src} data-alt={main.alt}><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" /></svg> See the screen</button>
+                    )}
+                    <details class="more">
+                      <summary>Everything it does</summary>
+                      <ul class="checklist small">{m.points.map((p) => <li>{p}</li>)}</ul>
+                    </details>
+                  </div>
+                </div>
+                {v && v.kind === 'clip' && <div class="fcard__media"><Clip id={v.clip} /></div>}
+                {v && v.kind === 'crop' && (() => { const s = src(v.screen); return (
+                  <figure class="fcard__media crop" style={`--pos:${v.pos};--ratio:${v.ratio}`}>
+                    <img src={s.src} alt={s.alt} loading="lazy" decoding="async" />
+                    <button type="button" class="expand crop__expand" data-full={s.src} data-alt={s.alt} aria-label="Open the full screen"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" /></svg></button>
+                  </figure>
+                ); })()}
+                {v && v.kind === 'phone' && (() => { const s = src(v.screen); return (
+                  <figure class="fcard__media phone">
+                    <div class="phone__frame"><img src={s.src} alt={s.alt} loading="lazy" decoding="async" /></div>
+                    <button type="button" class="expand phone__expand" data-full={s.src} data-alt={s.alt} aria-label="Open the full screen"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" /></svg></button>
+                  </figure>
+                ); })()}
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -108,27 +206,30 @@ const thumb = (id?: string) => {
 
 <style>
   /* hero */
-  .fhero { padding: clamp(40px, 6vw, 72px) 0 clamp(16px, 2vw, 24px); background: var(--bg); }
-  .fhero .tone { margin-bottom: 20px; }
+  .fhero { padding: clamp(36px, 5vw, 64px) 0 8px; background: var(--bg); }
+  .fhero__h { font-size: clamp(30px, 3.8vw, 46px); margin-bottom: 18px; max-width: 24ch; }
   .legend { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
-  .legend__note { color: var(--text-2); flex-basis: 100%; margin-top: 4px; max-width: 70ch; }
+  .legend__note { color: var(--text-2); flex-basis: 100%; margin-top: 4px; max-width: 72ch; }
 
-  /* map */
-  .fmap { padding-top: 12px; }
-  .grid12 { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 14px; }
-  .span-3 { grid-column: span 3; }
-  .span-6 { grid-column: span 6; }
-  .mcard { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; color: inherit; box-shadow: var(--shadow-card); transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease; }
-  .mcard:hover { text-decoration: none; transform: translateY(-3px); box-shadow: var(--shadow-float); border-color: var(--accent); }
-  .mcard__thumb { aspect-ratio: 16 / 9; background: var(--sunken); border-bottom: 1px solid var(--border); overflow: hidden; position: relative; }
-  .mcard__thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
-  .mcard__thumb--tall { background: linear-gradient(135deg, #f1eefa, #e6dffa); }
-  .mcard__thumb--tall img { width: 44%; height: auto; margin: 10px auto 0; border-radius: 14px 14px 0 0; box-shadow: var(--shadow-float); object-fit: unset; }
-  .mcard__body { padding: 14px 16px 16px; display: grid; gap: 6px; }
-  .mcard__body .pill { justify-self: start; }
-  .mcard h2 { font-size: 18px; line-height: 1.2; margin: 2px 0 0; }
-  .mcard p { margin: 0; color: var(--text-2); }
-  .span-6 .mcard__thumb, .span-6.mcard .mcard__thumb { aspect-ratio: 16 / 7; }
+  /* the job-flow map */
+  .jmap-wrap { padding-top: 20px; }
+  .jmap { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 2fr 3.4fr 1.6fr 4.4fr; gap: 14px; position: relative; }
+  .jmap::before { content: ''; position: absolute; left: 20px; right: 20px; top: 19px; height: 2px; background: linear-gradient(90deg, var(--accent) 0%, var(--accent) 72%, var(--border-strong) 72%); z-index: 0; }
+  .jstage { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 14px 14px 12px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 12px; }
+  .jstage--always { background: var(--sunken); }
+  .jstage__head { display: flex; gap: 10px; align-items: flex-start; }
+  .jstage__n { flex: none; width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 500; font-size: 15px; box-shadow: 0 0 0 4px var(--surface); }
+  .jstage--always .jstage__n { background: var(--accent-ink); box-shadow: 0 0 0 4px var(--sunken); }
+  .jstage__t { margin: 6px 0 2px; font-size: 20px; line-height: 1.1; }
+  .jstage__l { margin: 0; color: var(--text-2); }
+  .jchips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .jchip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px 8px 10px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 500; font-size: 14px; transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease; }
+  .jchip svg { color: var(--accent); flex: none; }
+  .jchip:hover { text-decoration: none; border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-card); }
+  .jchip__dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .jchip__dot.is-sb { background: var(--accent); }
+  .jchip__dot.is-ent { background: var(--success); }
+  .jmap__key { margin: 12px 0 0; color: var(--text-2); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 
   /* sticky tabs */
   .mtabs { position: sticky; top: var(--header-h); z-index: 30; background: rgba(250, 249, 246, 0.92); backdrop-filter: saturate(140%) blur(8px); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
@@ -138,56 +239,94 @@ const thumb = (id?: string) => {
   .mtabs__list a:hover { background: var(--accent); color: #fff; text-decoration: none; }
   .mtabs__list a.is-on { background: var(--accent); color: #fff; }
 
-  /* module sections */
-  .mod { scroll-margin-top: calc(var(--header-h) + 54px); }
-  .mod__title { margin: 12px 0 18px; }
-  .mod__media { display: grid; gap: 20px; align-content: start; }
+  /* bands and cards */
+  .band__h { margin-bottom: 22px; }
+  .cards { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+  .span-4 { grid-column: span 4; } .span-6 { grid-column: span 6; } .span-8 { grid-column: span 8; } .span-12 { grid-column: span 12; }
+  .fcard--lone.span-8 { grid-column: 3 / span 8; }
+  .fcard { position: relative; display: flex; flex-direction: column; gap: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 22px; box-shadow: var(--shadow-card); scroll-margin-top: calc(var(--header-h) + 62px); overflow: hidden; }
+  .fcard--wide { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 22px; align-items: stretch; }
+  .fcard--wide.fcard--clip .fcard__media { align-self: start; }
+  .fcard--wide.fcard--crop .crop { height: 100%; aspect-ratio: auto; min-height: 220px; }
+  .fcard--wide.fcard--phone .phone { align-self: center; }
+  .fcard--wide.fcard--phone { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
+  .fcard--crop:not(.fcard--wide), .fcard--phone:not(.fcard--wide) { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; }
+  .fcard__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .fcard__icon { width: 40px; height: 40px; border-radius: 12px; background: var(--accent-bg); color: var(--accent-ink); display: grid; place-items: center; }
+  .fcard__h { margin: 12px 0 2px; font-size: clamp(20px, 1.6vw, 24px); line-height: 1.2; }
+  .fcard__sum { margin: 0 0 10px; color: #5c4c9e; font-family: var(--font-display); font-size: 17px; line-height: 1.35; }
+  .hl { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .hl li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.45; }
+  .hl li::before { content: ''; position: absolute; left: 0; top: 9px; width: 12px; height: 2px; background: var(--accent); border-radius: 2px; }
+  .fcard__actions { margin-top: auto; padding-top: 12px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+  .seebtn { width: auto; height: auto; padding: 7px 12px 7px 10px; border-radius: 10px; font: 500 14px/1 var(--font-body); display: inline-flex; align-items: center; gap: 8px; }
+  .more summary { cursor: pointer; font-size: 14px; font-weight: 500; color: var(--accent-ink); list-style: none; display: inline-flex; align-items: center; gap: 6px; }
+  .more summary::-webkit-details-marker { display: none; }
+  .more summary::before { content: '+'; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-bg); display: inline-grid; place-items: center; font-weight: 600; }
+  .more[open] summary::before { content: '–'; }
+  .more .checklist { margin: 10px 0 0; gap: 6px; }
+
+  /* visuals */
+  .fcard__media { margin: 0; min-width: 0; }
+  .crop { position: relative; aspect-ratio: var(--ratio, 16 / 10); border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: var(--sunken); box-shadow: var(--shadow-float); }
+  .crop img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, top); display: block; }
+  .crop__expand { position: absolute; top: 8px; right: 8px; }
+  .phone { position: relative; display: flex; justify-content: center; }
+  .phone__frame { width: min(100%, 200px); border-radius: 24px; border: 5px solid #1e1c1a; background: #1e1c1a; overflow: hidden; box-shadow: var(--shadow-float); aspect-ratio: 9 / 16; }
+  .phone__frame img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+  .phone__expand { position: absolute; top: 6px; right: calc(50% - 100px + 6px); }
+  .fcard--phone:not(.fcard--wide) .phone { justify-content: flex-start; }
+  .fcard--phone:not(.fcard--wide) .phone__frame { width: 150px; }
+  .fcard--phone:not(.fcard--wide) .phone__expand { right: auto; left: 104px; }
+  .fcard--crop:not(.fcard--wide) .crop { aspect-ratio: 16 / 9; }
 
   /* closing */
   .cta__h { margin-left: auto; margin-right: auto; margin-bottom: 24px; max-width: 26ch; }
   .cta__dark { color: #fff; }
   .cta__light { display: block; color: #c9bff0; font-weight: 500; font-size: 0.6em; margin-top: 10px; line-height: 1.4; }
 
-  @media (max-width: 1024px) {
-    .span-3 { grid-column: span 6; }
-    .span-6 { grid-column: span 12; }
+  @media (max-width: 1100px) {
+    .jmap { grid-template-columns: 1fr 1fr; }
+    .jmap::before { display: none; }
+    .jstage__n { box-shadow: none; }
+    .span-4 { grid-column: span 6; }
+    .span-8, .span-12, .fcard--lone.span-8 { grid-column: span 12; }
+    .fcard--wide.fcard--crop .crop { height: auto; aspect-ratio: var(--ratio, 16 / 10); }
   }
-  @media (max-width: 600px) {
-    /* the map becomes a swipe row on phones instead of a 13-card column */
-    .grid12 { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 4px 12px; margin: 0 -4px; scrollbar-width: none; }
-    .grid12::-webkit-scrollbar { display: none; }
-    .mcard { flex: 0 0 74vw; scroll-snap-align: start; }
-    .span-6 .mcard__thumb, .span-6.mcard .mcard__thumb { aspect-ratio: 16 / 9; }
-    .mcard__thumb--tall img { width: 40%; }
+  @media (max-width: 720px) {
+    .jmap { grid-template-columns: 1fr; }
+    .fcard, .fcard--wide, .span-4, .span-6, .span-8, .span-12 { grid-column: span 12; grid-template-columns: minmax(0, 1fr); }
+    .fcard--wide.fcard--phone { grid-template-columns: minmax(0, 1fr); }
+    .phone__frame { width: 170px; }
+    .phone__expand { right: calc(50% - 85px + 6px); }
+    .fcard--phone:not(.fcard--wide) .phone__frame { width: 150px; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .mcard { transition: none; }
+    .jchip { transition: none; }
   }
 </style>
 
 <script>
-  // The sticky tabs follow the section in view and keep the active tab scrolled into sight.
+  // The sticky tabs follow the module card in view and keep the active tab scrolled into sight.
   (() => {
     const tabs = Array.from(document.querySelectorAll<HTMLAnchorElement>('#mtabs a[data-tab]'));
-    const sections = Array.from(document.querySelectorAll<HTMLElement>('section[data-mod]'));
-    if (!tabs.length || !sections.length || !('IntersectionObserver' in window)) return;
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-mod]'));
+    if (!tabs.length || !cards.length || !('IntersectionObserver' in window)) return;
     const byId = new Map(tabs.map((t) => [t.dataset.tab, t]));
     const list = document.querySelector<HTMLElement>('#mtabs .mtabs__list');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let current: string | undefined;
     const setOn = (id: string) => {
       if (id === current) return;
       current = id;
       tabs.forEach((t) => t.classList.toggle('is-on', t.dataset.tab === id));
       const t = byId.get(id);
-      if (t && list) {
-        const left = t.offsetLeft - list.clientWidth / 2 + t.offsetWidth / 2;
-        list.scrollTo({ left, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-      }
+      if (t && list) list.scrollTo({ left: t.offsetLeft - list.clientWidth / 2 + t.offsetWidth / 2, behavior: reduced ? 'auto' : 'smooth' });
     };
     const io = new IntersectionObserver((entries) => {
       const vis = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
       if (vis) setOn((vis.target as HTMLElement).dataset.mod || '');
-    }, { rootMargin: '-30% 0px -55% 0px', threshold: [0, 0.2, 0.5] });
-    sections.forEach((s) => io.observe(s));
+    }, { rootMargin: '-25% 0px -55% 0px', threshold: [0, 0.25, 0.5] });
+    cards.forEach((c) => io.observe(c));
   })();
 </script>
