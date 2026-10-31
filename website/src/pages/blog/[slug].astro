@@ -38,6 +38,23 @@ const fmt = (d: Date) => d.toLocaleDateString('en-AU', { day: 'numeric', month: 
   .prose :global(p) { font-size: 17px; line-height: 1.65; }
   .prose :global(ul) { padding-left: 22px; display: grid; gap: 8px; margin: 12px 0 18px; }
   .prose :global(strong) { color: var(--text); }
+  .prose :global(h2) { font-size: clamp(22px, 2.4vw, 28px); margin: 36px 0 10px; }
+  .prose :global(h3) { font-size: 19px; margin: 26px 0 8px; }
+  .prose :global(blockquote) { margin: 18px 0; padding: 14px 18px; border-left: 3px solid var(--accent); background: var(--accent-bg); border-radius: 0 var(--r-md) var(--r-md) 0; font-family: var(--font-display); font-size: 18px; line-height: 1.45; }
+  .prose :global(blockquote p) { margin: 0; font-size: inherit; }
+  .prose :global(figure.shot) { margin: 26px 0 30px; }
+  .prose :global(.shot__frame) { position: relative; border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; background: var(--sunken); box-shadow: var(--shadow-float); }
+  .prose :global(.shot--browser .shot__frame) { padding-top: 26px; }
+  .prose :global(.shot__dots) { position: absolute; left: 12px; top: 8px; display: flex; gap: 6px; }
+  .prose :global(.shot__dots i) { width: 9px; height: 9px; border-radius: 50%; background: var(--border-strong); display: block; }
+  .prose :global(.shot img) { display: block; width: 100%; height: auto; }
+  .prose :global(.shot--phone .shot__frame) { max-width: 300px; margin-inline: auto; border-radius: 28px; border: 6px solid #1e1c1a; background: #1e1c1a; }
+  .prose :global(.shot figcaption) { margin-top: 10px; font-size: 14px; line-height: 1.5; color: var(--text-2); text-align: center; }
+  .prose :global(.scenario) { margin: 22px 0; padding: 18px 20px; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--surface); }
+  .prose :global(.scenario > p:first-child) { margin-top: 0; }
+  .prose :global(.scenario > p:last-child) { margin-bottom: 0; }
+  .prose :global(.scenario .eyebrow) { display: block; margin-bottom: 6px; }
+  .prose :global(.plan-note) { font-size: 14px; color: var(--text-2); border-top: 1px solid var(--border); padding-top: 12px; margin-top: 28px; }
   .cta { margin-top: 36px; padding: 24px; }
   .cta h3 { margin-top: 0; }
   .cta .btn { margin-top: 8px; }

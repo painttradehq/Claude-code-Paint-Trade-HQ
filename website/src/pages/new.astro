@@ -39,7 +39,7 @@ const more = modules.filter((m) => !['dashboard', 'quotes', 'timesheets', 'invoi
 
 const homeFaqs = faqs.filter((f) => ['Does it track my crew?', 'Does the client need an account?', 'Is there an app for my phone?', 'Is there a free plan?'].includes(f.q));
 const quotes = testimonials.filter((t) => showSamples || !t.sample).slice(0, 3);
-const posts = (await getCollection('blog')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()).slice(0, 3);
+const posts = (await getCollection('blog')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf() || a.data.order - b.data.order).slice(0, 3);
 const fmt = (d: Date) => d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
 const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote', 'crew-clock-in-and-daily-report', 'invoice-payment-to-client-page'].includes(c.id));
 ---
