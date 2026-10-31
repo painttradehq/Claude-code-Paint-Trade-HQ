@@ -9,13 +9,13 @@ draft: true
 order: 1
 ---
 
-Most painters quote at night. The site visit was at four, dinner was at seven, and the quote gets written at nine on whatever is to hand: a notepad, a spreadsheet from three years ago, or a generic quoting app with a blank line that says "Description" and expects you to type the whole job from memory. Every one of those methods has the same two problems. The numbers depend on how tired you are, and nothing you type tonight helps you next time.
+A lot of painters quote at night. The site visit was at four, dinner was at seven, and the quote gets written at nine on whatever is to hand: a notepad, a spreadsheet from three years ago, or a generic quoting app with a blank line that says "Description" and expects you to type the whole job from memory. Every one of those methods has the same two problems. The numbers depend on how tired you are, and nothing you type tonight helps you next time.
 
 Paint Trade HQ was built by a painter who was sick of that. Here is how a quote actually gets made in it, and why the result is both faster and more accurate.
 
 ## It starts with your prices, not a blank page
 
-The quote never starts empty, because the **Library** comes first. The Library is your own price list: **items** such as walls, ceilings, doors and trims, each with a rate and the minutes it takes, plus an optional preparation note and preparation cost; **tasks** for repairs and extras; and **products**, the paints and materials, with the supplier price and your price. Items carry a photo, so "two-sided door, semi-gloss" means the same thing to you, the crew and the client. Rates go in ex-GST; the quote can show prices including GST.
+The quote never starts empty, because the **Library** comes first. The Library is your own price list: **items** such as walls, ceilings, doors and trims, each with a rate and the minutes it takes, plus an optional preparation note and preparation cost; **tasks** for repairs and extras; and **products**, the paints and materials, with the supplier price and your price. Items carry a photo, so "two-sided door, semi-gloss" means the same thing to everyone in the business. Rates go in ex-GST; the quote can show prices including GST.
 
 You set the Library up once. After that every quote is assembly, not arithmetic.
 
@@ -28,11 +28,11 @@ Start from the client and the address (an Australian address finder fills it). A
 Two kinds of line are worth knowing about:
 
 - **Optional lines.** Things the client can tick on themselves when they read the quote: the feature wall, the garage, the second coat on the fence. You stop writing three versions of the same quote.
-- **Line details.** Unit, quantity, the preparation note, and two switches: print this on the quote, and show this to the crew. The client sees a clean quote; the crew see the instructions.
+- **Line details.** Unit, quantity, the preparation note, and whether that note prints on the quote and shows to the crew.
 
 <figure class="shot shot--browser"><div class="shot__frame"><span class="shot__dots"><i></i><i></i><i></i></span><img src="/screens/webp/05-add-work-sheet-1440.webp" alt="The Add work sheet: picking items from the Library by category" width="1440" height="900" loading="lazy" decoding="async"></div><figcaption>Adding work: pick items from the Library by category instead of typing them.</figcaption></figure>
 
-<figure class="shot shot--browser"><div class="shot__frame"><span class="shot__dots"><i></i><i></i><i></i></span><img src="/screens/webp/06-line-details-1440.webp" alt="Line details: unit, quantity, preparation note, print on the quote and show the crew" width="1440" height="900" loading="lazy" decoding="async"></div><figcaption>Line details: what the client sees and what the crew sees are two different switches.</figcaption></figure>
+<figure class="shot shot--browser"><div class="shot__frame"><span class="shot__dots"><i></i><i></i><i></i></span><img src="/screens/webp/06-line-details-1440.webp" alt="Line details: unit, quantity, preparation note, print on the quote and show the crew" width="1440" height="900" loading="lazy" decoding="async"></div><figcaption>Line details: unit, quantity, the prep note, and whether it prints on the quote.</figcaption></figure>
 
 Photos go on areas, with mark-up (arrows, circles, text), so "the water stain above the window" is a picture, not a sentence. Product colours chosen on the quote flow through to the job, which is where most colour mix-ups used to start.
 
@@ -56,16 +56,16 @@ The client opens the link on their phone, reads the quote, ticks any optional li
 
 Say you looked at a three-bedroom interior repaint this afternoon: three bedrooms, a hallway, a living room, ceilings throughout, and the client is undecided about the feature wall. The old way, that is an hour at the kitchen table and a quote the client has to ring you about.
 
-In the app: pick the client, let the address finder fill the address, add the five rooms from the picker, pull walls, ceilings and trims from the Library and type the measurements. Add the feature wall as an optional line. Drop in the two photos you took of the cracked cornice with a circle on the crack, and a repair as a sub-row under that room. Open Review &amp; Send, read it once, sign, send. Fifteen minutes, and the numbers came from your Library, not from how tired you were.
+In the app: pick the client, let the address finder fill the address, add the five rooms from the picker, pull walls, ceilings and trims from the Library and type the measurements. Add the feature wall as an optional line. Drop in the two photos you took of the cracked cornice with a circle on the crack, and a repair as a sub-row under that room. Open Review &amp; Send, read it once, sign, send. A quarter of an hour or so, and the numbers came from your Library, not from how tired you were.
 
 The client reads it on the couch, ticks the feature wall, signs with a finger. The deposit invoice already exists when you wake up, and the job is waiting on the Projects page with the colours attached.</div>
 
 ## What it replaces, honestly
 
 - **The notepad and the calculator.** Rates and minutes live in the Library, so the maths is the app's job and the numbers are the same on a Tuesday night as on a Saturday morning.
-- **The spreadsheet.** A spreadsheet can price a job; it cannot send a link the client signs, create the deposit invoice, or hand the colours to the crew.
+- **The spreadsheet.** A spreadsheet can price a job; it cannot send a link the client signs, create the deposit invoice, or carry the colours through to the job.
 - **The generic template app.** A blank "Description" box knows nothing about rooms, coats, prep or optional extras. A painter's quote is made of those things.
 
 Deleted quotes go to an Archive with restore or permanent delete, so a mis-click is not a lost evening either.
 
-<p class="plan-note">Quoting, the full Library, Review &amp; Send, the client's signing link, variations and the deposit invoice are on every plan. Presentation pages and Lucy's help with wording and prices are on Small business and up. Bringing your existing price list across is part of setting up: free on Enterprise, quoted on the other plans.</p>
+<p class="plan-note">Quoting, the full Library, Review &amp; Send, the client's signing link, variations and the deposit invoice are on every plan. Presentation pages and Lucy's help with wording and prices are on Small business and up. Bringing your data across from your old software is free on Enterprise and quoted on the other plans.</p>

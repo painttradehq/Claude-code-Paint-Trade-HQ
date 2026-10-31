@@ -25,7 +25,7 @@ Each crew member has a profile: contact details, **documents** such as licences 
 
 ## Onboarding is a code or a QR
 
-A new start does not need an account set up for them by hand. You add the person, and the page gives you an **invite code or QR**. They scan it on their phone, sign in to the crew app, and they are in: today's job with the address, the time clock, and whatever else you have switched on for the crew.
+A new start does not need an account set up for them by hand. You add the person, and the page gives you an **onboarding code or QR**. They scan it on their phone, sign in to the crew app, and they are in: today's job with the address, the time clock, and whatever else you have switched on for the crew.
 
 <figure class="shot shot--phone"><div class="shot__frame"><img src="/screens/webp/38-crew-signin-390.webp" alt="The crew app sign-in on a phone" width="780" height="1688" loading="lazy" decoding="async"></div><figcaption>The crew app sign-in. It is a web page: add it to the home screen and it opens like an app. No app store.</figcaption></figure>
 
@@ -51,9 +51,9 @@ Not everyone who needs the admin side needs all of it. **Team admins** are offic
 
 Say a second-year apprentice starts with you on Monday. On Sunday night you add him on the Employees page, type his hourly rate, and leave the overtime rate blank so it follows the hourly rate. The page shows two documents missing: his licence and his white card. You send him the QR.
 
-Monday, 6:50 am, he scans the QR in the car park and the crew app opens on today's job with the address. He signs in on site; the app notes the time, the position and that he is inside the job's radius. He uploads his licence from the phone when you ask at smoko. Knock-off, he signs out. Tuesday he forgets; the auto sign-out closes it at your end time and you fix the minutes in the drawer.
+Monday, 6:50 am, he scans the QR in the car park, signs up in the crew app, and today's job is there with the address. He signs in on site; the app notes the time, the position and that he is inside the job's radius. He sends you a photo of his licence at smoko and you upload it to his page. Knock-off, he signs out. Tuesday he forgets; the auto sign-out closes it at the time you set and you fix the minutes in the drawer.
 
-Friday afternoon you open Timesheets. His week is 39.5 hours, so 38 regular and 1.5 overtime by your thresholds. You lock the week and export the CSV to the bookkeeper. Nothing was typed twice, and his first week is on the record the way it actually happened.</div>
+Friday afternoon you open Timesheets. His week is 39.5 hours, so 38 regular and 1.5 overtime by your thresholds. You lock the week and export the CSV to the bookkeeper. His first week is on the record the way it actually happened, and nobody sent a Friday text.</div>
 
 ## What it replaces
 

@@ -27,13 +27,13 @@ Microsoft OneDrive appears as an option on the same page but is not set up on th
 
 Files arrive from the work, not from a filing session:
 
-- **Quote photos**, taken on the site visit and marked up with arrows, circles and text, stay with the quote and the job.
+- **Quote photos**, taken on the site visit and marked up with arrows, circles and text, stay with the quote, linked from the job.
 - **Daily report photos** (Enterprise): the crew's photos from the phone each day land with that job.
-- **The before-and-after portfolio** on the project page is built from those.
+- **The before-and-after portfolio** on the project page holds the job's photos.
 - **PDFs**: every quote, invoice, credit note and completion report has one.
-- **Signed documents**: the client's accepted quote with who signed it, when and from which address; signed variations; and on Enterprise, employment agreements signed on the phone and countersigned by you, emailed to both and saved under "Employee contracts". Nothing signed is ever edited or deleted.
+- **Signed documents**: the client's accepted quote with who signed it, when and from which address; approved variations; and on Enterprise, employment agreements signed on the phone and countersigned by you, emailed to both and saved under "Employee contracts", where nothing signed is ever edited or deleted.
 
-<figure class="shot shot--browser"><div class="shot__frame"><span class="shot__dots"><i></i><i></i><i></i></span><img src="/screens/webp/16-job-drawer-1440.webp" alt="A live job: the job site on a map, the client, the crew and the project drawer with linked records" width="1440" height="900" loading="lazy" decoding="async"></div><figcaption>The job drawer: the linked quote, invoices and variations sit with the job, and so do its photos.</figcaption></figure>
+<figure class="shot shot--browser"><div class="shot__frame"><span class="shot__dots"><i></i><i></i><i></i></span><img src="/screens/webp/16-job-drawer-1440.webp" alt="A live job: the job site on a map, the client, the crew and the project drawer with linked records" width="1440" height="900" loading="lazy" decoding="async"></div><figcaption>The job drawer: the linked quote and invoice sit with the job, and so do its photos.</figcaption></figure>
 
 <figure class="shot shot--phone"><div class="shot__frame"><img src="/screens/webp/41-crew-daily-report-390.webp" alt="Today's report on a phone: hours from sign-ins, what was done, two site photos, any problems, weather and who was on site" width="780" height="1688" loading="lazy" decoding="async"></div><figcaption>A daily report from the crew's phone, photos included. They file themselves with the job (Enterprise).</figcaption></figure>
 
@@ -51,7 +51,7 @@ You own your data. Quotes, invoices, credit notes, reports and signed documents 
 
 **The insurer.** Your insurer asks for a copy of a crew member's signed employment agreement. It is under "Employee contracts" in your storage, the signed PDF that was emailed to both of you on the day, unchanged since.
 
-**The move.** Three years on, you sell the business, or change software, or retire. The quotes, invoices and reports export as PDF, the hours and reports as CSV, and because you connected your own Drive back at the start, every job's photos are already in a folder with the street name on it.</div>
+**The move.** Three years on, you sell the business, or change software, or retire. The quotes, invoices and reports export as PDF, the hours and reports as CSV, and because you connected your own Drive back at the start, every job's photos are already in a folder of their own.</div>
 
 ## Why this matters
 
