@@ -584,6 +584,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   }
   @media (max-width: 860px) {
     .nh::after, .nend::after { background: none; }
+    .nh__kicker, .nh__h1 { padding-right: 40px; } /* keeps the headline clear of the top-right ribbon piece at 360 to 412 wide */
     .bcard--f { flex-direction: column; align-items: stretch; }
     .bcard__text { flex-basis: auto; }
     .watch__in { grid-template-columns: minmax(0, 1fr); }

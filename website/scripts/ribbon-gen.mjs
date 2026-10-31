@@ -76,11 +76,11 @@ const thinT = satinOut(636, [[0, '#fff'], [1, '#f1eefa'], [2.5, '#7a63c9'], [7, 
 
 // ---------- phone pieces (section coords at 390 wide, anchored right) ----------
 const PW = 390;
-const P1 = band({ c: [800, 120], ro: 480, ri: 380, off: [-24, 66], startAng: 100, endAng: 262 });
+const P1 = band({ c: [824, 120], ro: 480, ri: 380, off: [-24, 66], startAng: 100, endAng: 262 }); // 24px further right than the first cut, clear of the 40px text padding at 360-412 wide
 const sheenP = conicAbs([[100, '#1f183d66'], [150, '#1f183d1a'], [175, '#ffffff00'], [205, '#ffffff40'], [225, '#ffffff1a'], [262, '#1f183d33']]);
 const satinP = satinOut(480, [[0, '#fff'], [1.5, '#e6dffa'], [4, '#8a79d6'], [10, '#7a63c9'], [26, '#9a8cd8'], [40, '#aa9ce0'], [55, '#8a79d6'], [75, '#6b5bb5'], [100, '#4b3e86'], [130, '#34295e']]);
-const [creaseLightP, creaseShadowP] = crease(P1, 225, [345, 250], 50, '#ffffffb3', '#1f183d99');
-const turnP = `linear-gradient(225deg,#0000 ${css(P1.lineStop(225, [345, 250]))}px,#1f183d40 ${css(P1.lineStop(225, [345, 250]) + 1)}px)`;
+const [creaseLightP, creaseShadowP] = crease(P1, 225, [369, 250], 50, '#ffffffb3', '#1f183d99');
+const turnP = `linear-gradient(225deg,#0000 ${css(P1.lineStop(225, [369, 250]))}px,#1f183d40 ${css(P1.lineStop(225, [369, 250]) + 1)}px)`;
 const S2 = band({ c: [380, 1352], ro: 900, ri: 844, off: [-140, 0], startAng: 236, endAng: 300 });
 const sheenS = conicAbs([[236, '#1f183d59'], [252, '#1f183d1a'], [262, '#ffffff00'], [278, '#ffffff40'], [290, '#ffffff00'], [300, '#1f183d33']]);
 const satinS = satinOut(900, [[0, '#fff'], [1.5, '#e6dffa'], [4, '#8a79d6'], [9, '#7a63c9'], [20, '#9a8cd8'], [30, '#aa9ce0'], [38, '#8a79d6'], [48, '#6b5bb5'], [60, '#4b3e86'], [75, '#34295e']]);
@@ -132,7 +132,7 @@ const style = `
 @media(min-width:861px){.nend .rb{--dx:max(0px,713px - 50vw)}.rp{display:none}}
 .rp{position:absolute;inset:0;overflow:hidden}
 .rp__a,.rp__as{${posR(P1, 'top:' + css(P1.top) + 'px;')}}
-.rp__c{${posR(S2, 'bottom:' + css(-(S2.c[1] + S2.ro - 513)) + 'px;')}}
+.rp__c{${posR(S2, 'bottom:' + css(-(S2.c[1] + S2.ro - 489)) + 'px;')}}
 .rp__e{${posR(E3, 'bottom:' + css(-(E3.c[1] + E3.ro - 285)) + 'px;')}}
 .rp__a{${bg(['var(--g)', creaseLightP, creaseShadowP, turnP, sheenP, satinP])}}
 .rp__c{${bg(['var(--g)', hemS, sheenS, satinS])}}
@@ -143,7 +143,9 @@ const style = `
 .rc__a{${bg(['var(--g)', creaseLightC, creaseShadowC, turnC, hemC, sheenC, satinC])}}
 .rc__s{position:absolute;inset:0;filter:blur(10px);transform:translate(8px,12px)}.rc__as{background:#120d26;opacity:.5}
 .rc__a{animation:rbm 40s ease-in-out infinite alternate}
-@media(max-width:860px){.rb{display:none}.rp{animation:rbm 40s ease-in-out infinite alternate}}
+@keyframes rbp{to{transform:translateX(6px)}}
+@media(max-width:860px){.rb{display:none}.rp__a,.rp__c,.rp__e{animation:rbp 40s ease-in-out infinite alternate}}
+@media print{.ribbon,.wpost__ribbon{display:none}}
 `;
 
 const heroMarkup = `<div class="rb"><i class="rb__t"></i><div class="rb__m"><div class="rb__s"><i class="rb__us"></i></div><i class="rb__u"><i class="rb__gl"></i></i></div></div><div class="rp"><div class="rp__s"><i class="rp__as"></i></div><i class="rp__a"></i><i class="rp__c"></i></div>`;
