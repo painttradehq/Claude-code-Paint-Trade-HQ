@@ -1,48 +1,132 @@
 ---
+/**
+ * Story in the home page's language (31 Oct 2026). What this page has that the others don't: a rail of the
+ * decisions behind the app and why each was made, every one taken from the knowledge file. Then how it gets
+ * built (the existing approved copy), and how to reach us. Josh's name appears here and in the legal footer
+ * line only. No screenshots: the rail is the visual.
+ */
 import Base from '../layouts/Base.astro';
 import Button from '../components/Button.astro';
-import Screenshot from '../components/Screenshot.astro';
+import Reveal from '../components/Reveal.astro';
 import { site, story } from '../data/site';
+
+/** Decisions and the reason for each; sources are the knowledge file sections noted. */
+const decisions = [
+  { t: 'Your price list comes first.', w: 'Quotes are built from your own Library of items, each with a rate and the minutes it takes, so a quote is assembly rather than arithmetic.' },
+  { t: 'The client never needs an account.', w: 'They get a link. They read the quote, tick what they want, sign on their phone, and the deposit invoice follows.' },
+  { t: 'The crew: two taps a day.', w: 'Sign in on site, sign out at knock-off. The app records where at those two moments and nothing in between.' },
+  { t: 'No card payments from your clients.', w: 'Your bank details print on every invoice. The app never takes a card and never holds card details.' },
+  { t: 'Your files can live in your own Google Drive.', w: 'A folder per job, created at the first upload. If you ever leave, the photos and PDFs are already yours.' },
+  { t: 'No legal wording from us.', w: 'You write your own contract templates. The app fills the fields and collects the signatures; the words are yours and your lawyer\'s.' },
+  { t: 'Your data stays yours.', w: 'Each business is its own isolated workspace, tested on every release. Export any time. Closed accounts are deleted after 30 days.' },
+  { t: 'AUD, GST on top, monthly only.', w: 'No lock-in. Cancel any time and keep access to the end of the paid month.' },
+];
 ---
-<Base title="Story" description="Paint Trade HQ is built by a Melbourne painter, round by round, to how a painting business actually works.">
-  <section class="section">
-    <div class="container story">
-      <span class="eyebrow">The people behind it</span>
-      <h1>{story.heading}</h1>
-      {story.paragraphs.map((p, i) => <p class={i === 0 ? 'lead' : ''}>{p}</p>)}
+<Base title="Story" description="Paint Trade HQ is built by a Melbourne painter, round by round, to how a painting business actually works. The decisions behind it, how it gets built, and how to reach us.">
+  <!-- Hero -->
+  <section class="shero">
+    <div class="container">
+      <h1 class="tone tone--h1 shero__h"><span class="tone__dark">{story.heading}.</span> <span class="tone__light">Designed round by round to how a painting business actually works.</span></h1>
+      <p class="lead shero__lead">{story.paragraphs[0]}</p>
+      <ul class="facts" aria-label="Key facts">
+        <li><strong>Melbourne</strong>, built in Australia</li>
+        <li><strong>AUD</strong>, GST on top</li>
+        <li><strong>Terms</strong> reviewed by a lawyer</li>
+      </ul>
     </div>
   </section>
 
-  <section class="section section--sunken section--tight">
-    <div class="container split">
-      <div>
-        <span class="eyebrow">How it gets built</span>
-        <h2>Round by round, with real painters</h2>
-        <p>Paint Trade HQ is built with painting businesses using it on real jobs. What they say shapes the next round, and there is a new round most weeks.</p>
-        <ul class="checklist">
-          <li>A feedback form inside the app goes straight to the people who build it</li>
-          <li>"What's new" notes appear in the app when something ships</li>
-          <li>Quick-start guides in the Help hub, and training videos for the crew on Enterprise</li>
-        </ul>
-        <p class="small">The Terms of Service were reviewed by a lawyer.</p>
+  <!-- The rail: decisions and why -->
+  <section class="section section--tight" id="decisions">
+    <div class="container">
+      <h2 class="tone reveal"><span class="tone__dark">Decisions we made, and why.</span> <span class="tone__light">Each one came from running a painting business, not from a feature list.</span></h2>
+      <ol class="rail">
+        {decisions.map((d, i) => (
+          <li class="rail__item reveal">
+            <span class="rail__dot mono" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <div class="rail__card">
+              <h3 class="rail__t">{d.t}</h3>
+              <p class="rail__w">{d.w}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- How it gets built -->
+  <section class="section section--ink built">
+    <div class="container">
+      <h2 class="tone built__h reveal"><span class="built__dark">How it gets built.</span> <span class="built__light">Round by round, with painting businesses using it on real jobs. What they say shapes the next round, and there is a new round most weeks.</span></h2>
+      <div class="built__grid">
+        <article class="built__card reveal">
+          <h3>Say it in the app</h3>
+          <p>A feedback form inside the app goes straight to the people who build it.</p>
+        </article>
+        <article class="built__card reveal">
+          <h3>See it ship</h3>
+          <p>"What's new" notes appear in the app when something ships.</p>
+        </article>
+        <article class="built__card reveal">
+          <h3>Learn it fast</h3>
+          <p>Quick-start guides in the Help hub, and training videos for the crew on Enterprise.</p>
+        </article>
       </div>
-      <Screenshot id="quote-builder" />
+      <p class="small built__note">{story.paragraphs[2]}</p>
     </div>
   </section>
 
-  <section class="section">
-    <div class="container contact">
-      <h2>Talk to us</h2>
-      <p class="lead">Questions, ideas, a job that doesn't fit the mould: email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>. A painter reads these, not a ticket queue.</p>
-      <p class="small">Josh Sano Painting and Decorating, trading as Paint Trade HQ · {site.location}</p>
-      <Button href={site.status.ctaHref} size="lg">{site.status.cta}</Button>
+  <!-- Talk to us -->
+  <section class="section" id="contact">
+    <div class="container talk">
+      <h2 class="tone reveal"><span class="tone__dark">Talk to us.</span> <span class="tone__light">Questions, ideas, a job that doesn't fit the mould.</span></h2>
+      <p class="lead reveal">Email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>. A painter reads these, not a ticket queue.</p>
+      <p class="small reveal">Josh Sano Painting and Decorating, trading as Paint Trade HQ · {site.location}</p>
+      <div class="reveal"><Button href={site.status.ctaHref} size="lg">{site.status.cta}</Button></div>
     </div>
   </section>
+
+  <Reveal />
 </Base>
 
 <style>
-  .story { max-width: 760px; }
-  .story h1 { margin-bottom: 20px; }
-  .contact { max-width: 760px; }
-  .contact .btn { margin-top: 8px; }
+  .shero { padding: clamp(36px, 5vw, 64px) 0 12px; background: var(--bg); }
+  .shero__h { font-size: clamp(30px, 3.8vw, 46px); margin-bottom: 18px; max-width: 24ch; }
+  .shero__lead { max-width: 60ch; margin: 0 0 16px; }
+  .facts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; color: var(--text-2); font-size: 15px; }
+  .facts strong { color: var(--text); }
+
+  /* rail */
+  .rail { list-style: none; margin: 8px 0 0; padding: 0; position: relative; display: grid; gap: 18px; max-width: 860px; }
+  .rail::before { content: ''; position: absolute; left: 21px; top: 24px; bottom: 24px; width: 2px; background: linear-gradient(180deg, var(--accent), var(--border-strong)); }
+  .rail__item { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 16px; align-items: start; }
+  .rail__dot { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 14px; font-weight: 500; box-shadow: 0 0 0 5px var(--bg); position: relative; z-index: 1; }
+  .rail__card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 18px 22px; box-shadow: var(--shadow-card); }
+  .rail__t { margin: 0 0 6px; font-size: clamp(19px, 1.7vw, 23px); line-height: 1.2; }
+  .rail__w { margin: 0; color: var(--text-2); font-size: 16px; line-height: 1.55; }
+
+  /* built */
+  .built__h { max-width: 34ch; margin-bottom: 26px; }
+  .built__dark { color: #fff; }
+  .built__light { display: block; color: #c9bff0; font-weight: 500; font-size: 0.62em; margin-top: 10px; line-height: 1.45; }
+  .built__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .built__card { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 18px; padding: 22px; }
+  .built__card h3 { margin: 0 0 8px; color: #fff; font-size: 20px; }
+  .built__card p { margin: 0; color: #d6cff0; }
+  .built__note { margin: 22px 0 0; color: #c9bff0; max-width: 70ch; }
+
+  .talk { max-width: 760px; }
+  .talk .lead { margin-bottom: 10px; }
+  .talk .btn { margin-top: 12px; }
+  section[id] { scroll-margin-top: calc(var(--header-h) + 12px); }
+
+  @media (max-width: 860px) {
+    .built__grid { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .rail::before { left: 17px; }
+    .rail__item { grid-template-columns: 36px minmax(0, 1fr); gap: 12px; }
+    .rail__dot { width: 36px; height: 36px; font-size: 12px; }
+    .rail__card { padding: 16px 18px; }
+  }
 </style>
