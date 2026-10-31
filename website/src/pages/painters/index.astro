@@ -1,84 +1,122 @@
 ---
+/**
+ * Find a painter, in the home page's language (31 Oct 2026). What this page has that the others don't: the
+ * state strip, a row of tiles in map order from west to east (WA, NT, SA, QLD, NSW, ACT, VIC, TAS) with the
+ * number of listings in each; the tiles are the filter. Sample listings stay marked and keep the page out of
+ * search engines until real businesses replace them. Listings are added by hand: the band at the end says so.
+ */
 import Base from '../../layouts/Base.astro';
 import Button from '../../components/Button.astro';
+import Reveal from '../../components/Reveal.astro';
 import { site } from '../../data/site';
-import { visibleListings, showSamples, STATES } from '../../data/directory';
+import { visibleListings, STATES } from '../../data/directory';
 
 const hasSamples = visibleListings.some((l) => l.sample);
-const byState = Object.entries(STATES)
-  .map(([code, name]) => ({ code, name, items: visibleListings.filter((l) => l.state === code) }))
-  .filter((g) => g.items.length > 0);
+const ORDER: (keyof typeof STATES)[] = ['WA', 'NT', 'SA', 'QLD', 'NSW', 'ACT', 'VIC', 'TAS'];
+const counts = Object.fromEntries(ORDER.map((c) => [c, visibleListings.filter((l) => l.state === c).length])) as Record<string, number>;
 ---
 <Base title="Find a painter" description="Painting businesses that run on Paint Trade HQ, by state and suburb: who they are, where they work and what they do best." noindex={hasSamples}>
-  <section class="section section--tight">
+  <section class="dhero">
     <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">Directory</span>
-        <h1>Find a painter</h1>
-        <p class="lead">Painting businesses that run their jobs on Paint Trade HQ, by state. Each one has a page of its own: who they are, where they work and what they do best.</p>
-        {hasSamples && (
-          <p class="small sample-banner"><span class="pill pill--neutral">Sample listings</span> These show what a listing looks like. Real businesses replace them as painters join.</p>
-        )}
-      </div>
+      <h1 class="tone tone--h1 dhero__h"><span class="tone__dark">Find a painter.</span> <span class="tone__light">Painting businesses that run their jobs on Paint Trade HQ, by state. Each has a page of its own.</span></h1>
+      {hasSamples && (
+        <p class="small sample-banner"><span class="pill pill--neutral">Sample listings</span> These show what a listing looks like. Real businesses replace them as painters join.</p>
+      )}
+    </div>
+  </section>
 
-      {visibleListings.length === 0 && (
+  {visibleListings.length === 0 && (
+    <section class="section section--tight">
+      <div class="container">
         <div class="card empty">
           <h2>Listings open to painting businesses on Paint Trade HQ</h2>
           <p>The first real listings appear here as painters join. Using the app? Email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a> and we add your page.</p>
           <Button href={site.status.ctaHref}>{site.status.cta}</Button>
         </div>
-      )}
+      </div>
+    </section>
+  )}
 
-      {visibleListings.length > 0 && (
-        <>
-          <div class="filter" role="group" aria-label="Filter by state" id="state-filter">
-            <button type="button" class="filter__btn is-on" data-state="" aria-pressed="true">All <span class="muted">{visibleListings.length}</span></button>
-            {byState.map((g) => (
-              <button type="button" class="filter__btn" data-state={g.code} aria-pressed="false">{g.name} <span class="muted">{g.items.length}</span></button>
-            ))}
-          </div>
-          <div class="grid grid--3 listings" id="listings">
-            {visibleListings.map((l) => (
-              <a class="card listing" href={`/painters/${l.slug}`} data-state={l.state}>
-                <div class="listing__top">
-                  <span class="pill pill--neutral">{l.state}</span>
-                  {l.sample && <span class="pill pill--neutral">Sample</span>}
-                </div>
-                <h3>{l.name}</h3>
-                <p class="small listing__where">{l.suburb} · {l.areas.join(' · ')}</p>
-                <ul class="listing__services">
-                  {l.services.slice(0, 3).map((s) => <li>{s}</li>)}
-                </ul>
-                <span class="small listing__more">See the listing</span>
-              </a>
-            ))}
-          </div>
-          <p class="small center empty-filter" id="empty-filter" hidden>No listings in that state yet.</p>
-        </>
-      )}
+  {visibleListings.length > 0 && (
+    <section class="section section--tight" id="directory">
+      <div class="container">
+        <!-- The state strip: west to east, counts, and it is the filter -->
+        <div class="strip reveal" role="group" aria-label="Filter by state" id="state-filter">
+          <button type="button" class="tile tile--all is-on" data-state="" aria-pressed="true">
+            <span class="tile__code">All</span>
+            <span class="tile__n mono">{visibleListings.length}</span>
+            <span class="tile__name small">Australia</span>
+          </button>
+          {ORDER.map((code) => (
+            <button type="button" class={`tile ${counts[code] ? '' : 'tile--none'}`} data-state={code} aria-pressed="false" disabled={!counts[code]} title={counts[code] ? `${counts[code]} in ${STATES[code]}` : `None in ${STATES[code]} yet`}>
+              <span class="tile__code">{code}</span>
+              <span class="tile__n mono">{counts[code] || '–'}</span>
+              <span class="tile__name small">{STATES[code]}</span>
+            </button>
+          ))}
+        </div>
+
+        <div class="grid grid--3 listings" id="listings">
+          {visibleListings.map((l) => (
+            <a class="card listing reveal" href={`/painters/${l.slug}`} data-state={l.state}>
+              <div class="listing__top">
+                <span class="pill pill--neutral">{l.state}</span>
+                {l.sample && <span class="pill pill--neutral">Sample</span>}
+              </div>
+              <h2 class="listing__name">{l.name}</h2>
+              <p class="small listing__where">{l.suburb} · {l.areas.join(' · ')}</p>
+              <ul class="listing__services">
+                {l.services.slice(0, 3).map((s) => <li>{s}</li>)}
+              </ul>
+              <span class="small listing__more">See the listing <span aria-hidden="true">→</span></span>
+            </a>
+          ))}
+        </div>
+        <p class="small center empty-filter" id="empty-filter" hidden>No listings in that state yet.</p>
+      </div>
+    </section>
+  )}
+
+  <!-- Get listed -->
+  <section class="section section--ink listed">
+    <div class="container">
+      <h2 class="tone listed__h reveal"><span class="listed__dark">Run a painting business on Paint Trade HQ?</span> <span class="listed__light">Listings are free for businesses using the app. A page of your own, with your areas and services, for people searching for a painter near them.</span></h2>
+      <ol class="listed__steps">
+        <li class="listed__step reveal"><span class="listed__n mono">1</span><div><h3>Use the app</h3><p>Listings are for businesses running their jobs on Paint Trade HQ.</p></div></li>
+        <li class="listed__step reveal"><span class="listed__n mono">2</span><div><h3>Email us the basics</h3><p>Business name, suburb, the areas you cover and what you do best, to <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>.</p></div></li>
+        <li class="listed__step reveal"><span class="listed__n mono">3</span><div><h3>We add your page</h3><p>By hand, for now. You check it, and it goes live under your state.</p></div></li>
+      </ol>
+      <div class="reveal"><Button href={site.status.ctaHref} variant="on-ink" size="lg">{site.status.cta}</Button></div>
     </div>
   </section>
 
-  <section class="section section--ink cta">
-    <div class="container center">
-      <h2>Run a painting business on Paint Trade HQ?</h2>
-      <p class="lead">Listings are free for businesses using the app. Email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a> with your business name, suburb, areas and services, and we add your page.</p>
-      <Button href={site.status.ctaHref} variant="on-ink" size="lg">{site.status.cta}</Button>
-    </div>
-  </section>
+  <Reveal />
 </Base>
 
 <style>
-  .sample-banner { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--text-2); }
-  .filter { display: flex; flex-wrap: wrap; gap: 8px; margin: 28px 0 20px; }
-  .filter__btn { font: inherit; font-size: 14px; font-weight: 500; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-pill); padding: 6px 14px; cursor: pointer; }
-  .filter__btn:hover { border-color: var(--accent); }
-  .filter__btn.is-on { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .filter__btn.is-on .muted { color: rgba(255, 255, 255, 0.75); }
+  .dhero { padding: clamp(36px, 5vw, 64px) 0 8px; background: var(--bg); }
+  .dhero__h { font-size: clamp(30px, 3.8vw, 46px); margin-bottom: 14px; max-width: 26ch; }
+  .sample-banner { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--text-2); margin: 0; }
+
+  /* the state strip */
+  .strip { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 8px; margin: 12px 0 24px; }
+  .tile { font: inherit; display: grid; gap: 2px; text-align: left; padding: 12px 12px 10px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease; min-width: 0; }
+  .tile:hover:not(:disabled) { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-card); }
+  .tile__code { font-family: var(--font-display); font-weight: 600; font-size: 18px; line-height: 1; }
+  .tile__n { font-size: 22px; font-weight: 500; color: var(--accent-ink); }
+  .tile__name { color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile.is-on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tile.is-on .tile__n, .tile.is-on .tile__name { color: rgba(255, 255, 255, 0.85); }
+  .tile--none { background: var(--sunken); color: var(--muted); cursor: default; }
+  .tile--none .tile__n { color: var(--muted); }
+  .tile--all { background: var(--accent-bg); border-color: var(--accent-bg); }
+
+  /* listings */
+  .listings { align-items: stretch; }
   .listing { display: flex; flex-direction: column; gap: 8px; color: inherit; }
   .listing:hover { text-decoration: none; border-color: var(--accent); }
   .listing__top { display: flex; gap: 6px; flex-wrap: wrap; }
-  .listing h3 { margin: 4px 0 0; }
+  .listing__name { margin: 4px 0 0; font-size: 21px; }
   .listing[hidden] { display: none; }
   .listing__where { color: var(--text-2); margin: 0; }
   .listing__services { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
@@ -87,11 +125,33 @@ const byState = Object.entries(STATES)
   .empty { max-width: 640px; }
   .empty h2 { margin-top: 0; }
   .empty .btn { margin-top: 12px; }
-  .cta .lead { margin-left: auto; margin-right: auto; margin-bottom: 24px; }
+
+  /* get listed */
+  .listed__h { max-width: 34ch; margin-bottom: 26px; }
+  .listed__dark { color: #fff; }
+  .listed__light { display: block; color: #c9bff0; font-weight: 500; font-size: 0.62em; margin-top: 10px; line-height: 1.45; }
+  .listed__steps { list-style: none; margin: 0 0 26px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .listed__step { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 18px; padding: 20px; }
+  .listed__n { width: 36px; height: 36px; border-radius: 50%; background: #fff; color: var(--accent-ink); display: grid; place-items: center; font-weight: 500; }
+  .listed__step h3 { margin: 6px 0 6px; color: #fff; font-size: 19px; }
+  .listed__step p { margin: 0; color: #d6cff0; font-size: 15px; }
+  .listed__step a { color: #fff; text-decoration: underline; }
+
+  @media (max-width: 1024px) {
+    .strip { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  }
+  @media (max-width: 860px) {
+    .listed__steps { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .tile__name { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .tile { transition: none; } }
 </style>
 
 <script>
-  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('#state-filter .filter__btn'));
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('#state-filter .tile'));
   const cards = Array.from(document.querySelectorAll<HTMLElement>('#listings .listing'));
   const empty = document.getElementById('empty-filter');
   function apply(state: string) {
@@ -100,7 +160,7 @@ const byState = Object.entries(STATES)
     cards.forEach((c) => { const on = !state || c.dataset.state === state; c.hidden = !on; if (on) shown++; });
     if (empty) empty.hidden = shown > 0;
   }
-  buttons.forEach((b) => b.addEventListener('click', () => { const st = b.dataset.state || ''; apply(st); history.replaceState(null, '', st ? `#${st.toLowerCase()}` : location.pathname); }));
+  buttons.forEach((b) => b.addEventListener('click', () => { if (b.disabled) return; const st = b.dataset.state || ''; apply(st); history.replaceState(null, '', st ? `#${st.toLowerCase()}` : location.pathname); }));
   const fromHash = location.hash.replace('#', '').toUpperCase();
-  if (buttons.some((b) => b.dataset.state === fromHash)) apply(fromHash);
+  if (buttons.some((b) => b.dataset.state === fromHash && !b.disabled)) apply(fromHash);
 </script>
