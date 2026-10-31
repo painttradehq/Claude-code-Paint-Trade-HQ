@@ -1,40 +1,94 @@
 ---
+/**
+ * Features: every module in the order a job runs, in the home page's language (31 Oct 2026).
+ * What this page has that the others don't: a "map of the app", a bento of one card per module that jumps
+ * to its section, and a row of module tabs that sticks under the header and follows you down.
+ * Each module section keeps its screens (with the expand button into the full-screen viewer) and its clip.
+ */
 import Base from '../layouts/Base.astro';
 import Button from '../components/Button.astro';
 import Screenshot from '../components/Screenshot.astro';
 import Clip from '../components/Clip.astro';
+import Viewer from '../components/Viewer.astro';
+import Reveal from '../components/Reveal.astro';
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { site, modules, chatEnabled } from '../data/site';
+import { screens } from '../data/screens';
 
+const planLabel = (p: string) => (p === 'Starter' ? 'All plans' : p === 'Enterprise' ? 'Enterprise' : `${p} and up`);
 const planPill = (p: string) => (p === 'Starter' ? 'pill--neutral' : p === 'Small business' ? '' : 'pill--success');
+const short = (name: string) => name.split(':')[0];
+const span: Record<string, number> = { quotes: 6, lucy: 6, files: 6 };
+/** Thumbnail for the map: the module's main screen, WebP where it exists. */
+const thumb = (id?: string) => {
+  if (!id) return null;
+  const s = screens[id];
+  if (!s) return null;
+  const webp = s.file.replace(/\.png$/, '.webp');
+  const has = existsSync(fileURLToPath(new URL(`../../public/screens/webp/${webp}`, import.meta.url)));
+  return { src: has ? `/screens/webp/${webp}` : `/screens/${s.file}`, alt: s.alt, tall: s.height > s.width };
+};
 ---
 <Base title="Features" description="Everything Paint Trade HQ does, in the order a job runs: Library, quotes clients sign online, live jobs, crew time clock, daily reports, invoices, calendar, employees and HR, the crew app, CRM, Lucy the AI assistant, files and storage.">
-  <section class="section section--tight">
+  <!-- Compact hero: two-tone headline, the plan legend, the demo note -->
+  <section class="fhero">
     <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">Features</span>
-        <h1>Everything, in the order a job runs</h1>
-        <p class="lead">What each part of Paint Trade HQ does today, and which plan includes it. Not sure about something? {chatEnabled ? 'Ask the chat box, or email us.' : 'Email us.'} The screens show Harbourline Painting, a demo business: real screens, made-up people and jobs.</p>
+      <h1 class="tone tone--h1"><span class="tone__dark">Everything, in the order a job runs.</span> <span class="tone__light">What each part of Paint Trade HQ does today, and which plan includes it.</span></h1>
+      <div class="legend" aria-label="Plan legend">
+        <span class="pill pill--neutral">All plans</span>
+        <span class="pill">Small business and up</span>
+        <span class="pill pill--success">Enterprise</span>
+        <span class="small legend__note">The screens show Harbourline Painting, a demo business: real screens, made-up people and jobs. {chatEnabled ? 'Not sure about something? Ask the chat box, or email us.' : 'Not sure about something? Email us.'}</span>
       </div>
-      <nav class="toc" aria-label="On this page">
-        {modules.map((m) => <a href={`#${m.id}`}>{m.name}</a>)}
-      </nav>
     </div>
   </section>
 
+  <!-- The map of the app: one card per module, jumps to its section -->
+  <section class="section section--tight fmap" aria-label="Map of the app">
+    <div class="container">
+      <div class="grid12">
+        {modules.map((m) => {
+          const t = thumb(m.screen);
+          return (
+            <a class={`mcard reveal span-${span[m.id] || 3}`} href={`#${m.id}`}>
+              <div class={`mcard__thumb ${t?.tall ? 'mcard__thumb--tall' : ''}`}>
+                {t && <img src={t.src} alt="" loading="lazy" decoding="async" />}
+              </div>
+              <div class="mcard__body">
+                <span class={`pill ${planPill(m.plan)}`}>{planLabel(m.plan)}</span>
+                <h2>{m.name}</h2>
+                <p class="small">{m.summary}</p>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  <!-- Module tabs that stick under the header -->
+  <nav class="mtabs" id="mtabs" aria-label="Modules">
+    <div class="container">
+      <ul class="mtabs__list">
+        {modules.map((m) => <li><a href={`#${m.id}`} data-tab={m.id}>{short(m.name)}</a></li>)}
+      </ul>
+    </div>
+  </nav>
+
   {modules.map((m, i) => (
-    <section class={`section section--tight ${i % 2 === 1 ? 'section--sunken' : ''}`} id={m.id}>
+    <section class={`section section--tight mod ${i % 2 === 1 ? 'section--sunken' : ''}`} id={m.id} data-mod={m.id}>
       <div class={`container split ${i % 2 === 1 ? 'split--reverse' : ''}`}>
-        <div>
-          <span class={`pill ${planPill(m.plan)}`}>{m.plan === 'Starter' ? 'All plans' : `${m.plan} and up`}</span>
-          <h2 class="mod__title">{m.name}</h2>
-          <p class="lead">{m.summary}</p>
+        <div class="mod__text reveal">
+          <span class={`pill ${planPill(m.plan)}`}>{planLabel(m.plan)}</span>
+          <h2 class="tone mod__title"><span class="tone__dark">{m.name}</span> <span class="tone__light">{m.summary}</span></h2>
           <ul class="checklist">
             {m.points.map((p) => <li>{p}</li>)}
           </ul>
         </div>
-        <div class="mod__media">
-          {m.screen && <Screenshot id={m.screen} />}
-          {m.screen2 && <Screenshot id={m.screen2} />}
+        <div class="mod__media reveal">
+          {m.screen && <Screenshot id={m.screen} expand />}
+          {m.screen2 && <Screenshot id={m.screen2} expand />}
           {m.clip && <Clip id={m.clip} />}
         </div>
       </div>
@@ -43,26 +97,97 @@ const planPill = (p: string) => (p === 'Starter' ? 'pill--neutral' : p === 'Smal
 
   <section class="section section--ink cta">
     <div class="container center">
-      <h2>See it on your own jobs</h2>
-      <p class="lead">Every plan starts with a 30-day free trial, no card needed. Leave your details and your login arrives by email.</p>
+      <h2 class="tone cta__h"><span class="cta__dark">See it on your own jobs.</span> <span class="cta__light">Every plan starts with a 30-day free trial, no card needed. Leave your details and your login arrives by email.</span></h2>
       <Button href={site.status.ctaHref} variant="on-ink" size="lg">{site.status.cta}</Button>
     </div>
   </section>
+
+  <Viewer />
+  <Reveal />
 </Base>
 
 <style>
-  .toc { display: flex; flex-wrap: wrap; gap: 8px; }
-  .toc a {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--accent-ink);
-    background: var(--accent-bg);
-    padding: 6px 12px;
-    border-radius: var(--r-pill);
-  }
-  .toc a:hover { background: var(--accent); color: #fff; text-decoration: none; }
-  .mod__title { margin-top: 12px; }
+  /* hero */
+  .fhero { padding: clamp(40px, 6vw, 72px) 0 clamp(16px, 2vw, 24px); background: var(--bg); }
+  .fhero .tone { margin-bottom: 20px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
+  .legend__note { color: var(--text-2); flex-basis: 100%; margin-top: 4px; max-width: 70ch; }
+
+  /* map */
+  .fmap { padding-top: 12px; }
+  .grid12 { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 14px; }
+  .span-3 { grid-column: span 3; }
+  .span-6 { grid-column: span 6; }
+  .mcard { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; color: inherit; box-shadow: var(--shadow-card); transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease; }
+  .mcard:hover { text-decoration: none; transform: translateY(-3px); box-shadow: var(--shadow-float); border-color: var(--accent); }
+  .mcard__thumb { aspect-ratio: 16 / 9; background: var(--sunken); border-bottom: 1px solid var(--border); overflow: hidden; position: relative; }
+  .mcard__thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+  .mcard__thumb--tall { background: linear-gradient(135deg, #f1eefa, #e6dffa); }
+  .mcard__thumb--tall img { width: 44%; height: auto; margin: 10px auto 0; border-radius: 14px 14px 0 0; box-shadow: var(--shadow-float); object-fit: unset; }
+  .mcard__body { padding: 14px 16px 16px; display: grid; gap: 6px; }
+  .mcard__body .pill { justify-self: start; }
+  .mcard h2 { font-size: 18px; line-height: 1.2; margin: 2px 0 0; }
+  .mcard p { margin: 0; color: var(--text-2); }
+  .span-6 .mcard__thumb, .span-6.mcard .mcard__thumb { aspect-ratio: 16 / 7; }
+
+  /* sticky tabs */
+  .mtabs { position: sticky; top: var(--header-h); z-index: 30; background: rgba(250, 249, 246, 0.92); backdrop-filter: saturate(140%) blur(8px); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .mtabs__list { list-style: none; margin: 0; padding: 10px 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .mtabs__list::-webkit-scrollbar { display: none; }
+  .mtabs__list a { display: inline-block; white-space: nowrap; font-size: 14px; font-weight: 500; color: var(--accent-ink); background: var(--accent-bg); padding: 6px 12px; border-radius: var(--r-pill); }
+  .mtabs__list a:hover { background: var(--accent); color: #fff; text-decoration: none; }
+  .mtabs__list a.is-on { background: var(--accent); color: #fff; }
+
+  /* module sections */
+  .mod { scroll-margin-top: calc(var(--header-h) + 54px); }
+  .mod__title { margin: 12px 0 18px; }
   .mod__media { display: grid; gap: 20px; align-content: start; }
-  .cta .lead { margin-left: auto; margin-right: auto; margin-bottom: 24px; }
-  section[id] { scroll-margin-top: calc(var(--header-h) + 12px); }
+
+  /* closing */
+  .cta__h { margin-left: auto; margin-right: auto; margin-bottom: 24px; max-width: 26ch; }
+  .cta__dark { color: #fff; }
+  .cta__light { display: block; color: #c9bff0; font-weight: 500; font-size: 0.6em; margin-top: 10px; line-height: 1.4; }
+
+  @media (max-width: 1024px) {
+    .span-3 { grid-column: span 6; }
+    .span-6 { grid-column: span 12; }
+  }
+  @media (max-width: 600px) {
+    /* the map becomes a swipe row on phones instead of a 13-card column */
+    .grid12 { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 4px 12px; margin: 0 -4px; scrollbar-width: none; }
+    .grid12::-webkit-scrollbar { display: none; }
+    .mcard { flex: 0 0 74vw; scroll-snap-align: start; }
+    .span-6 .mcard__thumb, .span-6.mcard .mcard__thumb { aspect-ratio: 16 / 9; }
+    .mcard__thumb--tall img { width: 40%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mcard { transition: none; }
+  }
 </style>
+
+<script>
+  // The sticky tabs follow the section in view and keep the active tab scrolled into sight.
+  (() => {
+    const tabs = Array.from(document.querySelectorAll<HTMLAnchorElement>('#mtabs a[data-tab]'));
+    const sections = Array.from(document.querySelectorAll<HTMLElement>('section[data-mod]'));
+    if (!tabs.length || !sections.length || !('IntersectionObserver' in window)) return;
+    const byId = new Map(tabs.map((t) => [t.dataset.tab, t]));
+    const list = document.querySelector<HTMLElement>('#mtabs .mtabs__list');
+    let current: string | undefined;
+    const setOn = (id: string) => {
+      if (id === current) return;
+      current = id;
+      tabs.forEach((t) => t.classList.toggle('is-on', t.dataset.tab === id));
+      const t = byId.get(id);
+      if (t && list) {
+        const left = t.offsetLeft - list.clientWidth / 2 + t.offsetWidth / 2;
+        list.scrollTo({ left, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      }
+    };
+    const io = new IntersectionObserver((entries) => {
+      const vis = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (vis) setOn((vis.target as HTMLElement).dataset.mod || '');
+    }, { rootMargin: '-30% 0px -55% 0px', threshold: [0, 0.2, 0.5] });
+    sections.forEach((s) => io.observe(s));
+  })();
+</script>

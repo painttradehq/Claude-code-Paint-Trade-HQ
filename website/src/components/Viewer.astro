@@ -1,0 +1,37 @@
+---
+/**
+ * The full-screen viewer that every `.expand` button on the page opens (data-full = image URL, data-alt = caption).
+ * Include once per page, after the content. The buttons themselves are styled by `.expand` in global.css.
+ */
+---
+<dialog class="viewer" id="viewer">
+  <button type="button" class="viewer__close" id="viewer-close" aria-label="Close">×</button>
+  <img id="viewer-img" src="" alt="" />
+  <p class="small viewer__cap" id="viewer-cap"></p>
+</dialog>
+
+<style>
+  .viewer { border: 0; border-radius: 16px; padding: 12px; max-width: min(1200px, 94vw); background: var(--surface); box-shadow: var(--shadow-float); }
+  .viewer::backdrop { background: rgba(30, 28, 26, 0.6); backdrop-filter: blur(4px); }
+  .viewer img { display: block; max-width: 100%; max-height: 80vh; margin: 0 auto; border-radius: 10px; }
+  .viewer__cap { margin: 10px 4px 0; color: var(--text-2); }
+  .viewer__close { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--accent); color: #fff; font-size: 22px; line-height: 1; cursor: pointer; }
+</style>
+
+<script>
+  const dlg = document.getElementById('viewer') as HTMLDialogElement | null;
+  const img = document.getElementById('viewer-img') as HTMLImageElement | null;
+  const cap = document.getElementById('viewer-cap');
+  if (dlg && img && cap) {
+    document.querySelectorAll<HTMLButtonElement>('.expand').forEach((b) =>
+      b.addEventListener('click', () => {
+        img.src = b.dataset.full || '';
+        img.alt = b.dataset.alt || '';
+        cap.textContent = b.dataset.alt || '';
+        dlg.showModal();
+      }),
+    );
+    document.getElementById('viewer-close')?.addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+  }
+</script>

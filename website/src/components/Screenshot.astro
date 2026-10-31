@@ -12,11 +12,16 @@ interface Props {
   priority?: boolean;
   class?: string;
   hideCaption?: boolean;
+  /** Adds the expand button that opens the page's <Viewer /> with the full screen. */
+  expand?: boolean;
 }
-const { id, priority = false, class: cls = '', hideCaption = false } = Astro.props;
+const { id, priority = false, class: cls = '', hideCaption = false, expand = false } = Astro.props;
 const s = screens[id as string];
 if (!s) throw new Error(`Unknown screen slot "${id}"`);
 const exists = !!s.file && existsSync(fileURLToPath(new URL(`../../public/screens/${s.file}`, import.meta.url)));
+const webp = s.file.replace(/\.png$/, '.webp');
+const hasWebp = exists && existsSync(fileURLToPath(new URL(`../../public/screens/webp/${webp}`, import.meta.url)));
+const src = hasWebp ? `/screens/webp/${webp}` : `/screens/${s.file}`;
 const ratio = `${s.width} / ${s.height}`;
 ---
 <figure class={`shot shot--${s.frame} ${cls}`}>
@@ -24,9 +29,12 @@ const ratio = `${s.width} / ${s.height}`;
     {s.frame === 'browser' && (
       <div class="shot__bar" aria-hidden="true"><span></span><span></span><span></span></div>
     )}
+    {exists && expand && (
+      <button type="button" class="expand shot__expand" data-full={src} data-alt={s.alt} aria-label="Open the full screen"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" /></svg></button>
+    )}
     {exists ? (
       <img
-        src={`/screens/${s.file}`}
+        src={src}
         alt={s.alt}
         width={s.width}
         height={s.height}
@@ -49,6 +57,7 @@ const ratio = `${s.width} / ${s.height}`;
     margin: 0;
   }
   .shot__frame {
+    position: relative;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--r-lg);
@@ -69,6 +78,9 @@ const ratio = `${s.width} / ${s.height}`;
     background: transparent;
     border-radius: var(--r-md);
   }
+  .shot__expand { position: absolute; top: 8px; right: 8px; opacity: 0.92; }
+  .shot--browser .shot__expand { top: 40px; }
+  .shot--phone .shot__expand { top: 10px; right: 10px; }
   .shot__bar {
     display: flex;
     gap: 6px;

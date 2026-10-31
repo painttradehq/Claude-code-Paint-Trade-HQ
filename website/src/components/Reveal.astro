@@ -1,0 +1,26 @@
+---
+/**
+ * Scroll reveals: anything with class="reveal" fades up once as it enters the viewport. Without JavaScript,
+ * or with reduced motion, everything is simply visible. Include once per page.
+ */
+---
+<style is:global>
+  html.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity 500ms ease, transform 500ms ease; }
+  html.js .reveal.is-in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    html.js .reveal { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+<script>
+  document.documentElement.classList.add('js');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const els = Array.from(document.querySelectorAll<HTMLElement>('.reveal'));
+  if (reduced || !('IntersectionObserver' in window)) {
+    els.forEach((e) => e.classList.add('is-in'));
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { (e.target as HTMLElement).classList.add('is-in'); io.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -4% 0px' });
+    els.forEach((e) => io.observe(e));
+  }
+</script>

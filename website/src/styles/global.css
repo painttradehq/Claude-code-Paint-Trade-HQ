@@ -524,3 +524,15 @@ p {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---------- shared pieces from the home page (31 Oct 2026) ---------- */
+/* Two-tone heading: a dark line and a purple line, used on every page. */
+.tone { font-size: clamp(26px, 3.4vw, 40px); line-height: 1.15; letter-spacing: -0.01em; max-width: 24ch; margin: 0 0 28px; font-weight: 600; }
+.tone--h1 { font-size: clamp(32px, 4.4vw, 54px); line-height: 1.08; letter-spacing: -0.015em; max-width: 20ch; }
+.tone__dark { color: var(--text); }
+.tone__light { color: #5c4c9e; font-weight: 500; display: block; font-size: 0.72em; margin-top: 6px; }
+/* The expand button that opens the Viewer. */
+.expand { flex: none; width: 34px; height: 34px; border-radius: 10px; border: 0; background: var(--accent); color: #fff; display: grid; place-items: center; cursor: pointer; transition: background-color 140ms ease, transform 140ms ease; position: relative; z-index: 2; }
+.expand:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.expand:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .expand { transition: none; } }
