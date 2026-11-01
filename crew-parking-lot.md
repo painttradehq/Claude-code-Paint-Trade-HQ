@@ -140,3 +140,9 @@ Josh: a tick "that says we have a right to store, use your details such as sendi
 ## 25 Oct — after D (from the report)
 - C6 carries (two one-liners): `utils/crewLocation.ts` → `getCurrentPositionAsync({accuracy: High, maximumAge: 0})`; the reset screen shows "Too many tries. Wait a few minutes and try again." on a 429 (today "No connection. Try again.").
 - Platform (later): record crew logins as sessions so a password reset can sign out other devices (`employee_login` never calls `create_session`); the drawer string for a confirmed no-position sign-in (admin chat, with the two distance strings).
+
+## 1 Nov — after C6 (from the report) and the Terms update
+- Next crew round carries: `VideoPlayer.tsx` native `baseUrl`/`origin` → `APP_WEB_URL` (two literals); the embed-error path (web iframe `onError` subscribed; caption "This video can't play in the app." + "Open on YouTube"; Mark as watched stays); the C6 report's "21 cases" → 9 (memory only).
+- Rules for every brief from now: no `rm -rf` outside `memory/tmp` and `/tmp`; the report's test counts come from `pytest --collect-only`.
+- Follow-up G (Terms gate) rides with C6b. Pending from Josh: the new `terms.md` (check crew clauses vs the facts card and the crew notice; date the gate's line).
+- Admin chat: Team page could show each crew member's `terms_version` / `terms_accepted_at`.
