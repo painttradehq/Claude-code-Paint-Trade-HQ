@@ -146,3 +146,6 @@ Josh: a tick "that says we have a right to store, use your details such as sendi
 - Rules for every brief from now: no `rm -rf` outside `memory/tmp` and `/tmp`; the report's test counts come from `pytest --collect-only`.
 - Follow-up G (Terms gate) rides with C6b. Pending from Josh: the new `terms.md` (check crew clauses vs the facts card and the crew notice; date the gate's line).
 - Admin chat: Team page could show each crew member's `terms_version` / `terms_accepted_at`.
+
+## 1 Nov — Josh: follow-up G (Terms gate) not needed yet (no live users)
+Parked, prototype (`#s-terms`) and spec kept. Trigger to unpark: before launch, or the first Terms change once crew exist. New starters already record the live Terms version at join, so nothing is needed until then. The new Terms text itself: still worth a read for the crew clauses when convenient; not blocking.

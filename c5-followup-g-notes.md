@@ -1,6 +1,6 @@
-# Follow-up G — "We've updated our Terms": a one-time gate for crew when the Terms version moves (v1, 1 Nov 2026, not sent)
+# Follow-up G — "We've updated our Terms": a one-time gate for crew when the Terms version moves (v1, 1 Nov 2026 — PARKED by Josh: no live users yet; build before launch or at the first Terms change after crew exist)
 
-Prototype: `#s-terms` in `c1-crew-shell.html` (`crew-terms`), deep link `?screen=terms-update`; checks in `tools/test_c1.js` (section "Follow-up G"; 476 total, 390 × 844 and 360 × 800; `shots-f/g-terms-*.png`). Prompted by Josh, 1 Nov: "I have updated the terms of use for the app, you probably want to update that too." Rides with C6b (or the next crew round).
+Prototype: `#s-terms` in `c1-crew-shell.html` (`crew-terms`), deep link `?screen=terms-update`; checks in `tools/test_c1.js` (section "Follow-up G"; 476 total, 390 × 844 and 360 × 800; `shots-f/g-terms-*.png`). Prompted by Josh, 1 Nov: "I have updated the terms of use for the app, you probably want to update that too." Parked 1 Nov (Josh: "there is no live users yet so it's not necessary"). Prototype and spec kept; goes into the pre-launch round.
 
 ## 1. Why
 
