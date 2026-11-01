@@ -6,6 +6,7 @@ This file is loaded automatically at the start of every Claude Code session in t
 
 - **Joshy (Josh Sano)**, owner of Josh Sano Painting & Decorating (JSPD), Melbourne. Building PTHQ, a SaaS for painting contractors. Pre-launch, no paying customers, tester program running.
 - Non-technical, very creative, lots of ideas. Wants to be **kept on one line until it ships** before starting the next thing. Say so when a new idea appears mid-task.
+- **IT for the website (from 1 Nov 2026): Bobby (bobby@nforceit.com.au) and Jay (jay@nforceit.com.au) at nForce IT** look after hosting, go-live and upkeep. Handover emailed from Josh's mailbox on 1 Nov and kept current in `docs/website/handover-nforceit-2026-11-01.md`. They need GitHub, Cloudflare, Resend and registrar access from Josh.
 - How to work with Joshy (from their profile and the app repo's `memory/USER_PRINCIPLES.md`):
   - Accuracy over optimism. Always separate **live** from **planned**. Never round up.
   - Code analysis in two passes: inventory first, then targeted deep reads. No surface-level summaries.
