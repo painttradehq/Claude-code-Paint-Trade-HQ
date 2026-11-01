@@ -456,6 +456,33 @@ async function run(b, W, H, tag) {
   await p.goto(U + '?screen=job&id=j2'); await p.waitForTimeout(300);
   ok('a job whose quote has no scope detail shows no "Open the full scope" row' + full, (await p.locator(T('crew-job-scope')).count()) === 0);
 
+  // ---- C6b: My feedback and Team events ----
+  await p.goto(U + '?screen=app&tab=inbox'); await p.waitForTimeout(300); await p.click(T('crew-inbox-message')); await p.waitForTimeout(200);
+  ok('Inbox › Message Josh opens My feedback: back Inbox, the composer, two messages (one replied, one waiting)' + full, await p.locator(T('crew-feedback')).isVisible() && (await txt(T('crew-feedback-title'))) === 'My feedback' && await p.locator(T('crew-feedback-text')).isVisible() && (await p.locator(T('crew-feedback-row')).count()) === 2 && (await p.locator(T('crew-feedback-reply')).count()) === 1 && /Reply from Josh · Wed 29 Oct/.test(await txt(T('crew-feedback-reply'))) && (await p.locator(T('crew-feedback-noreply')).count()) === 1 && (await go()) === '/employee/feedback');
+  await p.click(T('crew-feedback-send')); await p.waitForTimeout(100);
+  ok('Send with nothing → "Type your message first."' + full, (await txt(T('crew-feedback-err'))) === 'Type your message first.' && (await p.locator(T('crew-feedback-row')).count()) === 2);
+  await p.fill(T('crew-feedback-text'), 'TS_ the stairwell light is out'); await p.waitForTimeout(50);
+  ok('typing clears the line' + full, (await p.locator(T('crew-feedback-err')).count()) === 0);
+  await p.click(T('crew-feedback-send')); await p.waitForTimeout(150);
+  ok('Send → the message tops the list with "No reply yet.", the box clears, the post is recorded' + full, (await p.locator(T('crew-feedback-row')).count()) === 3 && /stairwell light is out/.test(await p.locator(T('crew-feedback-row')).first().textContent()) && /No reply yet/.test(await p.locator(T('crew-feedback-row')).first().textContent()) && (await p.locator(T('crew-feedback-text')).inputValue()) === '' && (await go()) === 'POST /feedback' && (await box(T('crew-feedback-send'))).height >= 44 && await noHScroll());
+  await p.screenshot({ path: OUT + `c6b-feedback-${tag}.png` });
+  await p.click(T('crew-feedback-back')); await p.waitForTimeout(150);
+  ok('Back → Inbox' + full, await p.locator(T('crew-shell')).isVisible() && !(await p.locator(T('crew-feedback')).isVisible()));
+  await p.goto(U + '?screen=feedback&feedback=0'); await p.waitForTimeout(300);
+  ok('feedback: empty state' + full, (await txt(T('crew-feedback-empty'))) === 'Nothing sent yet. Your messages and the replies land here.');
+  await p.goto(U + '?screen=app&tab=me'); await p.waitForTimeout(300); await p.click(T('crew-me-events')); await p.waitForTimeout(200);
+  ok('Me › Team events: back Me, "3 coming up", three birthday chips (you marked), three events with when/where, the invited pill, going counts' + full, await p.locator(T('crew-events')).isVisible() && (await txt(T('crew-events-meta'))) === '3 coming up' && (await p.locator(T('crew-events-birthday')).count()) === 3 && /Mia \(you\) · 28 Dec/.test(await txt(T('crew-events-birthdays'))) && (await p.locator(T('crew-event-row')).count()) === 3 && /Fri 7 Nov · 7:00 – 7:30 am · The yard/.test(await p.locator(T('crew-event-when')).first().textContent()) && (await p.locator(T('crew-event-row')).first().locator('.pill').count()) === 1 && (await p.locator(T('crew-event-count')).first().textContent()) === '5 going' && (await go()) === '/employee/team-events');
+  ok('an all-day notice (the shutdown) has no RSVP button; the others do; buttons ≥ 40 px; no horizontal scroll' + full, (await p.locator(T('crew-event-rsvp')).count()) === 2 && (await box(T('crew-event-rsvp'))).height >= 40 && await noHScroll());
+  await p.screenshot({ path: OUT + `c6b-events-${tag}.png` });
+  await p.locator(T('crew-event-rsvp')).first().click(); await p.waitForTimeout(100);
+  ok('tapping "I\'m going ✓" un-RSVPs: the count drops, the button reads "I\'m going", the post is recorded' + full, (await p.locator(T('crew-event-count')).first().textContent()) === '4 going' && (await p.locator(T('crew-event-rsvp')).first().textContent()) === "I'm going" && (await p.locator(T('crew-event-rsvp')).first().getAttribute('aria-pressed')) === 'false' && (await go()) === 'POST /events/e1/rsvp');
+  await p.locator(T('crew-event-rsvp')).nth(1).click(); await p.waitForTimeout(100);
+  ok('tapping "I\'m going" on the BBQ: 4 going, the button filled' + full, (await p.locator(T('crew-event-count')).nth(1).textContent()) === '4 going' && (await p.locator(T('crew-event-rsvp')).nth(1).textContent()) === "I'm going ✓");
+  await p.click(T('crew-events-back')); await p.waitForTimeout(150);
+  ok('Back → Me' + full, await p.locator(T('crew-shell')).isVisible());
+  await p.goto(U + '?screen=events&events=0&birthdays=0'); await p.waitForTimeout(300);
+  ok('events: empty state, no birthdays section, meta "Nothing coming up"' + full, (await txt(T('crew-events-empty'))) === 'No team events coming up. When your employer shares one, it lands here.' && (await p.locator(T('crew-events-birthdays')).count()) === 0 && (await txt(T('crew-events-meta'))) === 'Nothing coming up');
+
   // ---- Follow-up G: the Terms-updated gate ----
   await p.goto(U + '?screen=terms-update'); await p.waitForTimeout(300);
   ok('Terms updated: the title, the dated line, the agreement with both links, Continue, Sign out; no tab bar, no back' + full, await p.locator(T('crew-terms')).isVisible() && (await txt(T('crew-terms-title'))) === "We've updated our Terms" && /changed on 1 November 2026\. Have a read, then tick to keep using the app\./.test(await txt(T('crew-terms-line'))) && (await p.locator(T('crew-terms-agree')).getAttribute('aria-checked')) === 'false' && await p.locator(T('crew-terms-tos')).isVisible() && await p.locator(T('crew-terms-privacy')).isVisible() && (await txt(T('crew-terms-continue'))) === 'Continue' && await p.locator(T('crew-terms-signout')).isVisible() && !(await p.locator(T('crew-tabbar')).isVisible()) && (await p.locator('#s-terms .back').count()) === 0 && (await go()) === '/employee/terms-updated');

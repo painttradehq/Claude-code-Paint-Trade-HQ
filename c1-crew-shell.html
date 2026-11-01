@@ -324,6 +324,24 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
 .swatch{width:40px;height:40px;border-radius:12px;border:1px solid var(--border-strong);flex-shrink:0}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:12px}
 .sect .sect-sub{text-transform:none;letter-spacing:0;font-weight:500}
+.fb-msg{padding:14px 16px;border-top:1px solid var(--border)}
+.fb-msg:first-child{border-top:0}
+.fb-text{font-size:15px;line-height:1.45}
+.fb-meta{font-size:12.5px;color:var(--text-muted);margin-top:4px}
+.fb-reply{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--accent-bg);font-size:14px;line-height:1.45}
+.fb-reply b{display:block;font-size:12.5px;color:var(--accent);margin-bottom:2px}
+.fb-noreply{margin-top:8px;font-size:13px;color:var(--text-muted)}
+.ev{padding:14px 16px;border-top:1px solid var(--border)}
+.ev:first-child{border-top:0}
+.ev-title{font-size:16px;font-weight:600;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.ev-when{font-size:14px;color:var(--text-secondary);margin-top:3px}
+.ev-note{font-size:14px;color:var(--text-secondary);margin-top:8px;line-height:1.45}
+.ev-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:10px}
+.ev-count{font-size:13px;color:var(--text-muted)}
+.ev-btn{min-height:40px;padding:0 14px;border-radius:10px;border:1.5px solid var(--accent);background:var(--surface);color:var(--accent);font-weight:600;font-size:14px}
+.ev-btn.on{background:var(--accent);color:#fff}
+.bdays{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px}
+.bday{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--border);font-size:13.5px;min-height:36px}
 .scope-line .row-sub{white-space:normal}
 .scope-line .chev{transition:transform .15s}
 .scope-line[aria-expanded="true"] .chev{transform:rotate(90deg)}
@@ -520,6 +538,26 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     <div class="form-body" id="scopeBody" data-testid="crew-scope-body" style="padding-top:4px"></div>
   </section>
   <div id="scopeLb" class="lb hide" data-testid="crew-scope-lightbox"><button class="lb-x" id="scopeLbX" data-testid="crew-scope-lightbox-close" aria-label="Close">×</button><div class="ph" id="scopeLbPh"></div><div class="lb-cap" id="scopeLbCap"></div></div>
+
+  <!-- ================= C6b: MY FEEDBACK (Inbox › Message {owner}) ================= -->
+  <section id="s-feedback" class="hide" data-testid="crew-feedback" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="fbBack" data-testid="crew-feedback-back"><svg><use href="#i-back"/></svg>Inbox</button></div>
+      <div class="job-title" data-testid="crew-feedback-title">My feedback</div>
+      <div class="meta" data-testid="crew-feedback-meta">Messages to Josh and the replies. Only you and your employer see them.</div>
+    </div>
+    <div class="form-body" id="fbBody" data-testid="crew-feedback-body" style="padding-top:4px"></div>
+  </section>
+
+  <!-- ================= C6b: TEAM EVENTS (Me › Team events) ================= -->
+  <section id="s-events" class="hide" data-testid="crew-events" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="evBack" data-testid="crew-events-back"><svg><use href="#i-back"/></svg>Me</button></div>
+      <div class="job-title" data-testid="crew-events-title">Team events</div>
+      <div class="meta" id="evMeta" data-testid="crew-events-meta"></div>
+    </div>
+    <div class="form-body" id="evBody" data-testid="crew-events-body" style="padding-top:4px"></div>
+  </section>
 
   <!-- ================= Follow-up G: TERMS UPDATED (a one-time gate at app open when the Terms version moved) ================= -->
   <section id="s-terms" class="hide" data-testid="crew-terms" style="flex:1;display:flex;flex-direction:column;min-height:0">
@@ -1380,6 +1418,8 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     if (row.dataset.testid === 'crew-learn-coaching') { openCoaching(); return; }
     if (row.dataset.testid === 'crew-learn-validations') { openGoing(); return; }
     if (row.dataset.testid === 'crew-me-equipment') { openEquip(); return; }
+    if (row.dataset.testid === 'crew-me-events') { openEvents(); return; }
+    if (row.dataset.testid === 'crew-inbox-message') { openFeedback(); return; }
     if (row.dataset.id && /^\/employee\/daily-report\?report=/.test(row.dataset.go)) { const n = state.notifs.find(x => x.id === row.dataset.id); if (n) { n.read = true; renderNotifs(); } openReport(row.dataset.go.split('=')[1]); return; }
     if (row.dataset.id) { const n = state.notifs.find(x => x.id === row.dataset.id); if (n) { n.read = true; renderNotifs(); } }
     document.body.dataset.lastGo = row.dataset.go; // prototype: records the route the real app would push
@@ -1434,7 +1474,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     { id: 'd3', name: 'Safety agreement', status: 'ended', sent: '2026-05-01', signed: '2026-05-02', countersigned: '2026-05-02', ended: '2026-09-30', content: 'SAFETY AGREEMENT\n\nReplaced by the site safety plan of 30 Sep 2026.' },
   ];
   const cStatus = (c) => c.status === 'sent' ? { cls: 'wait', txt: 'Awaiting signature' } : c.status === 'signed' ? { cls: 'live', txt: 'Signed' } : { cls: 'ended', txt: 'Ended' };
-  function hideC5(){ ['#s-onb', '#s-profile', '#s-docs', '#s-doc', '#s-reset', '#s-notice', '#s-terms', '#s-scope', '#s-training', '#s-video', '#s-coaching', '#s-going', '#s-rating', '#s-equip', '#s-item'].forEach(x => $(x).classList.add('hide')); }
+  function hideC5(){ ['#s-onb', '#s-profile', '#s-docs', '#s-doc', '#s-reset', '#s-notice', '#s-terms', '#s-scope', '#s-feedback', '#s-events', '#s-training', '#s-video', '#s-coaching', '#s-going', '#s-rating', '#s-equip', '#s-item'].forEach(x => $(x).classList.add('hide')); }
   function stackOpen(id){ $('#s-app').classList.add('hide'); $('#s-login').classList.add('hide'); hideC5(); $(id).classList.remove('hide'); const b = $(id + ' .form-body'); if (b) b.scrollTop = 0; }
   const MARK = $('#s-login .mark').innerHTML;
 
@@ -1826,6 +1866,47 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   $('#reqCancel').addEventListener('click', closeReq); $('#reqSend').addEventListener('click', sendReq);
   $('#reqBack').addEventListener('click', () => { req.cat = null; req.items = []; req.err = ''; renderReq(); });
 
+  // ---- C6b: My feedback ----
+  // GET /feedback/mine → [{id, text, sent_at, reply: {text, at, by_first_name} | null}]; POST /feedback {employee_id, feedback_text} (as built, hardened)
+  const fb = { items: q.get('feedback') === '0' ? [] : [
+      { id: 'f1', text: 'The van\'s rear left tyre is getting low. Worth a look before the Lygon St start.', sent: 'Tue 28 Oct', reply: { text: 'Thanks Mia, booked it in for Friday arvo. Take the ute till then.', at: 'Wed 29 Oct', by: 'Josh' } },
+      { id: 'f2', text: 'Could we get a second extension pole? Sharing one on the stairwell is slowing us down.', sent: 'Mon 20 Oct', reply: null },
+    ], draft: '', err: '' };
+  function renderFeedback(){
+    const rows = fb.items.length ? fb.items.map(m => `<div class="fb-msg" data-testid="crew-feedback-row"><div class="fb-text">${esc(m.text)}</div><div class="fb-meta">Sent ${esc(m.sent)}</div>${m.reply ? `<div class="fb-reply" data-testid="crew-feedback-reply"><b>Reply from ${esc(m.reply.by)} · ${esc(m.reply.at)}</b>${esc(m.reply.text)}</div>` : '<div class="fb-noreply" data-testid="crew-feedback-noreply">No reply yet.</div>'}</div>`).join('') : '<div class="empty" data-testid="crew-feedback-empty">Nothing sent yet. Your messages and the replies land here.</div>';
+    $('#fbBody').innerHTML = `<div class="sect">Message Josh</div>
+      <div class="card" style="padding:14px 16px"><textarea class="tin ${fb.err ? 'bad' : ''}" id="fbText" data-testid="crew-feedback-text" rows="3" placeholder="e.g. The van's rear tyre is getting low" style="resize:none">${esc(fb.draft)}</textarea>${fb.err ? `<div class="err" data-testid="crew-feedback-err">${esc(fb.err)}</div>` : ''}<button class="btn btn-primary" style="margin-top:10px" data-testid="crew-feedback-send" data-fb="send">Send</button></div>
+      <div class="sect">Your messages</div>
+      <div class="list" data-testid="crew-feedback-list">${rows}</div>`;
+  }
+  function openFeedback(){ hideC5(); $('#s-app').classList.add('hide'); $('#s-feedback').classList.remove('hide'); renderFeedback(); document.body.dataset.lastGo = '/employee/feedback'; }
+  $('#fbBack').addEventListener('click', () => { $('#s-feedback').classList.add('hide'); showApp('inbox'); });
+  $('#fbBody').addEventListener('input', (e) => { if (e.target.id === 'fbText') { fb.draft = e.target.value; if (fb.err && fb.draft.trim()) { fb.err = ''; e.target.classList.remove('bad'); const er = $('#fbBody .err'); if (er) er.remove(); } } });
+  $('#fbBody').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-fb]'); if (!b) return;
+    const text = ($('#fbText').value || '').trim();
+    if (!text) { fb.err = 'Type your message first.'; renderFeedback(); return; }
+    fb.items.unshift({ id: 'f' + Date.now(), text, sent: 'just now', reply: null }); fb.draft = ''; fb.err = ''; renderFeedback(); document.body.dataset.lastGo = 'POST /feedback';
+  });
+
+  // ---- C6b: Team events ----
+  // GET /events/mine → [{id, title, starts_at, ends_at, all_day, location, note, invited, my_rsvp, going_count}]; POST /events/{id}/rsvp {going}; GET /team/birthdays → [{first_name, month, day, me}]
+  const ev = { items: q.get('events') === '0' ? [] : [
+      { id: 'e1', title: 'Toolbox talk · working at heights', when: 'Fri 7 Nov · 7:00 – 7:30 am', where: 'The yard', note: 'Short one before we head out. Harness check for everyone on the Lygon St job.', invited: true, going: true, count: 5 },
+      { id: 'e2', title: 'End of year BBQ', when: 'Sat 13 Dec · from 4 pm', where: 'Josh\'s place, 9 Hope St Brunswick', note: 'Partners and kids welcome. Bring a plate if you like; drinks sorted.', invited: false, going: false, count: 3 },
+      { id: 'e3', title: 'Christmas shutdown', when: 'Mon 22 Dec – Fri 9 Jan', where: '', note: 'Last day Friday 19 Dec. Back Monday 12 Jan.', allDay: true, invited: false, going: null, count: 0 },
+    ], bdays: q.get('birthdays') === '0' ? [] : [{ name: 'Tom', when: '14 Nov' }, { name: 'Lee', when: '2 Dec' }, { name: 'Mia', when: '28 Dec', me: true }] };
+  function renderEvents(){
+    const n = ev.items.length;
+    $('#evMeta').textContent = n ? `${n} coming up` : 'Nothing coming up';
+    const bd = ev.bdays.length ? `<div class="sect">Birthdays</div><div class="card" style="padding:0"><div class="bdays" data-testid="crew-events-birthdays">${ev.bdays.map(b => `<span class="bday" data-testid="crew-events-birthday">🎂 ${esc(b.name)}${b.me ? ' (you)' : ''} · ${esc(b.when)}</span>`).join('')}</div></div>` : '';
+    const rows = n ? ev.items.map(x => `<div class="ev" data-testid="crew-event-row"><div class="ev-title"><span>${esc(x.title)}</span>${x.invited ? '<span class="pill soon">Invited</span>' : ''}</div><div class="ev-when" data-testid="crew-event-when">${esc(x.when)}${x.where ? ' · ' + esc(x.where) : ''}</div>${x.note ? `<div class="ev-note">${esc(x.note)}</div>` : ''}${x.going === null ? '' : `<div class="ev-foot"><span class="ev-count" data-testid="crew-event-count">${x.count === 0 ? 'No one has said yet' : x.count === 1 ? '1 going' : x.count + ' going'}</span><button class="ev-btn ${x.going ? 'on' : ''}" data-testid="crew-event-rsvp" data-rsvp="${x.id}" aria-pressed="${x.going}">${x.going ? "I'm going ✓" : "I'm going"}</button></div>`}</div>`).join('') : '<div class="empty" data-testid="crew-events-empty">No team events coming up. When your employer shares one, it lands here.</div>';
+    $('#evBody').innerHTML = `${bd}<div class="sect">Coming up</div><div class="list" data-testid="crew-events-list">${rows}</div>`;
+  }
+  function openEvents(){ hideC5(); $('#s-app').classList.add('hide'); $('#s-events').classList.remove('hide'); renderEvents(); document.body.dataset.lastGo = '/employee/team-events'; }
+  $('#evBack').addEventListener('click', () => { $('#s-events').classList.add('hide'); showApp('me'); });
+  $('#evBody').addEventListener('click', (e) => { const b = e.target.closest('[data-rsvp]'); if (!b) return; const x = ev.items.find(i => i.id === b.dataset.rsvp); x.going = !x.going; x.count += x.going ? 1 : -1; renderEvents(); document.body.dataset.lastGo = 'POST /events/' + x.id + '/rsvp'; });
+
   // ---- Follow-up E: the Scope screen (the quote as built, no money; planned hours behind the owner's switch) ----
   // GET /projects/mine/{id}/scope → {summary, planned_hours: bool, hours, areas[{id, name, dims, note, hours, lines[{id, name, qty, unit, sub, note, size, condition, product, hours, photos[{url, note, marks, image_size}]}]}], added_work[...]}
   const sc = { job: null, open: new Set(), hours: q.get('hours') === '1', summary: q.get('summary') !== '0' };
@@ -1990,6 +2071,8 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   else if (q.get('screen') === 'notice') { openNotice(q.get('bn') || 'Sano Painting', null); }
   else if (q.get('screen') === 'terms-update') { openTermsUpdate(); }
   else if (q.get('screen') === 'scope') { showApp('jobs'); openScope(q.get('id') || 'j1'); }
+  else if (q.get('screen') === 'feedback') { showApp('inbox'); openFeedback(); }
+  else if (q.get('screen') === 'events') { showApp('me'); openEvents(); }
   else if (q.get('screen') === 'profile') { showApp('me'); openProfile(); }
   else if (q.get('screen') === 'docs') { showApp('me'); openDocs(); }
   else if (q.get('screen') === 'reset') { openReset(q.get('from') || 'login', q.get('email') || (q.get('step') ? 'mia@example.com' : '')); const st = parseInt(q.get('step') || '1', 10); if (st > 1) { rs.step = st; renderReset(); } }
