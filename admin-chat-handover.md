@@ -25,3 +25,9 @@ Paste into the admin chat as its next small round or parking lot. Nothing here t
 10. Rating, problem and daily-report photos are 7-day signed URLs with no re-sign: store the blob path and sign on read (one round for all three).
 11. **SMS Sender ID Register**: from 1 July 2026 a branded SMS sender name must be registered with the ACMA through the SMS provider (Twilio) or phones show it as "Unverified". Before any branded crew SMS.
 12. **privacy.md gaps for crew** (lawyer): §3 names only welcome emails, not the crew emails the app sends (temporary password, documents to sign, countersigned copy, password codes); §9's "Reply STOP" reads as if crew service messages are opt-out; the acceptance record is listed under business sign-up, not crew; §1 puts crew in both "account holders" and "people in a business's records"; §2's crew list does not name the police check (sensitive information) or the working-with-children check. Also the crew notice (`content/legal/crew-notice.md`, 1.0-draft) and the IP in the acceptance record (optional) are for the lawyer.
+
+## Added 1 Nov (from follow-up E and C6b)
+13. **Settings › Crew app: "Show planned hours to crew"** switch → `crew_app_settings.scope.planned_hours` (the backend side lands with follow-up E); off by default.
+14. **Events: a "Show to crew" tick** (`share_with_crew`) in `CalDrawer.tsx`, `DesktopCalendar.tsx` and `app/admin/events.tsx`, with a "shared with crew" line in the drawer (the backend accepts the field from C6b). Until then crew only see events they are named on.
+15. **Cross-tenant birthday notifications** — `server.py` `run_birthday_check` (scheduled in `worker.py`) notifies every employee of every business about every birthday. Group by tenant, skip deleted rows and the owner's bridge row, first names only. Fix before launch.
+16. **CrewMessages**: no unread indicator and no notification when a crew message arrives; the reply slot is single and overwritten.
