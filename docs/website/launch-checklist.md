@@ -35,6 +35,7 @@ In the Pages project, **Settings → Variables and secrets**, add these as **sec
 | `RESEND_API_KEY` | a new key with **sending access only**, restricted to the domain `painttradehq.co` | resend.com → API keys → Create |
 | `INVITE_FROM` | `Paint Trade HQ website <website@painttradehq.co>` | the domain is already verified in Resend |
 | `INVITE_TO` | `software@joshsano.com.au` | optional; this is the default anyway |
+| `INVITE_AUTOREPLY` | leave unset | optional; set to `0` to stop the confirmation email the form sends to each requester (added 1 Nov 2026) |
 
 Leave `APP_LEADS_URL` and the Turnstile keys unset for now. Redeploy once after adding secrets (Deployments → Retry) so the functions pick them up. Add the plain variable `PUBLIC_CHAT_ENABLED` = `0` now and leave it there until step 5 is done; the chat box then stays off the pages. (The chat function carries a dated overrides block with the new prices and trial, so it would not contradict the pages, but the rest of its answers still come from the old file.)
 
