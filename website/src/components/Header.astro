@@ -24,7 +24,6 @@ const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '').r
         ))}
       </ul>
       <div class="hdr__actions">
-        <a class="hdr__signin" href={site.signInUrl} rel="noopener">Sign in</a>
         <Button href={site.status.ctaHref} size="sm">{site.status.cta}</Button>
       </div>
     </nav>
@@ -80,7 +79,6 @@ const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '').r
     box-shadow: inset 0 -2px 0 var(--accent);
   }
   .hdr__actions { display: flex; align-items: center; gap: 16px; }
-  .hdr__signin { color: var(--accent-ink); font-weight: 600; font-size: 15px; }
   .hdr__burger {
     display: none;
     width: 44px;
@@ -116,7 +114,7 @@ const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '').r
     .hdr__links { flex-direction: column; gap: 4px; }
     .hdr__links a { display: block; padding: 10px 0; font-size: 17px; }
     .hdr__links a[aria-current='page'] { box-shadow: none; }
-    .hdr__actions { justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--border); }
+    .hdr__actions { display: grid; padding-top: 8px; border-top: 1px solid var(--border); }
   }
 </style>
 

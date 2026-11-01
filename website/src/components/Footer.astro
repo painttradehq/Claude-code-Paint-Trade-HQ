@@ -21,13 +21,6 @@ import { site, nav } from '../data/site';
           </ul>
         </div>
         <div>
-          <h4>Account</h4>
-          <ul>
-            <li><a href={site.signInUrl} rel="noopener">Sign in</a></li>
-            <li><a href={site.crewUrl} rel="noopener">Crew sign-in</a></li>
-          </ul>
-        </div>
-        <div>
           <h4>Legal</h4>
           <ul>
             <li><a href={site.termsUrl} rel="noopener">Terms of Service</a></li>
@@ -76,7 +69,7 @@ import { site, nav } from '../data/site';
   .ftr__blurb { max-width: 36ch; margin: 12px 0 10px; }
   .ftr__cols {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 24px;
   }
   .ftr__cols h4 {

@@ -14,8 +14,6 @@ export const site = {
   description:
     'Paint Trade HQ runs a painting business end to end: quotes clients sign online, live jobs, crew sign-in with GPS, daily reports, invoices and payments, employee records, a CRM, a calendar and Lucy, the AI assistant. Built in Melbourne. Priced in AUD, GST on top.',
   appUrl: 'https://painttradehq.co',
-  signInUrl: 'https://painttradehq.co/admin/login',
-  crewUrl: 'https://painttradehq.co/crew',
   termsUrl: 'https://painttradehq.co/terms',
   supportEmail: 'software@joshsano.com.au',
   copyright: '© 2026 Josh Sano Painting and Decorating, trading as Paint Trade HQ',
