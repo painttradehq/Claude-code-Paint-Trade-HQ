@@ -10,8 +10,9 @@
  *   RESEND_API_KEY      required to send email
  *   INVITE_FROM         required: a sender on a domain verified in Resend, e.g. "Paint Trade HQ <website@painttradehq.co>"
  *   INVITE_TO           optional, default software@joshsano.com.au
- *   INVITE_AUTOREPLY    optional; set to 0 to stop the confirmation email to the requester
- *   TURNSTILE_SECRET    optional; when set, the full form needs a Turnstile token. The chat's mini form is exempt
+ *   INVITE_CONFIRM_LIMIT optional Rate Limiting binding for the requester's confirmation (one per address a day)
+ *   TURNSTILE_SECRET    set it before launch: the function emails the address a visitor types, and Turnstile is what
+ *                       keeps a script from using that to mail strangers. When set, the full form needs a token. The chat's mini form is exempt
  *                       and gets its own tighter budget (2 a minute per IP) instead.
  *   APP_LEADS_URL       optional, e.g. https://painttradehq.co/api/signup-leads — also files the lead in the app
  *   INVITE_RATE_LIMIT   optional Rate Limiting binding; RATE_KV optional KV namespace (see wrangler.toml)
@@ -27,6 +28,7 @@ const FIELDS = ['name', 'business', 'location', 'email', 'mobile', 'crew', 'plan
 const MAX_BODY_BYTES = 64 * 1024;
 const RATE = { binding: 'INVITE_RATE_LIMIT', limit: 5, period: 60 };
 const CHAT_RATE = { binding: 'INVITE_CHAT_LIMIT', limit: 2, period: 60 };
+const CONFIRM_RATE = { binding: 'INVITE_CONFIRM_LIMIT', limit: 1, period: 24 * 60 * 60 };
 const DEFAULT_REDIRECT = '/trial/sent';
 const ERROR_REDIRECT = '/trial/error';
 /** Plans as the form sends them. Names and monthly prices mirror src/data/site.ts (the test checks they match). */
@@ -98,14 +100,14 @@ function confirmation(lead, origin) {
     '',
     'What happens next',
     `1. We set up your account${p ? ` on the ${p.name} plan` : ''} and email your login, usually the same business day.`,
-    '2. You use everything for 30 days. No card needed, nothing to pay today.',
+    p ? `2. You use the ${p.name} plan for 30 days. No card needed, nothing to pay today.` : '2. You use it for 30 days. No card needed, nothing to pay today.',
     p
       ? `3. After that, ${p.name} is ${aud(p.price)} + GST a month, billed monthly, cancel any time.`
       : `3. After that, plans are from ${aud(PLANS.starter.price)} + GST a month, billed monthly, cancel any time. We will help you pick one.`,
     '',
     p ? `What ${p.name} includes: ${origin}/pricing#${lead.plan}` : `The three plans side by side: ${origin}/pricing`,
   ];
-  if (lead.billing === 'yearly') lines.push('', 'You asked about paying yearly. We will come back to you on that.');
+  if (lead.billing === 'yearly') lines.push('', 'You said you would rather pay yearly. Plans are monthly only today; we will tell you if that changes.');
   lines.push('', 'Questions? Reply to this email and it reaches us.', '', 'Paint Trade HQ', 'Josh Sano Painting and Decorating, trading as Paint Trade HQ · Melbourne');
   return lines.join('\n');
 }
@@ -123,7 +125,7 @@ async function verifyTurnstile(secret, token, ip) {
   }
 }
 
-export async function onRequestPost({ request, env }) {
+export async function onRequestPost({ request, env, waitUntil }) {
   const contentType = request.headers.get('content-type') || '';
   const isFormHint = !contentType.includes('application/json');
   if (!sameOrigin(request)) {
@@ -208,40 +210,50 @@ export async function onRequestPost({ request, env }) {
   }
   if (!sent) return respond(isForm, 502, { error: `That didn't send. Please email ${to}.` }, redirectTo);
 
-  // The requester's confirmation: straight away, fixed text, same sender, replies go to the owner. Best effort:
-  // the owner's email above is the record.
-  if (lead.source === 'website' && env.INVITE_AUTOREPLY !== '0') {
-    try {
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, 'content-type': 'application/json' },
-        body: JSON.stringify({ from: env.INVITE_FROM, to: [lead.email], reply_to: to, subject: 'Your Paint Trade HQ free trial', text: confirmation(lead, new URL(request.url).origin) }),
-      });
-    } catch {
-      /* nothing to do; the owner emails the login anyway */
-    }
-  }
-
-  // Optional: also file the lead in the app's Signup leads inbox (Settings › Platform). Best effort. Not for updates sign-ups.
-  if (env.APP_LEADS_URL && lead.source !== 'newsletter') {
-    try {
-      await fetch(env.APP_LEADS_URL, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          business_name: lead.business || '(from website chat)',
-          owner_name: lead.name || lead.email,
-          email: lead.email,
-          phone: lead.mobile || null,
-          notes: [lead.location && `Where: ${lead.location}`, lead.crew && `Crew: ${lead.crew}`, plan && `Plan: ${plan.name}`, lead.billing && `Billing: ${BILLING[lead.billing]}`, `Source: website ${lead.source}`].filter(Boolean).join(' · '),
-        }),
-      });
-    } catch {
-      /* the email is the record; this is a bonus */
-    }
-  }
+  // Two follow-ups that never change the answer: the requester's confirmation and the optional app copy. On
+  // Cloudflare they finish after the response (waitUntil); without it (tests) they are awaited.
+  const followUps = [];
+  if (lead.source === 'website') followUps.push(sendConfirmation(env, lead, to, new URL(request.url).origin));
+  if (env.APP_LEADS_URL && lead.source !== 'newsletter') followUps.push(fileInApp(env, lead, plan));
+  const tail = Promise.allSettled(followUps);
+  if (typeof waitUntil === 'function') waitUntil(tail);
+  else await tail;
 
   return respond(isForm, 200, { ok: true }, redirectTo);
+}
+
+/** The requester's confirmation: fixed text, same sender, replies go to the owner, at most one per address a day. */
+async function sendConfirmation(env, lead, ownerTo, origin) {
+  if (!(await rateLimit(env, { ...CONFIRM_RATE, key: `confirm:${lead.email}` }))) return;
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ from: env.INVITE_FROM, to: [lead.email], reply_to: ownerTo, subject: 'Your Paint Trade HQ free trial', text: confirmation(lead, origin) }),
+    });
+    if (!r.ok) console.warn('invite: confirmation not sent', r.status);
+  } catch {
+    console.warn('invite: confirmation not sent');
+  }
+}
+
+/** Optional copy into the app's Signup leads inbox (Settings › Platform). The owner's email is the record; this is a bonus. */
+async function fileInApp(env, lead, plan) {
+  try {
+    await fetch(env.APP_LEADS_URL, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        business_name: lead.business || '(from website chat)',
+        owner_name: lead.name || lead.email,
+        email: lead.email,
+        phone: lead.mobile || null,
+        notes: [lead.location && `Where: ${lead.location}`, lead.crew && `Crew: ${lead.crew}`, plan && `Plan: ${plan.name}`, lead.billing && `Billing: ${BILLING[lead.billing]}`, `Source: website ${lead.source}`].filter(Boolean).join(' · '),
+      }),
+    });
+  } catch {
+    /* bonus only */
+  }
 }
 
 export function onRequestGet() {

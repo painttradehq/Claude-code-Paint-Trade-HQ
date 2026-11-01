@@ -11,7 +11,7 @@ import { inviteFields, plans, aud, incGst, site } from '../data/site';
 const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
 const seats = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 ---
-<form class="invite card" id="invite-form" method="post" action="/api/invite" novalidate>
+<form class="invite card" id="invite-form" method="post" action="/api/invite">
   <input type="hidden" name="source" value="trial-page" />
   <input type="hidden" name="redirect" value="/trial/sent" />
   <!-- Honeypot: real people never see or fill this. -->
@@ -70,7 +70,7 @@ const seats = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
       {plans.map((p) => (
         <div class="pp__what" data-plan={p.id}>
-          <h4 class="pp__wt">What you get on {p.name}</h4>
+          <h3 class="pp__wt">What you get on {p.name}</h3>
           {p.inherits && <p class="small pp__inh">{p.inherits}</p>}
           <ul class="checklist pp__list">
             {p.includes.map((f) => <li>{f}</li>)}
@@ -79,31 +79,31 @@ const seats = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
         </div>
       ))}
       <div class="pp__what" data-plan="unsure">
-        <h4 class="pp__wt">No worries</h4>
-        <p class="small pp__after">We look at your crew size and what you do most, and suggest a plan with your login. Plans are from {aud(plans[0].price)} + GST a month, and you can change later.</p>
+        <h3 class="pp__wt">No worries</h3>
+        <p class="small pp__after">We look at your crew size and suggest a plan with your login. Plans are from {aud(plans[0].price)} + GST a month, and you can change plan any time.</p>
       </div>
     </fieldset>
 
     <fieldset class="fs fs--billing">
-      <legend class="fs__t"><span class="fs__n mono" aria-hidden="true">3</span> Billing after the trial</legend>
+      <legend class="fs__t"><span class="fs__n mono" aria-hidden="true">3</span> How would you rather pay?</legend>
       <div class="seg" role="radiogroup" aria-label="Billing cycle">
         <label class="seg__opt"><input type="radio" name="billing" value="monthly" checked /><span>Monthly</span></label>
         <label class="seg__opt"><input type="radio" name="billing" value="yearly" /><span>Yearly</span></label>
       </div>
-      <p class="fs__hint small">Plans are billed monthly. If you would rather pay yearly, tick it and we will come back to you.</p>
+      <p class="fs__hint small">Plans are monthly only today. Tick Yearly and we will tell you if that changes.</p>
     </fieldset>
 
     {turnstileKey && <div class="cf-turnstile" data-sitekey={turnstileKey} data-theme="light"></div>}
 
     <div class="invite__foot">
       <button class="btn btn--primary btn--lg" type="submit" id="invite-submit">{site.status.cta}</button>
-      <p class="small invite__note">No card needed. A confirmation lands in your inbox straight away; your login follows by email, usually the same business day.</p>
+      <p class="small invite__note">No card needed. A confirmation email comes first; your login follows, usually the same business day.</p>
     </div>
   </div>
 
-  <div class="invite__done card--sunken" id="invite-done" hidden role="status">
+  <div class="invite__done card--sunken" id="invite-done" hidden role="status" tabindex="-1">
     <h3>Thanks, your trial is on its way.</h3>
-    <p>A confirmation is on its way to your inbox. We set up your account and email your login, usually the same business day.</p>
+    <p>A confirmation email is on its way. We set up your account and email your login, usually the same business day.</p>
   </div>
   <p class="invite__error small" id="invite-error" hidden role="alert">
     That didn't send. Or email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a> and we will get it.
@@ -162,7 +162,8 @@ const seats = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
   .seg__opt span { display: block; padding: 9px 18px; font-size: 15px; font-weight: 600; color: var(--text-2); }
   .seg__opt + .seg__opt { border-left: 1px solid var(--border-strong); }
   .seg__opt:has(input:checked) span, .seg__opt.is-on span { background: var(--accent); color: #fff; }
-  .seg__opt:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .seg__opt:has(input:focus-visible) span { box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px var(--accent); }
+  .invite__done:focus { outline: none; }
   .fs--billing .fs__hint { margin: 0; }
 
   .invite__foot { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
@@ -170,6 +171,11 @@ const seats = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
   .invite__done { margin-top: 20px; padding: 20px; border-radius: var(--r-md); }
   .invite__done h3 { margin-top: 0; }
   .invite__error { color: var(--danger); margin-top: 12px; }
+  @media (forced-colors: active) {
+    /* Forced colours drop backgrounds and shadows, so the native radios carry the picked state. */
+    .pp__card input, .pp__unsure input, .seg__opt input { position: static; opacity: 1; width: 16px; height: 16px; margin: 0 8px 0 0; justify-self: start; }
+    .pp__unsure span::before { display: none; }
+  }
   @media (max-width: 720px) {
     .invite { padding: 20px; }
     .invite__grid { grid-template-columns: 1fr; }
@@ -198,6 +204,10 @@ const seats = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
     const picked = (form.querySelector<HTMLInputElement>('input[name="plan"]:checked') || {}).value;
     form.querySelectorAll<HTMLElement>('.pp__what').forEach((el) => el.classList.toggle('is-on', !!picked && el.dataset.plan === picked));
   };
+  // Pricing's plan buttons link to /trial?plan=<id>: pre-pick that card.
+  const wanted = new URLSearchParams(location.search).get('plan');
+  const pre = wanted ? form.querySelector<HTMLInputElement>(`input[name="plan"][value="${CSS.escape(wanted)}"]`) : null;
+  if (pre) pre.checked = true;
   form.addEventListener('change', mirror);
   mirror();
 
@@ -209,25 +219,25 @@ const seats = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
     try {
       const res = await fetch('/api/invite', { method: 'POST', headers: { 'content-type': 'application/json', accept: 'application/json' }, body: JSON.stringify(payload) });
       if (!res.ok) {
-        // 4xx carries a short line meant for the visitor (bad email, missing name, failed check).
-        let msg = '';
-        if (res.status < 500) msg = (await res.json().catch(() => ({})))?.error || '';
+        // The function's error bodies are short fixed lines meant for the visitor (bad email, missing plan, not set up yet).
+        const msg = (await res.json().catch(() => ({})))?.error || '';
         throw new Error(msg);
       }
       form.querySelector('.invite__body')?.setAttribute('hidden', '');
       done.hidden = false;
+      done.focus({ preventScroll: true });
       done.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } catch (e) {
       const msg = e instanceof Error ? e.message : '';
       err.textContent = '';
-      if (msg) {
-        err.append(`${msg} `);
+      err.append(`${msg || "That didn't send."} `);
+      if (!msg.includes(SUPPORT)) {
+        // The function's own 5xx lines already say where to email; only add it when they do not.
+        const a = document.createElement('a');
+        a.href = `mailto:${SUPPORT}`;
+        a.textContent = SUPPORT;
+        err.append('Or email ', a, ' and we will get it.');
       }
-      err.append('Or email ');
-      const a = document.createElement('a');
-      a.href = `mailto:${SUPPORT}`;
-      a.textContent = SUPPORT;
-      err.append(a, ' and we will get it.');
       err.hidden = false;
       submit.disabled = false;
       // Turnstile tokens are single-use: get a fresh one for the retry.

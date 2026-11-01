@@ -39,13 +39,13 @@ Both functions refuse requests whose `Origin` header is not this site (a missing
 
 `PUBLIC_CHAT_ENABLED=0` at build time leaves the chat box off every page (for a launch before the Anthropic key exists, or while the knowledge file still describes the tester program). `PUBLIC_SHOW_SAMPLES=0` hides the sample feedback cards and the sample directory listings; with samples shown, the directory pages carry `noindex`. `PUBLIC_*` values are read at build time from `.env` (Astro), not from `.dev.vars` (Wrangler); set them in both places locally, or just in the Pages project settings.
 
-`npm run test:functions` exercises both functions in Node with a stubbed network: origin and size guards (including bodies without Content-Length and multi-byte text), honeypot, validation, redirect safety (including dot-segment tricks), rate-limit tiers that throw, Turnstile exemption and budget for chat leads, the email payload, and the chat's message sanitiser.
+`npm run test:functions` exercises both functions in Node with a stubbed network: origin and size guards (including bodies without Content-Length and multi-byte text), honeypot, validation, redirect safety (including dot-segment tricks), rate-limit tiers that throw, Turnstile exemption and budget for chat leads, the email payload, and the chat's message sanitiser. Since 1 Nov 2026 it also covers plan and billing validation, the requester's fixed-text confirmation (one per address a day, finished after the response via `waitUntil`) and the owner-emailed-but-confirmation-failed path.
 
 The same files deploy to Vercel or Netlify with a few lines of adapter code for the two functions; Cloudflare is the path of least resistance.
 
 ## Rules baked in
 
-- Call to action is always "Start free trial" (30 days, every plan, no card; Josh, 30 Oct 2026). The site never takes sign-ups or payments itself: the form emails the owner, who sets the account up.
+- Call to action is always "Start free trial" (30 days, every plan, no card; Josh, 30 Oct 2026). The site never takes sign-ups or payments itself: the form emails the owner, who sets the account up, and sends the requester a fixed-text confirmation (1 Nov 2026). Turnstile should be on before launch because of that email.
 - Prices are AUD a month, ex-GST, with the inc-GST figure shown: $98 / $178 / $249 (Josh, 30 Oct 2026).
 - No Privacy link (Terms §5 covers data). Footer: "© 2026 Josh Sano Painting and Decorating, trading as Paint Trade HQ".
 - "Sign in" goes to https://painttradehq.co/admin/login; crew to /crew.

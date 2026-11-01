@@ -9,7 +9,7 @@ import { setTimeout as sleep } from 'node:timers/promises';
 
 const PORT = 4399;
 const BASE = `http://127.0.0.1:${PORT}`;
-const PAGES = ['/', '/features', '/pricing', '/story', '/trial', '/trial/sent', '/trial/error', '/painters', '/painters/harbourline-painting', '/blog', '/blog/quoting-in-minutes-not-evenings', '/blog/the-project-page-keeps-the-record', '/blog/one-page-per-person', '/blog/meet-lucy', '/blog/where-your-photos-and-paperwork-live', '/blog/performance-and-hr-for-a-crew', '/404'];
+const PAGES = ['/', '/features', '/pricing', '/story', '/trial', '/trial/sent', '/trial/error', '/updates/sent', '/painters', '/painters/harbourline-painting', '/blog', '/blog/quoting-in-minutes-not-evenings', '/blog/the-project-page-keeps-the-record', '/blog/one-page-per-person', '/blog/meet-lucy', '/blog/where-your-photos-and-paperwork-live', '/blog/performance-and-hr-for-a-crew', '/404'];
 const WIDTHS = [390, 768, 1024, 1440];
 const OUT = '.qa';
 mkdirSync(OUT, { recursive: true });
@@ -100,7 +100,7 @@ try {
   }
 
   // Forbidden words and claims (knowledge file §12 and §9) must not appear on any page.
-  const banned = [/\btenant\b/i, /\btester/i, /plans open at launch/i, /ask for an invite/i, /14-day/i, /\bSaaS\b/, /\bplatforms?\b/i, /AI-powered/i, /revolutionary/i, /seamless/i, /App Store app/i, /free plan/i, /\bannual\b/i, /Stripe/, /Twilio/, /Resend/, /Emergent/, /offline/i, /Xero connected/i, /\bMYOB\b(?! \.)/];
+  const banned = [/\btenant\b/i, /\btester/i, /plans open at launch/i, /ask for an invite/i, /14-day/i, /\bSaaS\b/, /\bplatforms?\b/i, /AI-powered/i, /revolutionary/i, /seamless/i, /App Store app/i, /free plan/i, /\bannual\b/i, /\byearly (price|plan|billing)\b/i, /Stripe/, /Twilio/, /Resend/, /Emergent/, /offline/i, /Xero connected/i, /\bMYOB\b(?! \.)/];
   const allow = [/no app store app/i, /no app store or play store app/i, /app store or play store apps/i, /is there a free plan\?/i, /no\. three plans/i, /annual price yet/i, /no annual price/i, /annual pricing/i, /xero or myob/i, /no myob/i, /not connected yet/i];
   for (const path of PAGES.filter((p) => p !== '/404')) {
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });

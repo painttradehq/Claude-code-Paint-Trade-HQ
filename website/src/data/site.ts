@@ -119,7 +119,7 @@ export const plans: Plan[] = [
 
 export const pricingNotes = [
   'Prices are AUD a month, ex-GST; 10% GST is added.',
-  'Free trial: 30 days on any plan, no card needed. Then pick a plan, or walk away.',
+  'Free trial: 30 days on the plan you pick, no card needed. Then keep going, or walk away.',
   'Monthly only, no annual price yet. Cancel any time and keep access to the end of the paid month. Upgrades apply at once, pro-rated; downgrades at the end of the month.',
   'Seats: admins are the people on the Team admins list including the owner; employees are the people on the Employees page who have not been removed. Going over the included number adds a seat at the prices above, and the app asks before it adds one.',
   'Data migration from old software: free on Enterprise, quoted on the other two.',

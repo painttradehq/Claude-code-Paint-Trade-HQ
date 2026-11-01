@@ -1,0 +1,19 @@
+---
+/** Where the "Get the notes by email" forms land without JavaScript (with it, the note shows inline). */
+import Base from '../../layouts/Base.astro';
+import Button from '../../components/Button.astro';
+---
+<Base title="You're on the list" description="Your email is on the Paint Trade HQ notes list." noindex>
+  <section class="section">
+    <div class="container narrow center">
+      <h1>Thanks, you're on the list.</h1>
+      <p class="lead">One email when something ships or a note goes up. Nothing else.</p>
+      <Button href="/blog" variant="ghost">Back to the notes</Button>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .narrow { max-width: 620px; }
+  .narrow h1 { margin-top: 12px; }
+</style>

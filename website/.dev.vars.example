@@ -17,7 +17,8 @@ INVITE_TO=software@joshsano.com.au
 # Optional: also file the lead into the app's Signup leads inbox (Settings › Platform)
 APP_LEADS_URL=
 
-# Optional spam check on the invite form (Cloudflare Turnstile)
+# Spam check on the trial form (Cloudflare Turnstile). Set both before launch: since 1 Nov 2026 the form emails a
+# confirmation to the address a visitor types, and this is what keeps a script from mailing strangers from the domain.
 TURNSTILE_SECRET=
 PUBLIC_TURNSTILE_SITE_KEY=
 

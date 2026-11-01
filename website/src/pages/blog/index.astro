@@ -62,7 +62,7 @@ const count = (t: string) => posts.filter((p) => p.data.tag === t).length;
       </div>
       <form class="updates__form" id="updates-form" method="post" action="/api/invite" novalidate>
         <input type="hidden" name="source" value="newsletter" />
-        <input type="hidden" name="redirect" value="/trial/sent" />
+        <input type="hidden" name="redirect" value="/updates/sent" />
         <input type="text" name="website" class="visually-hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <label class="visually-hidden" for="updates-email">Your email</label>
         <div class="updates__row">

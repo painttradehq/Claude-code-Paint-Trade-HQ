@@ -35,9 +35,8 @@ In the Pages project, **Settings → Variables and secrets**, add these as **sec
 | `RESEND_API_KEY` | a new key with **sending access only**, restricted to the domain `painttradehq.co` | resend.com → API keys → Create |
 | `INVITE_FROM` | `Paint Trade HQ website <website@painttradehq.co>` | the domain is already verified in Resend |
 | `INVITE_TO` | `software@joshsano.com.au` | optional; this is the default anyway |
-| `INVITE_AUTOREPLY` | leave unset | optional; set to `0` to stop the confirmation email the form sends to each requester (added 1 Nov 2026) |
 
-Leave `APP_LEADS_URL` and the Turnstile keys unset for now. Redeploy once after adding secrets (Deployments → Retry) so the functions pick them up. Add the plain variable `PUBLIC_CHAT_ENABLED` = `0` now and leave it there until step 5 is done; the chat box then stays off the pages. (The chat function carries a dated overrides block with the new prices and trial, so it would not contradict the pages, but the rest of its answers still come from the old file.)
+Leave `APP_LEADS_URL` unset for now. **Set up Turnstile before launch** (free, 5 minutes): Cloudflare dashboard → **Turnstile → Add site** (domain `painttradehq.com`, widget mode Managed) → copy the **site key** into a plain variable `PUBLIC_TURNSTILE_SITE_KEY` and the **secret key** into the secret `TURNSTILE_SECRET`, then redeploy. Since 1 Nov 2026 the form emails a confirmation to whatever address a visitor types, and Turnstile is what stops a script using that to send strangers mail from your domain (the function also allows one confirmation per address a day). Redeploy once after adding secrets (Deployments → Retry) so the functions pick them up. Add the plain variable `PUBLIC_CHAT_ENABLED` = `0` now and leave it there until step 5 is done; the chat box then stays off the pages. (The chat function carries a dated overrides block with the new prices and trial, so it would not contradict the pages, but the rest of its answers still come from the old file.)
 
 Test on the preview link: fill in the free-trial form with your own email and check it arrives (and, once the knowledge file is updated and the chat is on, ask the chat box "What does it cost?"). Set `PUBLIC_SHOW_SAMPLES` = `0` for the live site unless you want the sample feedback cards and sample painter listings showing.
 
@@ -54,6 +53,8 @@ Test on the preview link: fill in the free-trial form with your own email and ch
 ## 5. The knowledge file (2 min)
 
 The pages changed on 30 Oct (30-day free trial on every plan, $98 / $178 / $249, no tester wording) but the chat box still answers from `docs/website/chat-knowledge.md` (your `website-chat-knowledge.md`), which says tester program, $59 / $179 and a 14-day trial on Enterprise. Update §0, §6, §9, §10 and §11 (and add that crew sign-in is on every plan) and send the file again. Until then keep `PUBLIC_CHAT_ENABLED` = `0` so the chat box stays off the pages.
+
+Also in §10 (1 Nov 2026): drop "what software they use today"; add "which plan (Starter, Small business, Enterprise, or not sure) and whether they would rather pay monthly or yearly"; and note that the site emails each requester a fixed confirmation as soon as the form is sent.
 
 ## After launch
 

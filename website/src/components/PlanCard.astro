@@ -25,11 +25,12 @@ const inc = incGst(plan.price);
     {plan.includes.map((f) => <li>{f}</li>)}
   </ul>
   <div class="plan__cta">
-    <Button href={site.status.ctaHref} variant={plan.highlight ? 'primary' : 'ghost'} class="plan__btn">{site.status.cta}</Button>
+    <Button href={`${site.status.ctaHref}?plan=${plan.id}`} variant={plan.highlight ? 'primary' : 'ghost'} class="plan__btn">{site.status.cta}</Button>
   </div>
 </article>
 
 <style>
+  .plan { scroll-margin-top: calc(var(--header-h) + 12px); }
   .plan {
     position: relative;
     display: flex;
