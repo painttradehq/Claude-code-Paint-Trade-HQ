@@ -3,9 +3,10 @@
  * the machine. Run: npm run test:functions (after npm run build, which generates _lib/knowledge.js).
  */
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { onRequestPost as chat, sanitiseMessages } from '../functions/api/chat.js';
 import { sameOrigin, readLimited, rateLimit } from '../functions/_lib/guard.js';
-import { onRequestPost as invite } from '../functions/api/invite.js';
+import { onRequestPost as invite, PLANS } from '../functions/api/invite.js';
 
 const SITE = 'https://www.painttradehq.co';
 let passed = 0;
@@ -80,7 +81,7 @@ console.log('chat.js');
 console.log('invite.js');
 {
   const base = { RESEND_API_KEY: 'rk', INVITE_FROM: 'Paint Trade HQ website <website@painttradehq.co>' };
-  const lead = { name: 'Mia', business: 'Harbourline Painting', email: 'mia@example.com', location: 'Mosman NSW' };
+  const lead = { name: 'Mia', business: 'Harbourline Painting', email: 'mia@example.com', location: 'Mosman NSW', plan: 'small-business', billing: 'monthly' };
 
   let r = await invite({ request: req('/api/invite', { body: lead, origin: null }), env: base });
   assert.equal(r.status, 403); ok('missing Origin → 403 (JSON)');
@@ -148,6 +149,50 @@ console.log('invite.js');
   assert.equal(r.status, 200);
   const nl = JSON.parse(calls.find((c) => c.url.includes('resend')).init.body);
   assert.ok(nl.subject.startsWith('Updates sign-up')); assert.ok(!calls.some((c) => c.url.includes('app.example'))); ok('updates sign-up emails the owner only, never the app inbox');
+
+  // Plan and billing (Josh, 1 Nov 2026): the full form must name a plan; both reach the owner; the requester
+  // gets a fixed-text confirmation that echoes nothing they typed.
+  fetchImpl = async () => new Response('{}', { status: 200 });
+  r = await invite({ request: req('/api/invite', { body: { ...lead, plan: undefined }, ip: '192.0.2.210' }), env: base });
+  assert.equal(r.status, 400); ok('website lead without a plan → 400');
+  r = await invite({ request: req('/api/invite', { body: { ...lead, plan: 'platinum' }, ip: '192.0.2.211' }), env: base });
+  assert.equal(r.status, 400); ok('unknown plan value → 400, never passed through');
+  calls.length = 0;
+  r = await invite({ request: req('/api/invite', { body: { ...lead, billing: 'yearly', software: 'Spreadsheets' }, ip: '192.0.2.212' }), env: { ...base, APP_LEADS_URL: 'https://app.example/api/signup-leads' } });
+  assert.equal(r.status, 200);
+  const mails = calls.filter((c) => c.url.includes('resend')).map((c) => JSON.parse(c.init.body));
+  assert.equal(mails.length, 2);
+  const [owner, you] = mails;
+  assert.deepEqual(owner.to, ['software@joshsano.com.au']);
+  assert.ok(owner.text.includes('Plan:        Small business ($178 + GST a month)')); assert.ok(owner.text.includes('Billing:     Yearly'));
+  assert.ok(owner.subject.includes('Small business')); assert.ok(!owner.text.includes('Uses today')); assert.ok(!owner.text.includes('Spreadsheets'));
+  ok('owner email carries plan and billing; the dropped "uses today" field is ignored');
+  assert.deepEqual(you.to, ['mia@example.com']); assert.equal(you.from, base.INVITE_FROM); assert.equal(you.reply_to, 'software@joshsano.com.au');
+  assert.equal(you.subject, 'Your Paint Trade HQ free trial'); assert.equal(you.html, undefined);
+  assert.ok(you.text.includes('Small business') && you.text.includes('$178 + GST a month') && you.text.includes(`${SITE}/pricing#small-business`) && you.text.includes('paying yearly'));
+  assert.ok(!you.text.includes('Mia') && !you.text.includes('Harbourline') && !you.text.includes('mia@example.com') && !you.text.includes('Spreadsheets'));
+  ok('requester gets a fixed-text confirmation: plan, price, pricing link, yearly note; nothing they typed is echoed');
+  const filed = JSON.parse(calls.find((c) => c.url.includes('app.example')).init.body);
+  assert.ok(filed.notes.includes('Plan: Small business') && filed.notes.includes('Billing: Yearly') && !filed.notes.includes('Uses:'));
+  ok('app inbox copy carries plan and billing');
+  calls.length = 0;
+  r = await invite({ request: req('/api/invite', { body: { ...lead, plan: 'unsure', billing: 'nonsense' }, ip: '192.0.2.213' }), env: base });
+  assert.equal(r.status, 200);
+  const [o2, y2] = calls.filter((c) => c.url.includes('resend')).map((c) => JSON.parse(c.init.body));
+  assert.ok(o2.text.includes('Plan:        Not sure yet') && o2.text.includes('Billing:     -'));
+  assert.ok(y2.text.includes('plans are from $98') && y2.text.includes(`${SITE}/pricing`) && !y2.text.includes('yearly'));
+  ok('"not sure yet" is a valid plan; an unknown billing value is dropped, not echoed');
+  calls.length = 0;
+  r = await invite({ request: req('/api/invite', { body: lead, ip: '192.0.2.214' }), env: { ...base, INVITE_AUTOREPLY: '0' } });
+  assert.equal(r.status, 200); assert.equal(calls.filter((c) => c.url.includes('resend')).length, 1); ok('INVITE_AUTOREPLY=0 turns the confirmation off');
+  calls.length = 0;
+  r = await invite({ request: req('/api/invite', { body: { email: 'x@example.com', source: 'chat' }, ip: '192.0.2.215' }), env: base });
+  assert.equal(r.status, 200); assert.equal(calls.filter((c) => c.url.includes('resend')).length, 1); ok('chat leads need no plan and get no confirmation');
+  r = await invite({ request: req('/api/invite', { body: { ...lead, redirect: '/trial/sent' }, json: false, ip: '192.0.2.216' }), env: base });
+  assert.equal(r.status, 303); assert.equal(r.headers.get('location'), '/trial/sent'); ok('the no-JavaScript form POST carries plan and billing through');
+  const siteTs = await readFile(new URL('../src/data/site.ts', import.meta.url), 'utf8');
+  for (const [id, p] of Object.entries(PLANS)) if (p.price) assert.ok(siteTs.includes(`id: '${id}',\n    name: '${p.name}',\n    price: ${p.price},`), `${id} differs from site.ts`);
+  assert.ok(!siteTs.includes("name: 'software'")); ok('the function\'s plan table matches site.ts; the form no longer has a software field');
 
   // Upstream failures become fixed answers, never a Cloudflare error page.
   fetchImpl = async () => { throw new TypeError('fetch failed'); };

@@ -2,8 +2,8 @@
 /**
  * Start free trial, in the home page's language (31 Oct 2026). What this page has that the others don't: the
  * "what happens next" steps drawn as a numbered path beside the form, so the manual part (we set the account
- * up and email the login) is plain before anyone types. The form itself (InviteForm) is unchanged: same fields,
- * honeypot, optional Turnstile, the same /api/invite function and redirects.
+ * up and email the login) is plain before anyone types. The form (InviteForm) asks for the plan and the billing
+ * cycle as well as the details (Josh, 1 Nov 2026); same honeypot, optional Turnstile, /api/invite and redirects.
  */
 import Base from '../layouts/Base.astro';
 import InviteForm from '../components/InviteForm.astro';
@@ -11,9 +11,9 @@ import Reveal from '../components/Reveal.astro';
 import { site } from '../data/site';
 
 const steps = [
-  { t: 'Leave your details', w: 'Name, business, where you are, how many on the crew. No card, no password, no ABN.' },
-  { t: 'We set up your account', w: 'And email your login, usually the same business day.' },
-  { t: 'Use everything for 30 days', w: 'Then pick a plan, or walk away with your data.' },
+  { t: 'Leave your details', w: 'Name, business, where you are, how many on the crew, and the plan you want. No card, no password, no ABN.' },
+  { t: 'We set up your account', w: 'A confirmation lands in your inbox straight away. Your login follows by email, usually the same business day.' },
+  { t: 'Use everything for 30 days', w: 'Then your plan starts at its monthly price, or walk away with your data.' },
 ];
 ---
 <Base title="Start your free trial" description="Try every part of Paint Trade HQ free for 30 days, no card needed. Leave your details and your login arrives by email.">

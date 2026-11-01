@@ -1,11 +1,15 @@
 ---
 /**
- * "Start free trial" — the site's only call to action (Josh, 30 Oct 2026). Collects what the
- * knowledge file §10 lists and emails the owner through /api/invite. Works without JavaScript (plain
- * POST; the function redirects to /trial/sent or /trial/error) and with it (fetch + inline success).
+ * "Start free trial" — the site's only call to action (Josh, 30 Oct 2026). Three sections: who you are,
+ * which plan (with what that plan includes shown once it is picked), and how you would rather be billed
+ * after the trial (Josh, 1 Nov 2026). Emails the owner through /api/invite, which also sends the requester a
+ * fixed-text confirmation. Works without JavaScript (plain POST; the function redirects to /trial/sent or
+ * /trial/error) and with it (fetch + inline success). The plan panels switch with CSS :has(), so no script
+ * is needed for them either.
  */
-import { inviteFields, site } from '../data/site';
+import { inviteFields, plans, aud, incGst, site } from '../data/site';
 const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
+const seats = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 ---
 <form class="invite card" id="invite-form" method="post" action="/api/invite" novalidate>
   <input type="hidden" name="source" value="trial-page" />
@@ -16,41 +20,90 @@ const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
     <input id="invite-website" type="text" name="website" tabindex="-1" autocomplete="off" />
   </div>
 
-  <div class="invite__grid">
-    {inviteFields.map((f) => (
-      <div class={`field ${f.name === 'software' ? 'field--wide' : ''}`}>
-        <label for={`invite-${f.name}`}>{f.label}{f.required ? '' : <span class="muted"> (optional)</span>}</label>
-        {f.type === 'select' ? (
-          <select class="select" id={`invite-${f.name}`} name={f.name} required={f.required}>
-            <option value="" disabled selected>Choose…</option>
-            {f.options!.map((o) => <option value={o}>{o}</option>)}
-          </select>
-        ) : (
-          <input
-            class="input"
-            id={`invite-${f.name}`}
-            name={f.name}
-            type={f.type}
-            required={f.required}
-            placeholder={'placeholder' in f ? f.placeholder : undefined}
-            autocomplete={'autocomplete' in f ? f.autocomplete : undefined}
-            inputmode={f.type === 'tel' ? 'tel' : undefined}
-          />
-        )}
+  <div class="invite__body">
+    <fieldset class="fs">
+      <legend class="fs__t"><span class="fs__n mono" aria-hidden="true">1</span> About you</legend>
+      <div class="invite__grid">
+        {inviteFields.map((f) => (
+          <div class="field">
+            <label for={`invite-${f.name}`}>{f.label}{f.required ? '' : <span class="muted"> (optional)</span>}</label>
+            {f.type === 'select' ? (
+              <select class="select" id={`invite-${f.name}`} name={f.name} required={f.required}>
+                <option value="" disabled selected>Choose…</option>
+                {f.options!.map((o) => <option value={o}>{o}</option>)}
+              </select>
+            ) : (
+              <input
+                class="input"
+                id={`invite-${f.name}`}
+                name={f.name}
+                type={f.type}
+                required={f.required}
+                placeholder={'placeholder' in f ? f.placeholder : undefined}
+                autocomplete={'autocomplete' in f ? f.autocomplete : undefined}
+                inputmode={f.type === 'tel' ? 'tel' : undefined}
+              />
+            )}
+          </div>
+        ))}
       </div>
-    ))}
-  </div>
+    </fieldset>
 
-  {turnstileKey && <div class="cf-turnstile" data-sitekey={turnstileKey} data-theme="light"></div>}
+    <fieldset class="fs fs--plan">
+      <legend class="fs__t"><span class="fs__n mono" aria-hidden="true">2</span> Your plan</legend>
+      <p class="fs__hint small">30 days free on any plan, no card. You can change plan later.</p>
+      <div class="pp" role="radiogroup" aria-label="Plan">
+        {plans.map((p) => (
+          <label class="pp__card">
+            <input type="radio" name="plan" value={p.id} required />
+            <span class="pp__name">{p.name}</span>
+            <span class="pp__price"><span class="mono">{aud(p.price)}</span> <small>+ GST a month</small></span>
+            <span class="pp__who">{p.blurb}</span>
+            <span class="pp__seats">{seats(p.admins, 'admin')} · {seats(p.employees, 'employee')} included</span>
+          </label>
+        ))}
+        <label class="pp__unsure">
+          <input type="radio" name="plan" value="unsure" />
+          <span>Not sure yet, help me choose</span>
+        </label>
+      </div>
 
-  <div class="invite__foot">
-    <button class="btn btn--primary btn--lg" type="submit" id="invite-submit">{site.status.cta}</button>
-    <p class="small invite__note">No card needed. Your login arrives by email, usually the same business day. No passwords or ABN needed.</p>
+      {plans.map((p) => (
+        <div class="pp__what" data-plan={p.id}>
+          <h4 class="pp__wt">What you get on {p.name}</h4>
+          {p.inherits && <p class="small pp__inh">{p.inherits}</p>}
+          <ul class="checklist pp__list">
+            {p.includes.map((f) => <li>{f}</li>)}
+          </ul>
+          <p class="small pp__after">After the trial: <strong class="mono">{aud(p.price)}</strong> + GST a month ({aud(incGst(p.price))} including GST), billed monthly, cancel any time. Nothing to pay today.</p>
+        </div>
+      ))}
+      <div class="pp__what" data-plan="unsure">
+        <h4 class="pp__wt">No worries</h4>
+        <p class="small pp__after">We look at your crew size and what you do most, and suggest a plan with your login. Plans are from {aud(plans[0].price)} + GST a month, and you can change later.</p>
+      </div>
+    </fieldset>
+
+    <fieldset class="fs fs--billing">
+      <legend class="fs__t"><span class="fs__n mono" aria-hidden="true">3</span> Billing after the trial</legend>
+      <div class="seg" role="radiogroup" aria-label="Billing cycle">
+        <label class="seg__opt"><input type="radio" name="billing" value="monthly" checked /><span>Monthly</span></label>
+        <label class="seg__opt"><input type="radio" name="billing" value="yearly" /><span>Yearly</span></label>
+      </div>
+      <p class="fs__hint small">Plans are billed monthly. If you would rather pay yearly, tick it and we will come back to you.</p>
+    </fieldset>
+
+    {turnstileKey && <div class="cf-turnstile" data-sitekey={turnstileKey} data-theme="light"></div>}
+
+    <div class="invite__foot">
+      <button class="btn btn--primary btn--lg" type="submit" id="invite-submit">{site.status.cta}</button>
+      <p class="small invite__note">No card needed. A confirmation lands in your inbox straight away; your login follows by email, usually the same business day.</p>
+    </div>
   </div>
 
   <div class="invite__done card--sunken" id="invite-done" hidden role="status">
     <h3>Thanks, your trial is on its way.</h3>
-    <p>We set up your account and email your login, usually the same business day.</p>
+    <p>A confirmation is on its way to your inbox. We set up your account and email your login, usually the same business day.</p>
   </div>
   <p class="invite__error small" id="invite-error" hidden role="alert">
     That didn't send. Or email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a> and we will get it.
@@ -61,16 +114,73 @@ const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
 
 <style>
   .invite { padding: 28px; }
+  .invite__body { display: grid; gap: 26px; }
+  .fs { border: 0; margin: 0; padding: 0; min-width: 0; }
+  .fs__t { font-family: var(--font-display); font-weight: 600; font-size: 19px; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding: 0; }
+  .fs__n { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 13px; display: grid; place-items: center; font-weight: 500; }
+  .fs__hint { margin: -6px 0 12px; color: var(--text-2); }
   .invite__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
-  .field--wide { grid-column: 1 / -1; }
-  .invite__foot { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 8px; }
-  .invite__note { margin: 0; max-width: 42ch; }
+  .invite__grid .field:last-child { margin-bottom: 0; }
+
+  /* plan cards */
+  .pp { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .pp__card, .pp__unsure { position: relative; cursor: pointer; }
+  .pp__card input, .pp__unsure input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
+  .pp__card { display: grid; gap: 4px; align-content: start; padding: 14px 14px 12px; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--surface); transition: border-color 0.15s, box-shadow 0.15s; }
+  .pp__card:hover { border-color: var(--border-strong); }
+  .pp__card:has(input:checked), .pp__card.is-on { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); }
+  .pp__card:has(input:focus-visible), .pp__unsure:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .pp__name { font-family: var(--font-display); font-weight: 600; font-size: 17px; color: var(--text); }
+  .pp__price { font-size: 15px; color: var(--text); }
+  .pp__price .mono { font-size: 22px; font-weight: 500; letter-spacing: -0.01em; }
+  .pp__price small { color: var(--text-2); font-size: 13px; }
+  .pp__who { font-size: 13px; color: var(--text-2); line-height: 1.4; }
+  .pp__seats { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+  .pp__unsure { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-2); padding: 4px 2px; }
+  .pp__unsure span::before { content: ''; display: inline-block; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--border-strong); vertical-align: -3px; margin-right: 8px; background: var(--surface); }
+  .pp__unsure:has(input:checked) span::before, .pp__unsure.is-on span::before { border-color: var(--accent); box-shadow: inset 0 0 0 4px var(--accent); }
+  .pp__unsure:has(input:checked), .pp__unsure.is-on { color: var(--text); }
+
+  /* what the picked plan includes: shown by CSS :has(), nothing to script */
+  .pp__what { display: none; margin-top: 14px; padding: 16px 18px; border-radius: var(--r-md); background: var(--sunken); border: 1px solid var(--border); }
+  .fs--plan:has(input[value='starter']:checked) .pp__what[data-plan='starter'],
+  .fs--plan:has(input[value='small-business']:checked) .pp__what[data-plan='small-business'],
+  .fs--plan:has(input[value='enterprise']:checked) .pp__what[data-plan='enterprise'],
+  .fs--plan:has(input[value='unsure']:checked) .pp__what[data-plan='unsure'],
+  .pp__what.is-on { display: block; }
+  .pp__wt { margin: 0 0 6px; font-size: 16px; }
+  .pp__inh { margin: 0 0 8px; color: var(--text-2); font-weight: 600; }
+  .pp__list { columns: 2; column-gap: 20px; font-size: 14px; }
+  .pp__list li { break-inside: avoid; margin-bottom: 6px; }
+  .pp__after { margin: 10px 0 0; color: var(--text-2); }
+  .pp__after .mono { color: var(--text); }
+
+  /* billing */
+  .seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: var(--r-sm); overflow: hidden; background: var(--surface); margin-bottom: 10px; }
+  .seg__opt { position: relative; cursor: pointer; }
+  .seg__opt input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
+  .seg__opt span { display: block; padding: 9px 18px; font-size: 15px; font-weight: 600; color: var(--text-2); }
+  .seg__opt + .seg__opt { border-left: 1px solid var(--border-strong); }
+  .seg__opt:has(input:checked) span, .seg__opt.is-on span { background: var(--accent); color: #fff; }
+  .seg__opt:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .fs--billing .fs__hint { margin: 0; }
+
+  .invite__foot { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .invite__note { margin: 0; max-width: 46ch; }
   .invite__done { margin-top: 20px; padding: 20px; border-radius: var(--r-md); }
   .invite__done h3 { margin-top: 0; }
   .invite__error { color: var(--danger); margin-top: 12px; }
   @media (max-width: 720px) {
     .invite { padding: 20px; }
     .invite__grid { grid-template-columns: 1fr; }
+    .pp { grid-template-columns: 1fr; }
+    .pp__card { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'name price' 'who price' 'seats price'; align-items: center; column-gap: 12px; }
+    .pp__name { grid-area: name; }
+    .pp__price { grid-area: price; text-align: right; }
+    .pp__price small { display: block; }
+    .pp__who { grid-area: who; }
+    .pp__seats { grid-area: seats; }
+    .pp__list { columns: 1; }
   }
 </style>
 
@@ -80,6 +190,16 @@ const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
   const err = document.getElementById('invite-error') as HTMLElement;
   const submit = document.getElementById('invite-submit') as HTMLButtonElement;
   const SUPPORT = 'software@joshsano.com.au';
+
+  // The picked plan's card, its "what you get" panel and the billing toggle are styled with :has(); browsers
+  // without it get the same picture from these classes.
+  const mirror = () => {
+    form.querySelectorAll<HTMLInputElement>('input[name="plan"], input[name="billing"]').forEach((r) => r.closest('label')?.classList.toggle('is-on', r.checked));
+    const picked = (form.querySelector<HTMLInputElement>('input[name="plan"]:checked') || {}).value;
+    form.querySelectorAll<HTMLElement>('.pp__what').forEach((el) => el.classList.toggle('is-on', !!picked && el.dataset.plan === picked));
+  };
+  form.addEventListener('change', mirror);
+  mirror();
 
   form.addEventListener('submit', async (e) => {
     if (!form.checkValidity()) { form.reportValidity(); e.preventDefault(); return; }
@@ -94,8 +214,7 @@ const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
         if (res.status < 500) msg = (await res.json().catch(() => ({})))?.error || '';
         throw new Error(msg);
       }
-      form.querySelector('.invite__grid')?.setAttribute('hidden', '');
-      form.querySelector('.invite__foot')?.setAttribute('hidden', '');
+      form.querySelector('.invite__body')?.setAttribute('hidden', '');
       done.hidden = false;
       done.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } catch (e) {

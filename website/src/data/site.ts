@@ -451,7 +451,7 @@ export const faqs: { q: string; a: string }[] = [
   },
 ];
 
-/** §10 — what the free-trial form collects. Never passwords, card numbers or an ABN. */
+/** §10 — what the free-trial form collects, plus the plan and billing choice (Josh, 1 Nov 2026). Never passwords, card numbers or an ABN. */
 export const inviteFields = [
   { name: 'name', label: 'Your name', type: 'text', required: true, autocomplete: 'name' },
   { name: 'business', label: 'Business name', type: 'text', required: true, autocomplete: 'organization' },
@@ -459,7 +459,6 @@ export const inviteFields = [
   { name: 'email', label: 'Email', type: 'email', required: true, autocomplete: 'email' },
   { name: 'mobile', label: 'Mobile', type: 'tel', required: false, placeholder: '04…', autocomplete: 'tel' },
   { name: 'crew', label: 'How many on the crew?', type: 'select', required: true, options: ['Just me', '2 to 3', '4 to 6', '7 to 15', 'More than 15'] },
-  { name: 'software', label: 'What do you use today?', type: 'text', required: false, placeholder: 'Spreadsheets, another app, pen and paper…' },
 ] as const;
 
 /** §8 — the people behind it. */

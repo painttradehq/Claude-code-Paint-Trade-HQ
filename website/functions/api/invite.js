@@ -1,14 +1,16 @@
 /**
  * POST /api/invite — the "Start free trial" form (Cloudflare Pages Function). The path is internal.
  *
- * Takes the invite form (or the chat box's mini lead form), checks the honeypot and, if configured,
- * Cloudflare Turnstile, then emails Josh through Resend. Optionally also posts the lead into the app's
+ * Takes the trial form (or the chat box's mini lead form), checks the honeypot and, if configured,
+ * Cloudflare Turnstile, then emails Josh through Resend and sends the requester a fixed-text confirmation
+ * (Josh, 1 Nov 2026: "they immediately get an email"). Optionally also posts the lead into the app's
  * Signup leads inbox. Works for both fetch/JSON and a plain HTML form POST (redirects back).
  *
  * Env (Cloudflare Pages → Settings → Variables and secrets):
  *   RESEND_API_KEY      required to send email
  *   INVITE_FROM         required: a sender on a domain verified in Resend, e.g. "Paint Trade HQ <website@painttradehq.co>"
  *   INVITE_TO           optional, default software@joshsano.com.au
+ *   INVITE_AUTOREPLY    optional; set to 0 to stop the confirmation email to the requester
  *   TURNSTILE_SECRET    optional; when set, the full form needs a Turnstile token. The chat's mini form is exempt
  *                       and gets its own tighter budget (2 a minute per IP) instead.
  *   APP_LEADS_URL       optional, e.g. https://painttradehq.co/api/signup-leads — also files the lead in the app
@@ -21,12 +23,21 @@
 import { sameOrigin, readLimited, rateLimit } from '../_lib/guard.js';
 
 const DEFAULT_TO = 'software@joshsano.com.au';
-const FIELDS = ['name', 'business', 'location', 'email', 'mobile', 'crew', 'software', 'source', 'transcript', 'redirect', 'website', 'cf-turnstile-response'];
+const FIELDS = ['name', 'business', 'location', 'email', 'mobile', 'crew', 'plan', 'billing', 'source', 'transcript', 'redirect', 'website', 'cf-turnstile-response'];
 const MAX_BODY_BYTES = 64 * 1024;
 const RATE = { binding: 'INVITE_RATE_LIMIT', limit: 5, period: 60 };
 const CHAT_RATE = { binding: 'INVITE_CHAT_LIMIT', limit: 2, period: 60 };
 const DEFAULT_REDIRECT = '/trial/sent';
 const ERROR_REDIRECT = '/trial/error';
+/** Plans as the form sends them. Names and monthly prices mirror src/data/site.ts (the test checks they match). */
+export const PLANS = {
+  starter: { name: 'Starter', price: 98 },
+  'small-business': { name: 'Small business', price: 178 },
+  enterprise: { name: 'Enterprise', price: 249 },
+  unsure: { name: 'Not sure yet' },
+};
+const BILLING = { monthly: 'Monthly', yearly: 'Yearly' };
+const aud = (n) => `$${n}`;
 
 const json = (status, body) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
@@ -76,6 +87,29 @@ function respond(isForm, status, payload, redirectTo) {
   return json(status, payload);
 }
 
+/**
+ * The requester's confirmation. Fixed text only: nothing they typed is echoed, so the address they gave is
+ * the only input and a stranger's inbox can get at most this standard note, rate-limited like the rest.
+ */
+function confirmation(lead, origin) {
+  const p = lead.plan && PLANS[lead.plan].price ? PLANS[lead.plan] : null;
+  const lines = [
+    'Thanks for starting a free trial of Paint Trade HQ.',
+    '',
+    'What happens next',
+    `1. We set up your account${p ? ` on the ${p.name} plan` : ''} and email your login, usually the same business day.`,
+    '2. You use everything for 30 days. No card needed, nothing to pay today.',
+    p
+      ? `3. After that, ${p.name} is ${aud(p.price)} + GST a month, billed monthly, cancel any time.`
+      : `3. After that, plans are from ${aud(PLANS.starter.price)} + GST a month, billed monthly, cancel any time. We will help you pick one.`,
+    '',
+    p ? `What ${p.name} includes: ${origin}/pricing#${lead.plan}` : `The three plans side by side: ${origin}/pricing`,
+  ];
+  if (lead.billing === 'yearly') lines.push('', 'You asked about paying yearly. We will come back to you on that.');
+  lines.push('', 'Questions? Reply to this email and it reaches us.', '', 'Paint Trade HQ', 'Josh Sano Painting and Decorating, trading as Paint Trade HQ · Melbourne');
+  return lines.join('\n');
+}
+
 async function verifyTurnstile(secret, token, ip) {
   if (!token) return false;
   const form = new URLSearchParams({ secret, response: token });
@@ -116,7 +150,8 @@ export async function onRequestPost({ request, env }) {
     email: clean(data.email, 200).toLowerCase(),
     mobile: clean(data.mobile, 40),
     crew: clean(data.crew, 40),
-    software: clean(data.software, 200),
+    plan: Object.hasOwn(PLANS, clean(data.plan, 40)) ? clean(data.plan, 40) : '',
+    billing: Object.hasOwn(BILLING, clean(data.billing, 20)) ? clean(data.billing, 20) : '',
     source: ['chat', 'newsletter'].includes(clean(data.source, 40)) ? clean(data.source, 40) : 'website',
     transcript: clean(data.transcript, 6000),
   };
@@ -133,12 +168,15 @@ export async function onRequestPost({ request, env }) {
 
   if (!lead.email || !isEmail(lead.email)) return respond(isForm, 400, { error: 'Please enter a valid email.' }, redirectTo);
   if (lead.source === 'website' && (!lead.name || !lead.business)) return respond(isForm, 400, { error: 'Name and business name are needed.' }, redirectTo);
+  if (lead.source === 'website' && !lead.plan) return respond(isForm, 400, { error: 'Pick a plan.' }, redirectTo);
 
   if (!env.RESEND_API_KEY || !env.INVITE_FROM) {
     return respond(isForm, 503, { error: `Email isn't set up yet. Please email ${DEFAULT_TO}.` }, redirectTo);
   }
 
   const to = env.INVITE_TO || DEFAULT_TO;
+  const plan = lead.plan ? PLANS[lead.plan] : null;
+  const planText = plan ? (plan.price ? `${plan.name} (${aud(plan.price)} + GST a month)` : plan.name) : '-';
   const lines = [
     lead.source === 'newsletter' ? 'Updates sign-up from the website' : `Free trial request from the website (${lead.source})`,
     '',
@@ -148,14 +186,15 @@ export async function onRequestPost({ request, env }) {
     `Email:       ${lead.email}`,
     `Mobile:      ${lead.mobile || '-'}`,
     `Crew size:   ${lead.crew || '-'}`,
-    `Uses today:  ${lead.software || '-'}`,
+    `Plan:        ${planText}`,
+    `Billing:     ${lead.billing ? BILLING[lead.billing] : '-'}`,
     '',
     `Page: ${clean(request.headers.get('referer'), 300) || '-'}`,
     `IP: ${ip} · ${clean(request.headers.get('user-agent'), 300)}`,
   ];
   if (lead.transcript) lines.push('', '--- Chat transcript (as sent by the visitor\'s browser; unverified) ---', lead.transcript);
 
-  const subject = lead.source === 'newsletter' ? `Updates sign-up: ${lead.email}` : lead.business ? `Free trial request: ${lead.business} (${lead.name || lead.email})` : `Free trial request: ${lead.email}`;
+  const subject = lead.source === 'newsletter' ? `Updates sign-up: ${lead.email}` : lead.business ? `Free trial request: ${lead.business} (${lead.name || lead.email})${plan ? ` · ${plan.name}` : ''}` : `Free trial request: ${lead.email}`;
   let sent = false;
   try {
     const r = await fetch('https://api.resend.com/emails', {
@@ -169,6 +208,20 @@ export async function onRequestPost({ request, env }) {
   }
   if (!sent) return respond(isForm, 502, { error: `That didn't send. Please email ${to}.` }, redirectTo);
 
+  // The requester's confirmation: straight away, fixed text, same sender, replies go to the owner. Best effort:
+  // the owner's email above is the record.
+  if (lead.source === 'website' && env.INVITE_AUTOREPLY !== '0') {
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ from: env.INVITE_FROM, to: [lead.email], reply_to: to, subject: 'Your Paint Trade HQ free trial', text: confirmation(lead, new URL(request.url).origin) }),
+      });
+    } catch {
+      /* nothing to do; the owner emails the login anyway */
+    }
+  }
+
   // Optional: also file the lead in the app's Signup leads inbox (Settings › Platform). Best effort. Not for updates sign-ups.
   if (env.APP_LEADS_URL && lead.source !== 'newsletter') {
     try {
@@ -180,7 +233,7 @@ export async function onRequestPost({ request, env }) {
           owner_name: lead.name || lead.email,
           email: lead.email,
           phone: lead.mobile || null,
-          notes: [lead.location && `Where: ${lead.location}`, lead.crew && `Crew: ${lead.crew}`, lead.software && `Uses: ${lead.software}`, `Source: website ${lead.source}`].filter(Boolean).join(' · '),
+          notes: [lead.location && `Where: ${lead.location}`, lead.crew && `Crew: ${lead.crew}`, plan && `Plan: ${plan.name}`, lead.billing && `Billing: ${BILLING[lead.billing]}`, `Source: website ${lead.source}`].filter(Boolean).join(' · '),
         }),
       });
     } catch {
