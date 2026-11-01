@@ -7,7 +7,7 @@
  * /trial/error) and with it (fetch + inline success). The plan panels switch with CSS :has(), so no script
  * is needed for them either.
  */
-import { inviteFields, plans, aud, incGst, site } from '../data/site';
+import { inviteFields, plans, aud, incGst, yearly, yearlyPerMonth, site } from '../data/site';
 const turnstileKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
 const seats = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 ---
@@ -75,22 +75,23 @@ const seats = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
           <ul class="checklist pp__list">
             {p.includes.map((f) => <li>{f}</li>)}
           </ul>
-          <p class="small pp__after">After the trial: <strong class="mono">{aud(p.price)}</strong> + GST a month ({aud(incGst(p.price))} including GST), billed monthly, cancel any time. Nothing to pay today.</p>
+          <p class="small pp__after pp__after--m">After the trial: <strong class="mono">{aud(p.price)}</strong> + GST a month ({aud(incGst(p.price))} including GST), cancel any time. Nothing to pay today.</p>
+          <p class="small pp__after pp__after--y">After the trial: <strong class="mono">{aud(yearly(p.price))}</strong> + GST a year, paid up front ({aud(yearlyPerMonth(p.price))} a month; {aud(incGst(yearly(p.price)))} including GST). Nothing to pay today.</p>
         </div>
       ))}
       <div class="pp__what" data-plan="unsure">
         <h3 class="pp__wt">No worries</h3>
-        <p class="small pp__after">We look at your crew size and suggest a plan with your login. Plans are from {aud(plans[0].price)} + GST a month, and you can change plan any time.</p>
+        <p class="small pp__after">We look at your crew size and suggest a plan with your login. Plans are from {aud(plans[0].price)} + GST a month, or 10% less paid yearly, and you can change plan any time.</p>
       </div>
     </fieldset>
 
     <fieldset class="fs fs--billing">
-      <legend class="fs__t"><span class="fs__n mono" aria-hidden="true">3</span> How would you rather pay?</legend>
+      <legend class="fs__t"><span class="fs__n mono" aria-hidden="true">3</span> Billing after the trial</legend>
       <div class="seg" role="radiogroup" aria-label="Billing cycle">
         <label class="seg__opt"><input type="radio" name="billing" value="monthly" checked /><span>Monthly</span></label>
-        <label class="seg__opt"><input type="radio" name="billing" value="yearly" /><span>Yearly</span></label>
+        <label class="seg__opt"><input type="radio" name="billing" value="yearly" /><span>Yearly <small>save 10%</small></span></label>
       </div>
-      <p class="fs__hint small">Plans are monthly only today. Tick Yearly and we will tell you if that changes.</p>
+      <p class="fs__hint small">Yearly is paid up front and costs 10% less than twelve monthly payments. Nothing to pay during the trial.</p>
     </fieldset>
 
     {turnstileKey && <div class="cf-turnstile" data-sitekey={turnstileKey} data-theme="light"></div>}
@@ -153,13 +154,18 @@ const seats = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
   .pp__list { columns: 2; column-gap: 20px; font-size: 14px; }
   .pp__list li { break-inside: avoid; margin-bottom: 6px; }
   .pp__after { margin: 10px 0 0; color: var(--text-2); }
+  .pp__after--y { display: none; }
+  .invite:has(input[name='billing'][value='yearly']:checked) .pp__after--m, .invite.is-yearly .pp__after--m { display: none; }
+  .invite:has(input[name='billing'][value='yearly']:checked) .pp__after--y, .invite.is-yearly .pp__after--y { display: block; }
   .pp__after .mono { color: var(--text); }
 
   /* billing */
   .seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: var(--r-sm); overflow: hidden; background: var(--surface); margin-bottom: 10px; }
   .seg__opt { position: relative; cursor: pointer; }
   .seg__opt input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
-  .seg__opt span { display: block; padding: 9px 18px; font-size: 15px; font-weight: 600; color: var(--text-2); }
+  .seg__opt span { display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; font-size: 15px; font-weight: 600; color: var(--text-2); }
+  .seg__opt small { font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: var(--r-pill); background: var(--accent-bg); color: var(--accent-ink); }
+  .seg__opt:has(input:checked) small, .seg__opt.is-on small { background: rgba(255, 255, 255, 0.22); color: #fff; }
   .seg__opt + .seg__opt { border-left: 1px solid var(--border-strong); }
   .seg__opt:has(input:checked) span, .seg__opt.is-on span { background: var(--accent); color: #fff; }
   .seg__opt:has(input:focus-visible) span { box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px var(--accent); }
@@ -203,11 +209,13 @@ const seats = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
     form.querySelectorAll<HTMLInputElement>('input[name="plan"], input[name="billing"]').forEach((r) => r.closest('label')?.classList.toggle('is-on', r.checked));
     const picked = (form.querySelector<HTMLInputElement>('input[name="plan"]:checked') || {}).value;
     form.querySelectorAll<HTMLElement>('.pp__what').forEach((el) => el.classList.toggle('is-on', !!picked && el.dataset.plan === picked));
+    form.classList.toggle('is-yearly', !!form.querySelector('input[name="billing"][value="yearly"]:checked'));
   };
   // Pricing's plan buttons link to /trial?plan=<id>: pre-pick that card.
   const wanted = new URLSearchParams(location.search).get('plan');
   const pre = wanted ? form.querySelector<HTMLInputElement>(`input[name="plan"][value="${CSS.escape(wanted)}"]`) : null;
   if (pre) pre.checked = true;
+  if (new URLSearchParams(location.search).get('billing') === 'yearly') { const y = form.querySelector<HTMLInputElement>('input[name="billing"][value="yearly"]'); if (y) y.checked = true; }
   form.addEventListener('change', mirror);
   mirror();
 

@@ -12,7 +12,7 @@ import Button from '../components/Button.astro';
 import PlanCard from '../components/PlanCard.astro';
 import Faq from '../components/Faq.astro';
 import Reveal from '../components/Reveal.astro';
-import { site, plans, pricingNotes, faqs, trust, aud, incGst } from '../data/site';
+import { site, plans, pricingNotes, faqs, trust, aud, incGst, yearly } from '../data/site';
 
 const pricingFaqs = faqs.filter((f) =>
   ['Is there a free plan?', 'Do I need a card to try it?', 'Does it do GST?', 'How many people can use it?', 'What happens if I stop paying?', 'Can I import my clients from my old software?', 'Can office staff have limited access?', 'Who sees my data?', 'Is my data in Australia?', 'Does it connect to Xero or MYOB?', 'How do I start?'].includes(f.q),
@@ -29,15 +29,16 @@ const tally = (p: (typeof plans)[number], admins: number, employees: number) => 
 /** Comparison rows: each feature with the first plan that includes it; higher plans include it too. */
 const rows = plans.flatMap((p, i) => p.includes.map((f) => ({ f, from: i })));
 ---
-<Base title="Pricing" description="Paint Trade HQ plans: Starter $98, Small business $178, Enterprise $249 a month, AUD, ex-GST with 10% GST added. Seats included, extra seats from $15. Every plan starts with a 30-day free trial, no card needed.">
+<Base title="Pricing" description="Paint Trade HQ plans: Starter $98, Small business $178, Enterprise $249 a month, or 10% less paid yearly. AUD, ex-GST with 10% GST added. Seats included, extra seats from $15. Every plan starts with a 30-day free trial, no card needed.">
   <!-- Hero -->
   <section class="phero">
     <div class="container">
-      <h1 class="tone tone--h1 phero__h"><span class="tone__dark">Three plans. Monthly. AUD, GST on top.</span> <span class="tone__light">Every plan starts with a 30-day free trial, no card needed.</span></h1>
+      <h1 class="tone tone--h1 phero__h"><span class="tone__dark">Three plans. Monthly or yearly. AUD, GST on top.</span> <span class="tone__light">Every plan starts with a 30-day free trial, no card needed.</span></h1>
       <ul class="facts" aria-label="Key facts">
         <li><strong>30 days</strong> free on every plan</li>
         <li><strong>No card</strong> to start</li>
-        <li><strong>Monthly</strong>, cancel any time</li>
+        <li><strong>Monthly or yearly</strong>, 10% off paid up front</li>
+        <li><strong>Cancel</strong> any time</li>
         <li><strong>Ex-GST</strong>, 10% added</li>
       </ul>
     </div>
@@ -46,6 +47,13 @@ const rows = plans.flatMap((p, i) => p.includes.map((f) => ({ f, from: i })));
   <!-- The three plans -->
   <section class="section section--tight" id="plans">
     <div class="container">
+      <div class="bill reveal">
+        <div class="bill__seg" role="radiogroup" aria-label="Billing cycle">
+          <label class="bill__opt"><input type="radio" name="bill" value="monthly" checked /><span>Monthly</span></label>
+          <label class="bill__opt"><input type="radio" name="bill" value="yearly" /><span>Yearly <em>save 10%</em></span></label>
+        </div>
+        <p class="small bill__note">Yearly is paid up front and costs 10% less than twelve monthly payments. Extra seats stay monthly.</p>
+      </div>
       <div class="grid grid--3 plans reveal">
         {plans.map((p) => <PlanCard plan={p} />)}
       </div>
@@ -78,7 +86,7 @@ const rows = plans.flatMap((p, i) => p.includes.map((f) => ({ f, from: i })));
               <span class="small stepper__hint">Employees: the people on your Employees page</span>
             </div>
           </div>
-          <p class="small calc__note">Going over a plan's included seats adds a seat at that plan's price, and the app asks before it adds one. The plans differ by features too, so pick by what you need, then check the figure here.</p>
+          <p class="small calc__note">Going over a plan's included seats adds a seat at that plan's price, and the app asks before it adds one. The plans differ by features too, so pick by what you need, then check the figure here. These figures are monthly; a year paid up front takes 10% off the plan part, and extra seats stay monthly.</p>
         </div>
         <div class="calc__plans" id="calc-plans">
           {plans.map((p) => {
@@ -111,6 +119,7 @@ const rows = plans.flatMap((p, i) => p.includes.map((f) => ({ f, from: i })));
             <tbody>
               <tr><th scope="row">A month, ex-GST</th>{plans.map((p) => <td class="mono">{aud(p.price)}</td>)}</tr>
               <tr><th scope="row">A month, including GST</th>{plans.map((p) => <td class="mono">{aud(incGst(p.price))}</td>)}</tr>
+              <tr><th scope="row">A year up front, ex-GST (10% off)</th>{plans.map((p) => <td class="mono">{aud(yearly(p.price))}</td>)}</tr>
               <tr><th scope="row">Admins included</th>{plans.map((p) => <td class="mono">{p.admins}</td>)}</tr>
               <tr><th scope="row">Employees included</th>{plans.map((p) => <td class="mono">{p.employees}</td>)}</tr>
               <tr><th scope="row">Extra admin seat, a month</th>{plans.map((p) => <td class="mono">{aud(p.extraAdmin)}</td>)}</tr>
@@ -168,6 +177,20 @@ const rows = plans.flatMap((p, i) => p.includes.map((f) => ({ f, from: i })));
   .facts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; color: var(--text-2); font-size: 15px; }
   .facts strong { color: var(--text); }
   .plans { align-items: stretch; margin-top: 8px; }
+  .bill { display: flex; align-items: center; gap: 14px 18px; flex-wrap: wrap; margin: 4px 0 18px; }
+  .bill__seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: var(--r-sm); overflow: hidden; background: var(--surface); }
+  .bill__opt { position: relative; cursor: pointer; }
+  .bill__opt input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
+  .bill__opt span { display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; font-size: 15px; font-weight: 600; color: var(--text-2); }
+  .bill__opt + .bill__opt { border-left: 1px solid var(--border-strong); }
+  .bill__opt em { font-style: normal; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: var(--r-pill); background: var(--accent-bg); color: var(--accent-ink); }
+  .bill__opt:has(input:checked) span, .bill__opt.is-on span { background: var(--accent); color: #fff; }
+  .bill__opt:has(input:checked) em, .bill__opt.is-on em { background: rgba(255, 255, 255, 0.22); color: #fff; }
+  .bill__opt:has(input:focus-visible) span { box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px var(--accent); }
+  .bill__note { margin: 0; color: var(--text-2); }
+  #plans:has(input[name='bill'][value='yearly']:checked) :global(.plan__m), #plans.is-yearly :global(.plan__m) { display: none; }
+  #plans:has(input[name='bill'][value='yearly']:checked) :global(.plan__y), #plans.is-yearly :global(.plan__y) { display: block; }
+  @media (forced-colors: active) { .bill__opt input { position: static; opacity: 1; width: 16px; height: 16px; margin: 0 0 0 10px; } }
 
   /* calculator */
   .calc { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 28px; align-items: start; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; box-shadow: var(--shadow-card); }
@@ -231,6 +254,24 @@ const rows = plans.flatMap((p, i) => p.includes.map((f) => ({ f, from: i })));
 </style>
 
 <script>
+  // Monthly / yearly toggle: :has() does the switching; the class is for browsers without it. The plan buttons
+  // carry the choice to the trial form.
+  const plansEl = document.getElementById('plans');
+  const bill = () => {
+    const y = !!plansEl?.querySelector('input[name="bill"][value="yearly"]:checked');
+    plansEl?.classList.toggle('is-yearly', y);
+    plansEl?.querySelectorAll('.bill__opt').forEach((l) => l.classList.toggle('is-on', !!l.querySelector('input:checked')));
+    plansEl?.querySelectorAll<HTMLAnchorElement>('a.plan__btn').forEach((btn) => {
+      const base = btn.dataset.href || (btn.dataset.href = btn.getAttribute('href') || '');
+      const [path, q = ''] = base.split('?');
+      const sp = new URLSearchParams(q);
+      if (y) sp.set('billing', 'yearly'); else sp.delete('billing');
+      btn.setAttribute('href', sp.toString() ? `${path}?${sp}` : path);
+    });
+  };
+  plansEl?.addEventListener('change', bill);
+  bill();
+
   // The seat calculator: the prices come from the data attributes PlanCard and site.ts share.
   (() => {
     const outs = { admins: document.getElementById('n-admins') as HTMLOutputElement | null, employees: document.getElementById('n-employees') as HTMLOutputElement | null };

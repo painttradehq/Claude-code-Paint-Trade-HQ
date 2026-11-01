@@ -40,7 +40,7 @@ export const nav = [
   { label: 'Find a painter', href: '/painters' },
 ];
 
-/** §6 — plans, AUD a month, ex-GST; 10% GST is added. */
+/** §6 — plans, AUD a month, ex-GST; 10% GST is added. Yearly = 10% off (Josh, 1 Nov 2026), see yearly(). */
 export type Plan = {
   id: string;
   name: string;
@@ -118,17 +118,23 @@ export const plans: Plan[] = [
 ];
 
 export const pricingNotes = [
-  'Prices are AUD a month, ex-GST; 10% GST is added.',
+  'Prices are AUD, ex-GST; 10% GST is added. Pay monthly, or a year up front for 10% off the plan price; extra seats stay monthly.',
   'Free trial: 30 days on the plan you pick, no card needed. Then keep going, or walk away.',
-  'Monthly only, no annual price yet. Cancel any time and keep access to the end of the paid month. Upgrades apply at once, pro-rated; downgrades at the end of the month.',
+  'Monthly or yearly. Cancel any time and keep access to the end of the paid period. Upgrades apply at once, pro-rated; downgrades at the end of the period.',
   'Seats: admins are the people on the Team admins list including the owner; employees are the people on the Employees page who have not been removed. Going over the included number adds a seat at the prices above, and the app asks before it adds one.',
   'Data migration from old software: free on Enterprise, quoted on the other two.',
 ];
 
-/** Format AUD like the knowledge file does: $59 and $64.90. */
-export const aud = (n: number) =>
-  Number.isInteger(n) ? `$${n}` : `$${n.toFixed(2)}`;
+/** Format AUD like the knowledge file does ($59 and $64.90), with thousands separators above $999. */
+export const aud = (n: number) => {
+  const [whole, cents] = n.toFixed(2).split('.');
+  return `$${whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}${cents === '00' ? '' : `.${cents}`}`;
+};
 export const incGst = (n: number) => Math.round(n * 1.1 * 100) / 100;
+/** Yearly billing (Josh, 1 Nov 2026): a year up front costs 10% less than twelve monthly payments. Extra seats stay monthly. */
+export const YEARLY_OFF = 0.1;
+export const yearly = (monthly: number) => Math.round(monthly * 12 * (1 - YEARLY_OFF) * 100) / 100;
+export const yearlyPerMonth = (monthly: number) => Math.round((yearly(monthly) / 12) * 100) / 100;
 
 /** §4 — the modules, in the order a job runs. `plan` is the lowest plan that includes it (§6). */
 export type Module = {
@@ -444,6 +450,10 @@ export const faqs: { q: string; a: string }[] = [
   {
     q: 'Is my data in Australia?',
     a: "The app is built and run from Australia; hosting is cloud-based (ask us for the current region); AI runs on Anthropic's service.",
+  },
+  {
+    q: 'Can I pay yearly?',
+    a: 'Yes. Pay a year up front and the plan price is 10% less than twelve monthly payments; extra seats stay monthly.',
   },
   {
     q: 'How do I start?',

@@ -46,7 +46,7 @@ The same files deploy to Vercel or Netlify with a few lines of adapter code for 
 ## Rules baked in
 
 - Call to action is always "Start free trial" (30 days, every plan, no card; Josh, 30 Oct 2026). The site never takes sign-ups or payments itself: the form emails the owner, who sets the account up, and sends the requester a fixed-text confirmation (1 Nov 2026). Turnstile should be on before launch because of that email.
-- Prices are AUD a month, ex-GST, with the inc-GST figure shown: $98 / $178 / $249 (Josh, 30 Oct 2026).
+- Prices are AUD a month, ex-GST, with the inc-GST figure shown: $98 / $178 / $249 (Josh, 30 Oct 2026), or a year up front for 10% off (Josh, 1 Nov 2026; `yearly()` in `src/data/site.ts` and `yearlyOf()` in the invite function must agree).
 - No Privacy link (Terms §5 covers data). Footer: "© 2026 Josh Sano Painting and Decorating, trading as Paint Trade HQ".
 - "Sign in" goes to https://painttradehq.co/admin/login; crew to /crew.
 - Buttons are solid accent with white text. Tokens mirror the app's `theme/tokens.ts`.

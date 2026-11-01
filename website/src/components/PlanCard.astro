@@ -1,19 +1,25 @@
 ---
-import { aud, incGst, type Plan, site } from '../data/site';
+import { aud, incGst, yearly, yearlyPerMonth, type Plan, site } from '../data/site';
 import Button from './Button.astro';
 interface Props { plan: Plan }
 const { plan } = Astro.props;
 const inc = incGst(plan.price);
+const yr = yearly(plan.price);
 ---
 <article class={`plan card ${plan.highlight ? 'plan--highlight' : ''}`} id={plan.id} aria-labelledby={`plan-${plan.id}`}>
   {plan.highlight && <span class="pill plan__flag">Includes Lucy</span>}
   <h3 id={`plan-${plan.id}`} class="plan__name">{plan.name}</h3>
   <p class="plan__blurb small">{plan.blurb}</p>
-  <p class="plan__price">
+  <p class="plan__price plan__m">
     <span class="mono plan__amount">{aud(plan.price)}</span>
     <span class="plan__per">+ GST a month</span>
   </p>
-  <p class="small plan__inc">{aud(inc)} a month including GST</p>
+  <p class="small plan__inc plan__m">{aud(inc)} a month including GST</p>
+  <p class="plan__price plan__y">
+    <span class="mono plan__amount">{aud(yr)}</span>
+    <span class="plan__per">+ GST a year</span>
+  </p>
+  <p class="small plan__inc plan__y">{aud(yearlyPerMonth(plan.price))} a month, paid yearly · {aud(incGst(yr))} a year including GST</p>
   <dl class="plan__seats">
     <div><dt>Admins</dt><dd class="mono">{plan.admins}</dd></div>
     <div><dt>Employees</dt><dd class="mono">{plan.employees}</dd></div>
@@ -31,6 +37,7 @@ const inc = incGst(plan.price);
 
 <style>
   .plan { scroll-margin-top: calc(var(--header-h) + 12px); }
+  .plan__y { display: none; }
   .plan {
     position: relative;
     display: flex;

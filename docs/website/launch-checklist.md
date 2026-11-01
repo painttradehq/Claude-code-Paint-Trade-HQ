@@ -54,7 +54,7 @@ Test on the preview link: fill in the free-trial form with your own email and ch
 
 The pages changed on 30 Oct (30-day free trial on every plan, $98 / $178 / $249, no tester wording) but the chat box still answers from `docs/website/chat-knowledge.md` (your `website-chat-knowledge.md`), which says tester program, $59 / $179 and a 14-day trial on Enterprise. Update §0, §6, §9, §10 and §11 (and add that crew sign-in is on every plan) and send the file again. Until then keep `PUBLIC_CHAT_ENABLED` = `0` so the chat box stays off the pages.
 
-Also in §10 (1 Nov 2026): drop "what software they use today"; add "which plan (Starter, Small business, Enterprise, or not sure) and whether they would rather pay monthly or yearly"; and note that the site emails each requester a fixed confirmation as soon as the form is sent.
+Also in §10 (1 Nov 2026): drop "what software they use today"; add "which plan (Starter, Small business, Enterprise, or not sure) and whether they would rather pay monthly or yearly"; and note that the site emails each requester a fixed confirmation as soon as the form is sent. In §6, replace "Monthly only, no annual price yet" with the yearly option: a year up front is 10% less than twelve monthly payments ($1,058.40 / $1,922.40 / $2,689.20 ex-GST); extra seats stay monthly.
 
 ## After launch
 

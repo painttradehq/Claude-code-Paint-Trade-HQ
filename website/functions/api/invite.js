@@ -39,7 +39,11 @@ export const PLANS = {
   unsure: { name: 'Not sure yet' },
 };
 const BILLING = { monthly: 'Monthly', yearly: 'Yearly' };
-const aud = (n) => `$${n}`;
+/** Yearly = 10% off twelve monthly payments (Josh, 1 Nov 2026); mirrors yearly() in src/data/site.ts. */
+const yearlyOf = (monthly) => Math.round(monthly * 12 * 0.9 * 100) / 100;
+const aud = (n) => `$${n.toLocaleString('en-AU', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 })}`;
+/** "$178 + GST a month" or "$1,922.40 + GST a year" for a priced plan and a billing choice. */
+const priceLine = (plan, billing) => (billing === 'yearly' ? `${aud(yearlyOf(plan.price))} + GST a year` : `${aud(plan.price)} + GST a month`);
 
 const json = (status, body) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
@@ -102,12 +106,11 @@ function confirmation(lead, origin) {
     `1. We set up your account${p ? ` on the ${p.name} plan` : ''} and email your login, usually the same business day.`,
     p ? `2. You use the ${p.name} plan for 30 days. No card needed, nothing to pay today.` : '2. You use it for 30 days. No card needed, nothing to pay today.',
     p
-      ? `3. After that, ${p.name} is ${aud(p.price)} + GST a month, billed monthly, cancel any time.`
-      : `3. After that, plans are from ${aud(PLANS.starter.price)} + GST a month, billed monthly, cancel any time. We will help you pick one.`,
+      ? `3. After that, ${p.name} is ${priceLine(p, lead.billing)}${lead.billing === 'yearly' ? ', paid up front (10% less than monthly)' : ''}, cancel any time.`
+      : `3. After that, plans are from ${aud(PLANS.starter.price)} + GST a month, or 10% less paid yearly, cancel any time. We will help you pick one.`,
     '',
     p ? `What ${p.name} includes: ${origin}/pricing#${lead.plan}` : `The three plans side by side: ${origin}/pricing`,
   ];
-  if (lead.billing === 'yearly') lines.push('', 'You said you would rather pay yearly. Plans are monthly only today; we will tell you if that changes.');
   lines.push('', 'Questions? Reply to this email and it reaches us.', '', 'Paint Trade HQ', 'Josh Sano Painting and Decorating, trading as Paint Trade HQ · Melbourne');
   return lines.join('\n');
 }
@@ -189,7 +192,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
     `Mobile:      ${lead.mobile || '-'}`,
     `Crew size:   ${lead.crew || '-'}`,
     `Plan:        ${planText}`,
-    `Billing:     ${lead.billing ? BILLING[lead.billing] : '-'}`,
+    `Billing:     ${lead.billing ? BILLING[lead.billing] + (plan && plan.price ? ` (${priceLine(plan, lead.billing)})` : '') : '-'}`,
     '',
     `Page: ${clean(request.headers.get('referer'), 300) || '-'}`,
     `IP: ${ip} · ${clean(request.headers.get('user-agent'), 300)}`,
