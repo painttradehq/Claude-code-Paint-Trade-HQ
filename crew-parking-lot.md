@@ -149,3 +149,6 @@ Josh: a tick "that says we have a right to store, use your details such as sendi
 
 ## 1 Nov — Josh: follow-up G (Terms gate) not needed yet (no live users)
 Parked, prototype (`#s-terms`) and spec kept. Trigger to unpark: before launch, or the first Terms change once crew exist. New starters already record the live Terms version at join, so nothing is needed until then. The new Terms text itself: still worth a read for the crew clauses when convenient; not blocking.
+
+## 1 Nov — Follow-up E pulled forward by Josh (scope detail): prototyped + specified (`c2-followup-e-notes.md`)
+Decided by Josh ("ok", 1 Nov): the Scope screen as proposed; the summary shows; planned hours behind an owner switch, off by default; E2 (tick-off + progress + report prefill) after. Order: E next, then C6b (with the C6 carry-overs). Admin chat: the "Show planned hours to crew" switch on Settings › Crew app.

@@ -429,6 +429,33 @@ async function run(b, W, H, tag) {
   await p.click(T('crew-notice-back')); await p.waitForTimeout(150);
   ok('…back on Me' + full, await p.locator(T('crew-shell')).isVisible() && !(await p.locator(T('crew-notice')).isVisible()));
 
+  // ---- Follow-up E: the Scope screen ----
+  await p.goto(U + '?screen=job&id=j1'); await p.waitForTimeout(300);
+  ok('job page: "Open the full scope" row under The work, with the line count' + full, await p.locator(T('crew-job-scope')).isVisible() && /Open the full scope/.test(await txt(T('crew-job-scope'))) && /8 lines/.test(await txt(T('crew-job-scope'))) && (await box(T('crew-job-scope'))).height >= 44);
+  await p.click(T('crew-job-scope')); await p.waitForTimeout(200);
+  ok('scope: back = the job name, title Scope, meta "4 areas · 8 lines", the summary card, four area sections, the added work; no money, no hours by default' + full, await p.locator(T('crew-scope')).isVisible() && /Wattle St repaint/.test(await txt(T('crew-scope-back'))) && (await txt(T('crew-scope-title'))) === 'Scope' && (await txt(T('crew-scope-meta'))) === '4 areas · 8 lines' && /Full interior repaint/.test(await txt(T('crew-scope-summary'))) && (await p.locator(T('crew-scope-area')).count()) === 4 && (await p.locator(T('crew-scope-line')).count()) === 8 && (await p.locator(T('crew-scope-added')).count()) === 1 && !/\$/.test(await txt(T('crew-scope-body'))) && !/\d+ h/.test(await txt(T('crew-scope-body'))) && (await go()) === '/employee/project/j1/scope');
+  ok('scope: area notes show as cards (two of the four areas have one); rows ≥ 44 px; no horizontal scroll' + full, (await p.locator(T('crew-scope-area-note')).count()) === 2 && /TV wall first/.test(await p.locator(T('crew-scope-area-note')).first().textContent()) && (await box(T('crew-scope-line'))).height >= 44 && await noHScroll());
+  await p.locator(T('crew-scope-line')).first().click(); await p.waitForTimeout(150);
+  ok('a line opens: the estimator\'s note, the condition, the paint, two photos with the marks drawn' + full, (await p.locator(T('crew-scope-line')).first().getAttribute('aria-expanded')) === 'true' && await p.locator(T('crew-scope-detail')).isVisible() && /Hairline cracks above the window/.test(await txt(T('crew-scope-note'))) && /Condition Fair/.test(await txt(T('crew-scope-facts'))) && /Natural White/.test(await txt(T('crew-scope-product'))) && (await p.locator(T('crew-scope-photo')).count()) === 2 && (await p.locator(T('crew-scope-photo') + ' svg.marks circle').count()) === 2 && (await p.locator(T('crew-scope-photo') + ' svg.marks line').count()) === 1);
+  await p.screenshot({ path: OUT + `e-scope-open-${tag}.png` });
+  await p.locator(T('crew-scope-photo')).first().click(); await p.waitForTimeout(150);
+  ok('a photo opens the lightbox with its marks and caption; close hides it' + full, await p.locator(T('crew-scope-lightbox')).isVisible() && (await p.locator(T('crew-scope-lightbox') + ' svg.marks circle').count()) === 2 && /Walls · Window wall/.test(await txt(T('crew-scope-lightbox'))));
+  await p.click(T('crew-scope-lightbox-close')); await p.waitForTimeout(100);
+  ok('…closed' + full, !(await p.locator(T('crew-scope-lightbox')).isVisible()));
+  await p.locator(T('crew-scope-line')).first().click(); await p.waitForTimeout(100);
+  ok('tapping the line again collapses it' + full, (await p.locator(T('crew-scope-detail')).count()) === 0);
+  await p.locator(T('crew-scope-line')).last().click(); await p.waitForTimeout(100);
+  ok('a line with nothing behind it has no chevron and does not open (Laundry)' + full, (await p.locator(T('crew-scope-line')).last().locator('.chev').count()) === 0 && (await p.locator(T('crew-scope-detail')).count()) === 0);
+  await p.click(T('crew-scope-back')); await p.waitForTimeout(150);
+  ok('Back returns to the job page' + full, await p.locator(T('crew-job')).isVisible() && !(await p.locator(T('crew-scope')).isVisible()));
+  await p.goto(U + '?screen=scope&id=j1&hours=1'); await p.waitForTimeout(300);
+  ok('with the owner\'s planned-hours switch on: the meta, each area label and each line sub carry the hours' + full, /about 46 h planned/.test(await txt(T('crew-scope-meta'))) && /Living room · 5\.1 × 4\.2 m · 14 h/.test(await p.locator(T('crew-scope-area')).first().textContent()) && /prep · 2 coats · 9 h/.test(await p.locator(T('crew-scope-line')).first().textContent()) && /· 6 h/.test(await txt(T('crew-scope-added'))));
+  await p.screenshot({ path: OUT + `e-scope-hours-${tag}.png` });
+  await p.goto(U + '?screen=scope&id=j1&summary=0'); await p.waitForTimeout(300);
+  ok('no scope summary on the quote → no card, the areas start the page' + full, (await p.locator(T('crew-scope-summary')).count()) === 0 && (await p.locator(T('crew-scope-area')).count()) === 4);
+  await p.goto(U + '?screen=job&id=j2'); await p.waitForTimeout(300);
+  ok('a job whose quote has no scope detail shows no "Open the full scope" row' + full, (await p.locator(T('crew-job-scope')).count()) === 0);
+
   // ---- Follow-up G: the Terms-updated gate ----
   await p.goto(U + '?screen=terms-update'); await p.waitForTimeout(300);
   ok('Terms updated: the title, the dated line, the agreement with both links, Continue, Sign out; no tab bar, no back' + full, await p.locator(T('crew-terms')).isVisible() && (await txt(T('crew-terms-title'))) === "We've updated our Terms" && /changed on 1 November 2026\. Have a read, then tick to keep using the app\./.test(await txt(T('crew-terms-line'))) && (await p.locator(T('crew-terms-agree')).getAttribute('aria-checked')) === 'false' && await p.locator(T('crew-terms-tos')).isVisible() && await p.locator(T('crew-terms-privacy')).isVisible() && (await txt(T('crew-terms-continue'))) === 'Continue' && await p.locator(T('crew-terms-signout')).isVisible() && !(await p.locator(T('crew-tabbar')).isVisible()) && (await p.locator('#s-terms .back').count()) === 0 && (await go()) === '/employee/terms-updated');
