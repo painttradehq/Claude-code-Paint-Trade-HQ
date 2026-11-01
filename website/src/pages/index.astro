@@ -39,6 +39,18 @@ const more = modules.filter((m) => !['dashboard', 'quotes', 'timesheets', 'invoi
 
 const homeFaqs = faqs.filter((f) => ['Does it track my crew?', 'Does the client need an account?', 'Is there an app for my phone?', 'Is there a free plan?'].includes(f.q));
 const quotes = testimonials.filter((t) => showSamples || !t.sample).slice(0, 3);
+/** The "Works with" strip: live connections from the knowledge file; Xero and OneDrive marked not yet. */
+const worksWith = [
+  { name: 'Google Calendar' },
+  { name: 'Google Drive' },
+  { name: 'Gmail' },
+  { name: 'Microsoft 365' },
+  { name: 'Your own SMS number' },
+  { name: 'Google reviews' },
+  { name: 'Anthropic Claude' },
+  { name: 'Xero', soon: true },
+  { name: 'OneDrive', soon: true },
+];
 const videos = videoFeedback.filter((v) => showSamples || !v.sample).slice(0, 3);
 const posts = (await getCollection('blog')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf() || a.data.order - b.data.order).slice(0, 3);
 const fmt = (d: Date) => d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
@@ -62,14 +74,21 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
     </div>
   </section>
 
-  <!-- Fact strip where the reference has its logo row -->
-  <section class="facts" aria-label="Key facts">
-    <div class="container facts__in">
-      <span>From <strong>$98 + GST</strong> a month</span>
-      <span><strong>30-day</strong> free trial</span>
-      <span><strong>No app store</strong> needed</span>
-      <span><strong>AUD</strong>, GST on top</span>
-      <span>Built by a <strong>painter</strong></span>
+  <!-- "Works with" strip (Josh, 1 Nov 2026: a moving row of the services the app connects to, in place of the
+       fact strip). Wordmarks in text until official logo files arrive; only connections the knowledge file
+       calls live, plus Xero and OneDrive marked "not yet" as the band below does. -->
+  <section class="works" aria-label="Works with">
+    <div class="container works__in">
+      <span class="works__label">Works with</span>
+      <div class="mq">
+        {[0, 1].map((copy) => (
+          <ul class="mq__track" aria-hidden={copy === 1 ? 'true' : undefined}>
+            {worksWith.map((w) => (
+              <li class={`mq__item ${w.soon ? 'is-soon' : ''}`}><span class="mq__dot" aria-hidden="true"></span>{w.name}{w.soon && <em>not yet</em>}</li>
+            ))}
+          </ul>
+        ))}
+      </div>
     </div>
   </section>
 
@@ -408,10 +427,19 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   .nh::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, var(--bg) 0%, var(--bg) 36%, rgba(250, 249, 246, 0) 58%); pointer-events: none; }
   .nh__in { z-index: 1; }
 
-  /* ---------- facts ---------- */
-  .facts { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface); }
-  .facts__in { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; padding: 18px 0; font-size: 15px; color: var(--text-2); }
-  .facts__in strong { color: var(--text); }
+  /* ---------- works with (marquee) ---------- */
+  .works { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface); }
+  .works__in { display: flex; align-items: center; gap: 22px; padding: 14px 0; }
+  .works__label { flex: none; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); }
+  .mq { flex: 1; min-width: 0; display: flex; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+  .mq__track { list-style: none; margin: 0; padding: 0 0 0 44px; display: flex; align-items: center; gap: 44px; flex: none; animation: mq 34s linear infinite; }
+  .mq:hover .mq__track, .mq:focus-within .mq__track { animation-play-state: paused; }
+  @keyframes mq { to { transform: translateX(-100%); } }
+  .mq__item { display: inline-flex; align-items: center; gap: 9px; white-space: nowrap; font-weight: 600; font-size: 15px; color: var(--text); }
+  .mq__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); flex: none; }
+  .mq__item.is-soon { color: var(--text-3); }
+  .mq__item.is-soon .mq__dot { background: transparent; border: 1.5px dashed var(--text-3); }
+  .mq__item em { font-style: normal; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: var(--r-pill); background: var(--sunken); color: var(--text-2); }
 
   /* ---------- bento ---------- */
   .bento__h { font-size: clamp(26px, 3.4vw, 40px); line-height: 1.15; letter-spacing: -0.01em; max-width: 24ch; margin: 0 0 28px; font-weight: 600; }
@@ -651,10 +679,15 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
     .stage__frames { padding-right: 18%; }
     .stage__phone { width: 30%; }
     .chapters { grid-template-columns: 1fr; }
-    .facts__in { justify-content: flex-start; gap: 6px 18px; font-size: 14px; }
+    .works__in { gap: 14px; padding: 12px 0; }
+    .mq__track { gap: 30px; padding-left: 30px; }
+    .mq__item { font-size: 14px; }
   }
   @media (prefers-reduced-motion: reduce) {
     .ribbon i { animation: none; }
+    .mq { -webkit-mask-image: none; mask-image: none; overflow: visible; }
+    .mq__track { animation: none; flex: 1 1 0; min-width: 0; flex-wrap: wrap; gap: 10px 24px; padding-left: 0; }
+    .mq__track[aria-hidden='true'] { display: none; }
     .stage__panel:not([hidden]) { animation: none; }
     html.js .reveal { opacity: 1; transform: none; transition: none; }
     .expand { transition: none; }
