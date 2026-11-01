@@ -495,6 +495,14 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     <div class="form-body notice" id="noticeBody" data-testid="crew-notice-body"></div>
   </section>
 
+  <!-- ================= Follow-up G: TERMS UPDATED (a one-time gate at app open when the Terms version moved) ================= -->
+  <section id="s-terms" class="hide" data-testid="crew-terms" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="job-title" data-testid="crew-terms-title">We've updated our Terms</div>
+    </div>
+    <div class="form-body" id="termsBody" style="padding-top:8px"></div>
+  </section>
+
   <!-- ================= APP ================= -->
   <section id="s-app" class="hide" data-testid="crew-shell">
 
@@ -1385,7 +1393,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     { id: 'd3', name: 'Safety agreement', status: 'ended', sent: '2026-05-01', signed: '2026-05-02', countersigned: '2026-05-02', ended: '2026-09-30', content: 'SAFETY AGREEMENT\n\nReplaced by the site safety plan of 30 Sep 2026.' },
   ];
   const cStatus = (c) => c.status === 'sent' ? { cls: 'wait', txt: 'Awaiting signature' } : c.status === 'signed' ? { cls: 'live', txt: 'Signed' } : { cls: 'ended', txt: 'Ended' };
-  function hideC5(){ ['#s-onb', '#s-profile', '#s-docs', '#s-doc', '#s-reset', '#s-notice', '#s-training', '#s-video', '#s-coaching', '#s-going', '#s-rating', '#s-equip', '#s-item'].forEach(x => $(x).classList.add('hide')); }
+  function hideC5(){ ['#s-onb', '#s-profile', '#s-docs', '#s-doc', '#s-reset', '#s-notice', '#s-terms', '#s-training', '#s-video', '#s-coaching', '#s-going', '#s-rating', '#s-equip', '#s-item'].forEach(x => $(x).classList.add('hide')); }
   function stackOpen(id){ $('#s-app').classList.add('hide'); $('#s-login').classList.add('hide'); hideC5(); $(id).classList.remove('hide'); const b = $(id + ' .form-body'); if (b) b.scrollTop = 0; }
   const MARK = $('#s-login .mark').innerHTML;
 
@@ -1777,6 +1785,27 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   $('#reqCancel').addEventListener('click', closeReq); $('#reqSend').addEventListener('click', sendReq);
   $('#reqBack').addEventListener('click', () => { req.cat = null; req.items = []; req.err = ''; renderReq(); });
 
+  // ---- Follow-up G: the Terms-updated gate ----
+  // GET /employee/legal/status → {current_version, accepted_version, needs_notice, updated}; POST /employee/legal/accept → {terms_version, terms_accepted_at}
+  const tu = { agree: false, tried: false, updated: '1 November 2026' };
+  function renderTerms(){
+    const bad = tu.tried && !tu.agree;
+    $('#termsBody').innerHTML = `<div class="reset-line" data-testid="crew-terms-line">Paint Trade HQ's Terms of Service changed on ${tu.updated}. Have a read, then tick to keep using the app.</div>
+      <button class="agree ${tu.agree ? 'on' : ''} ${bad ? 'bad' : ''}" data-testid="crew-terms-agree" data-terms="agree" role="checkbox" aria-checked="${tu.agree}"><span class="box">${tu.agree ? '✓' : ''}</span><span class="at">I've read and agree to the <a href="#" data-testid="crew-terms-tos" data-legal="/terms">Terms of Service</a> and the <a href="#" data-testid="crew-terms-privacy" data-legal="/privacy">Privacy Policy</a>.</span></button>
+      <div class="fld">${bad ? '<div class="err" data-testid="crew-terms-err">Tick the agreement to continue.</div>' : ''}</div>
+      <button class="btn btn-primary" style="margin-top:8px" data-testid="crew-terms-continue" data-terms="continue">Continue</button>
+      <div class="login-links" style="margin-top:16px"><a href="#" data-testid="crew-terms-signout" data-terms="signout">Sign out</a></div>`;
+  }
+  function openTermsUpdate(){ tu.agree = false; tu.tried = false; hideC5(); $('#s-login').classList.add('hide'); $('#s-app').classList.add('hide'); $('#s-terms').classList.remove('hide'); renderTerms(); document.body.dataset.lastGo = '/employee/terms-updated'; }
+  $('#termsBody').addEventListener('click', (e) => {
+    if (e.target.closest('[data-legal]')) return;   // the links open the pages; the shared handler below records them
+    const t = e.target.closest('[data-terms]'); if (!t) return; e.preventDefault();
+    const a = t.dataset.terms;
+    if (a === 'agree') { tu.agree = !tu.agree; renderTerms(); return; }
+    if (a === 'continue') { if (!tu.agree) { tu.tried = true; renderTerms(); return; } document.body.dataset.lastGo = 'POST /employee/legal/accept'; showApp('today'); return; }
+    if (a === 'signout') { showLogin(); return; }
+  });
+
   // ---- C5 amendment: the crew notice page ----
   let noticeFrom = null;   // the section to show again on Back
   function renderNotice(bn){
@@ -1891,6 +1920,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   else if (q.get('screen') === 'report') { showApp('today'); openReport(q.get('id') || 'r1'); }
   else if (q.get('screen') === 'onboarding') { openOnb(parseInt(q.get('step') || '0', 10)); }
   else if (q.get('screen') === 'notice') { openNotice(q.get('bn') || 'Sano Painting', null); }
+  else if (q.get('screen') === 'terms-update') { openTermsUpdate(); }
   else if (q.get('screen') === 'profile') { showApp('me'); openProfile(); }
   else if (q.get('screen') === 'docs') { showApp('me'); openDocs(); }
   else if (q.get('screen') === 'reset') { openReset(q.get('from') || 'login', q.get('email') || (q.get('step') ? 'mia@example.com' : '')); const st = parseInt(q.get('step') || '1', 10); if (st > 1) { rs.step = st; renderReset(); } }

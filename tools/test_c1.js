@@ -429,6 +429,22 @@ async function run(b, W, H, tag) {
   await p.click(T('crew-notice-back')); await p.waitForTimeout(150);
   ok('…back on Me' + full, await p.locator(T('crew-shell')).isVisible() && !(await p.locator(T('crew-notice')).isVisible()));
 
+  // ---- Follow-up G: the Terms-updated gate ----
+  await p.goto(U + '?screen=terms-update'); await p.waitForTimeout(300);
+  ok('Terms updated: the title, the dated line, the agreement with both links, Continue, Sign out; no tab bar, no back' + full, await p.locator(T('crew-terms')).isVisible() && (await txt(T('crew-terms-title'))) === "We've updated our Terms" && /changed on 1 November 2026\. Have a read, then tick to keep using the app\./.test(await txt(T('crew-terms-line'))) && (await p.locator(T('crew-terms-agree')).getAttribute('aria-checked')) === 'false' && await p.locator(T('crew-terms-tos')).isVisible() && await p.locator(T('crew-terms-privacy')).isVisible() && (await txt(T('crew-terms-continue'))) === 'Continue' && await p.locator(T('crew-terms-signout')).isVisible() && !(await p.locator(T('crew-tabbar')).isVisible()) && (await p.locator('#s-terms .back').count()) === 0 && (await go()) === '/employee/terms-updated');
+  ok('…the row and the button are at least 44 px tall; no horizontal scroll' + full, (await box(T('crew-terms-agree'))).height >= 44 && (await box(T('crew-terms-continue'))).height >= 44 && await noHScroll());
+  await p.click(T('crew-terms-continue')); await p.waitForTimeout(100);
+  ok('Continue without the tick → the one line, still on the gate' + full, (await txt(T('crew-terms-err'))) === 'Tick the agreement to continue.' && await p.locator(T('crew-terms')).isVisible());
+  await p.click(T('crew-terms-tos')); await p.waitForTimeout(100);
+  ok('the Terms link opens /terms without ticking' + full, (await go()) === '/terms' && (await p.locator(T('crew-terms-agree')).getAttribute('aria-checked')) === 'false');
+  await p.screenshot({ path: OUT + `g-terms-${tag}.png` });
+  await p.click(T('crew-terms-agree') + ' .box'); await p.waitForTimeout(100);
+  ok('tapping the box ticks it and clears the line' + full, (await p.locator(T('crew-terms-agree')).getAttribute('aria-checked')) === 'true' && (await p.locator(T('crew-terms-err')).count()) === 0);
+  await p.click(T('crew-terms-continue')); await p.waitForTimeout(200);
+  ok('Continue → the acceptance is posted and Today opens' + full, (await go()) === 'POST /employee/legal/accept' && await p.locator(T('crew-shell')).isVisible() && !(await p.locator(T('crew-terms')).isVisible()));
+  await p.goto(U + '?screen=terms-update'); await p.waitForTimeout(300); await p.click(T('crew-terms-signout')); await p.waitForTimeout(150);
+  ok('Sign out from the gate → the sign-in screen' + full, await p.locator(T('crew-login')).isVisible());
+
   // ---- C5: onboarding, profile, my documents ----
   await p.goto(U + '?screen=onboarding'); await p.waitForTimeout(300);
   ok('onboarding 0: invite from the business, Let\'s go, Sign in link' + full, (await txt(T('crew-onb-title'))) === 'Join Sano Painting' && /Josh Sano has invited you/.test(await txt('#onbBody')) && await p.locator(T('crew-onb-start')).isVisible() && await p.locator(T('crew-onb-signin')).isVisible());
