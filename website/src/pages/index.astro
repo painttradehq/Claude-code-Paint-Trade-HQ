@@ -6,6 +6,10 @@
  * composed inside each, a soft colour wash in one corner and an expand button that opens the full
  * screen. Our palette (purple, lavender, peach) and our type (Fraunces, Inter) throughout.
  * Claims are the same as on the existing pages. Screens are the demo business's, served as WebP.
+ * 4 Nov 2026: wording and order reworked from the home-page redesign proposal and Josh's answers in his doc
+ * (Adam's line as the headline; "Sound familiar?" after the strip; Watch it work moved up above the plans;
+ * plans with two buttons; questions rebuilt; every connection shown as working because Josh says they are all
+ * connected by go-live, see the launch checklist's go-live checks).
  * The ribbon drifts slowly in CSS and stops under reduced motion; nothing else moves on its own
  * except the quote→sign→run→paid stage in the first card, which pauses on hover, focus, tap or
  * when it scrolls out of view.
@@ -14,69 +18,105 @@ import Base from '../layouts/Base.astro';
 import Button from '../components/Button.astro';
 import Clip from '../components/Clip.astro';
 import Faq from '../components/Faq.astro';
-import { site, modules, faqs, testimonials, videoFeedback, plans, aud, incGst } from '../data/site';
+import { site, faqs, testimonials, videoFeedback, plans, aud, incGst } from '../data/site';
 import { getCollection } from 'astro:content';
 import { clips } from '../data/screens';
 import { showSamples } from '../data/directory';
 
 const W = '/screens/webp';
 const steps = [
-  { id: 'quote', label: 'Quote', caption: 'Built from your Library, room by room.', browser: `${W}/04-quote-builder-1440.webp`, phone: null },
-  { id: 'sign', label: 'Sign', caption: 'Signed on their phone. No account, no app.', browser: `${W}/09-review-and-send-1440.webp`, phone: `${W}/10-client-quote-accept-390.webp` },
-  { id: 'run', label: 'Run', caption: 'The accepted quote becomes the live job; crew sign in with GPS.', browser: `${W}/16-job-drawer-1440.webp`, phone: `${W}/40-crew-time-clock-390.webp` },
-  { id: 'paid', label: 'Paid', caption: 'Invoices follow the payment schedule on the quote.', browser: `${W}/02-dashboard-1440.webp`, phone: `${W}/21-client-invoice-390.webp` },
+  { id: 'quote', label: 'Quote', caption: 'Built from your own price list, room by room.', browser: `${W}/04-quote-builder-1440.webp`, phone: null },
+  { id: 'sign', label: 'Sign', caption: 'Your client signs on their phone. No account, no app.', browser: `${W}/09-review-and-send-1440.webp`, phone: `${W}/10-client-quote-accept-390.webp` },
+  { id: 'run', label: 'Run', caption: 'The signed quote becomes the job, and your crew sign in on site.', browser: `${W}/16-job-drawer-1440.webp`, phone: `${W}/40-crew-time-clock-390.webp` },
+  { id: 'paid', label: 'Paid', caption: 'Your invoices follow the payment schedule on the quote.', browser: `${W}/02-dashboard-1440.webp`, phone: `${W}/21-client-invoice-390.webp` },
 ];
 
 /** Bento cards. `full` is the screen the expand button opens. */
 const cards = [
-  { id: 'crew', title: 'Crew sign in on site, sign out at knock-off', line: 'GPS at those two moments only. Never prices.', href: '/features#timesheets', full: `${W}/40-crew-time-clock-390.webp`, fullAlt: 'The crew time clock on a phone', plan: '' },
-  { id: 'invoices', title: 'Invoices that follow the quote', line: 'Deposit, progress, final. Bank transfer, never a card.', href: '/features#invoices', full: `${W}/21-client-invoice-390.webp`, fullAlt: 'The invoice as the client sees it on a phone', plan: '' },
-  { id: 'lucy', title: 'Lucy, the AI assistant', line: 'Drafts, briefs and summaries from your own data.', href: '/features#lucy', full: `${W}/32-lucy-on-quote-1440.webp`, fullAlt: 'Lucy open beside a quote, answering with her sources', plan: 'Small business+' },
-  { id: 'timesheets', title: 'Timesheets to payroll', line: 'Approve the week, lock it, export the CSV.', href: '/features#timesheets', full: `${W}/17-timesheets-week-1440.webp`, fullAlt: 'Timesheets: a pay-week grid with regular and overtime hours', plan: 'Small business+' },
-  { id: 'jobs', title: 'Every live job on one page', line: 'Site on a map, crew, photos, variations, the completion report.', href: '/features#projects', full: `${W}/16-job-drawer-1440.webp`, fullAlt: 'A live job: the site on a map, the client, the crew and the project drawer', plan: '' },
+  { id: 'crew', title: 'Your crew sign in on site and out at knock-off', line: 'The app records where they are at those two moments only. Nothing in between. They never see your prices.', href: '/features#crew-app', full: `${W}/40-crew-time-clock-390.webp`, fullAlt: 'The crew time clock on a phone', plan: '' },
+  { id: 'invoices', title: 'Invoices made from the quote', line: "Deposit, progress and final invoices, plus credit notes. Your bank details print on every invoice; the app never takes your client's card.", href: '/features#invoices', full: `${W}/21-client-invoice-390.webp`, fullAlt: 'The invoice as the client sees it on a phone', plan: '' },
+  { id: 'lucy', title: 'Lucy, your AI assistant', line: 'Ask her about your quotes and clients. She drafts messages and quote text for you to check, and writes you a morning brief.', href: '/features#lucy', full: `${W}/32-lucy-on-quote-1440.webp`, fullAlt: 'Lucy open beside a quote, answering with her sources', plan: 'Small business plan and up' },
+  { id: 'timesheets', title: 'Timesheets ready for payroll', line: "Hours come straight from your crew's sign-ins, with overtime split out. Lock the week, then download it as a spreadsheet file for payroll.", href: '/features#timesheets', full: `${W}/17-timesheets-week-1440.webp`, fullAlt: 'Timesheets: a pay-week grid with regular and overtime hours', plan: 'Small business plan and up' },
+  { id: 'jobs', title: 'Every job on its own page', line: "The site on a map, who's on it, photos, and what the job is costing you in labour.", href: '/features#projects', full: `${W}/16-job-drawer-1440.webp`, fullAlt: 'A live job: the site on a map, the client, the crew and the project drawer', plan: '' },
 ];
-const more = modules.filter((m) => !['dashboard', 'quotes', 'timesheets', 'invoices', 'lucy', 'projects'].includes(m.id));
+/** The "Also in the app" card: the parts the big cards don't cover, each linking to its place on Features. */
+const also = [
+  { href: '/features#library', label: 'Your price list' },
+  { href: '/features#calendar', label: 'Calendar' },
+  { href: '/features#crm', label: 'Clients and follow-ups' },
+  { href: '/features#employees', label: 'Staff records' },
+  { href: '/features#crew-app', label: "The crew app, in the phone's browser" },
+  { href: '/features#files', label: 'Files and photos, in our cloud, Google Drive or OneDrive' },
+  { href: '/features#employees', label: 'Contracts, training and equipment (Enterprise plan)' },
+];
 
-const homeFaqs = faqs.filter((f) => ['Does it track my crew?', 'Does the client need an account?', 'Is there an app for my phone?', 'Is there a free plan?'].includes(f.q));
+/** "Sound familiar?": three everyday problems, each with what changes. General, not claims about anyone. */
+const pains = [
+  { id: 'evenings', t: 'Your evenings go on quotes.', w: "You measure up on site, then type it all out at night on a template that doesn't know your prices.", fix: 'Here you build it room by room from your own price list, and send it as a link.' },
+  { id: 'deposit', t: 'The deposit drifts.', w: 'The client says yes on the phone, then chasing the paperwork and the deposit takes days.', fix: 'Here your client signs on their phone, and the deposit invoice is created the moment they do.' },
+  { id: 'hours', t: 'Hours on scraps of paper.', w: "Friday comes and the week's hours arrive by text, from memory, or not at all.", fix: 'Here your crew sign in and out on their phones, so the hours are already recorded.' },
+];
+
+/** Plans, in a painter's words: who it suits, the people included, one line of what's in it. */
+const planWho: Record<string, string> = { starter: 'Just you, or you and a couple of hands', 'small-business': 'A crew with someone in the office', enterprise: 'A bigger crew, with HR to run' };
+const planSum: Record<string, string> = {
+  starter: 'Quotes, jobs, invoices, the crew time clock, clients and calendar.',
+  'small-business': 'Everything in Starter, plus Lucy, timesheets, texts to clients, and invoices raised for you on schedule.',
+  enterprise: 'Everything in Small business, plus daily site reports, staff contracts in your own wording signed on the phone, training videos, equipment, and free data migration from your old software.',
+};
+const people = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+const planSeats = (admins: number, employees: number) =>
+  admins > 1 ? `You, ${people(admins - 1, 'office person', 'office people')} and ${employees} crew included` : `You and ${employees} crew included`;
+
+const homeFaqs = ['What happens when I press Start free trial?', 'What happens when the 30 days are up?', "What's involved in setting up?", 'What do my crew need?', 'Can I run it from my phone?', 'Does it connect to Xero or MYOB?', 'Can someone in the office use it too?']
+  .map((q) => faqs.find((f) => f.q === q))
+  .filter((f): f is { q: string; a: string } => Boolean(f));
 const quotes = testimonials.filter((t) => showSamples || !t.sample).slice(0, 3);
-/** The "Works with" strip: live connections from the knowledge file; Xero and OneDrive marked not yet. */
+/** The "Works with" strip. Josh, 4 Nov 2026: everything here is connected by go-live; the launch checklist's
+ *  go-live checks say to take any item out that isn't. No supplier names (Anthropic stays in the Lucy card). */
 const worksWith = [
   { name: 'Google Calendar' },
+  { name: 'Outlook calendar' },
   { name: 'Google Drive' },
+  { name: 'OneDrive' },
   { name: 'Gmail' },
   { name: 'Microsoft 365' },
-  { name: 'Your own SMS number' },
-  { name: 'Google reviews' },
-  { name: 'Anthropic Claude' },
-  { name: 'Xero', soon: true },
-  { name: 'OneDrive', soon: true },
+  { name: 'Xero' },
+  { name: 'Your Google review link' },
 ];
 const videos = videoFeedback.filter((v) => showSamples || !v.sample).slice(0, 3);
 const posts = (await getCollection('blog')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf() || a.data.order - b.data.order).slice(0, 3);
 const fmt = (d: Date) => d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
 const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote', 'crew-clock-in-and-daily-report', 'invoice-payment-to-client-page'].includes(c.id));
+/** Home-page wording for the four videos (Features keeps the wording in screens.ts). */
+const chapterText: Record<string, { title: string; caption: string }> = {
+  'new-quote-to-sent': { title: 'You build and send a quote', caption: 'Pick the client, add rooms and lines from your price list, attach photos, check it over and send.' },
+  'client-accepts-quote': { title: 'Your client accepts on their phone', caption: 'Your client reads the quote, ticks the agreement and signs.' },
+  'crew-clock-in-and-daily-report': { title: "Your crew sign in and write the day's report", caption: "Your crew sign in on site, then write the day's report with photos. Daily reports are on the Enterprise plan." },
+  'invoice-payment-to-client-page': { title: 'You invoice and record the payment', caption: "Raise the invoice, record the payment, and see it on your client's page." },
+};
 ---
-<Base title="Paint Trade HQ" fullTitle="Paint Trade HQ · Quote it. Run it. Get paid." description={site.description}>
+<Base title="Paint Trade HQ" fullTitle="Paint Trade HQ · Software for Australian painting businesses" description="Software for Australian painting businesses. Quotes your client signs on their phone, the job, your crew's time clock and invoices. 30 days free, no card.">
   <!-- Hero: white page, one ribbon -->
   <section class="nh" id="top">
     <div class="ribbon" aria-hidden="true"><i class="ribbon__a"></i><i class="ribbon__b"></i><i class="ribbon__c"></i><i class="ribbon__d"></i></div>
     <div class="container nh__in">
-      <p class="nh__kicker">Built in Melbourne for painting businesses</p>
+      <p class="nh__kicker">Software for Australian painting businesses</p>
       <h1 class="nh__h1">
-        <span class="nh__dark">Quote it. Run it. Get paid.</span>
-        <span class="nh__light">The quote your client signs on their phone becomes the job your crew sign in to, and the invoices follow.</span>
+        <span class="nh__dark">Everything you need to run your painting business.</span>
+        <span class="nh__light">From the quote your client signs to the invoice, made by a painter.</span>
       </h1>
+      <p class="nh__sub">You run it on a laptop or tablet. Your crew use their phones. From a sole trader to a crew of 15 or more.</p>
       <div class="nh__cta">
         <Button href={site.status.ctaHref} size="lg">{site.status.cta} <span aria-hidden="true">›</span></Button>
         <a class="btn btn--ghost btn--lg nh__ghostbtn" href="#watch">Watch it work</a>
       </div>
-      <p class="nh__fine">30 days free on every plan. No card.</p>
+      <p class="nh__fine">Free for 30 days on every plan, no card needed. We email your login, usually the same business day.</p>
     </div>
   </section>
 
   <!-- "Works with" strip (Josh, 1 Nov 2026: a moving row of the services the app connects to, in place of the
-       fact strip). Wordmarks in text until official logo files arrive; only connections the knowledge file
-       calls live, plus Xero and OneDrive marked "not yet" as the band below does. -->
+       fact strip). Wordmarks in text until official logo files arrive. 4 Nov: all shown as working (Josh). -->
   <section class="works" aria-label="Works with">
     <div class="container works__in">
       <span class="works__label">Works with</span>
@@ -84,9 +124,25 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
         {[0, 1].map((copy) => (
           <ul class="mq__track" aria-hidden={copy === 1 ? 'true' : undefined}>
             {worksWith.map((w) => (
-              <li class={`mq__item ${w.soon ? 'is-soon' : ''}`}><span class="mq__dot" aria-hidden="true"></span>{w.name}{w.soon && <em>not yet</em>}</li>
+              <li class="mq__item"><span class="mq__dot" aria-hidden="true"></span>{w.name}</li>
             ))}
           </ul>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Sound familiar? (Josh, 4 Nov 2026) -->
+  <section class="section section--sunken pains" id="familiar">
+    <div class="container">
+      <h2 class="bento__h reveal"><span class="nh__dark">Sound familiar?</span> <span class="nh__light">Three jobs that eat into your week.</span></h2>
+      <div class="pains__grid">
+        {pains.map((x) => (
+          <article class="pain reveal" id={`pain-${x.id}`}>
+            <h3 class="pain__t">{x.t}</h3>
+            <p class="pain__w">{x.w}</p>
+            <p class="pain__fix">{x.fix}</p>
+          </article>
         ))}
       </div>
     </div>
@@ -95,13 +151,13 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   <!-- Bento -->
   <section class="section bento" id="how">
     <div class="container">
-      <h2 class="bento__h reveal"><span class="nh__dark">Everything a painting business runs on.</span> <span class="nh__light">Each part feeds the next, so nothing is typed twice.</span></h2>
+      <h2 class="bento__h reveal"><span class="nh__dark">Quote it. Run it. Get paid.</span> <span class="nh__light">Here's what each part does for you, from quote to paid.</span></h2>
 
       <div class="grid12">
         <!-- A: the stage -->
         <article class="bcard bcard--a reveal" id="stage" data-step="0">
           <div class="bcard__head">
-            <h3>From quote to signed, on their phone</h3>
+            <h3>Your quote, signed on your client's phone</h3>
             <button type="button" class="expand" data-full={`${W}/09-review-and-send-1440.webp`} data-alt="Review & Send: the email beside the quote the client sees" aria-label="Open the full screen"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" /></svg></button>
           </div>
           <div class="bcard__wash bcard__wash--a" aria-hidden="true"></div>
@@ -159,12 +215,13 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
           </div>
           <p class="bcard__line">{cards[2].line} <span class="bcard__plan">{cards[2].plan}</span></p>
           <canvas class="halo" width="320" height="320" aria-hidden="true"></canvas>
+          <p class="chat__intro small">A real answer from the app, on our made-up demo business:</p>
           <div class="chat">
             <p class="chat__q">What is the total of this quote and when was it sent?</p>
             <p class="chat__a">EST-0008 is $1,107.17, and it hasn't been sent — it's still a draft, created this morning at 8:25. The only quote sent to Mia is EST-0001 ($2,640.00), emailed yesterday 22 October.</p>
-            <p class="chat__src small">Sources shown: Estimates · search clients · client status</p>
+            <p class="chat__src small">Where she looked: the business's estimates and client records.</p>
           </div>
-          <p class="bcard__fine small">Her words from the demo screen, not invented. Your data only; every call in your audit log.</p>
+          <p class="bcard__fine small">She only sees your own business's data. Powered by Anthropic.</p>
         </article>
 
         <!-- E: timesheets -->
@@ -178,6 +235,17 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
           <figure class="mock mock--browser bcard__crop"><img src={`${W}/17-timesheets-week-1440.webp`} alt="Timesheets: a pay-week grid with regular and overtime hours" width="1200" height="750" loading="lazy" decoding="async" /></figure>
         </article>
 
+        <!-- G: also in the app, in the gap beside Timesheets -->
+        <article class="bcard bcard--g reveal">
+          <div class="bcard__head"><h3>Also in the app</h3></div>
+          <p class="bcard__line">The rest of what comes with it. Each one has its own section on the Features page.</p>
+          <div class="bcard__wash bcard__wash--g" aria-hidden="true"></div>
+          <ul class="also">
+            {also.map((a) => <li><a href={a.href}>{a.label}</a></li>)}
+          </ul>
+          <a class="bcard__more" href="/pricing#compare">What's on each plan <span aria-hidden="true">→</span></a>
+        </article>
+
         <!-- F: live jobs, wide -->
         <article class="bcard bcard--f reveal">
           <div class="bcard__text">
@@ -186,11 +254,12 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
             </div>
             <p class="bcard__line">{cards[4].line}</p>
             <ul class="checklist small">
-              <li>Labour cost straight from the time clock</li>
-              <li>Variations the client approves on a link</li>
-              <li>Daily reports with photos (Enterprise)</li>
+              <li>Labour cost worked out from your crew's sign-ins and pay rates</li>
+              <li>Variations (priced changes to the job) your client approves on a link</li>
+              <li>A completion report your client gets on a link</li>
+              <li>Daily site reports with photos from your crew · Enterprise plan</li>
             </ul>
-            <a class="bcard__more" href={cards[4].href}>More about live jobs <span aria-hidden="true">→</span></a>
+            <a class="bcard__more" href={cards[4].href}>More about the job page <span aria-hidden="true">→</span></a>
           </div>
           <div class="bcard__media">
             <button type="button" class="expand" data-full={cards[4].full} data-alt={cards[4].fullAlt} aria-label="Open the full screen"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" /></svg></button>
@@ -200,81 +269,86 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
         </article>
       </div>
 
-      <p class="also reveal"><span>And also:</span> {more.map((m) => <a href={`/features#${m.id}`}>{m.name.replace(/:.*$/, '')}</a>)}</p>
-    </div>
-  </section>
-
-  <!-- For every size of crew -->
-  <section class="section sizes" id="sizes">
-    <div class="container">
-      <h2 class="bento__h reveal"><span class="nh__dark">For every size of crew.</span> <span class="nh__light">Three plans, picked by headcount. Every one starts with 30 days free.</span></h2>
-      <div class="sizes__grid">
-        {plans.map((p) => (
-          <a class="size reveal" href="/pricing">
-            <span class="size__who">{p.id === 'starter' ? 'Just you, or you and a mate' : p.id === 'small-business' ? 'A crew with an office' : 'A bigger outfit with HR to run'}</span>
-            <span class="size__name">{p.name}</span>
-            <span class="size__price"><strong class="mono">{aud(p.price)}</strong> + GST a month · {aud(incGst(p.price))} inc.</span>
-            <span class="size__seats small">{p.admins} admin{p.admins > 1 ? 's' : ''} and {p.employees} employees included</span>
-            <span class="size__more">See what's included <span aria-hidden="true">→</span></span>
-          </a>
-        ))}
-      </div>
     </div>
   </section>
 
   <!-- Watch it work -->
   <section class="section section--sunken watch" id="watch">
     <div class="container">
-      <h2 class="bento__h reveal"><span class="nh__dark">Watch it work.</span> <span class="nh__light">Four short walkthroughs, no sound.</span></h2>
+      <h2 class="bento__h reveal"><span class="nh__dark">Watch it work.</span> <span class="nh__light">Four short videos, no sound.</span></h2>
       <div class="watch__in">
         <ol class="chapters" id="chapters">
           {chapters.map((c, i) => (
-            <li><button type="button" class={`chapter ${i === 0 ? 'is-on' : ''}`} data-i={i} aria-pressed={i === 0 ? 'true' : 'false'}><span class="chapter__n mono">{String(i + 1).padStart(2, '0')}</span><span class="chapter__t">{c.title}</span><span class="chapter__d mono">{Math.floor(c.seconds / 60)}:{String(c.seconds % 60).padStart(2, '0')}</span></button></li>
+            <li><button type="button" class={`chapter ${i === 0 ? 'is-on' : ''}`} data-i={i} aria-pressed={i === 0 ? 'true' : 'false'}><span class="chapter__n mono">{String(i + 1).padStart(2, '0')}</span><span class="chapter__t">{chapterText[c.id]?.title ?? c.title}</span><span class="chapter__d mono">{Math.floor(c.seconds / 60)}:{String(c.seconds % 60).padStart(2, '0')}</span></button></li>
           ))}
         </ol>
         <div class="player" id="player">
           {chapters.map((c, i) => (
-            <div class="player__slot" data-i={i} hidden={i !== 0}><Clip id={c.id} /></div>
+            <div class="player__slot" data-i={i} hidden={i !== 0}><Clip id={c.id} title={chapterText[c.id]?.title} caption={chapterText[c.id]?.caption} /></div>
           ))}
         </div>
       </div>
     </div>
   </section>
 
+  <!-- What it costs -->
+  <section class="section sizes" id="sizes">
+    <div class="container">
+      <h2 class="bento__h reveal"><span class="nh__dark">What it costs.</span> <span class="nh__light">Three plans. Pick by the size of your crew and what you need.</span></h2>
+      <div class="sizes__grid">
+        {plans.map((p) => (
+          <article class="size reveal">
+            <span class="size__who">{planWho[p.id]}</span>
+            <h3 class="size__name">{p.name}</h3>
+            <span class="size__price"><strong class="mono">{aud(p.price)}</strong> a month + GST <span class="size__inc">· {aud(incGst(p.price))} with GST</span></span>
+            <span class="size__seats small">{planSeats(p.admins, p.employees)}</span>
+            <p class="size__sum">{planSum[p.id]}</p>
+            <div class="size__cta">
+              <Button href={`${site.status.ctaHref}?plan=${p.id}`} size="sm" variant={p.highlight ? 'primary' : 'ghost'}>{site.status.cta}</Button>
+              <a class="size__more" href={`/pricing#${p.id}`}>See what's included <span aria-hidden="true">→</span></a>
+            </div>
+          </article>
+        ))}
+      </div>
+      <p class="sizes__note small reveal">Every plan starts with 30 days free, no card needed. Pay monthly, or a year up front for 10% off. Need more people? Extra seats from {aud(15)} a month + GST.</p>
+    </div>
+  </section>
+
   <!-- Connects to what you already use (dark band) -->
   <section class="section ink" id="connect">
     <div class="container">
-      <h2 class="bento__h ink__h reveal"><span>Connects to what you already use.</span> <span class="ink__light">Your calendar, your Drive, your mailbox, your own SMS number. And, said plainly, what isn't connected yet.</span></h2>
+      <h2 class="bento__h ink__h reveal"><span>Fits the way you already work.</span> <span class="ink__light">Your calendar, your email, your files and Xero. Bring your data across, and take it with you.</span></h2>
 
       <div class="hub reveal" aria-label="What Paint Trade HQ connects to">
         <ul class="hub__col hub__col--l">
           <li class="node is-live"><span>Google Calendar</span><em>Live</em></li>
+          <li class="node is-live"><span>Outlook calendar</span><em>Live</em></li>
           <li class="node is-live"><span>Google Drive</span><em>Live</em></li>
-          <li class="node is-live"><span>Email: Gmail, Microsoft 365 or IMAP</span><em>Live</em></li>
+          <li class="node is-live"><span>OneDrive</span><em>Live</em></li>
         </ul>
-        <div class="hub__core"><img src="/brand/logo.svg" alt="" width="40" height="40" /><span>Paint Trade HQ</span><small>one workspace per business</small></div>
+        <div class="hub__core"><img src="/brand/logo.svg" alt="" width="40" height="40" /><span>Paint Trade HQ</span><small>your business only</small></div>
         <ul class="hub__col hub__col--r">
-          <li class="node is-live"><span>Your own SMS number</span><em>Small business and up</em></li>
-          <li class="node is-live"><span>Your Google review link</span><em>Live</em></li>
-          <li class="node is-soon"><span>Xero</span><em>On the list, not yet</em></li>
-          <li class="node is-soon"><span>OneDrive and Outlook mail</span><em>Not yet</em></li>
+          <li class="node is-live"><span>Email: Gmail, Microsoft 365 or another mailbox</span><em>Live</em></li>
+          <li class="node is-live"><span>Texts to clients from your own SMS number</span><em>Small business and up</em></li>
+          <li class="node is-live"><span>Review requests with your Google review link</span><em>Live</em></li>
+          <li class="node is-live"><span>Xero</span><em>Live</em></li>
         </ul>
       </div>
 
       <div class="ink__grid">
         <article class="ink__card reveal">
-          <h3>Bring your clients across.</h3>
-          <p>Your client list and price list come in when you set up. Free on Enterprise, quoted on Starter and Small business.</p>
-          <a href="/pricing">How plans compare <span aria-hidden="true">→</span></a>
+          <h3>Moving from other software?</h3>
+          <p>We bring your clients across from your old software. Free on Enterprise; on Starter and Small business we give you a price first.</p>
+          <a href="/pricing#compare">How plans compare <span aria-hidden="true">→</span></a>
         </article>
         <article class="ink__card reveal">
-          <h3>On every phone, no app store.</h3>
-          <p>The crew app and the client's pages are web pages. Add them to the home screen and they open like an app.</p>
+          <h3>Your crew and clients need only a phone.</h3>
+          <p>Nothing to download. Your crew's app and the quote and invoice pages your client opens work in the phone's browser. Add them to the home screen and they open like an app.</p>
           <a href="/features#crew-app">The crew app <span aria-hidden="true">→</span></a>
         </article>
         <article class="ink__card reveal">
           <h3>Your data stays yours.</h3>
-          <p>Each business is its own isolated workspace, tested on every release. Export it any time. Closed accounts are deleted after 30 days.</p>
+          <p>No other business can see your clients, quotes or crew, and that's tested with every update. Export your records any time. Ask us to close your account and we keep your data 30 days in case you change your mind, then delete it.</p>
           <a href="/pricing#faq">Data and privacy <span aria-hidden="true">→</span></a>
         </article>
       </div>
@@ -349,12 +423,13 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
     </section>
   )}
 
-  <!-- FAQ, four only -->
-  <section class="section section--sunken">
+  <!-- Questions before you start -->
+  <section class="section section--sunken" id="questions">
     <div class="container faq-wrap">
-      <h2 class="bento__h reveal"><span class="nh__dark">Questions painters ask.</span></h2>
+      <h2 class="bento__h reveal"><span class="nh__dark">Questions before you start.</span></h2>
       <Faq items={homeFaqs} openFirst />
-      <p class="small"><a href="/pricing#faq">More answers on the pricing page</a></p>
+      <p class="small"><a href="/pricing#faq">More answers on the pricing page <span aria-hidden="true">→</span></a></p>
+      <p class="small faq-ask">Something we haven't answered? Email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>. We read every email ourselves.</p>
     </div>
   </section>
 
@@ -362,7 +437,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   <section class="section updates" id="updates">
     <div class="container updates__in">
       <div>
-        <h2 class="bento__h"><span class="nh__dark">Get the notes by email.</span> <span class="nh__light">One email when something ships or a note goes up. Nothing else.</span></h2>
+        <h2 class="bento__h"><span class="nh__dark">Get the notes by email.</span> <span class="nh__light">One email when we add something to the app or post a new note. Nothing else.</span></h2>
       </div>
       <form class="updates__form" id="updates-form" method="post" action="/api/invite" novalidate>
         <input type="hidden" name="source" value="newsletter" />
@@ -382,7 +457,12 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   <section class="nend">
     <div class="ribbon ribbon--end" aria-hidden="true"><i class="ribbon__a"></i><i class="ribbon__b"></i><i class="ribbon__d"></i></div>
     <div class="container nend__in">
-      <h2 class="bento__h"><span class="nh__dark">Try it on your own jobs.</span> <span class="nh__light">30 days free on every plan. No card. Your login arrives by email.</span></h2>
+      <h2 class="bento__h"><span class="nh__dark">Try it on your own jobs.</span></h2>
+      <ol class="nend__steps">
+        <li>Leave your details and pick a plan.</li>
+        <li>We set up your account and email your login, usually the same business day.</li>
+        <li>Use your plan free for 30 days. Then keep going, monthly or yearly, or walk away with your data.</li>
+      </ol>
       <Button href={site.status.ctaHref} size="lg">{site.status.cta} <span aria-hidden="true">›</span></Button>
     </div>
   </section>
@@ -410,6 +490,9 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   .nh__h1 { font-size: clamp(34px, 4.6vw, 58px); line-height: 1.08; letter-spacing: -0.015em; margin: 0 0 32px; font-weight: 600; }
   .nh__dark { color: var(--text); }
   .nh__light { color: #5c4c9e; font-weight: 500; }
+  .nh__h1 .nh__light { display: block; font-size: 0.6em; line-height: 1.2; margin-top: 12px; }
+  .nh__in > .nh__sub { margin: -14px 0 28px; font-size: clamp(16px, 1.3vw, 18px); line-height: 1.55; color: var(--text-2); max-width: min(40ch, 62%); }
+  .nh__in > .nh__fine { max-width: min(46ch, 62%); }
   .nh__cta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
   .nh__ghostbtn { background: rgba(255, 255, 255, 0.75); }
   .nh__fine { margin-top: 18px; font-size: 14px; color: var(--text-2); }
@@ -459,6 +542,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   .bcard__wash--b { left: -20%; bottom: -20%; width: 120%; height: 60%; background: radial-gradient(closest-side, rgba(138, 121, 214, 0.55), rgba(233, 165, 200, 0.35) 60%, transparent); }
   .bcard__wash--c { right: -30%; top: 30%; width: 100%; height: 90%; background: radial-gradient(closest-side, rgba(246, 201, 162, 0.85), rgba(240, 180, 142, 0.35) 60%, transparent); }
   .bcard__wash--e { left: -10%; bottom: -40%; width: 90%; height: 90%; background: radial-gradient(closest-side, rgba(154, 140, 216, 0.5), transparent 70%); }
+  .bcard__wash--g { right: -12%; bottom: -45%; width: 60%; height: 110%; background: radial-gradient(closest-side, rgba(154, 140, 216, 0.4), rgba(246, 201, 162, 0.3) 60%, transparent); }
   .bcard__wash--f { right: -10%; top: -20%; width: 70%; height: 120%; background: radial-gradient(closest-side, rgba(233, 165, 200, 0.55), rgba(246, 201, 162, 0.45) 50%, transparent); }
 
   .mock { position: relative; z-index: 1; margin: 0; background: #fff; border: 1px solid rgba(30, 28, 26, 0.08); border-radius: 12px; overflow: hidden; box-shadow: 0 24px 48px -18px rgba(52, 41, 94, 0.35), 0 8px 20px -10px rgba(0, 0, 0, 0.18); }
@@ -499,6 +583,8 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   .bcard--e { grid-column: span 4; }
   /* card F wide */
   .bcard--f { grid-column: span 12; flex-direction: row; gap: 28px; align-items: center; }
+  .bcard--g { grid-column: span 8; min-height: 0; }
+  .chat__intro { margin: 0; color: var(--muted); position: relative; z-index: 1; }
   .bcard__text { flex: 0 0 38%; display: flex; flex-direction: column; gap: 10px; }
   .bcard__media { position: relative; flex: 1 1 auto; min-width: 0; }
   .bcard__media .expand { position: absolute; top: 0; right: 0; }
@@ -512,8 +598,8 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   .chat__a { background: var(--sunken); color: var(--text); border-bottom-left-radius: 4px; }
   .chat__src { background: none !important; padding: 0 2px !important; color: var(--muted); }
 
-  .also { margin: 22px 0 0; display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; color: var(--text-2); font-size: 14px; }
-  .also a { font-weight: 600; color: var(--accent-ink); background: var(--accent-bg); border-radius: var(--r-pill); padding: 5px 11px; }
+  .also { list-style: none; margin: 8px 0 12px; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 10px; align-items: center; font-size: 15px; position: relative; z-index: 1; }
+  .also a { display: inline-block; font-weight: 600; color: var(--accent-ink); background: var(--accent-bg); border-radius: var(--r-pill); padding: 8px 14px; }
   .also a:hover { background: var(--accent); color: #fff; text-decoration: none; }
 
   /* ---------- watch ---------- */
@@ -566,7 +652,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
 
   /* ---------- sticky bar ---------- */
   .sticky { display: none; }
-  :global(body[data-sticky] .chat) { bottom: 76px; }
+  :global(body[data-sticky] #chat) { bottom: 76px; }
 
   /* ---------- reveal ---------- */
   html.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity 500ms ease, transform 500ms ease; }
@@ -575,14 +661,26 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
 
   /* ---------- sizes ---------- */
   .sizes__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .size { display: grid; gap: 6px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; color: inherit; transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease; }
-  .size:hover { text-decoration: none; transform: translateY(-3px); box-shadow: var(--shadow-float); border-color: rgba(75, 62, 134, 0.35); }
+  .size { display: flex; flex-direction: column; gap: 6px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; color: inherit; }
   .size__who { font-size: 13px; font-weight: 600; color: var(--accent-ink); letter-spacing: 0.02em; }
-  .size__name { font-family: var(--font-display); font-weight: 600; font-size: 28px; line-height: 1.1; }
+  .size__name { font-family: var(--font-display); font-weight: 600; font-size: 28px; line-height: 1.1; margin: 0; }
+  .size__sum { margin: 6px 0 0; color: var(--text-2); font-size: 15px; line-height: 1.5; }
+  .size__cta { margin-top: auto; padding-top: 16px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .sizes__note { margin: 20px 0 0; color: var(--text-2); }
+  /* sound familiar */
+  .pains__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .pain { display: flex; flex-direction: column; gap: 8px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow-card); }
+  .pain__t { margin: 0; font-size: clamp(20px, 1.7vw, 24px); line-height: 1.2; }
+  .pain__w { margin: 0; color: var(--text-2); }
+  .pain__fix { margin: auto 0 0; padding-top: 12px; border-top: 1px dashed var(--border-strong); color: var(--accent-ink); font-weight: 600; }
+  /* closing steps and the ask line */
+  .nend__steps { margin: 0 0 24px; padding-left: 22px; display: grid; gap: 6px; color: var(--text-2); font-size: clamp(16px, 1.3vw, 18px); max-width: 46ch; }
+  .faq-ask { color: var(--text-2); margin-top: 4px; }
   .size__price { color: var(--text-2); }
   .size__price strong { color: var(--text); font-size: 20px; }
+  .size__inc { white-space: nowrap; }
   .size__seats { color: var(--muted); }
-  .size__more { margin-top: 10px; font-weight: 600; color: var(--accent-ink); }
+  .size__more { font-weight: 600; color: var(--accent-ink); }
 
   /* ---------- dark connect band ---------- */
   .ink { background: #1f183d; color: #fff; position: relative; overflow: hidden; }
@@ -636,7 +734,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
   .updates__note { margin: 10px 0 0; color: var(--text-2); }
 
   @media (max-width: 1024px) {
-    .sizes__grid, .ink__grid { grid-template-columns: 1fr; }
+    .sizes__grid, .ink__grid, .pains__grid { grid-template-columns: 1fr; }
     .wshop__grid { grid-template-columns: 1fr 1fr; }
     .wpost--lead { grid-column: span 2; min-height: 260px; }
   }
@@ -656,6 +754,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
     .bcard--a { grid-column: span 12; }
     .bcard--b { grid-column: span 6; grid-row: auto; }
     .bcard--c, .bcard--d, .bcard--e { grid-column: span 6; }
+    .bcard--g { grid-column: span 12; }
   }
   @media (max-width: 860px) {
     .ribbon__a { left: 38%; width: 64vw; }
@@ -670,11 +769,13 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
     .fb__row { grid-template-columns: minmax(0, 1fr); }
     .fb__vrow { grid-template-columns: minmax(0, 1fr); }
     .nend__in { text-align: left; margin-left: 0; }
+    .nend__in { background: rgba(250, 249, 246, 0.88); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-radius: 16px; padding: 20px; }
     .sticky { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px max(16px, env(safe-area-inset-left, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-right, 0px)); background: rgba(255, 255, 255, 0.92); border-top: 1px solid var(--border); backdrop-filter: blur(8px); }
     .sticky[hidden] { display: none; }
   }
   @media (max-width: 600px) {
-    .bcard--b, .bcard--c, .bcard--d, .bcard--e { grid-column: span 12; }
+    .bcard--b, .bcard--c, .bcard--d, .bcard--e, .bcard--g { grid-column: span 12; }
+    .nh__in > * { max-width: 88%; }
     .bcard { min-height: 0; }
     .stage__frames { padding-right: 18%; }
     .stage__phone { width: 30%; }
@@ -706,7 +807,7 @@ const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote
     const panels = Array.from(stage.querySelectorAll<HTMLElement>('.stage__panel'));
     const caption = document.getElementById('stage-caption');
     const pauseBtn = document.getElementById('stage-pause') as HTMLButtonElement | null;
-    const captions = ['Built from your Library, room by room.', 'Signed on their phone. No account, no app.', 'The accepted quote becomes the live job; crew sign in with GPS.', 'Invoices follow the payment schedule on the quote.'];
+    const captions = ['Built from your own price list, room by room.', 'Your client signs on their phone. No account, no app.', 'The signed quote becomes the job, and your crew sign in on site.', 'Your invoices follow the payment schedule on the quote.'];
     const MS = 4000;
     let i = 0, timer = 0, paused = reduced, userPaused = false, visible = true, hovered = false;
     const show = (n: number) => {

@@ -405,7 +405,7 @@ export const faqs: { q: string; a: string }[] = [
   },
   {
     q: 'Does it connect to Xero or MYOB?',
-    a: 'Xero is on the list and not connected yet. No MYOB.',
+    a: 'Xero, yes: you connect it from your settings. No MYOB.',
   },
   {
     q: 'Is there an app for my phone?',
@@ -454,6 +454,31 @@ export const faqs: { q: string; a: string }[] = [
   {
     q: 'Can I pay yearly?',
     a: 'Yes. Pay a year up front and the plan price is 10% less than twelve monthly payments; extra seats stay monthly.',
+  },
+  // The home page's questions (4 Nov 2026), picked by their wording in index.astro.
+  {
+    q: 'What happens when I press Start free trial?',
+    a: 'You fill in a short form: your name, business, suburb, email, crew size and the plan you want. A confirmation email comes first. Then we set up your account and email your login, usually the same business day. No card, and nothing to pay during the 30 days.',
+  },
+  {
+    q: 'What happens when the 30 days are up?',
+    a: "Nothing is charged automatically, because the trial never takes a card. To keep going, choose your plan in the app's Billing page, monthly or yearly. If you'd rather stop, tell us and we close your account; we keep your data 30 days in case you change your mind, then delete it.",
+  },
+  {
+    q: "What's involved in setting up?",
+    a: 'Once your login arrives, you add your prices and your clients. The Help hub in the app has quick-start guides. Small business includes an hour of training for one person, Enterprise an hour for each person. On Enterprise we move your data across from your old software for free.',
+  },
+  {
+    q: 'What do my crew need?',
+    a: 'A phone with a browser. They join with the code or QR you give them, with nothing to download from an app store. They see their jobs, the time clock and the other crew pages you switch on (some are Enterprise only), and never your prices.',
+  },
+  {
+    q: 'Can I run it from my phone?',
+    a: 'The office side, where you build quotes, send invoices and lock timesheets, is made for a laptop, desktop or tablet. Your crew\'s app, and the quote and invoice pages your client opens, are made for phones.',
+  },
+  {
+    q: 'Can someone in the office use it too?',
+    a: 'Yes. You choose which pages each office person can open, and your crew only ever get the crew app. Small business includes one office login besides yours, Enterprise two. On Starter an extra one is $25 a month + GST.',
   },
   {
     q: 'How do I start?',

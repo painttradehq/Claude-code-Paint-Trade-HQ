@@ -25,7 +25,8 @@ for (let i = 0; i < 40; i++) {
   await sleep(500);
 }
 
-const browser = await chromium.launch();
+// PLAYWRIGHT_CHROMIUM_PATH lets a machine whose installed browser differs from the pinned Playwright point at its own Chrome.
+const browser = await chromium.launch(process.env.PLAYWRIGHT_CHROMIUM_PATH ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH } : {});
 try {
   const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? walk(`${dir}/${d.name}`) : [`${dir}/${d.name}`]));
   const builtFiles = new Set(walk('dist').filter((f) => f.endsWith('.html')).map((f) => f.replace(/^dist/, '').replace(/\.html$/, '').replace(/\/index$/, '') || '/'));

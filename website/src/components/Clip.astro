@@ -8,10 +8,12 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { clips } from '../data/screens';
 
-interface Props { id: string; class?: string }
-const { id, class: cls = '' } = Astro.props;
-const c = clips.find((x) => x.id === id);
-if (!c) throw new Error(`Unknown clip "${id}"`);
+/** `title` and `caption` override the screens.ts wording for one page (the home page uses its own). */
+interface Props { id: string; class?: string; title?: string; caption?: string }
+const { id, class: cls = '', title: titleOverride, caption: captionOverride } = Astro.props;
+const found = clips.find((x) => x.id === id);
+if (!found) throw new Error(`Unknown clip "${id}"`);
+const c = { ...found, title: titleOverride ?? found.title, caption: captionOverride ?? found.caption };
 const exists = existsSync(fileURLToPath(new URL(`../../public/clips/${c.file}`, import.meta.url)));
 const posterExists = existsSync(fileURLToPath(new URL(`../../public/clips/posters/${c.poster}`, import.meta.url)));
 const poster = posterExists ? `/clips/posters/${c.poster}` : undefined;
