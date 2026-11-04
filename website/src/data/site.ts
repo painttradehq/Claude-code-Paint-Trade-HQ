@@ -120,7 +120,7 @@ export const plans: Plan[] = [
 export const pricingNotes = [
   'Prices are AUD, ex-GST; 10% GST is added. Pay monthly, or a year up front for 10% off the plan price; extra seats stay monthly.',
   'Free trial: 30 days on the plan you pick, no card needed. Then keep going, or walk away.',
-  'Monthly or yearly. Upgrades apply at once, pro-rated; downgrades at the end of the period. Cancelling and refunds are covered in the Terms of Service.',
+  'Monthly or yearly. On monthly billing, upgrades apply at once, pro-rated; downgrades at the end of the month.',
   'Seats: admins are the people on the Team admins list including the owner; employees are the people on the Employees page who have not been removed. Going over the included number adds a seat at the prices above, and the app asks before it adds one.',
   'Data migration from old software: free on Enterprise, quoted on the other two.',
 ];
@@ -330,7 +330,7 @@ export const modules: Module[] = [
     points: [
       'Job photos, PDFs and signed documents go to Paint Trade HQ cloud by default.',
       'Or connect your own Google Drive: a "Paint Trade HQ" folder, one sub-folder per job, created at the first upload. You keep the files if you ever leave.',
-      'Or connect Microsoft OneDrive from the same page.',
+      'Or connect your own Microsoft OneDrive instead.',
     ],
     screen: 'files',
   },
@@ -422,7 +422,7 @@ export const faqs: { q: string; a: string }[] = [
   },
   {
     q: 'What happens if I stop paying?',
-    a: 'Only Billing and Account open until a plan is chosen. Your data is kept and you can export it; closed accounts are deleted after 30 days. Cancelling and refunds are covered in the Terms of Service.',
+    a: 'Without a current plan, only the Billing and Account pages open until you choose one. Your data is kept and you can export it; closed accounts are deleted after 30 days, with backups overwritten within a further 60. Ending your account is covered in the Terms of Service.',
   },
   {
     q: 'Who sees my data?',

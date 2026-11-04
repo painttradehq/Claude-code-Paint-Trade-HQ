@@ -55,7 +55,9 @@ export const screens: Record<string, Screen> = {
   performance: admin('performance', '30-performance-1440.png', 'The Performance page with validations and score trends'),
   equipment: admin('equipment', '31-equipment-1440.png', 'The Equipment register: tools and gear, who has what, and requests'),
   lucy: admin('lucy', '32-lucy-on-quote-1440.png', 'Lucy, the AI assistant, open beside a quote, answering what the quote total is and when it was sent, with the sources it used', 'Lucy answers from your own data and shows her sources.'),
-  files: admin('files', '33-settings-files-storage-1440.png', 'Settings: Files & storage with Paint Trade HQ cloud in use, a connected Google Drive, OneDrive not set up yet, and the Xero connect button not set up yet', 'Our cloud, or your own Google Drive.'),
+  // Cropped (4 Nov 2026) above the OneDrive and Xero rows, which showed "not set up on this server yet" on 23 Oct;
+  // Josh: everything is connected by go-live. Ask the builder for a fresh full screen 33 once it is.
+  files: { ...admin('files', '33-settings-files-storage-crop.png', 'Settings: Files & storage with Paint Trade HQ cloud in use and a connected Google Drive', 'Our cloud by default, or your own Drive.'), width: 864, height: 332 },
   'operating-hours': admin('operating-hours', '34-settings-operating-hours-1440.png', 'Settings: operating hours, working days and auto sign-out'),
   'crew-app-settings': admin('crew-app-settings', '35-settings-crew-app-1440.png', 'Settings: which pages and notifications the crew app shows'),
   billing: admin('billing', '36-settings-billing-launch-1440.png', 'Settings: Billing'),

@@ -106,8 +106,8 @@ function confirmation(lead, origin) {
     `1. We set up your account${p ? ` on the ${p.name} plan` : ''} and email your login, usually the same business day.`,
     p ? `2. You use the ${p.name} plan for 30 days. No card needed, nothing to pay today.` : '2. You use it for 30 days. No card needed, nothing to pay today.',
     p
-      ? `3. After that, ${p.name} is ${priceLine(p, lead.billing)}${lead.billing === 'yearly' ? ', paid up front (10% less than monthly)' : ''}, cancel any time.`
-      : `3. After that, plans are from ${aud(PLANS.starter.price)} + GST a month, or 10% less paid yearly, cancel any time. We will help you pick one.`,
+      ? `3. After that, ${p.name} is ${priceLine(p, lead.billing)}${lead.billing === 'yearly' ? ', paid up front (10% less than monthly)' : ''}.`
+      : `3. After that, plans are from ${aud(PLANS.starter.price)} + GST a month, or 10% less paid yearly. We will help you pick one.`,
     '',
     p ? `What ${p.name} includes: ${origin}/pricing#${lead.plan}` : `The three plans side by side: ${origin}/pricing`,
   ];

@@ -18,8 +18,15 @@ const failures = [];
 const fail = (msg) => { failures.push(msg); console.log('  ✗', msg); };
 const ok = (msg) => console.log('  ✓', msg);
 
-// Serve dist/ with astro preview.
-const server = spawn('npx', ['astro', 'preview', '--port', String(PORT), '--host', '127.0.0.1'], { stdio: 'ignore' });
+// Serve dist/ with astro preview. Refuse to start if something already answers on the port: an old preview
+// server left running would be tested instead of this one. Astro is started directly (not through npx) so
+// that server.kill() stops the server itself and leaves nothing behind.
+try {
+  await fetch(BASE + '/');
+  console.error(`Port ${PORT} is already in use (an old preview server?). Stop it and run again.`);
+  process.exit(1);
+} catch {}
+const server = spawn(process.execPath, ['node_modules/astro/astro.js', 'preview', '--port', String(PORT), '--host', '127.0.0.1'], { stdio: 'ignore' });
 for (let i = 0; i < 40; i++) {
   try { const r = await fetch(BASE + '/'); if (r.ok) break; } catch {}
   await sleep(500);
@@ -92,6 +99,15 @@ try {
           if (!txt.includes(ex) || !txt.includes(inc)) fail(`pricing: missing ${ex} / ${inc}`);
         }
         ok('prices ex and inc GST present');
+        // The Monthly/Yearly toggle: only the chosen cycle's price shows on each plan card.
+        const shown = () => page.$$eval('#plans .plan', (cards) => cards.map((c) => [...c.querySelectorAll('.plan__price')].filter((el) => getComputedStyle(el).display !== 'none').map((el) => el.textContent.replace(/\s+/g, ' ').trim())));
+        const monthly = await shown();
+        if (monthly.length !== 3 || monthly.some((v) => v.length !== 1 || !v[0].includes('a month'))) fail(`pricing: Monthly shows ${JSON.stringify(monthly)}`);
+        await page.locator("label.bill__opt:has(input[value='yearly'])").click();
+        const yearlyShown = await shown();
+        if (yearlyShown.length !== 3 || yearlyShown.some((v) => v.length !== 1 || !v[0].includes('a year'))) fail(`pricing: Yearly shows ${JSON.stringify(yearlyShown)}`);
+        await page.locator("label.bill__opt:has(input[value='monthly'])").click();
+        ok('billing toggle shows one price per plan');
       }
 
       if (errors.length) fail(`${path}@${width}: console errors: ${errors.slice(0, 3).join(' | ')}`);

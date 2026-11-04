@@ -2,8 +2,8 @@
 title: "Where your photos and paperwork live"
 date: 2026-10-31
 summary: "Job photos, quote and invoice PDFs, signed contracts and completion reports all land in one place: Paint Trade HQ's cloud, or your own Google Drive with a folder per job. What goes where, who can get it, and what happens if you ever leave."
-cover: /screens/webp/33-settings-files-storage-1440.webp
-coverAlt: "Settings: Files & storage with Paint Trade HQ cloud in use, a connected Google Drive, OneDrive not set up yet"
+cover: /screens/webp/33-settings-files-storage-cover.webp
+coverAlt: "Settings: Files & storage with Paint Trade HQ cloud in use and a connected Google Drive"
 tag: Files
 draft: false
 order: 5
@@ -21,7 +21,7 @@ Or you connect **your own Google Drive** in Settings › Business › Files & st
 
 Or connect **Microsoft OneDrive** from the same page, if that is where your business keeps its files.
 
-<figure class="shot shot--browser"><div class="shot__frame"><span class="shot__dots"><i></i><i></i><i></i></span><img src="/screens/webp/33-settings-files-storage-1440.webp" alt="Settings: Files & storage with Paint Trade HQ cloud in use, a connected Google Drive, and OneDrive not set up yet" width="1440" height="900" loading="lazy" decoding="async"></div><figcaption>Settings › Files &amp; storage: our cloud by default, or your own Google Drive. Harbourline Painting is the demo business.</figcaption></figure>
+<figure class="shot shot--browser"><div class="shot__frame"><span class="shot__dots"><i></i><i></i><i></i></span><img src="/screens/webp/33-settings-files-storage-crop.webp" alt="Settings: Files & storage with Paint Trade HQ cloud in use and a connected Google Drive" width="864" height="332" loading="lazy" decoding="async"></div><figcaption>Settings › Files &amp; storage: our cloud by default, or your own Google Drive. Harbourline Painting is the demo business.</figcaption></figure>
 
 ## What goes there, and from where
 

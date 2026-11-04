@@ -54,7 +54,7 @@ const also = [
 const pains = [
   { id: 'evenings', t: 'Your evenings go on quotes.', w: "You measure up on site, then type it all out at night on a template that doesn't know your prices.", fix: 'Here you build it room by room from your own price list, and send it as a link.' },
   { id: 'deposit', t: 'The deposit drifts.', w: 'The client says yes on the phone, then chasing the paperwork and the deposit takes days.', fix: 'Here your client signs on their phone, and the deposit invoice is created the moment they do.' },
-  { id: 'hours', t: 'Hours on scraps of paper.', w: "Friday comes and the week's hours arrive by text, from memory, or not at all.", fix: 'Here your crew sign in and out on their phones, so the hours are already recorded. On Small business and up, the Timesheets page adds up the week for payroll.' },
+  { id: 'hours', t: 'Hours on scraps of paper.', w: "Friday comes and the week's hours arrive by text, from memory, or not at all.", fix: 'Here your crew sign in and out on their phones, so the hours are already recorded. On the Small business plan and up, the Timesheets page adds up the week for payroll.' },
 ];
 
 /** Plans, in a painter's words: who it suits, the people included, one line of what's in it. */
@@ -699,6 +699,7 @@ const chapterText: Record<string, { title: string; caption: string }> = {
   .hub__core { display: grid; justify-items: center; gap: 6px; padding: 22px 26px; border-radius: 16px; background: #fff; color: var(--text); font-family: var(--font-display); font-weight: 600; font-size: 18px; box-shadow: 0 20px 40px -16px rgba(0, 0, 0, 0.5); text-align: center; }
   .hub__core small { font-family: var(--font-body); font-weight: 400; font-size: 12px; color: var(--text-2); }
   .ink__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
+  .ink__card p, .pain__w, .pain__fix, .nend__steps li { text-wrap: pretty; }
   .ink__card { padding: 22px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.04); }
   .ink__card h3 { margin: 0 0 8px; font-size: 20px; color: #fff; }
   .ink__card p { margin: 0 0 12px; color: #d6cff0; }
@@ -776,6 +777,8 @@ const chapterText: Record<string, { title: string; caption: string }> = {
   @media (max-width: 600px) {
     .bcard--b, .bcard--c, .bcard--d, .bcard--e, .bcard--g { grid-column: span 12; }
     .nh__in > *, .nh__in > .nh__sub, .nh__in > .nh__fine { max-width: 88%; }
+    .nh__in > .nh__kicker { max-width: 75%; }
+    .nh__in > .nh__sub { color: var(--text); }
     .bcard { min-height: 0; }
     .stage__frames { padding-right: 18%; }
     .stage__phone { width: 30%; }

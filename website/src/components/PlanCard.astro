@@ -37,7 +37,6 @@ const yr = yearly(plan.price);
 
 <style>
   .plan { scroll-margin-top: calc(var(--header-h) + 12px); }
-  .plan__y { display: none; }
   .plan {
     position: relative;
     display: flex;
@@ -78,6 +77,8 @@ const yr = yearly(plan.price);
   .plan__list { font-size: 15px; flex: 1; }
   .plan__cta { margin-top: 18px; }
   .plan__btn { width: 100%; }
+  /* After .plan__price so it wins: the yearly lines stay hidden until Yearly is picked (pricing.astro). */
+  .plan__price.plan__y, .plan__inc.plan__y { display: none; }
   @media (max-width: 720px) {
     .plan__seats { grid-template-columns: 1fr; }
   }

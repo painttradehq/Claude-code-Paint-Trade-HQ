@@ -189,6 +189,7 @@ const rows = plans.flatMap((p, i) => p.includes.map((f) => ({ f, from: i })));
   .bill__note { margin: 0; color: var(--text-2); }
   #plans:has(input[name='bill'][value='yearly']:checked) :global(.plan__m), #plans.is-yearly :global(.plan__m) { display: none; }
   #plans:has(input[name='bill'][value='yearly']:checked) :global(.plan__y), #plans.is-yearly :global(.plan__y) { display: block; }
+  #plans:has(input[name='bill'][value='yearly']:checked) :global(.plan__price.plan__y), #plans.is-yearly :global(.plan__price.plan__y) { display: flex; }
   @media (forced-colors: active) { .bill__opt input { position: static; opacity: 1; width: 16px; height: 16px; margin: 0 0 0 10px; } }
 
   /* calculator */

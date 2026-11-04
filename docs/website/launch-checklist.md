@@ -65,15 +65,17 @@ On 4 Nov you said to write the home page as if everything is connected by go-liv
 | Xero connects from your settings | Works-with strip, the dark "Fits the way you already work" band, the question "Does it connect to Xero or MYOB?" (also on Pricing) | Settings › Business › Accounting: Xero connects and stays connected | §4.7, §9, §11: "not yet set up on the server" |
 | OneDrive | Strip, dark band | Settings › Business › Files & storage: OneDrive connects and a job photo lands in it | §9: "Not yet" |
 | Outlook calendar | Strip, dark band | Calendar settings: Outlook connects and your events show | §9: "Not yet" |
-| Choose your plan on the app's Billing page, monthly or yearly | The question "What happens when the 30 days are up?" | Billing page is switched on, shows $98 / $178 / $249, and offers a year up front at 10% off | §6: "built but not switched on" |
+| Choose your plan on the app's Billing page | The question "What happens when the 30 days are up?" | Billing page is switched on, shows $98 / $178 / $249, and offers a year up front at 10% off | §6: "built but not switched on" |
 | Gmail, Microsoft 365, Google Calendar, Google Drive, your Google review link | Strip, dark band | Connect each once | Live on 23 Oct; a quick check is enough |
 
 So the site doesn't contradict itself, the same assumption was carried to the other pages that mentioned these services on 4 Nov: the Features page (Files and storage: "our cloud, your own Google Drive or OneDrive"; Calendar: "Google Calendar or Outlook") and the blog post "Where your photos and paperwork live" (OneDrive "from the same page"). **If one of them isn't live on launch day, every place it appears comes off together:** the home page strip, dark band and "Also in the app" card, the Xero answer (home and Pricing), the day-31 answer (Billing page), the two Features modules and the blog post.
 
-Still showing the old state, whichever way it goes:
+Still to sort, whichever way it goes:
 
-- Screen 33 (Settings › Files & storage, used on Features and as the blog post's picture) shows OneDrive and Xero "not set up yet", because that is what the app showed on 23 Oct. Its description for screen readers says so honestly. Once they are connected, ask the builder for a fresh screen 33.
+- Screen 33 (Settings › Files & storage) showed OneDrive and Xero "not set up on this server yet" on 23 Oct. On 4 Nov it was cropped above those two rows for the Features viewer and the files blog post (picture and cover), so it shows our cloud and a connected Google Drive only. Once OneDrive and Xero are connected, ask the builder for a fresh full screen 33.
 - The knowledge file: §4.7, §9 and §11 on Xero, §4.8 and §9 on Outlook and OneDrive, §6 and §9 on billing. Until you change them and re-send the file, the chat box would say "not yet" to a question the home page answers "yes". Keep `PUBLIC_CHAT_ENABLED` = `0` until then.
+
+- **The Terms of Service before billing goes on.** Terms v1.2 (22 Oct) were written for the free tester program: they say no fee is charged and have nothing on paying, cancelling or refunds. Before the first painter pays, the Terms need a fees, cancelling and refunds section (your lawyer; the refund on a prepaid year is still undecided). Until then the site says nothing about cancelling or refunds; the only pointer to the Terms is "Ending your account is covered in the Terms of Service", which §11 does cover.
 
 **Videos to re-record (ask the builder, same demo business, any made-up client email such as mia@example.com):** all four play from the home page's "Watch it work".
 
