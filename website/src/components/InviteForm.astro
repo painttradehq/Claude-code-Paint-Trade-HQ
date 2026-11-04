@@ -51,7 +51,7 @@ const seats = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
     <fieldset class="fs fs--plan">
       <legend class="fs__t"><span class="fs__n mono" aria-hidden="true">2</span> Your plan</legend>
-      <p class="fs__hint small">30 days free on any plan, no card. You can change plan later.</p>
+      <p class="fs__hint small">30 days free on any plan, no card. You can change your plan later.</p>
       <div class="pp" role="radiogroup" aria-label="Plan">
         {plans.map((p) => (
           <label class="pp__card">
@@ -81,7 +81,7 @@ const seats = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
       ))}
       <div class="pp__what" data-plan="unsure">
         <h3 class="pp__wt">No worries</h3>
-        <p class="small pp__after">We look at your crew size and suggest a plan with your login. Plans are from {aud(plans[0].price)} + GST a month, or 10% less paid yearly, and you can change plan later.</p>
+        <p class="small pp__after">We look at your crew size and suggest a plan with your login. Plans are from {aud(plans[0].price)} + GST a month, or 10% less paid yearly.</p>
       </div>
     </fieldset>
 

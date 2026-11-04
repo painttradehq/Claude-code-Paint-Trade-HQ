@@ -33,8 +33,9 @@ for (let i = 0; i < 40; i++) {
 }
 
 // PLAYWRIGHT_CHROMIUM_PATH lets a machine whose installed browser differs from the pinned Playwright point at its own Chrome.
-const browser = await chromium.launch(process.env.PLAYWRIGHT_CHROMIUM_PATH ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH } : {});
+let browser;
 try {
+  browser = await chromium.launch(process.env.PLAYWRIGHT_CHROMIUM_PATH ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH } : {});
   const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? walk(`${dir}/${d.name}`) : [`${dir}/${d.name}`]));
   const builtFiles = new Set(walk('dist').filter((f) => f.endsWith('.html')).map((f) => f.replace(/^dist/, '').replace(/\.html$/, '').replace(/\/index$/, '') || '/'));
 
@@ -99,15 +100,16 @@ try {
           if (!txt.includes(ex) || !txt.includes(inc)) fail(`pricing: missing ${ex} / ${inc}`);
         }
         ok('prices ex and inc GST present');
-        // The Monthly/Yearly toggle: only the chosen cycle's price shows on each plan card.
-        const shown = () => page.$$eval('#plans .plan', (cards) => cards.map((c) => [...c.querySelectorAll('.plan__price')].filter((el) => getComputedStyle(el).display !== 'none').map((el) => el.textContent.replace(/\s+/g, ' ').trim())));
+        // The Monthly/Yearly toggle: each plan card shows the chosen cycle's price line and inc-GST line, nothing else.
+        const before = failures.length;
+        const shown = () => page.$$eval('#plans .plan', (cards) => cards.map((c) => [...c.querySelectorAll('.plan__price, .plan__inc')].filter((el) => getComputedStyle(el).display !== 'none').map((el) => el.textContent.replace(/\s+/g, ' ').trim())));
         const monthly = await shown();
-        if (monthly.length !== 3 || monthly.some((v) => v.length !== 1 || !v[0].includes('a month'))) fail(`pricing: Monthly shows ${JSON.stringify(monthly)}`);
+        if (monthly.length !== 3 || monthly.some((v) => v.length !== 2 || !v[0].includes('a month') || !v[1].includes('a month including GST') || v.some((l) => l.includes('a year')))) fail(`pricing: Monthly shows ${JSON.stringify(monthly)}`);
         await page.locator("label.bill__opt:has(input[value='yearly'])").click();
         const yearlyShown = await shown();
-        if (yearlyShown.length !== 3 || yearlyShown.some((v) => v.length !== 1 || !v[0].includes('a year'))) fail(`pricing: Yearly shows ${JSON.stringify(yearlyShown)}`);
+        if (yearlyShown.length !== 3 || yearlyShown.some((v) => v.length !== 2 || !v[0].includes('a year') || !v[1].includes('paid yearly'))) fail(`pricing: Yearly shows ${JSON.stringify(yearlyShown)}`);
         await page.locator("label.bill__opt:has(input[value='monthly'])").click();
-        ok('billing toggle shows one price per plan');
+        if (failures.length === before) ok('billing toggle shows one price per plan');
       }
 
       if (errors.length) fail(`${path}@${width}: console errors: ${errors.slice(0, 3).join(' | ')}`);
@@ -135,7 +137,7 @@ try {
   }
   ok('word check done');
 } finally {
-  await browser.close();
+  await browser?.close();
   server.kill();
 }
 
