@@ -75,7 +75,7 @@ const seats = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
           <ul class="checklist pp__list">
             {p.includes.map((f) => <li>{f}</li>)}
           </ul>
-          <p class="small pp__after pp__after--m">After the trial: <strong class="mono">{aud(p.price)}</strong> + GST a month ({aud(incGst(p.price))} including GST), cancel any time. Nothing to pay today.</p>
+          <p class="small pp__after pp__after--m">After the trial: <strong class="mono">{aud(p.price)}</strong> + GST a month ({aud(incGst(p.price))} including GST). Nothing to pay today.</p>
           <p class="small pp__after pp__after--y">After the trial: <strong class="mono">{aud(yearly(p.price))}</strong> + GST a year, paid up front ({aud(yearlyPerMonth(p.price))} a month; {aud(incGst(yearly(p.price)))} including GST). Nothing to pay today.</p>
         </div>
       ))}

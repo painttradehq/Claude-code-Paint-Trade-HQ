@@ -120,7 +120,7 @@ export const plans: Plan[] = [
 export const pricingNotes = [
   'Prices are AUD, ex-GST; 10% GST is added. Pay monthly, or a year up front for 10% off the plan price; extra seats stay monthly.',
   'Free trial: 30 days on the plan you pick, no card needed. Then keep going, or walk away.',
-  'Monthly or yearly. Cancel any time and keep access to the end of the paid period. Upgrades apply at once, pro-rated; downgrades at the end of the period.',
+  'Monthly or yearly. Upgrades apply at once, pro-rated; downgrades at the end of the period. Cancelling and refunds are covered in the Terms of Service.',
   'Seats: admins are the people on the Team admins list including the owner; employees are the people on the Employees page who have not been removed. Going over the included number adds a seat at the prices above, and the app asks before it adds one.',
   'Data migration from old software: free on Enterprise, quoted on the other two.',
 ];
@@ -259,7 +259,7 @@ export const modules: Module[] = [
     points: [
       'Events, jobs and reminders with colour categories.',
       'Reminders can be tied to a client, with Tomorrow and Mark done.',
-      'Connect Google Calendar to see it alongside your jobs.',
+      'Connect Google Calendar or Outlook to see it alongside your jobs.',
     ],
     screen: 'calendar',
   },
@@ -326,10 +326,11 @@ export const modules: Module[] = [
     id: 'files',
     name: 'Files and storage',
     plan: 'Starter',
-    summary: 'Your files, in our cloud or your own Google Drive.',
+    summary: 'Your files, in our cloud, your own Google Drive or OneDrive.',
     points: [
       'Job photos, PDFs and signed documents go to Paint Trade HQ cloud by default.',
       'Or connect your own Google Drive: a "Paint Trade HQ" folder, one sub-folder per job, created at the first upload. You keep the files if you ever leave.',
+      'Or connect Microsoft OneDrive from the same page.',
     ],
     screen: 'files',
   },
@@ -421,7 +422,7 @@ export const faqs: { q: string; a: string }[] = [
   },
   {
     q: 'What happens if I stop paying?',
-    a: 'You keep access to the end of the paid month; after that only Billing and Account open until a plan is chosen. Your data is kept and exportable; closed accounts are deleted after 30 days.',
+    a: 'Only Billing and Account open until a plan is chosen. Your data is kept and you can export it; closed accounts are deleted after 30 days. Cancelling and refunds are covered in the Terms of Service.',
   },
   {
     q: 'Who sees my data?',
@@ -458,11 +459,11 @@ export const faqs: { q: string; a: string }[] = [
   // The home page's questions (4 Nov 2026), picked by their wording in index.astro.
   {
     q: 'What happens when I press Start free trial?',
-    a: 'You fill in a short form: your name, business, suburb, email, crew size and the plan you want. A confirmation email comes first. Then we set up your account and email your login, usually the same business day. No card, and nothing to pay during the 30 days.',
+    a: 'You fill in a short form: your name, business, suburb, email, crew size and the plan you want. A confirmation email comes first. Then we set up your account and email you the login. No card, and nothing to pay during the 30 days.',
   },
   {
     q: 'What happens when the 30 days are up?',
-    a: "Nothing is charged automatically, because the trial never takes a card. To keep going, choose your plan in the app's Billing page, monthly or yearly. If you'd rather stop, tell us and we close your account; we keep your data 30 days in case you change your mind, then delete it.",
+    a: "Nothing is charged automatically, because the trial never takes a card. To keep going, choose your plan on the app's Billing page. If you'd rather stop, tell us and we close your account; we keep your data 30 days in case you change your mind, then delete it, with backups overwritten within a further 60 days.",
   },
   {
     q: "What's involved in setting up?",

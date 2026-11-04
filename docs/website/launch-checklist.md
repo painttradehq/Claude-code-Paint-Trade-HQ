@@ -68,13 +68,23 @@ On 4 Nov you said to write the home page as if everything is connected by go-liv
 | Choose your plan on the app's Billing page, monthly or yearly | The question "What happens when the 30 days are up?" | Billing page is switched on, shows $98 / $178 / $249, and offers a year up front at 10% off | §6: "built but not switched on" |
 | Gmail, Microsoft 365, Google Calendar, Google Drive, your Google review link | Strip, dark band | Connect each once | Live on 23 Oct; a quick check is enough |
 
-If they are all live, three places still describe the old state and change the same day (tell Claude):
+So the site doesn't contradict itself, the same assumption was carried to the other pages that mentioned these services on 4 Nov: the Features page (Files and storage: "our cloud, your own Google Drive or OneDrive"; Calendar: "Google Calendar or Outlook") and the blog post "Where your photos and paperwork live" (OneDrive "from the same page"). **If one of them isn't live on launch day, every place it appears comes off together:** the home page strip, dark band and "Also in the app" card, the Xero answer (home and Pricing), the day-31 answer (Billing page), the two Features modules and the blog post.
 
-- The blog post "Where your photos and paperwork live" says OneDrive isn't set up and shows screen 33 (OneDrive and Xero "not set up yet"). It needs a new screenshot of Files & storage and one paragraph changed.
-- The Features page caption for screen 33 says the same.
-- The knowledge file: §4.7, §9 and §11 on Xero, §9 on OneDrive and Outlook, §6 on billing. Until you change them and re-send the file, the chat box would say "not yet" to a question the home page answers "yes". Keep `PUBLIC_CHAT_ENABLED` = `0` until then.
+Still showing the old state, whichever way it goes:
 
-The builder should also recapture clip 02 (quote to sent): the video shows the test address "delivered@resend.dev" while it plays. Its cover picture was swapped on 4 Nov for a clean frame, but the video itself can't be fixed from this side.
+- Screen 33 (Settings › Files & storage, used on Features and as the blog post's picture) shows OneDrive and Xero "not set up yet", because that is what the app showed on 23 Oct. Its description for screen readers says so honestly. Once they are connected, ask the builder for a fresh screen 33.
+- The knowledge file: §4.7, §9 and §11 on Xero, §4.8 and §9 on Outlook and OneDrive, §6 and §9 on billing. Until you change them and re-send the file, the chat box would say "not yet" to a question the home page answers "yes". Keep `PUBLIC_CHAT_ENABLED` = `0` until then.
+
+**Videos to re-record (ask the builder, same demo business, any made-up client email such as mia@example.com):** all four play from the home page's "Watch it work".
+
+| Clip | What shows that shouldn't |
+|---|---|
+| 02, quote to sent | Opens on a sign-in screen with a test login typed in (alpha.owner@test.pthq.local); the client card and the Review & Send "To" line show "delivered@resend.dev" (a supplier's test address); it ends on "Estimate sent! Emailed delivered@resend.dev" with the builder's preview link (pthq-replica.preview.emergentagent.com). Its cover picture was swapped on 4 Nov for a clean frame; the video itself can't be fixed from this side. |
+| 03, client accepts | "delivered@resend.dev" under the client's name on the quote, the whole way through. |
+| 07, invoice and payment | The demo invoice shows a red "150% of the quote · over the quote" warning, which reads like a billing mistake. |
+| 05, crew clock-in | Fine. |
+
+Until they are re-recorded, the cheaper option is to hide clips 02 and 03 from the home page (the stage card above still shows quote to signed). Your call.
 
 ## After launch
 
