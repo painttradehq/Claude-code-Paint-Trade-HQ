@@ -56,6 +56,26 @@ The pages changed on 30 Oct (30-day free trial on every plan, $98 / $178 / $249,
 
 Also in §10 (1 Nov 2026): drop "what software they use today"; add "which plan (Starter, Small business, Enterprise, or not sure) and whether they would rather pay monthly or yearly"; and note that the site emails each requester a fixed confirmation as soon as the form is sent. In §6, replace "Monthly only, no annual price yet" with the yearly option: a year up front is 10% less than twelve monthly payments ($1,058.40 / $1,922.40 / $2,689.20 ex-GST); extra seats stay monthly.
 
+## 6. Check what the home page promises (4 Nov 2026, 15 min in the live app)
+
+On 4 Nov you said to write the home page as if everything is connected by go-live ("by the time we go live it's all gonna be connected"). So the home page now says the items below work. On 23 Oct, when the knowledge file was written, they did not. Before the site goes public, try each one in the live app. **If any one isn't working on launch day, tell Claude and that line comes off the page** (a few minutes each). A page that promises Xero to a painter who then can't connect it costs more than leaving Xero off.
+
+| The home page says | Where on the site | Try this in the live app | Knowledge file on 23 Oct |
+|---|---|---|---|
+| Xero connects from your settings | Works-with strip, the dark "Fits the way you already work" band, the question "Does it connect to Xero or MYOB?" (also on Pricing) | Settings › Business › Accounting: Xero connects and stays connected | §4.7, §9, §11: "not yet set up on the server" |
+| OneDrive | Strip, dark band | Settings › Business › Files & storage: OneDrive connects and a job photo lands in it | §9: "Not yet" |
+| Outlook calendar | Strip, dark band | Calendar settings: Outlook connects and your events show | §9: "Not yet" |
+| Choose your plan on the app's Billing page, monthly or yearly | The question "What happens when the 30 days are up?" | Billing page is switched on, shows $98 / $178 / $249, and offers a year up front at 10% off | §6: "built but not switched on" |
+| Gmail, Microsoft 365, Google Calendar, Google Drive, your Google review link | Strip, dark band | Connect each once | Live on 23 Oct; a quick check is enough |
+
+If they are all live, three places still describe the old state and change the same day (tell Claude):
+
+- The blog post "Where your photos and paperwork live" says OneDrive isn't set up and shows screen 33 (OneDrive and Xero "not set up yet"). It needs a new screenshot of Files & storage and one paragraph changed.
+- The Features page caption for screen 33 says the same.
+- The knowledge file: §4.7, §9 and §11 on Xero, §9 on OneDrive and Outlook, §6 on billing. Until you change them and re-send the file, the chat box would say "not yet" to a question the home page answers "yes". Keep `PUBLIC_CHAT_ENABLED` = `0` until then.
+
+The builder should also recapture clip 02 (quote to sent): the video shows the test address "delivered@resend.dev" while it plays. Its cover picture was swapped on 4 Nov for a clean frame, but the video itself can't be fixed from this side.
+
 ## After launch
 
 - Check the invite emails land in the inbox, not spam, for the first few days.
