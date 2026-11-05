@@ -44,6 +44,8 @@ Test on the preview link: fill in the free-trial form with your own email and ch
 
 ## 3. Domain (5 min, then wait on DNS)
 
+> **Changed on 5 Nov 2026 (Josh):** the website and the app both go on **painttradehq.co**, the app's sign-in is reached through the website, and **painttradehq.com and painttradehq.com.au redirect to the website**. All three domains are registered at **GoDaddy** (none is in Cloudflare yet). The steps below were written for the old plan (site on .com) and get rewritten once the layout is confirmed: website on painttradehq.co with the app on a subdomain such as app.painttradehq.co is the recommendation. Do not follow them as they stand.
+
 1. In the Pages project, **Custom domains → Set up a custom domain**: add `painttradehq.com`, then add `www.painttradehq.com`. Cloudflare writes the DNS records if the `.com` zone is on Cloudflare; if the domain is registered elsewhere, move its nameservers to Cloudflare first (the registrar shows where).
 2. For `painttradehq.com.au`: add the zone to Cloudflare and create a **Redirect Rule** sending everything to `https://painttradehq.com` (status 301).
 3. The app stays on `painttradehq.co`; nothing changes there.
