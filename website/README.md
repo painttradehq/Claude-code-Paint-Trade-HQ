@@ -41,6 +41,8 @@ Both functions refuse requests whose `Origin` header is not this site (a missing
 
 `npm run test:functions` exercises both functions in Node with a stubbed network: origin and size guards (including bodies without Content-Length and multi-byte text), honeypot, validation, redirect safety (including dot-segment tricks), rate-limit tiers that throw, Turnstile exemption and budget for chat leads, the email payload, and the chat's message sanitiser. Since 1 Nov 2026 it also covers plan and billing validation, the requester's fixed-text confirmation (one per address a day, finished after the response via `waitUntil`) and the owner-emailed-but-confirmation-failed path.
 
+**Tested on Cloudflare's runtime (5 Nov 2026):** `npx wrangler@4 pages dev` (workerd, the engine Pages runs) served all 23 pages, the screens and clips, and the `/new` → `/` redirect; both functions compiled (the Anthropic SDK included, with `nodejs_compat`), refused other sites with 403, rejected a form without a plan, and, with dummy keys and no outbound network, fell back to their fixed messages (the no-JavaScript form landed on `/trial/error`). Real email and real chat replies can only be proven on the deployed site with real keys (launch checklist step 2).
+
 The same files deploy to Vercel or Netlify with a few lines of adapter code for the two functions; Cloudflare is the path of least resistance.
 
 ## Rules baked in
@@ -48,5 +50,5 @@ The same files deploy to Vercel or Netlify with a few lines of adapter code for 
 - Call to action is always "Start free trial" (30 days, every plan, no card; Josh, 30 Oct 2026). The site never takes sign-ups or payments itself: the form emails the owner, who sets the account up, and sends the requester a fixed-text confirmation (1 Nov 2026). Turnstile should be on before launch because of that email.
 - Prices are AUD a month, ex-GST, with the inc-GST figure shown: $98 / $178 / $249 (Josh, 30 Oct 2026), or a year up front for 10% off (Josh, 1 Nov 2026; `yearly()` in `src/data/site.ts` and `yearlyOf()` in the invite function must agree).
 - No Privacy link (Terms §5 covers data). Footer: "© 2026 Josh Sano Painting and Decorating, trading as Paint Trade HQ".
-- "Sign in" goes to https://painttradehq.co/admin/login; crew to /crew.
+- No sign-in links on the site (Josh, 1 Nov 2026: sign-in comes after sign-up). Moving sign-up and sign-in onto the website's domain is parked (`docs/parking-lot.md` row 4).
 - Buttons are solid accent with white text. Tokens mirror the app's `theme/tokens.ts`.
