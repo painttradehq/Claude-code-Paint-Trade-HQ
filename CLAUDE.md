@@ -63,7 +63,7 @@ Headline truths from the Round 64 code audit (HEAD `7139b03`; several are update
 
 ## Parking lot
 
-- Ideas Josh parks go in **`docs/parking-lot.md`** (dated, one row each). When a new idea appears mid-task, park it there and keep going. First entry (25 Oct 2026): a public directory of subscribed painting businesses for their SEO and visibility. **Taken off the lot 30 Oct:** built as `/painters` with sample listings; the app-side opt-in and profile are still to come.
+- Ideas Josh parks go in **`docs/parking-lot.md`** (dated, one row each). When a new idea appears mid-task, park it there and keep going. First entry (25 Oct 2026): a public directory of subscribed painting businesses for their SEO and visibility. **Taken off the lot 30 Oct:** built as `/painters` with sample listings; the app-side opt-in and profile are still to come. **Parked 5 Nov (row 4):** sign-up and sign-in from the website on one domain (Josh); reverses the 1 Nov no-sign-in-links rule and the .com/.co split, so nothing changes on the site until it comes off the lot.
 
 ## Conventions in this repo
 
