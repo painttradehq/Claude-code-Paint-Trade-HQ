@@ -7,14 +7,21 @@ pages_build_output_dir = "dist"
 
 # Rate limiting for the two functions. The code picks the best tier it finds:
 #   1. a Rate Limiting binding (CHAT_RATE_LIMIT / INVITE_RATE_LIMIT), if the Pages project supports one;
-#   2. a KV namespace bound as RATE_KV (create it in the dashboard, paste its id below);
+#   2. a KV namespace bound as RATE_KV (created 5 Nov 2026, bound below);
 #   3. otherwise an in-memory counter per server, which is a soft floor only.
 # Whatever tier runs here, also add a WAF rate-limiting rule on /api/* (free plan includes one) and a
 # monthly spend cap in the Anthropic Console. See README → Deploy.
-#
-# [[kv_namespaces]]
-# binding = "RATE_KV"
-# id = "paste-the-namespace-id"
+
+# Tier 2, in use: KV namespace "pthq-website-rate-limits", created in Josh's Cloudflare account on 5 Nov 2026.
+# One write per allowed request; the free plan allows 1,000 writes a day, and past that the code falls back to
+# tier 3 rather than failing. With pages_build_output_dir set, this file is the source of truth for the Pages
+# project's bindings (Cloudflare docs, Pages Functions → Configuration), so the binding needs no dashboard step.
+[[kv_namespaces]]
+binding = "RATE_KV"
+id = "934463ce5861435db6b75ba387f70bee"
+
+# Tier 1 is kept for reference: Cloudflare's Pages bindings list did not include Rate Limiting when checked on
+# 5 Nov 2026 (it is a Workers binding), so it stays off unless the site moves to Workers.
 #
 # [[ratelimits]]
 # name = "CHAT_RATE_LIMIT"
