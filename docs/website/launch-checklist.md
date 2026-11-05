@@ -20,7 +20,7 @@ Cloudflare builds from one branch. Either tell Claude to open a pull request so 
 
 ## 1. Cloudflare Pages project (15 min)
 
-**Already done from Claude's side (5 Nov 2026, through your Cloudflare connector):** the storage the form and chat use for their spam limits (a KV namespace called `pthq-website-rate-limits`) is created in your Cloudflare account and wired into `website/wrangler.toml`, so there is nothing to click for it. The connector found no other Workers or storage in the account, so check it's the account you mean to use. It cannot create the Pages project, connect GitHub, set secrets or add the domain; those are the steps below.
+**Already done from Claude's side (5 Nov 2026, through your Cloudflare connector):** the storage the form and chat use for their spam limits (a KV namespace called `pthq-website-rate-limits`) is created in your Cloudflare account and wired into `website/wrangler.toml`, so there is nothing to click for it. The connector found no other Workers or storage in the account. Your Cloudflare login is software@joshsano.com.au (you, 5 Nov); to confirm the connector reached that same account, open **Storage & databases → KV** in the dashboard and look for `pthq-website-rate-limits`. It cannot create the Pages project, connect GitHub, set secrets or add the domain; those are the steps below.
 
 1. In the Cloudflare dashboard open **Workers & Pages → Create → Pages → Connect to Git**, and pick the repo `painttradehq/Claude-code-Paint-Trade-HQ`.
 2. Project name **`pthq-website`** (it must match `name` in `website/wrangler.toml`, which Cloudflare reads for the project's settings). Build settings: framework preset **Astro**; **root directory `website`**; build command `npm run build`; output directory `dist`.
