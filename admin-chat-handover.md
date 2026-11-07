@@ -31,3 +31,4 @@ Paste into the admin chat as its next small round or parking lot. Nothing here t
 14. **Events: a "Show to crew" tick** (`share_with_crew`) in `CalDrawer.tsx`, `DesktopCalendar.tsx` and `app/admin/events.tsx`, with a "shared with crew" line in the drawer (the backend accepts the field from C6b). Until then crew only see events they are named on.
 15. **Cross-tenant birthday notifications** — `server.py` `run_birthday_check` (scheduled in `worker.py`) notifies every employee of every business about every birthday. Group by tenant, skip deleted rows and the owner's bridge row, first names only. Fix before launch.
 16. **CrewMessages**: no unread indicator and no notification when a crew message arrives; the reply slot is single and overwritten.
+17. **Rate limiter**: per-rule, per-method buckets for `auth`-style rules (today a path-only match and one bucket per token shared with the daily-report export rule); then a 30/min rule on `POST /feedback`.
