@@ -52,6 +52,14 @@ Since 25 Oct Emergent's own record shows work that neither chat sent: "Crew sign
 6. **Confirm** the November work was yours directly with Emergent (so the records can say so), and whether "Admin adds crew document types" was published.
 7. **GitHub for this chat:** the app repository is still not readable from here (403). If you add `the-newest-update-of-PTHQ` to the Claude GitHub app's repository access, I can check items against the code instead of spending Emergent's time on "checks first".
 
+## D2. Josh's answers (7 Nov)
+
+1. Round 87: **wait** (not sent).
+2. Phone: **both** — Android and iPhone must work; the app is for many people. Item 19 of Round 87 already specifies both.
+3. **Trade accounts** = each paint brand's trade account a painting business registers for (discounts and the like). The business holds one per brand; crew need to see them to buy under the account. Admin half (this chat, prototype first): where the accounts are kept and which crew see them. Crew half: the crew chat.
+4. **The repository**: Josh wants this chat to read the app code. The 403 is the session's GitHub proxy refusing the app repository (the deliverables repository passes through the same path), i.e. the Claude GitHub App does not cover `the-newest-update-of-PTHQ`. Fix: claude.ai/connect-github → the Claude GitHub App's repository access → add the app repository; then `add_repo` here (a new session if the proxy still refuses). Separate matter: Emergent's 7-day push token (24 Oct) has expired, so GitHub `main` may still be the 24 Oct code; a regenerated token with a longer expiry (or Save to GitHub fixed, `platform-steps.md` §10 Fix A) and one push is needed for what I read to be current.
+5. DMARC: **later**.
+
 ## E. Proposed order
 
 Round 87 (Fix Round H, ready on "send") → the crew chat sends Follow-up E and the Today's-jobs fix → Round 88 (builder) → 89 (prep presets) → 90 (catalogue) → 91 (calendar, after the screenshot) → 92 (admin push) → trade accounts after the answer. One round at a time across both chats.
