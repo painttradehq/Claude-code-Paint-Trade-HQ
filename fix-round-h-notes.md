@@ -1,4 +1,4 @@
-# Round 87 — Fix Round H (7 November) — SENT 7 Nov (`round87-message.md`), building
+# Round 87 — Fix Round H (7 November) — BUILT 7 Nov (report `memory/reports/round87-fix-h-report.md`; results at the end of this file); waits for publish
 
 Twenty-one small items: the five collected since Round 83 (`fix-round-h-candidates.md`) and sixteen from Josh's notes of 7 November (`notes-triage-7nov.md` §B), checked against GitHub `main` at commit `82bf0a3` (7 Nov). No prototypes: each is a bug, a label, a guard, a control on an existing screen or a measurement. Nothing under `app/employee/*`. TS_ tenants only, torn down; the owner's tenant read-only (counts and reads only); nothing published. Items marked **check first** are reported before they are fixed; if the finding says no change is needed, say so and change nothing. Restart the frontend process before the testing agent runs (Round 86's stale bundle). Line numbers are from `82bf0a3`; if a file moved since, say so.
 
@@ -41,3 +41,15 @@ A new draft, the next free number, title **"Little fixes, November"**, one card:
 ## Report
 
 `memory/reports/round87-fix-h-report.md`, starting "Round 87 done": one line per item (done / no change needed / left for next, with the reason), the check-first findings with their screenshots, the measurements of item 11 and the timings of item 12, the email headers of item 16, the counts of item 20, the suite before and after. No code review. Do not start anything else after it. Do not offer next action items.
+
+
+## Results (Emergent, 7 Nov, ~1 h 45 min; not published)
+
+- **17 fixed, 4 check-first items needed no change:** the equipment page lists Josh's one item (his tenant has one, "1 with crew"); the New client dialog is clean at 1440, 1024 and 390 (560 × 708, nothing cut off, no overflow); the quote PDF reads the same field the Brand upload writes; the catalogue count on Josh's tenant is **1,101 rows against the 1,034 catalogue** — nothing missing (so "doesn't have many products" was the search, not the data).
+- Item 11 photo path: a 12 MP phone photo 1.87 MB → 499 kB after the device resize; request 0.74 s → 0.36 s; the server already shrinks (172 ms → 27 ms) and stores in 27–33 ms; grid refresh 0.14 s; the owner's Drive copy does not hold the response (provider "pthq" on the preview).
+- Item 12 employees on a TS_ tenant with ten employees: `/employees` 9 kB · 1 trip · ~131 ms; `/employees/summary` 15 kB · 8 trips · ~140 ms; one employee page 1.6 kB · 3 trips · ~135 ms. No `data:` strings.
+- Item 16: a real quote email from TS_ Alpha delivered through Resend: From `"TS_ Alpha Painting via Paint Trade HQ" <no-reply@painttradehq.co>`, Reply-To the owner's address, plain-text part present. **`painttradehq.co` already publishes DMARC** (`v=DMARC1; p=quarantine; adkim=r; aspf=r; rua=mailto:dmarc_rua@onsecureserver.net` — the registrar's default); nothing for Josh to add. My earlier note that no DMARC existed was wrong.
+- Item 10: the sidebar row now opens the two-item menu; sign-out verified to land on `/admin/login`. Item 21: a month-cell click opens `/admin/events?view=day&date=…` at 1440 and 1024; quick-add not fired. Item 13: the trash icon and the confirm dialog ("Mon 2 Nov · 7:00 am–3:30 pm") in the drawer. Item 15: focus kept after three keys in the quote details fields. Item 19: Settings › Business logo shows the sheet (camera `capture=environment`, gallery `accept=image/*` without capture). Item 4: `memory/.tok` and `memory/tmp/` removed from the tree, ignored; no other token-like file.
+- Tests: `test_r87_fix_h.py` 8/8 (one assertion loosened after a first failure: the label search is proven by the seeded row being found); touched suites green; `tsc` clean; nothing under `app/employee/*`; TS_ rows torn down; owner's tenant read-only. Draft **n 30 "Little fixes, November"**, unpublished.
+- **Pre-existing failures at the baseline `82bf0a3`, left as is:** `test_r78_contracts` (2) and `test_materials_tier_gating` (3) — from the November work, not this round. → Fix Round I candidates.
+- Not captured: the 390 inbox after-screenshot (the harness tore the session down mid-run); that layout is code-verified only — Josh to look at the CRM inbox on his phone after the publish.
