@@ -1885,7 +1885,8 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   $('#fbBody').addEventListener('click', (e) => {
     const b = e.target.closest('[data-fb]'); if (!b) return;
     const text = ($('#fbText').value || '').trim();
-    if (!text) { fb.err = 'Type your message first.'; renderFeedback(); return; }
+    if (!text) { fb.err = 'Write your message first.'; renderFeedback(); return; }
+    if (text.length > 2000) { fb.err = 'Keep it under 2000 characters.'; renderFeedback(); return; }
     fb.items.unshift({ id: 'f' + Date.now(), text, sent: 'just now', reply: null }); fb.draft = ''; fb.err = ''; renderFeedback(); document.body.dataset.lastGo = 'POST /feedback';
   });
 

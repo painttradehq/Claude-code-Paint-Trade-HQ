@@ -1,4 +1,9 @@
-# Items for the admin chat (from the crew rounds C5, D and the 23 Oct reviews) — 25 Oct 2026
+# Items for the admin chat (from the crew rounds C5, D and the 23 Oct reviews) — 25 Oct 2026, updated 7 Nov
+
+## 7 Nov — first, a privacy regression
+0. **Crew documents served without a login.** Since the 5 Nov speed fix (`c5b7815`) crew photos, licences, IDs and police checks live in the blob store and `GET /api/blobs/{id}` serves them to anyone holding the link, with a public immutable cache (`backend/routes/blobs.py:1–2, :15, :34–38`). The onboarding wizard (`onboarding.tsx:210`) and the crew notice promise "never shared by link". Build the authenticated document route the 1 Nov audit named as the precondition (bearer-checked, tenant-scoped, no public cache; the admin FileCard and the crew Profile fetch with the token), or change both promises. Before launch.
+Done since 25 Oct by the other chat (strike from the list below): item 9 (crew sessions recorded and revoked, 2 Nov); item 11 (SMS sender registration) still open; item 15 corrected: the birthday job is dormant (filters on `status`, never written) but still cross-tenant in its loop — fix and scope in one change, modelled on `services/doc_expiry.py`.
+
 
 Paste into the admin chat as its next small round or parking lot. Nothing here touches `app/employee/*`.
 
@@ -32,3 +37,7 @@ Paste into the admin chat as its next small round or parking lot. Nothing here t
 15. **Cross-tenant birthday notifications** — `server.py` `run_birthday_check` (scheduled in `worker.py`) notifies every employee of every business about every birthday. Group by tenant, skip deleted rows and the owner's bridge row, first names only. Fix before launch.
 16. **CrewMessages**: no unread indicator and no notification when a crew message arrives; the reply slot is single and overwritten.
 17. **Rate limiter**: per-rule, per-method buckets for `auth`-style rules (today a path-only match and one bucket per token shared with the daily-report export rule); then a 30/min rule on `POST /feedback`.
+18. **Settings › Crew app copy**: the notifications card still says push "arrives with the crew app's next round" (`CrewAppPage.tsx:84`); the backend docstring says "Push notifications" (`crew_app_settings.py:20`). Push shipped 2 Nov.
+19. **A scope summary field in the v2 quote builder** (Round 68 removed the edit), so the crew Scope's "What was quoted" can appear on new quotes.
+20. **Settings › Crew app shows Flag it / Refuse it only** while the backend accepts `ask` since Round D (item 1, still open).
+21. **PRD hygiene**: seven November rounds are dated "2026-06"; the `test_reports/*.json` the PRD cites are not in the repository.

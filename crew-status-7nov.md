@@ -28,9 +28,20 @@ Source: `painttradehq/the-newest-update-of-PTHQ` on GitHub, `main`, pushed 7 Nov
 - **Closed by the audit:** crew sessions recorded (password reset can sign out other devices), UTC timestamps, open-redirect on notification links.
 - **Still open from my lists:** the cross-tenant birthday job (to confirm in `worker.py`), the "Ask them first" radio, the Equipment "Problem" pill, the three Timesheets strings, the "Show to crew" event tick, the planned-hours switch, the three unpublished What's new drafts n 26–28 (plus n 29 for C6), the SMS sender ID registration, the Privacy Policy crew gaps for the lawyer.
 
+## Found while reconciling the live code (7 Nov, second pass)
+
+- **Crew documents are now reachable without a login.** The 5 Nov speed fix moved crew photos and licences out of the employee record into the blob store, and that store serves files at `/api/blobs/{id}` to anyone with the link, with a public cache header (`backend/routes/blobs.py:1–2, :15, :34–38`). The link is unguessable, but the onboarding wizard and the crew notice promise "never shared by link; only {business} and you can open them". Either an authenticated document route (the one the 1 Nov audit named as the precondition and deferred) or the promise changes. Before launch; admin/platform item, top of the handover.
+- **The birthday job is dormant, not live**: it filters on a field nothing writes. Its loop is still cross-tenant, so fixing the filter alone would switch the leak on. One change: scope by business, real active filter, bridge row out.
+- **"What was quoted" will rarely show**: the v2 quote builder stopped editing the scope summary in Round 68; only the legacy save writes it. E keeps the card for quotes that have one; a summary field in the builder is an admin item.
+- **Crew can see any event by id**: `GET /events/{id}` has no crew filter, and `GET /events` returns whole documents (colleagues' RSVP ids). C6b closes both.
+- **Stale copy**: Settings › Crew app still says push "arrives with the crew app's next round" (it shipped 2 Nov); the PRD dates seven November rounds as "2026-06"; the test reports the PRD cites are not in the repository (the round summaries live only in commit messages).
+- **Crew have no "sign out other devices"** of their own (only a password change or reset revokes others); admins have it. A Me › Security row later, if wanted.
+- Push has no per-kind or per-crew mute and no quiet hours (both listed as next items by the other chat).
+
 ## Questions for Josh (decisions the other chat made that touch the crew design)
 
 1. **Crew accept only the Crew notice, not the Terms of Service.** The Terms' own preamble says the tick is how a user accepts them; crew no longer tick them. Fine if the lawyer agrees the crew notice + the employer's contract covers it; otherwise the Terms tick should come back beside the notice. The notice is still "1.0-draft" — the other chat offered to bump it to 1.0 when you are happy with the wording.
 2. **Crew now see an off-site sign-out warning** (Round D had them not see the sign-out distance). Keep?
 3. **Self-signup lost the emergency-contact field and requires address + suburb.** C5 had emergency contact as a required field for a reason (site safety). Keep the removal?
 4. **Publish state:** several rounds say "needs a publish". When did you last publish, and do you want a single publish after E lands?
+5. **The blob-store link question above**: build the authenticated document route first (platform work, before launch), or soften the wizard's and the notice's wording? My recommendation: the route; licences, IDs and police checks should not be fetchable by link at all.

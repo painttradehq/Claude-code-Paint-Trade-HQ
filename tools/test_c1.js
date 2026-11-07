@@ -464,7 +464,7 @@ async function run(b, W, H, tag) {
   await p.goto(U + '?screen=app&tab=inbox'); await p.waitForTimeout(300); await p.click(T('crew-inbox-message')); await p.waitForTimeout(200);
   ok('Inbox › Message Josh opens My feedback: back Inbox, the composer, two messages (one replied, one waiting)' + full, await p.locator(T('crew-feedback')).isVisible() && (await txt(T('crew-feedback-title'))) === 'My feedback' && await p.locator(T('crew-feedback-text')).isVisible() && (await p.locator(T('crew-feedback-row')).count()) === 2 && (await p.locator(T('crew-feedback-reply')).count()) === 1 && /Reply from Josh · Wed 29 Oct/.test(await txt(T('crew-feedback-reply'))) && (await p.locator(T('crew-feedback-noreply')).count()) === 1 && (await go()) === '/employee/feedback');
   await p.click(T('crew-feedback-send')); await p.waitForTimeout(100);
-  ok('Send with nothing → "Type your message first."' + full, (await txt(T('crew-feedback-err'))) === 'Type your message first.' && (await p.locator(T('crew-feedback-row')).count()) === 2);
+  ok('Send with nothing → "Write your message first." (the live text)' + full, (await txt(T('crew-feedback-err'))) === 'Write your message first.' && (await p.locator(T('crew-feedback-row')).count()) === 2);
   await p.fill(T('crew-feedback-text'), 'TS_ the stairwell light is out'); await p.waitForTimeout(50);
   ok('typing clears the line' + full, (await p.locator(T('crew-feedback-err')).count()) === 0);
   await p.click(T('crew-feedback-send')); await p.waitForTimeout(150);
