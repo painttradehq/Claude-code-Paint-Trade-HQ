@@ -1,4 +1,4 @@
-# Round 87 — Fix Round H (7 November) — ready for Josh's "send"
+# Round 87 — Fix Round H (7 November) — SENT 7 Nov (`round87-message.md`), building
 
 Twenty-one small items: the five collected since Round 83 (`fix-round-h-candidates.md`) and sixteen from Josh's notes of 7 November (`notes-triage-7nov.md` §B), checked against GitHub `main` at commit `82bf0a3` (7 Nov). No prototypes: each is a bug, a label, a guard, a control on an existing screen or a measurement. Nothing under `app/employee/*`. TS_ tenants only, torn down; the owner's tenant read-only (counts and reads only); nothing published. Items marked **check first** are reported before they are fixed; if the finding says no change is needed, say so and change nothing. Restart the frontend process before the testing agent runs (Round 86's stale bundle). Line numbers are from `82bf0a3`; if a file moved since, say so.
 
