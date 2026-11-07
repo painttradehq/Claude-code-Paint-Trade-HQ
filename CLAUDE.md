@@ -24,6 +24,7 @@ This file is loaded automatically at the start of every Claude Code session in t
 
 ## Where the code is
 
+- **GitHub accounts with the Claude GitHub App installed:** `painttradehq` (software@joshsano.com.au, installation 168747008) and `forpainters-source` (forpainters@joshsano.com.au, installation 142757407). On 6 Nov 2026 both received GitHub's "Claude is requesting updated permissions" email (checked 7 Nov: genuine, DKIM/SPF/DMARC pass from github.com; it means the app's publisher changed what the app asks for, not a session action; no session was running that day). Pending Josh's review at GitHub → Settings → Applications → Installed GitHub Apps → Claude; until accepted, Claude keeps its current access.
 - **This repo** (`painttradehq/Claude-code-Paint-Trade-HQ`) holds Claude-managed files only: docs, plans, the marketing website. Do not copy app source in here.
 - **App source**: `painttradehq/the-newest-update-of-PTHQ` on GitHub (public until mid-October 2026; since 14 Oct `add_repo` reports no access, so it is private or renamed and needs the Claude GitHub App installed on it). When readable: `add_repo`, then clone to `/home/user/painttradehq/the-newest-update-of-pthq`.
 - Inside the app repo, the truthful docs are: `memory/PRD.md` (the **tail** is newest; entries are dated), `memory/reports/roundNN-*.md` (one per build round, Round 64 = 4 Oct 2026), `memory/USER_PRINCIPLES.md`, `DEPLOY.md`. `ARCHITECTURE.md` and `memory/FORK_HANDOFF_SUMMARY.md` are **August 2026 snapshots and stale**.
