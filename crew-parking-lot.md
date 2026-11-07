@@ -152,3 +152,6 @@ Parked, prototype (`#s-terms`) and spec kept. Trigger to unpark: before launch, 
 
 ## 1 Nov — Follow-up E pulled forward by Josh (scope detail): prototyped + specified (`c2-followup-e-notes.md`)
 Decided by Josh ("ok", 1 Nov): the Scope screen as proposed; the summary shows; planned hours behind an owner switch, off by default; E2 (tick-off + progress + report prefill) after. Order: E next, then C6b (with the C6 carry-overs). Admin chat: the "Show planned hours to crew" switch on Settings › Crew app.
+
+## 7 Nov — catch-up on the shared job (see `crew-status-7nov.md`)
+Closed by the 1–7 Nov rounds: crew sessions recorded/revoked (reset signs out other devices); UTC timestamps; notification-link open redirect; crew documents out of the record (blob store); push alerts (C7); doc-expiry nudges; custom document types. Reversed C-series decisions: crew accept the Crew notice only (no Terms tick); off-site sign-out warning shown to crew; self-signup without emergency contact. On hold until the live-tree reconciliation lands: the E and C6b briefs. Follow-up G half-moot (crew do not accept the Terms now).
