@@ -2,7 +2,7 @@
 
 Josh pasted 28 notes ("some of them have been done"). Each was checked against the app code on GitHub `main` (commit `82bf0a3`, 7 Nov 2026, cloned after Josh gave this chat the repository), the round records and the crew chat's log. File and line references are from that commit.
 
-Emergent's record shows November work that neither chat sent (Josh ran it directly): crew sign-up audit (1 Nov), crew app audit (2 Nov), crew notification audit, crew Web Push, MYOB connector (mock only), slow Employees pages fixed, crew photos in admin + document expiry nudges, stay signed in 30 days + quote logo on the preview and client page, admin adds crew document types (7 Nov). The last commits say "needs a publish" — Josh to say whether he published after 7 Nov.
+Emergent's record shows November work that neither chat sent (Josh ran it directly): crew sign-up audit (1 Nov), crew app audit (2 Nov), crew notification audit, crew Web Push, MYOB connector (mock only), slow Employees pages fixed, crew photos in admin + document expiry nudges, stay signed in 30 days + quote logo on the preview and client page, admin adds crew document types (7 Nov). The last commits say "needs a publish" — Josh (7 Nov): published.
 
 ## A. Already done in the code (confirm on the live app after the publish)
 
