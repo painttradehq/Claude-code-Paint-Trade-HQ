@@ -4,25 +4,25 @@ Josh pasted 28 notes ("some of them have been done"). Each is checked against th
 
 Since 25 Oct Emergent's own record shows work that neither chat sent: "Crew signup audit + fixes" (1 Nov), "Crew app full audit" (2 Nov), "Crew notification system audit", "Crew phone alerts (Web Push) + tester invite Never", one more section (title cut off), and "Admin adds crew document types" (7 Nov, not published). Josh to confirm he ran these directly.
 
-## A. Not done, small, no prototype → **Round 87 — Fix Round H** (`fix-round-h-notes.md`)
+## A. Not done, small, no prototype → **Round 87 — Fix Round H** (`fix-round-h-notes.md`, nineteen items, ready for "send")
 
 | # | Josh's note | What the records say | Goes in as |
 |---|---|---|---|
-| 3 | Exterior: the face picker (north face, south…) stays open for multi-pick; close it on one click | Round 76 (E8) made the item picker an 860 px right panel; the **face** picker's stay-open behaviour is as built in Round 60 | H8: one click on a face closes the picker and lands on that face |
-| 6 | CRM: remove the bottom "New lead" button; New client is enough | Not touched since the address finder (Round 71) | H9 |
-| 7 | CRM: the inbox page scrolling is not right | No record | H10, Emergent checks first (1440, 1024, phone) |
-| 11 | The equipment page shows no list of items | The check rounds say "as today"; no record of a list | H11, Emergent checks first |
-| 12a | Clicking the "JS" logo signs the admin out | No record; a bug | H12 |
-| 16 | Builder: after capturing a photo it takes a long time to load | Round 85/86 made uploads files; nothing shrinks a 12 MP phone photo before upload | H13: downscale on the device before upload, measure |
-| 18 | Employee list and profile load slowly | Round 84–86 never measured `/employees`; the 7 Nov document-types work touched the Employee page | H14: measure with Server-Timing, fix the trips |
-| 22 | Timesheets: admin cannot delete a mistaken clock-in | Round 79/81 built the editor without a delete | H15 |
-| 23 | Estimates list: only the client's name should be the link, not the whole line | No record | H16 |
-| 24 | Quote details right sidebar: typing closes the keyboard | Same cause as Round 77's F1 (a component defined inside the render); fixed there for the Library only | H17: the same fix in the quote details panel and a sweep of the builder |
-| 25 | A test quote email landed in Gmail's Promotions | Resend sends from `Paint Trade HQ <no-reply@painttradehq.co>`; Round 83 set Reply-To to the painter; no DMARC record; no plain-text part known | H18 (Emergent: text part, From name "{Business} via Paint Trade HQ", headers report) + Josh: a DMARC record (§D) |
-| 1 | Builder: the New client form looks disoriented | Round 76 (E6) added "More details" to the form; built and verified at 1440/1024 | H19: Emergent checks the form at 1440, 1024 and 390 and sends a screenshot in the report; fix any overlap found |
-| 2 | Quote PDF: business name but no spot for the logo | Round 85's report says PDFs inline the logo at render; Round 71 says PDFs show "only the painter's logo" | H20: Emergent checks whether the quote PDF prints `logo_url` when set and where; if it does not, add it to the header |
-| 5, 12b, 20a | Photo upload opens the cloud / Google Photos, not the device gallery; adding a photo should first offer **Take a photo / Choose from gallery** | File inputs today carry `accept` only; no camera/gallery choice | H21: every photo entry point (builder, Library item, Settings, presentation) offers the two choices; the gallery input is `accept="image/*"` without `capture`, the camera input adds `capture="environment"` |
-| H1–H7 | The earlier Fix H candidates (`fix-round-h-candidates.md`): quote email button text, business-name fallback, two parked feedbacks, `memory/.tok`, the owner signature on the contract countersign PDF, the stale Metro note | — | H1–H7 |
+| 3 | Exterior: the face picker (north face, south…) stays open for multi-pick; close it on one click | Round 76 (E8) made the item picker an 860 px right panel; the **face** picker's stay-open behaviour is as built in Round 60 | item 6 |
+| 6 | CRM: remove the bottom "New lead" button; New client is enough | Not touched since the address finder (Round 71) | item 7 |
+| 7 | CRM: the inbox page scrolling is not right | No record | item 8, check first (1440, 1024, 390) |
+| 11 | The equipment page shows no list of items | The check rounds say "as today"; no record of a list | item 9, check first |
+| 12a | Clicking the "JS" logo signs the admin out | No record; a bug | item 10 |
+| 16 | Builder: after capturing a photo it takes a long time to load | Round 85/86 made uploads files; nothing shrinks a 12 MP phone photo before upload | item 11: measure, downscale on the device, Drive copy never holds the response |
+| 18 | Employee list and profile load slowly | Round 84–86 never measured `/employees`; the 7 Nov document-types work touched the Employee page | item 12: measure with Server-Timing, fix the trips |
+| 22 | Timesheets: admin cannot delete a mistaken clock-in | Round 79/81 built the editor without a delete | item 13 |
+| 23 | Estimates list: only the client's name should be the link, not the whole line | No record | item 14 |
+| 24 | Quote details right sidebar: typing closes the keyboard | Same cause as Round 77's F1 (a component defined inside the render); fixed there for the Library only | item 15: the same fix in the quote details panel and a sweep of the builder |
+| 25 | A test quote email landed in Gmail's Promotions | Resend sends from `Paint Trade HQ <no-reply@painttradehq.co>`; Round 83 set Reply-To to the painter; no DMARC record; no plain-text part known | item 16 (text part, From name "{Business} via Paint Trade HQ", headers report) + Josh: a DMARC record (§D) |
+| 1 | Builder: the New client form looks disoriented | Round 76 (E6) added "More details" to the form; built and verified at 1440/1024 | item 17: check first at 1440, 1024 and 390 with screenshots; fix overlaps only |
+| 2 | Quote PDF: business name but no spot for the logo | Round 85's report says PDFs inline the logo at render; Round 71 says PDFs show "only the painter's logo" | item 18: check first whether the quote PDF prints `logo_url`; if not, add it to the header |
+| 5, 12b, 20a | Photo upload opens the cloud / Google Photos, not the device gallery; adding a photo should first offer **Take a photo / Choose from gallery** | File inputs today carry `accept` only; no camera/gallery choice | item 19: every photo entry point (builder, Library item, Settings, presentation) offers the two choices; the gallery input is `accept="image/*"` without `capture`, the camera input adds `capture="environment"` |
+| 1–5 | The earlier Fix H candidates (`fix-round-h-candidates.md`): quote email button text, business-name fallback, two parked feedbacks, `memory/.tok`, the owner signature on the contract countersign PDF, the stale Metro note | — | items 1–5 (the Metro note becomes a rule line) |
 
 ## B. Needs a prototype first (design rounds, one each, in Josh's order)
 
