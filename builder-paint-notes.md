@@ -1,4 +1,4 @@
-# Round 88 — Builder: areas in order, one product once, paint from coverage (7 November) — DRAFT, waits for Josh's review and "send"
+# Round 88 — Builder: areas in order, one product once, paint from coverage (7 November) — SENT 8 Nov (`round88-message.md`; the prototype goes up as Josh's upload with "here"), building
 
 Prototype: **`estimate-builder-paint.html`** (open at 1440: hover the "01" beside Kitchen → ▼ moves it under Living Room, ▲ back; the area ⋯ menu has Move up / Move down → click the Walls line's summary → the Product list shows each product once with its coverage and sizes → "Paint for this line" shows the litres and the sum → By hand → type 9 → Auto → Save → scroll to the bottom: the Paint card under the totals → Charge on top → a Paint row joins the totals → edit tins → Client view shows one Paint line; then 1024). Playwright `tools/test_paint.js` **31/31** at 1440 and 1024. Built on the Round 76 builder (`estimate-builder-fix-e.html`, generator `tools/make_paint.py`); everything not named here is unchanged. Josh's notes of 7 Nov, items 13 and 14 (`notes-triage-7nov.md` §C).
 
