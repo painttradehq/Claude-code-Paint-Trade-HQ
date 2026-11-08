@@ -155,3 +155,10 @@ Decided by Josh ("ok", 1 Nov): the Scope screen as proposed; the summary shows; 
 
 ## 7 Nov — catch-up on the shared job (see `crew-status-7nov.md`)
 Closed by the 1–7 Nov rounds: crew sessions recorded/revoked (reset signs out other devices); UTC timestamps; notification-link open redirect; crew documents out of the record (blob store); push alerts (C7); doc-expiry nudges; custom document types. Reversed C-series decisions: crew accept the Crew notice only (no Terms tick); off-site sign-out warning shown to crew; self-signup without emergency contact. On hold until the live-tree reconciliation lands: the E and C6b briefs. Follow-up G half-moot (crew do not accept the Terms now).
+
+
+## Added 8 Nov (after Round E) — small Scope follow-ups for a later crew pass (not C6b)
+- **Lightbox caption** on Scope reads "Walls · Kitchen · Walls — Crack above the window" when the builder's photo name already contains the line name. One line in `scope.tsx` `openPhoto`: when `p.name` contains the line name, caption = `p.name` + note.
+- **Back label**: `scope.tsx` calls `GET /projects/mine/{id}` only for the job name. Pass the name in the route params from the job page (`?name=`) and drop the second call.
+- **Areas with no kept line** (only a note or photos, or only an unchosen optional line) are not shown on Scope (Round E silence 3). Leave unless it bites.
+- **Crew 403 on a crew-visible attachment's PDF** (`test_r46_attachments::test_crew_switch_signed_link_rename_delete`, pre-existing before E): check the signed-link route for crew; if real, a one-fix round with the blob-route item.
