@@ -1,4 +1,4 @@
-# Round 88 — Builder: areas in order, one product once, paint from coverage (7 November) — SENT 8 Nov (`round88-message.md`; the prototype goes up as Josh's upload with "here"), building
+# Round 88 — Builder: areas in order, one product once, paint from coverage (7 November) — BUILT 8 Nov (report `memory/reports/round88-paint-report.md`; results at the end of this file); waits for publish
 
 Prototype: **`estimate-builder-paint.html`** (open at 1440: hover the "01" beside Kitchen → ▼ moves it under Living Room, ▲ back; the area ⋯ menu has Move up / Move down → click the Walls line's summary → the Product list shows each product once with its coverage and sizes → "Paint for this line" shows the litres and the sum → By hand → type 9 → Auto → Save → scroll to the bottom: the Paint card under the totals → Charge on top → a Paint row joins the totals → edit tins → Client view shows one Paint line; then 1024). Playwright `tools/test_paint.js` **31/31** at 1440 and 1024. Built on the Round 76 builder (`estimate-builder-fix-e.html`, generator `tools/make_paint.py`); everything not named here is unchanged. Josh's notes of 7 Nov, items 13 and 14 (`notes-triage-7nov.md` §C).
 
@@ -68,3 +68,13 @@ A new draft, the next free number, title **"Paint, worked out"**, one card: "Pic
 2. **Paint prices:** the business's own price per size when set, else retail + markup, as the builder already does. (Alternative: retail only.)
 3. **No wastage allowance** in the auto figure; By hand covers it. (Alternative: a per-business "+10%" setting in Quote setup.)
 4. **Primer not counted** in this round.
+
+
+## Results (Emergent, 8 Nov, ~1 h; not published)
+
+- Built as specified: the ▲▼ arrows and Move up / Move down (order saved; the places that print areas confirmed in the report); one chip per product with coverage, sizes and from-price; "Paint for this line" auto (m² × coats ÷ coverage) and By hand with a reason; the "Paint for this quote" card with the fit rule and editable tins; In my rates / Charge on top with the Paint row, the client's single Paint line and the Quote setup › Pricing default. Backend `services/paint.py`; `compute_estimate` writes `paint_summary`, `paint_total`, `paint_line`; `paint_charge` on the PUT.
+- **Builder and server agree to the cent** on the test quote: 13.4 L → 1 × 15 L → $240.00; subtotal $1,572.00 · GST $157.20 · total $1,729.20. Charge on top on a second quote: $1,578.00 → $1,958.00 subtotal with $380 of paint; total $1,735.80 → $2,153.80.
+- Fit table from the tests (prices as seeded): 22 L against 1/4/10/15 L → 1 × 15 L + 1 × 4 L + 3 × 1 L = $420 (22 L bought); 22 L against 1/4/10 L → 2 × 10 L + 2 × 1 L = $440; 9.5 L → 1 × 10 L; 16 L against 2/15 L → 1 × 15 L + 1 × 2 L; 6.4 L against 4/10 L → 2 × 4 L.
+- Testing agent at 1440 and 1024: items 1–4 and 6 pass. **Item 5 (the Quote setup › Pricing switch) hit a pre-existing bug:** `GET /api/admin/profile` returned a partial `estimate_defaults` for a tenant with only issued quote numbers, so the Pricing tab opened blank and Save refused; the tester made a one-line backend fix (defaults merged under the saved keys), kept, and the switch then passed. One low finding fixed on the way: with a product already on the line and an empty search, the Product section hid the current product — it now shows first.
+- **Lucy's "how much paint for this quote?" was skipped** ("missing backend data" in the harness) — unverified; Josh can ask Lucy on the live app after the publish. The MCP read's `paint` field is in the code.
+- `tests/test_r88_paint.py` green (fit table, rounding, auto vs manual, per-product sums, subtotal + GST, the client line, the order round trip, isolation); the estimate, invoice, crew-scope and MCP suites green; `tsc` clean; nothing under `app/employee/*`; TS_ rows torn down. Draft **n 32 "Paint, worked out"**, unpublished. Pre-existing failures unchanged (`test_r19`, `test_r46` ×2, `test_r63`, `test_r78` ×2 → Fix I).
