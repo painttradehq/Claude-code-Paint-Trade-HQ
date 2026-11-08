@@ -23,6 +23,7 @@ const ok = (name, cond) => { if (cond) { pass++; console.log('PASS', name); } el
   ok('the three chosen steps are ticked and counted', (await p.locator(T('prep-list') + ' input:checked').count()) === 3 && (await p.locator(T('prep-count')).textContent()).trim() === '3 steps chosen');
   const box = await p.locator('#mbox').boundingBox();
   ok('the pop-up is a centred box about 520 px wide, above the panel', box && box.width <= 520 && box.x > 400 && box.x + box.width < 1040);
+  ok('the Done button and the list stay on screen together (the list scrolls)', await p.locator(T('prep-done')).isVisible() && (await p.locator(T('prep-done')).boundingBox()).y + 40 <= 900 && await p.evaluate(() => { const l = document.querySelector('[data-testid="prep-list"]'); return l.scrollHeight > l.clientHeight; }));
   await p.screenshot({ path: OUT + 'r89-popup-1440.png' });
   // search, tick, own step, remove, note, print switch
   await p.fill(T('prep-search'), 'sand'); await p.waitForTimeout(200);
@@ -76,6 +77,7 @@ const ok = (name, cond) => { if (cond) { pass++; console.log('PASS', name); } el
   const b2 = await p.locator('#mbox').boundingBox();
   ok('1024: the pop-up fits inside the viewport', b2 && b2.x >= 0 && b2.x + b2.width <= 1024 && b2.y + b2.height <= 800);
   ok('1024: no horizontal scroll', await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
+  ok('1024: Done stays on screen', await p.locator(T('prep-done')).isVisible() && (await p.locator(T('prep-done')).boundingBox()).y + 40 <= 800);
   await p.screenshot({ path: OUT + 'r89-popup-1024.png' });
   ok('no console errors at 1024', errs.length === 0);
   console.log(`\n${pass} passed, ${fail} failed`);
