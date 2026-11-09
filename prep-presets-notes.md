@@ -1,4 +1,4 @@
-# Round 89 — Prep as a pop-up from the line panel (8 November) — DRAFT, waits for Josh's review and "send"
+# Round 89 — Prep as a pop-up from the line panel (8 November) — SENT 9 Nov (`round89-message.md`; the prototype goes up as Josh's upload with "here"), building
 
 Prototype: **`estimate-builder-prep.html`** (open at 1440: click the Skirting line's summary → the Preparation row reads "Edit prep · 3" with the steps under it → click it → the pop-up: search "sand", tick Wash down, type "Remove picture hooks" + Enter, hover "Strip old wallpaper" and × it, type a one-off note, Done → Save → the paper and the Client view carry the steps; open the Walls line, tick Preparation → "Add prep"; then 1024). Playwright `tools/test_prep.js` **27/27** at 1440 and 1024. Built on the Round 88 builder (`estimate-builder-paint.html`, generator `tools/make_prep.py`); everything not named here is unchanged. Josh's note 21 of 7 Nov, with his change of flow (8 Nov): **not a Library section — a pop-up from the builder, multiple steps, add your own.**
 
