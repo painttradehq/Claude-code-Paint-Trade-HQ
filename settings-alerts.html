@@ -19,7 +19,7 @@ button{ font:inherit; cursor:pointer; }
 .main{ padding:32px 48px 120px; max-width:1400px; min-width:0; }
 .main h1{ font-family:var(--font-display); font-weight:600; font-size:31px; margin:0; letter-spacing:-.01em; } .main .lead{ margin:6px 0 24px; font-size:13.5px; color:var(--text-secondary); max-width:600px; line-height:1.5; }
 .shell{ display:flex; gap:32px; align-items:flex-start; }
-.rail{ width:220px; flex-shrink:0; display:flex; flex-direction:column; gap:2px; } .rail button{ display:flex; align-items:center; gap:10px; width:100%; text-align:left; border:none; background:none; padding:10px 12px; border-radius:9px; font-size:14px; color:var(--text-primary); white-space:nowrap; } .rail button.on{ background:var(--accent-bg); color:var(--accent-ink); font-weight:600; } .rail button i{ width:14px; height:14px; border:1.5px solid currentColor; border-radius:4px; opacity:.6; display:inline-block; } .rail .tag{ margin-left:auto; font-size:10px; letter-spacing:.08em; color:var(--text-muted); background:var(--surface-sunken); border-radius:999px; padding:2px 7px; font-weight:600; }
+.rail{ width:220px; flex-shrink:0; display:flex; flex-direction:column; gap:2px; } .rail .gl{ font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); font-weight:600; padding:14px 12px 4px; } .rail .gl:first-child{ padding-top:0; } .rail button{ display:flex; align-items:center; gap:10px; width:100%; text-align:left; border:none; background:none; padding:10px 12px; border-radius:9px; font-size:14px; color:var(--text-primary); white-space:nowrap; } .rail button.on{ background:var(--accent-bg); color:var(--accent-ink); font-weight:600; } .rail button i{ width:14px; height:14px; border:1.5px solid currentColor; border-radius:4px; opacity:.6; display:inline-block; } .rail .tag{ margin-left:auto; font-size:10px; letter-spacing:.08em; color:var(--text-muted); background:var(--surface-sunken); border-radius:999px; padding:2px 7px; font-weight:600; }
 .content{ flex:1; min-width:0; max-width:960px; }
 .content h2{ margin:0; font-family:var(--font-display); font-weight:600; font-size:24px; } .content .pagesub{ margin:6px 0 20px; font-size:14px; color:var(--text-secondary); line-height:1.5; max-width:640px; }
 .pill{ font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; font-weight:600; color:var(--text-muted); background:var(--surface-sunken); border-radius:999px; padding:3px 9px; }
@@ -55,7 +55,7 @@ button{ font:inherit; cursor:pointer; }
 .modal-bg{ position:fixed; inset:0; background:rgba(20,16,10,.35); display:flex; align-items:center; justify-content:center; z-index:65; } .modal{ width:420px; background:var(--surface); border-radius:14px; padding:22px 24px; box-shadow:0 20px 60px rgba(20,16,10,.25); } .modal h4{ margin:0 0 6px; font-size:16px; font-weight:600; } .modal p{ margin:0 0 18px; color:var(--text-secondary); font-size:13.5px; line-height:1.5; } .modal .bt{ display:flex; justify-content:flex-end; gap:8px; }
 .proto{ margin-top:22px; padding:10px 12px; border:1px dashed var(--border-strong); border-radius:10px; font-size:12px; color:var(--text-muted); display:flex; align-items:center; gap:8px; flex-wrap:wrap; } .proto button{ border:1px solid var(--border-strong); background:var(--surface); border-radius:999px; padding:3px 10px; font-size:12px; color:var(--text-secondary); } .proto button.on{ background:var(--accent-bg); border-color:var(--accent-bg); color:var(--accent-ink); font-weight:600; }
 .toast{ position:fixed; left:50%; bottom:28px; transform:translateX(-50%); background:#1E1C1A; color:#fff; padding:10px 16px; border-radius:10px; font-size:13px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:70; } .toast.show{ opacity:1; }
-@media (max-width:1100px){ .main{ padding:24px 24px 100px; } .shell{ flex-direction:column; gap:18px; } .rail{ width:100%; flex-direction:row; gap:4px; border-bottom:1px solid var(--border); padding-bottom:6px; } .rail button{ width:auto; } .rail .tag{ margin-left:6px; } .hero .body{ grid-template-columns:minmax(0,1fr) 280px; gap:20px; padding:20px; } .groups{ grid-template-columns:repeat(2,minmax(0,1fr)); } .devs{ padding:12px 20px; } }
+@media (max-width:1100px){ .main{ padding:24px 24px 100px; } .shell{ flex-direction:column; gap:18px; } .rail{ width:100%; flex-direction:row; flex-wrap:wrap; gap:4px; border-bottom:1px solid var(--border); padding-bottom:6px; } .rail .gl{ display:none; } .rail button{ width:auto; } .rail .tag{ margin-left:6px; } .hero .body{ grid-template-columns:minmax(0,1fr) 280px; gap:20px; padding:20px; } .groups{ grid-template-columns:repeat(2,minmax(0,1fr)); } .devs{ padding:12px 20px; } }
 </style>
 </head>
 <body>
@@ -74,7 +74,14 @@ button{ font:inherit; cursor:pointer; }
     <p class="lead">A buzz on this computer or your phone when something needs you, even with Paint Trade HQ closed. Each admin sets their own.</p>
     <div class="shell">
       <nav class="rail" data-testid="set-rail">
-        <button><i></i>Business</button><button><i></i>Crew app</button><button><i></i>Account</button><button class="on" data-testid="set-rail-alerts"><i></i>Alerts</button><button><i></i>Billing</button><button><i></i>Platform<span class="tag">JOSH ONLY</span></button>
+        <div class="gl">Your business</div>
+        <button><i></i>Business</button><button><i></i>Suppliers</button><button><i></i>Connections</button><button><i></i>Crew app</button>
+        <div class="gl">You</div>
+        <button><i></i>Account</button><button class="on" data-testid="set-rail-alerts"><i></i>Alerts</button>
+        <div class="gl">Plan</div>
+        <button><i></i>Billing</button>
+        <div class="gl">Paint Trade HQ</div>
+        <button><i></i>Platform<span class="tag">JOSH ONLY</span></button>
       </nav>
       <div class="content" data-testid="set-page-alerts">
         <h2>Alerts</h2>

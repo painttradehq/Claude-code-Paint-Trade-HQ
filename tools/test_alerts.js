@@ -12,7 +12,7 @@ const ok = (name, cond) => { if (cond) { pass++; console.log('PASS', name); } el
   await p.goto(U); await p.waitForTimeout(800);
 
   // 1. its own Settings page
-  ok('Alerts is its own rail page, between Account and Billing', (await p.$$eval(T('set-rail') + ' button', els => els.map(e => e.textContent.trim().replace(/JOSH ONLY/, '').trim()))).join(',') === 'Business,Crew app,Account,Alerts,Billing,Platform' && await p.locator(T('set-page-alerts')).isVisible());
+  ok('Alerts is its own rail page, between Account and Billing (the Round 93/94 rail)', (await p.$$eval(T('set-rail') + ' button', els => els.map(e => e.textContent.trim().replace(/JOSH ONLY/, '').trim()))).join(',') === 'Business,Suppliers,Connections,Crew app,Account,Alerts,Billing,Platform' && await p.locator(T('set-page-alerts')).isVisible());
   ok('the hero reads off, with one big Turn on button and the preview of a real alert', /off on this computer/.test(await p.locator(T('alerts-device-status')).textContent()) && /Turn on alerts/.test(await p.locator(T('alerts-device')).textContent()) && /Jo Okafor accepted Q-0142/.test(await p.locator(T('alerts-preview')).textContent()));
   ok('the devices strip lists the other device as a pill', (await p.locator(T('alerts-device-row')).count()) === 1 && /iPhone app/.test(await p.locator(T('alerts-devices')).textContent()));
   await p.screenshot({ path: OUT + 'r92-page-1440.png' });
@@ -62,7 +62,7 @@ const ok = (name, cond) => { if (cond) { pass++; console.log('PASS', name); } el
   await p.setViewportSize({ width: 1024, height: 800 }); await p.goto(U); await p.waitForTimeout(600);
   ok('1024: no horizontal scroll', await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
   const hero = await p.locator(T('alerts-card')).boundingBox(); const content = await p.locator(T('set-page-alerts')).boundingBox();
-  ok('1024: the rail is a tab strip; the hero spans the content; the groups fall to two columns', (await p.locator(T('set-rail')).boundingBox()).height < 60 && hero && content && Math.abs(hero.width - content.width) < 2 && (await p.$$eval('[data-testid^="alerts-group-"]', els => new Set(els.map(e => Math.round(e.getBoundingClientRect().x))).size)) === 2);
+  ok('1024: the rail is a tab strip; the hero spans the content; the groups fall to two columns', (await p.locator(T('set-rail')).boundingBox()).height < 100 && hero && content && Math.abs(hero.width - content.width) < 2 && (await p.$$eval('[data-testid^="alerts-group-"]', els => new Set(els.map(e => Math.round(e.getBoundingClientRect().x))).size)) === 2);
   await p.screenshot({ path: OUT + 'r92-page-1024.png' });
   await p.click(T('alerts-device')); await p.click(T('perm-allow')); await p.waitForTimeout(150);
   ok('1024: the on state fits', await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth) && await p.locator(T('alerts-test')).isVisible());

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 94 — Settings › Connections — Paint Trade HQ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter:wght@400..700&family=IBM+Plex+Mono:wght@400..700&display=swap');
+:root{ --accent:#4B3E86; --accent-hover:#5C4C9E; --accent-bg:#F1EEFA; --accent-ink:#34295E; --success:#1C8A4B; --success-bg:#E7F6ED; --warning:#B45309; --warning-bg:#FCF0E1; --danger:#C6382E; --danger-bg:#FBEAEA; --bg:#FAF9F6; --surface:#FFFFFF; --surface-sunken:#F4F2EE; --border:#E7E3DA; --border-strong:#D8D3C7; --text-primary:#1E1C1A; --text-secondary:#6B675F; --text-muted:#9B968A; --font-display:'Fraunces',Georgia,serif; --font-body:'Inter',-apple-system,sans-serif; --font-mono:'IBM Plex Mono',Consolas,monospace; }
+*{ box-sizing:border-box; } html,body{ margin:0; background:var(--bg); color:var(--text-primary); font-family:var(--font-body); font-size:14px; }
+button{ font:inherit; cursor:pointer; }
+.app{ display:grid; grid-template-columns:260px 1fr; min-height:100vh; }
+.side{ background:var(--surface); border-right:1px solid var(--border); padding:18px 16px; display:flex; flex-direction:column; }
+.brand{ display:flex; align-items:center; gap:10px; padding:4px 4px 18px; } .brand .tile{ width:34px; height:34px; border-radius:9px; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; } .brand b{ font-family:var(--font-display); font-weight:600; font-size:16px; display:block; } .brand span{ font-size:11.5px; color:var(--text-secondary); }
+.grp{ font-size:11px; color:var(--text-muted); padding:12px 10px 4px; } .nav{ display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px; color:var(--text-primary); font-size:14px; } .nav i{ width:16px; height:16px; border:1.5px solid currentColor; border-radius:4px; opacity:.6; display:inline-block; }
+.side .tools{ margin-top:auto; display:flex; gap:8px; padding:8px 4px 12px; border-bottom:1px solid var(--border); } .side .tools span{ width:40px; height:40px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; color:var(--text-secondary); } .side .tools span.on{ background:var(--accent-bg); color:var(--accent-ink); }
+.side .foot{ padding-top:12px; display:flex; align-items:center; gap:10px; font-size:13px; } .side .foot .av{ width:34px; height:34px; border-radius:50%; background:var(--accent-bg); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
+.main{ padding:32px 48px 120px; max-width:1400px; min-width:0; }
+.main h1{ font-family:var(--font-display); font-weight:600; font-size:31px; margin:0; letter-spacing:-.01em; } .main .lead{ margin:6px 0 24px; font-size:13.5px; color:var(--text-secondary); max-width:600px; line-height:1.5; }
+.shell{ display:flex; gap:32px; align-items:flex-start; }
+.rail{ width:220px; flex-shrink:0; display:flex; flex-direction:column; gap:2px; } .rail .gl{ font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); font-weight:600; padding:14px 12px 4px; } .rail .gl:first-child{ padding-top:0; } .rail button{ display:flex; align-items:center; gap:10px; width:100%; text-align:left; border:none; background:none; padding:10px 12px; border-radius:9px; font-size:14px; color:var(--text-primary); white-space:nowrap; } .rail button.on{ background:var(--accent-bg); color:var(--accent-ink); font-weight:600; } .rail button i{ width:14px; height:14px; border:1.5px solid currentColor; border-radius:4px; opacity:.6; display:inline-block; } .rail .tag{ margin-left:auto; font-size:10px; letter-spacing:.08em; color:var(--text-muted); background:var(--surface-sunken); border-radius:999px; padding:2px 7px; font-weight:600; }
+.content{ flex:1; min-width:0; max-width:960px; }
+.content h2{ margin:0; font-family:var(--font-display); font-weight:600; font-size:24px; } .content .pagesub{ margin:6px 0 10px; font-size:14px; color:var(--text-secondary); line-height:1.5; max-width:640px; }
+section.sec{ padding:26px 0; border-top:1px solid var(--border); } section.sec.first{ border-top:none; }
+.sec .ttl{ display:flex; align-items:center; gap:10px; } .sec h3{ margin:0; font-weight:600; font-size:16px; } .pill{ font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; font-weight:600; color:var(--text-muted); background:var(--surface-sunken); border-radius:999px; padding:3px 9px; }
+.sec .desc{ margin:6px 0 18px; font-size:13.5px; line-height:1.5; color:var(--text-secondary); max-width:640px; }
+.opts{ display:flex; flex-direction:column; gap:10px; }
+.opt{ display:flex; gap:12px; padding:14px 16px; border-radius:12px; border:1.5px solid var(--border); background:var(--surface); align-items:flex-start; cursor:pointer; } .opt.on{ border-color:var(--accent); background:var(--accent-bg); }
+.radio{ width:18px; height:18px; border-radius:50%; border:1.5px solid var(--border-strong); background:#fff; flex-shrink:0; margin-top:2px; box-sizing:border-box; } .opt.on .radio{ border:5px solid var(--accent); }
+.opt .t{ font-weight:600; font-size:14.5px; } .opt .d{ font-size:13px; color:var(--text-secondary); margin-top:2px; line-height:1.45; } .opt .st{ font-size:12.5px; margin-top:8px; color:var(--text-muted); } .opt .st.ok{ color:var(--success); } .opt .st2{ font-size:12px; color:var(--text-muted); margin-top:2px; }
+.opt .acts{ margin-left:auto; display:flex; gap:10px; align-items:center; flex-shrink:0; }
+.btn{ display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 14px; border-radius:8px; border:1px solid var(--border-strong); background:var(--surface); font-weight:600; font-size:13px; color:var(--text-primary); white-space:nowrap; } .btn.primary{ border-color:var(--accent); background:var(--accent); color:#fff; } .btn.soft{ border-color:transparent; background:#C9C1E6; color:#fff; } .btn.danger{ border:none; background:none; color:var(--danger); padding:0 8px; }
+.acct{ display:flex; gap:12px; padding:14px 16px; border-radius:12px; border:1px solid var(--border); background:var(--surface); align-items:flex-start; } .acct .logo{ width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center; color:#fff; font-family:var(--font-display); font-weight:700; font-size:16px; flex-shrink:0; }
+.also{ margin-top:8px; padding:14px 16px; border:1px dashed var(--border-strong); border-radius:12px; font-size:13px; color:var(--text-secondary); line-height:1.6; } .also a{ color:var(--accent); font-weight:600; cursor:pointer; }
+.toast{ position:fixed; left:50%; bottom:28px; transform:translateX(-50%); background:#1E1C1A; color:#fff; padding:10px 16px; border-radius:10px; font-size:13px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:70; } .toast.show{ opacity:1; }
+@media (max-width:1100px){ .main{ padding:24px 24px 100px; } .shell{ flex-direction:column; gap:18px; } .rail{ width:100%; flex-direction:row; flex-wrap:wrap; gap:4px; border-bottom:1px solid var(--border); padding-bottom:6px; } .rail .gl{ display:none; } .rail button{ width:auto; } .rail .tag{ margin-left:6px; } .opt{ flex-wrap:wrap; } .opt .acts{ margin-left:30px; width:100%; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><div class="tile">P</div><div><b>Paint Trade HQ</b><span>Harbourline Painting</span></div></div>
+    <a class="nav"><i></i>Dashboard</a>
+    <div class="grp">Pipeline</div><a class="nav"><i></i>Estimates</a><a class="nav"><i></i>Invoices</a><a class="nav"><i></i>Live Projects</a><a class="nav"><i></i>CRM</a>
+    <div class="grp">Operations</div><a class="nav"><i></i>Calendar</a><a class="nav"><i></i>Daily Reports</a><a class="nav"><i></i>Timesheets</a><a class="nav"><i></i>Equipment</a>
+    <div class="grp">HR</div><a class="nav"><i></i>Employees</a><a class="nav"><i></i>Performance</a><a class="nav"><i></i>Contracts</a><a class="nav"><i></i>Training Videos</a>
+    <div class="tools"><span class="on">⚙</span><span>?</span></div>
+    <div class="foot"><div class="av">SR</div><div><b>Sam Reyes</b><div style="font-size:11.5px;color:var(--text-muted)">Owner · Admin</div></div></div>
+  </aside>
+  <main class="main">
+    <h1>Settings</h1>
+    <p class="lead">The outside services this business is connected to: where files are kept and which accounting software invoices go to. One connection each, for every admin.</p>
+    <div class="shell">
+      <nav class="rail" data-testid="set-rail">
+        <div class="gl">Your business</div>
+        <button><i></i>Business</button><button><i></i>Suppliers</button><button class="on" data-testid="set-rail-connections"><i></i>Connections</button><button><i></i>Crew app</button>
+        <div class="gl">You</div>
+        <button><i></i>Account</button><button><i></i>Alerts</button>
+        <div class="gl">Plan</div>
+        <button><i></i>Billing</button>
+        <div class="gl">Paint Trade HQ</div>
+        <button><i></i>Platform<span class="tag">JOSH ONLY</span></button>
+      </nav>
+      <div class="content" data-testid="set-page-connections">
+        <h2>Connections</h2>
+        <p class="pagesub">Where this business keeps its files and which accounting software its invoices go to. One connection each, shared by every admin. The Business page keeps your brand, details and contact.</p>
+
+        <section class="sec first" data-testid="sec-storage">
+          <div class="ttl"><h3>Files &amp; storage</h3><span class="pill">Saves at once</span></div>
+          <p class="desc">Where job photos, PDFs and signed documents are kept. Pick one place for the whole business — every admin sees the same setting. You can connect both clouds and switch any time; files already saved stay where they are.</p>
+          <div class="opts" id="storage" data-testid="storage-options" role="radiogroup"></div>
+        </section>
+
+        <div id="accounting"></div>
+        <section class="sec" data-testid="sec-accounting">
+          <div class="ttl"><h3>Accounting</h3><span class="pill">Saves at once</span></div>
+          <p class="desc">Invoices, credit notes and payments go to your accounting software as you send and record them, and a payment you reconcile there marks the invoice paid here. One connection for the whole business.</p>
+          <div class="opts">
+            <div class="acct" data-testid="acct-xero"><div class="logo" style="background:#13B5EA">X</div><div style="flex:1;min-width:0"><div class="t" style="font-weight:600">Xero</div><div class="d" style="font-size:13px;color:var(--text-secondary);margin-top:2px;line-height:1.45">Each invoice you send appears in Xero with its number, lines, GST and client. Payments you record here are posted to your bank account in Xero; payments you reconcile in Xero come back within the hour.</div><div class="st" style="font-size:12.5px;margin-top:8px;color:var(--text-muted)">Not connected</div></div><div class="acts"><button class="btn soft" data-testid="xero-connect-btn" data-say="Opens Xero’s sign-in, then comes back here (prototype).">Connect Xero</button></div></div>
+            <div class="acct" data-testid="acct-myob"><div class="logo" style="background:#6100A5">M</div><div style="flex:1;min-width:0"><div class="t" style="font-weight:600">MYOB</div><div class="d" style="font-size:13px;color:var(--text-secondary);margin-top:2px;line-height:1.45">The same for MYOB Business: invoices, credit notes and payments both ways. One of Xero or MYOB at a time.</div><div class="st" style="font-size:12.5px;margin-top:8px;color:var(--text-muted)">Not connected</div></div><div class="acts"><button class="btn soft" data-testid="myob-connect-btn" data-say="Opens MYOB’s sign-in, then comes back here (prototype).">Connect MYOB</button></div></div>
+          </div>
+        </section>
+
+        <div class="also" data-testid="connections-also">Also connected, where they are used: your <a>calendars</a> from the calendar’s gear (Google, Outlook, Apple) and your <a>email and SMS</a> from CRM › Messages setup.</div>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const $ = (s) => document.querySelector(s);
+let tt; const say = (m) => { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 2200); };
+let mode = 'builtin'; const drive = { connected: true, as: 'hello@harbourlinepainting.com.au' }; const od = { connected: false };
+const render = () => {
+  $('#storage').innerHTML = `
+    <div class="opt ${mode === 'builtin' ? 'on' : ''}" role="radio" aria-checked="${mode === 'builtin'}" data-mode="builtin" data-testid="storage-mode-builtin"><span class="radio"></span><div><div class="t">Paint Trade HQ cloud</div><div class="d">Stored securely by Paint Trade HQ. Nothing to set up.</div><div class="st ${mode === 'builtin' ? 'ok' : ''}">${mode === 'builtin' ? '✓ In use' : '☁ Not in use — existing files stay here'}</div></div></div>
+    <div class="opt ${mode === 'drive' ? 'on' : ''}" role="radio" aria-checked="${mode === 'drive'}" data-mode="drive" data-testid="storage-mode-drive"><span class="radio"></span><div style="flex:1;min-width:0"><div class="t">Your Google Drive</div><div class="d">Files land in a “Paint Trade HQ” folder in your own Drive, one sub-folder per job. You keep them if you ever leave.</div><div class="st ok">✓ Connected as ${drive.as} · folder “Paint Trade HQ”${mode === 'drive' ? ' · in use' : ''}</div></div><div class="acts"><button class="btn" data-say="Opens the Paint Trade HQ folder in your Drive (prototype).">Open folder</button><button class="btn danger" data-say="Disconnect asks first (prototype).">Disconnect</button></div></div>
+    <div class="opt ${mode === 'onedrive' ? 'on' : ''}" role="radio" aria-checked="${mode === 'onedrive'}" data-mode="onedrive" data-testid="storage-mode-onedrive"><span class="radio"></span><div style="flex:1;min-width:0"><div class="t">Your Microsoft OneDrive</div><div class="d">Same idea for Microsoft 365 businesses: a “Paint Trade HQ” folder in your OneDrive, one sub-folder per job.</div><div class="st">Not connected</div><div class="st2">Not set up on this server yet</div></div><div class="acts"><button class="btn soft" data-testid="onedrive-connect-btn" data-say="Not set up on this server yet.">Connect Microsoft OneDrive</button></div></div>`;
+};
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (b && b.dataset.say) { say(b.dataset.say); return; }
+  const o = e.target.closest('[data-mode]'); if (!o) return;
+  const m = o.dataset.mode; if (m === 'onedrive') { say('Connect OneDrive first.'); return; }
+  if (m === 'drive' && !drive.connected) { say('Connect Google Drive first.'); return; }
+  if (mode !== m) { mode = m; render(); say(m === 'builtin' ? 'New files go to the Paint Trade HQ cloud.' : 'New files go to your Google Drive.'); }
+});
+render();
+</script>
+</body>
+</html>

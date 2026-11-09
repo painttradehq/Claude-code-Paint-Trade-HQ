@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 93 — Settings › Suppliers — Paint Trade HQ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter:wght@400..700&family=IBM+Plex+Mono:wght@400..700&display=swap');
+:root{ --accent:#4B3E86; --accent-hover:#5C4C9E; --accent-bg:#F1EEFA; --accent-ink:#34295E; --success:#1C8A4B; --success-bg:#E7F6ED; --warning:#B45309; --warning-bg:#FCF0E1; --danger:#C6382E; --danger-bg:#FBEAEA; --bg:#FAF9F6; --surface:#FFFFFF; --surface-sunken:#F4F2EE; --border:#E7E3DA; --border-strong:#D8D3C7; --text-primary:#1E1C1A; --text-secondary:#6B675F; --text-muted:#9B968A; --font-display:'Fraunces',Georgia,serif; --font-body:'Inter',-apple-system,sans-serif; --font-mono:'IBM Plex Mono',Consolas,monospace; }
+*{ box-sizing:border-box; } html,body{ margin:0; background:var(--bg); color:var(--text-primary); font-family:var(--font-body); font-size:14px; }
+button{ font:inherit; cursor:pointer; } input,select,textarea{ font:inherit; }
+.app{ display:grid; grid-template-columns:260px 1fr; min-height:100vh; }
+.side{ background:var(--surface); border-right:1px solid var(--border); padding:18px 16px; display:flex; flex-direction:column; }
+.brand{ display:flex; align-items:center; gap:10px; padding:4px 4px 18px; } .brand .tile{ width:34px; height:34px; border-radius:9px; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; } .brand b{ font-family:var(--font-display); font-weight:600; font-size:16px; display:block; } .brand span{ font-size:11.5px; color:var(--text-secondary); }
+.grp{ font-size:11px; color:var(--text-muted); padding:12px 10px 4px; } .nav{ display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px; color:var(--text-primary); font-size:14px; } .nav i{ width:16px; height:16px; border:1.5px solid currentColor; border-radius:4px; opacity:.6; display:inline-block; }
+.side .tools{ margin-top:auto; display:flex; gap:8px; padding:8px 4px 12px; border-bottom:1px solid var(--border); } .side .tools span{ width:40px; height:40px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; color:var(--text-secondary); } .side .tools span.on{ background:var(--accent-bg); color:var(--accent-ink); }
+.side .foot{ padding-top:12px; display:flex; align-items:center; gap:10px; font-size:13px; } .side .foot .av{ width:34px; height:34px; border-radius:50%; background:var(--accent-bg); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
+/* settings shell (SettingsShell.tsx) + the Round 93/94 rail with group labels */
+.main{ padding:32px 48px 120px; max-width:1400px; min-width:0; }
+.main h1{ font-family:var(--font-display); font-weight:600; font-size:31px; margin:0; letter-spacing:-.01em; } .main .lead{ margin:6px 0 24px; font-size:13.5px; color:var(--text-secondary); max-width:600px; line-height:1.5; }
+.shell{ display:flex; gap:32px; align-items:flex-start; }
+.rail{ width:220px; flex-shrink:0; display:flex; flex-direction:column; gap:2px; } .rail .gl{ font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); font-weight:600; padding:14px 12px 4px; } .rail .gl:first-child{ padding-top:0; } .rail button{ display:flex; align-items:center; gap:10px; width:100%; text-align:left; border:none; background:none; padding:10px 12px; border-radius:9px; font-size:14px; color:var(--text-primary); white-space:nowrap; } .rail button.on{ background:var(--accent-bg); color:var(--accent-ink); font-weight:600; } .rail button i{ width:14px; height:14px; border:1.5px solid currentColor; border-radius:4px; opacity:.6; display:inline-block; } .rail .tag{ margin-left:auto; font-size:10px; letter-spacing:.08em; color:var(--text-muted); background:var(--surface-sunken); border-radius:999px; padding:2px 7px; font-weight:600; }
+.content{ flex:1; min-width:0; max-width:960px; }
+.top{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; } .content h2{ margin:0; font-family:var(--font-display); font-weight:600; font-size:24px; } .content .pagesub{ margin:6px 0 0; font-size:14px; color:var(--text-secondary); line-height:1.5; max-width:560px; }
+.btn{ display:inline-flex; align-items:center; gap:7px; border:1px solid var(--border-strong); background:var(--surface); border-radius:9px; height:38px; padding:0 14px; font-weight:600; font-size:13.5px; color:var(--text-primary); white-space:nowrap; } .btn.primary{ background:var(--accent); border-color:var(--accent); color:#fff; } .btn.ghost{ border-color:transparent; background:none; color:var(--text-secondary); } .btn.danger{ border-color:transparent; background:none; color:var(--danger); } .btn.sm{ height:32px; padding:0 11px; font-size:13px; }
+.srow{ display:flex; gap:10px; margin:18px 0 16px; align-items:center; } .search{ flex:1; display:flex; align-items:center; gap:8px; border:1px solid var(--border-strong); background:var(--surface); border-radius:9px; padding:0 14px; height:40px; color:var(--text-muted); } .search input{ border:none; outline:none; width:100%; background:none; font-size:14px; color:var(--text-primary); }
+.stats{ display:flex; gap:10px; margin-bottom:16px; } .stat{ background:var(--surface-sunken); border-radius:10px; padding:10px 14px; min-width:120px; } .stat b{ font-family:var(--font-mono); font-size:16px; display:block; } .stat span{ font-size:11.5px; color:var(--text-muted); }
+.grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+.card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 16px 12px; cursor:pointer; position:relative; display:flex; flex-direction:column; gap:8px; min-height:200px; } .card:hover{ border-color:var(--border-strong); box-shadow:0 2px 10px rgba(20,16,10,.06); }
+.card .hd{ display:flex; align-items:center; gap:10px; } .card .bt{ width:36px; height:36px; border-radius:9px; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex-shrink:0; } .card .hd b{ font-size:15px; font-weight:600; display:block; } .card .hd small{ display:block; color:var(--text-secondary); font-size:12.5px; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.card .menu{ margin-left:auto; border:1px solid var(--border); background:var(--surface); border-radius:8px; width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; color:var(--text-secondary); flex-shrink:0; }
+.card .num{ display:flex; align-items:center; gap:8px; min-height:26px; } .card .num .lbl{ font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); font-weight:600; } .card .num code{ font-family:var(--font-mono); font-size:17px; font-weight:600; letter-spacing:.02em; } .card .num .cp{ border:none; background:none; color:var(--accent); font-size:12px; font-weight:600; padding:2px 6px; border-radius:6px; } .card .num .cp:hover{ background:var(--accent-bg); } .card .num .none{ font-size:12.5px; color:var(--text-muted); }
+.card .ln{ font-size:12.5px; color:var(--text-secondary); line-height:1.5; } .card .ln b{ color:var(--text-primary); font-weight:600; }
+.card .ft{ margin-top:auto; display:flex; align-items:center; gap:8px; padding-top:8px; border-top:1px solid var(--border); font-size:12px; color:var(--text-muted); }
+.badge{ font-size:10px; letter-spacing:.07em; text-transform:uppercase; font-weight:600; border-radius:999px; padding:3px 8px; white-space:nowrap; } .badge.on{ color:var(--success); background:var(--success-bg); } .badge.off{ color:var(--text-muted); background:var(--surface-sunken); }
+.pop{ position:absolute; top:46px; right:14px; width:190px; background:var(--surface); border:1px solid var(--border); border-radius:10px; box-shadow:0 12px 30px rgba(20,16,10,.14); padding:6px; z-index:20; } .pop button{ display:block; width:100%; text-align:left; border:none; background:none; padding:8px 10px; border-radius:7px; font-size:13.5px; } .pop button:hover{ background:var(--surface-sunken); } .pop button.danger{ color:var(--danger); }
+.empty{ border:1px dashed var(--border-strong); border-radius:14px; padding:40px; text-align:center; color:var(--text-secondary); } .empty h3{ margin:0 0 6px; font-family:var(--font-display); font-weight:600; font-size:20px; color:var(--text-primary); }
+/* right panel */
+.scrim{ position:fixed; inset:0; background:rgba(20,16,10,.28); z-index:40; }
+.panel{ position:fixed; top:0; right:0; bottom:0; width:480px; background:var(--surface); border-left:1px solid var(--border); box-shadow:-16px 0 40px rgba(20,16,10,.12); z-index:41; display:flex; flex-direction:column; }
+.panel .ph{ padding:18px 22px 14px; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; gap:12px; } .panel .ph h2{ margin:0; font-family:var(--font-display); font-weight:600; font-size:22px; } .panel .ph .sub{ color:var(--text-secondary); font-size:13px; margin-top:3px; } .panel .ph .x{ margin-left:auto; border:none; background:none; font-size:20px; color:var(--text-muted); padding:0 4px; }
+.panel .pb{ flex:1; overflow-y:auto; padding:18px 22px; display:flex; flex-direction:column; gap:14px; }
+.f label{ display:block; font-size:12.5px; font-weight:600; margin-bottom:5px; } .f label small{ font-weight:400; color:var(--text-muted); } .f .hint{ font-size:12px; color:var(--text-muted); margin-top:4px; line-height:1.45; }
+.inp{ width:100%; height:38px; padding:0 12px; border-radius:8px; border:1px solid var(--border-strong); background:var(--surface); font-size:14px; color:var(--text-primary); } textarea.inp{ height:auto; padding:9px 12px; min-height:66px; resize:vertical; line-height:1.45; } .inp:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-bg); } .inp.err{ border-color:var(--danger); }
+.two{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.sect{ font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); font-weight:600; padding-top:6px; border-top:1px solid var(--border); margin-top:4px; }
+.swrow{ display:flex; align-items:flex-start; gap:12px; padding:12px 14px; border:1px solid var(--border); border-radius:10px; background:var(--surface-sunken); } .swrow b{ font-size:13.5px; display:block; } .swrow .s{ font-size:12px; color:var(--text-secondary); margin-top:2px; line-height:1.45; }
+.sw{ width:40px; height:22px; border-radius:11px; border:none; padding:2px; background:var(--border-strong); display:inline-flex; justify-content:flex-start; flex-shrink:0; margin-left:auto; } .sw[aria-checked="true"]{ background:var(--accent); justify-content:flex-end; } .sw span{ width:18px; height:18px; border-radius:9px; background:#fff; display:block; }
+.panel .pf{ padding:14px 22px; border-top:1px solid var(--border); display:flex; align-items:center; gap:10px; } .panel .pf .sp{ flex:1; }
+/* crew preview + confirm */
+.modal-bg{ position:fixed; inset:0; background:rgba(20,16,10,.4); display:flex; align-items:center; justify-content:center; z-index:50; }
+.modal{ width:420px; background:var(--surface); border-radius:14px; padding:22px 24px; box-shadow:0 20px 60px rgba(20,16,10,.25); } .modal h4{ margin:0 0 6px; font-size:16px; font-weight:600; } .modal p{ margin:0 0 18px; color:var(--text-secondary); font-size:13.5px; line-height:1.5; } .modal .bt{ display:flex; justify-content:flex-end; gap:8px; }
+.phone{ width:390px; height:720px; background:#F7F6F2; border-radius:36px; border:8px solid #1E1C1A; overflow:hidden; display:flex; flex-direction:column; flex-shrink:0; } .phone .bar{ padding:18px 18px 10px; font-family:var(--font-display); font-weight:600; font-size:22px; } .phone .bar small{ display:block; font-family:var(--font-body); font-weight:400; font-size:13px; color:var(--text-secondary); margin-top:3px; }
+.phone .list{ flex:1; overflow-y:auto; padding:0 14px 14px; display:flex; flex-direction:column; gap:10px; }
+.pc{ background:#fff; border:1px solid var(--border); border-radius:14px; padding:14px; } .pc .hd{ display:flex; align-items:center; gap:10px; } .pc .bt{ width:34px; height:34px; border-radius:9px; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; } .pc .hd b{ display:block; font-size:15px; } .pc .hd small{ color:var(--text-secondary); font-size:12.5px; }
+.pc .n{ margin:10px 0 6px; } .pc .n .lbl{ font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); font-weight:600; } .pc .n code{ font-family:var(--font-mono); font-size:22px; font-weight:600; display:block; } .pc .n .cash{ font-size:13px; color:var(--text-secondary); }
+.pc .row{ display:flex; align-items:center; gap:8px; font-size:13.5px; padding:7px 0; border-top:1px solid var(--border); } .pc .row span.c{ margin-left:auto; color:var(--accent); font-weight:600; } .pc .note{ font-size:13px; color:var(--text-secondary); line-height:1.45; background:var(--surface-sunken); border-radius:8px; padding:8px 10px; margin-top:6px; }
+.pwrap{ display:flex; gap:26px; align-items:flex-start; } .pwrap .txt{ color:#fff; max-width:300px; font-size:13.5px; line-height:1.55; } .pwrap .txt h3{ margin:0 0 8px; font-family:var(--font-display); font-weight:600; font-size:20px; } .pwrap .txt button{ margin-top:14px; }
+.toast{ position:fixed; left:50%; bottom:28px; transform:translateX(-50%); background:#1E1C1A; color:#fff; padding:10px 16px; border-radius:10px; font-size:13px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:70; } .toast.show{ opacity:1; }
+@media (max-width:1100px){ .main{ padding:24px 24px 100px; } .shell{ flex-direction:column; gap:18px; } .rail{ width:100%; flex-direction:row; flex-wrap:wrap; gap:4px; border-bottom:1px solid var(--border); padding-bottom:6px; } .rail .gl{ display:none; } .rail button{ width:auto; } .rail .tag{ margin-left:6px; } .grid{ grid-template-columns:repeat(2,minmax(0,1fr)); } .panel{ width:440px; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><div class="tile">P</div><div><b>Paint Trade HQ</b><span>Harbourline Painting</span></div></div>
+    <a class="nav"><i></i>Dashboard</a>
+    <div class="grp">Pipeline</div><a class="nav"><i></i>Estimates</a><a class="nav"><i></i>Invoices</a><a class="nav"><i></i>Live Projects</a><a class="nav"><i></i>CRM</a>
+    <div class="grp">Operations</div><a class="nav"><i></i>Calendar</a><a class="nav"><i></i>Daily Reports</a><a class="nav"><i></i>Timesheets</a><a class="nav"><i></i>Equipment</a>
+    <div class="grp">HR</div><a class="nav"><i></i>Employees</a><a class="nav"><i></i>Performance</a><a class="nav"><i></i>Contracts</a><a class="nav"><i></i>Training Videos</a>
+    <div class="tools"><span class="on">⚙</span><span>?</span></div>
+    <div class="foot"><div class="av">SR</div><div><b>Sam Reyes</b><div style="font-size:11.5px;color:var(--text-muted)">Owner · Admin</div></div></div>
+  </aside>
+  <main class="main">
+    <h1>Settings</h1>
+    <p class="lead">The brands and stores you buy from, and the trade account you hold with each. The crew see what you let them.</p>
+    <div class="shell">
+      <nav class="rail" data-testid="set-rail">
+        <div class="gl">Your business</div>
+        <button><i></i>Business</button><button class="on" data-testid="set-rail-suppliers"><i></i>Suppliers</button><button><i></i>Connections</button><button><i></i>Crew app</button>
+        <div class="gl">You</div>
+        <button><i></i>Account</button><button><i></i>Alerts</button>
+        <div class="gl">Plan</div>
+        <button><i></i>Billing</button>
+        <div class="gl">Paint Trade HQ</div>
+        <button><i></i>Platform<span class="tag">JOSH ONLY</span></button>
+      </nav>
+      <div class="content" data-testid="set-page-suppliers">
+        <div class="top">
+          <div><h2>Suppliers</h2><p class="pagesub">The brands and stores you buy from, and the trade account you hold with each. The crew see the ones you let them — the number, the store and what to say at the counter — so they can buy on the account.</p></div>
+          <div style="display:flex;gap:10px;align-items:center"><button class="btn" id="crewPreview" data-testid="sup-crew-preview">What the crew see</button><button class="btn primary" id="addBtn" data-testid="sup-add">+ Add supplier</button></div>
+        </div>
+        <div class="srow"><label class="search">🔍<input id="q" placeholder="Search by brand, store or account number…" data-testid="sup-search"></label></div>
+        <div class="stats" id="stats"></div>
+        <div id="list"></div>
+      </div>
+    </div>
+  </main>
+</div>
+<div id="pbox"></div>
+<div id="mbox"></div>
+<div class="toast" id="toast"></div>
+<script>
+// ── data ─────────────────────────────────────────────────────────────────────
+const BRANDS = ['Dulux','Haymes','Wattyl','Taubmans','Resene','British Paints','Berger','Porter’s Paints','Zinsser','Cabot’s','Feast Watson','Intergrain','Rust-Oleum','White Knight','Crommelin','Rockcote'];
+const COLOUR = { Dulux:'#1F4E9A', Haymes:'#B5312A', Wattyl:'#2E7D4F', Taubmans:'#D9811E', Resene:'#6B4C9A', 'British Paints':'#0E6E8C', Berger:'#C23B6F' };
+const FALLBACK = ['#4B3E86','#2E9E5B','#3E86C7','#B45309','#7E6FC0'];
+const BUSINESS = 'Harbourline Painting Pty Ltd';
+let rows = [
+  { id:'a1', brand:'Dulux',  account_name:BUSINESS, number:'4471 0362', store:'Dulux Trade Centre Nerang', store_phone:'07 5596 1122', rep:'Carla Mendes', rep_phone:'0412 555 019', terms:'30-day account', discount:'Trade price list', counter:'Give the business name and the job name as the order reference. Keep the docket for the office.', show_crew:true, notes:'Statement arrives by email on the 1st.', updated:'3 Nov' },
+  { id:'a2', brand:'Haymes', account_name:BUSINESS, number:'HB-20931', store:'Haymes Paint Shop Burleigh', store_phone:'07 5535 4400', rep:'', rep_phone:'', terms:'30-day account', discount:'35% off retail', counter:'Say Harbourline — Sam’s account. Job name on the docket.', show_crew:true, notes:'', updated:'3 Nov' },
+  { id:'a3', brand:'Wattyl', account_name:BUSINESS, number:'00218-77', store:'Inspirations Paint Southport', store_phone:'07 5591 2277', rep:'Dean', rep_phone:'0400 118 221', terms:'Cash on pickup', discount:'Trade price', counter:'', show_crew:false, notes:'Account under review — cash until sorted.', updated:'28 Oct' },
+  { id:'a4', brand:'Bunnings', account_name:'', number:'', store:'Bunnings Burleigh Waters', store_phone:'07 5520 9200', rep:'', rep_phone:'', terms:'Cash', discount:'', counter:'No account here — pay with the business card and photograph the receipt.', show_crew:true, notes:'', updated:'1 Nov' },
+];
+let q = '', editing = null, menuFor = null;
+const $ = (s) => document.querySelector(s); const $$ = (s) => Array.from(document.querySelectorAll(s));
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let tt; const say = (m) => { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 2200); };
+const colour = (b, i) => COLOUR[b] || FALLBACK[i % FALLBACK.length];
+const mono = (b) => b.replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase();
+const uid = () => 'a' + Math.random().toString(36).slice(2, 7);
+
+// ── list ─────────────────────────────────────────────────────────────────────
+const visible = () => rows.filter(r => !q || [r.brand, r.store, r.number, r.account_name].join(' ').toLowerCase().includes(q.toLowerCase())).sort((a, b) => a.brand.localeCompare(b.brand));
+const render = () => {
+  const crew = rows.filter(r => r.show_crew).length, withAcc = rows.filter(r => r.number).length;
+  $('#stats').innerHTML = `<div class="stat"><b data-testid="sup-count">${rows.length}</b><span>suppliers</span></div><div class="stat"><b data-testid="sup-crew-count">${crew}</b><span>crew can see</span></div><div class="stat"><b data-testid="sup-acc-count">${withAcc}</b><span>with a trade account</span></div>`;
+  const v = visible();
+  if (!rows.length) { $('#list').innerHTML = `<div class="empty" data-testid="sup-empty"><h3>No suppliers yet</h3>Add the brands and stores you buy from — the trade account number if you hold one, the branch, and what the crew should say at the counter.<div style="margin-top:14px"><button class="btn primary" data-add="1">+ Add supplier</button></div></div>`; return; }
+  if (!v.length) { $('#list').innerHTML = `<div class="empty" data-testid="sup-nomatch">Nothing matches “${esc(q)}”.</div>`; return; }
+  $('#list').innerHTML = `<div class="grid">${v.map((r, i) => `
+    <div class="card" data-id="${r.id}" data-testid="sup-card-${r.id}">
+      <div class="hd"><div class="bt" style="background:${colour(r.brand, i)}">${mono(r.brand)}</div><div style="min-width:0"><b>${esc(r.brand)}</b><small>${esc(r.store || 'No store named')}</small></div><button class="menu" data-menu="${r.id}" data-testid="sup-menu-${r.id}" aria-label="More">⋯</button></div>
+      ${r.number ? `<div class="num"><span class="lbl">Account</span><code>${esc(r.number)}</code><button class="cp" data-copy="${esc(r.number)}" data-testid="sup-copy-${r.id}">Copy</button></div>` : `<div class="num"><span class="none" data-testid="sup-noacc-${r.id}">No trade account — ${esc(r.terms || 'cash')}</span></div>`}
+      <div class="ln">${r.account_name ? `<b>${esc(r.account_name)}</b>` : ''}${r.store_phone ? `${r.account_name ? '<br>' : ''}Store ${esc(r.store_phone)}` : ''}${r.rep ? ` · Rep ${esc(r.rep)}${r.rep_phone ? ' ' + esc(r.rep_phone) : ''}` : ''}</div>
+      ${r.number ? `<div class="ln">${[r.terms, r.discount].filter(Boolean).map(esc).join(' · ') || '<span style="color:var(--text-muted)">No terms noted</span>'}</div>` : ''}
+      <div class="ft"><span class="badge ${r.show_crew ? 'on' : 'off'}" data-testid="sup-badge-${r.id}">${r.show_crew ? 'Crew see this' : 'Hidden from crew'}</span><span style="margin-left:auto">Updated ${esc(r.updated)}</span></div>
+      ${menuFor === r.id ? `<div class="pop" data-testid="sup-pop"><button data-edit="${r.id}">Edit</button><button data-toggle="${r.id}" data-testid="sup-toggle-${r.id}">${r.show_crew ? 'Hide from crew' : 'Show to crew'}</button><button class="danger" data-remove="${r.id}" data-testid="sup-remove-${r.id}">Remove</button></div>` : ''}
+    </div>`).join('')}</div>`;
+};
+
+// ── panel ────────────────────────────────────────────────────────────────────
+const field = (k, label, ph, extra = '') => `<div class="f"><label for="f_${k}">${label}</label><input class="inp" id="f_${k}" data-testid="sup-f-${k}" placeholder="${esc(ph)}" ${extra}></div>`;
+const openPanel = (r) => {
+  editing = r ? { ...r } : { id:null, brand:'', account_name:BUSINESS, number:'', store:'', store_phone:'', rep:'', rep_phone:'', terms:'', discount:'', counter:'', show_crew:true, notes:'' };
+  const e = editing; const known = BRANDS.includes(e.brand) || !e.brand;
+  $('#pbox').innerHTML = `<div class="scrim" data-testid="sup-scrim"></div><aside class="panel" data-testid="sup-panel" role="dialog" aria-label="${r ? 'Edit supplier' : 'New supplier'}">
+    <div class="ph"><div><h2>${r ? esc(e.brand) : 'New supplier'}</h2><div class="sub">${r ? 'Saves when you press Save.' : 'A brand or a store. The crew see it once you save, unless you hide it.'}</div></div><button class="x" data-testid="sup-close" aria-label="Close">×</button></div>
+    <div class="pb">
+      <div class="f"><label for="f_brand">Brand or store</label><select class="inp" id="f_brand" data-testid="sup-f-brand"><option value="">Choose…</option>${BRANDS.map(b => `<option ${e.brand === b ? 'selected' : ''}>${esc(b)}</option>`).join('')}<option value="__other" ${!known ? 'selected' : ''}>Other — a store or a brand not listed</option></select><div class="hint">Your brands from Products setup, plus any store you buy from (a Bunnings, an Inspirations Paint shop).</div></div>
+      <div class="f" id="otherWrap" ${known ? 'hidden' : ''}><label for="f_other">Name it</label><input class="inp" id="f_other" data-testid="sup-f-other" placeholder="e.g. Bunnings" value="${!known ? esc(e.brand) : ''}"></div>
+      <div class="two">${field('store', 'Store or branch', 'e.g. Dulux Trade Centre Nerang', `value="${esc(e.store)}"`)}${field('store_phone', 'Store phone', '07 …', `value="${esc(e.store_phone)}"`)}</div>
+      <div class="sect">Trade account <span style="font-weight:400;text-transform:none;letter-spacing:0">— leave the number blank if you pay cash here</span></div>
+      <div class="two">${field('number', 'Account number', 'As it is on the account', `value="${esc(e.number)}"`)}${field('account_name', 'Account is under', BUSINESS, `value="${esc(e.account_name)}"`)}</div>
+      <div class="f"><label for="f_counter">At the counter <small>— what the crew should say or show</small></label><textarea class="inp" id="f_counter" data-testid="sup-f-counter" placeholder="e.g. Give the business name and the job name as the order reference. Keep the docket.">${esc(e.counter)}</textarea></div>
+      <div class="swrow"><div><b>Show to crew</b><div class="s">The crew app lists the brand or store, who the account is under, the number, the store and its phone, and your note for the counter. Never the terms, the discount, the rep or your notes.</div></div><button class="sw" role="switch" aria-checked="${e.show_crew}" id="f_show" data-testid="sup-f-show" aria-label="Show to crew"><span></span></button></div>
+      <div class="sect">Office only</div>
+      <div class="two">${field('rep', 'Rep', 'Name', `value="${esc(e.rep)}"`)}${field('rep_phone', 'Rep phone', '04 …', `value="${esc(e.rep_phone)}"`)}</div>
+      <div class="two">${field('terms', 'Terms', 'e.g. 30-day account, or Cash', `value="${esc(e.terms)}"`)}${field('discount', 'Discount or price level', 'e.g. 35% off retail', `value="${esc(e.discount)}"`)}</div>
+      <div class="f"><label for="f_notes">Notes</label><textarea class="inp" id="f_notes" data-testid="sup-f-notes" placeholder="Anything the office should remember about this supplier.">${esc(e.notes)}</textarea></div>
+    </div>
+    <div class="pf">${r ? `<button class="btn danger" data-remove="${e.id}" data-testid="sup-remove">Remove</button>` : ''}<span class="sp"></span><button class="btn" data-testid="sup-cancel">Cancel</button><button class="btn primary" data-testid="sup-save">Save</button></div>
+  </aside>`;
+  setTimeout(() => $('#f_brand').focus(), 30);
+};
+const closePanel = () => { $('#pbox').innerHTML = ''; editing = null; };
+const readPanel = () => {
+  const sel = $('#f_brand').value; const brand = sel === '__other' ? $('#f_other').value.trim() : sel;
+  const v = (k) => ($('#f_' + k)?.value || '').trim();
+  const number = v('number');
+  return { brand, number, account_name: number ? (v('account_name') || BUSINESS) : v('account_name'), store: v('store'), store_phone: v('store_phone'), counter: v('counter'), rep: v('rep'), rep_phone: v('rep_phone'), terms: v('terms'), discount: v('discount'), notes: v('notes'), show_crew: $('#f_show').getAttribute('aria-checked') === 'true' };
+};
+const save = () => {
+  const d = readPanel();
+  $$('.inp.err').forEach(x => x.classList.remove('err'));
+  if (!d.brand) { ($('#f_brand').value === '__other' ? $('#f_other') : $('#f_brand')).classList.add('err'); say('Choose the brand or name the store.'); return; }
+  if (rows.some(r => r.id !== editing.id && r.brand.toLowerCase() === d.brand.toLowerCase() && r.store.toLowerCase() === d.store.toLowerCase())) { say(`You already have ${d.brand}${d.store ? ' at ' + d.store : ''}.`); $('#f_brand').classList.add('err'); return; }
+  if (editing.id) { const i = rows.findIndex(r => r.id === editing.id); rows[i] = { ...rows[i], ...d, updated: 'today' }; say(`${d.brand} saved.`); }
+  else { rows.push({ id: uid(), ...d, updated: 'today' }); say(`${d.brand} added.`); }
+  closePanel(); render();
+};
+const confirmRemove = (id) => { const r = rows.find(x => x.id === id); $('#mbox').innerHTML = `<div class="modal-bg" data-testid="modal"><div class="modal"><h4>Remove ${esc(r.brand)}?</h4><p>It leaves this list and the crew app. Any account you hold with them is untouched — this is only your record of it.</p><div class="bt"><button class="btn" data-testid="modal-cancel">Cancel</button><button class="btn primary" data-testid="modal-ok" data-rmid="${id}">Remove</button></div></div></div>`; };
+
+// ── crew preview (illustration for the crew chat's half) ─────────────────────
+const crewPreview = () => {
+  const v = rows.filter(r => r.show_crew).sort((a, b) => a.brand.localeCompare(b.brand));
+  $('#mbox').innerHTML = `<div class="modal-bg" data-testid="crew-preview"><div class="pwrap"><div class="phone"><div class="bar">Suppliers<small>Where we buy, and the account to buy on. Show the counter this screen.</small></div><div class="list">${v.length ? v.map((r, i) => `
+    <div class="pc" data-testid="crew-card-${r.id}"><div class="hd"><div class="bt" style="background:${colour(r.brand, i)}">${mono(r.brand)}</div><div><b>${esc(r.brand)}</b>${r.account_name ? `<small>${esc(r.account_name)}</small>` : ''}</div></div>
+      ${r.number ? `<div class="n"><div class="lbl">Account number</div><code>${esc(r.number)}</code></div>` : `<div class="n"><div class="cash">No trade account — pay as the note says.</div></div>`}
+      ${r.store ? `<div class="row">📍 ${esc(r.store)}</div>` : ''}${r.store_phone ? `<div class="row">📞 ${esc(r.store_phone)}<span class="c">Call</span></div>` : ''}
+      ${r.counter ? `<div class="note">${esc(r.counter)}</div>` : ''}
+    </div>`).join('') : `<div class="pc" style="color:var(--text-secondary)">Nothing to show yet.</div>`}</div></div>
+    <div class="txt"><h3>What the crew see</h3>The crew app's Suppliers screen as the crew chat will build it: the suppliers you show, the account number large enough to read out, the store, a tap-to-call phone and your note for the counter. Nothing office-only.<br><br>Hidden suppliers (${rows.length - v.length}) are not listed.<button class="btn" data-testid="crew-preview-close">Close</button></div></div></div>`;
+};
+
+// ── events ───────────────────────────────────────────────────────────────────
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('button, .card, .scrim, a'); if (!t) { menuFor = null; render(); return; }
+  if (t.id === 'addBtn' || t.dataset.add) { openPanel(null); return; }
+  if (t.id === 'crewPreview') { crewPreview(); return; }
+  if (t.dataset.testid === 'crew-preview-close') { $('#mbox').innerHTML = ''; return; }
+  if (t.dataset.menu) { menuFor = menuFor === t.dataset.menu ? null : t.dataset.menu; render(); e.stopPropagation(); return; }
+  if (t.dataset.copy) { try { navigator.clipboard?.writeText(t.dataset.copy); } catch {} say(`${t.dataset.copy} copied.`); return; }
+  if (t.dataset.edit) { menuFor = null; render(); openPanel(rows.find(r => r.id === t.dataset.edit)); return; }
+  if (t.dataset.toggle) { const r = rows.find(x => x.id === t.dataset.toggle); r.show_crew = !r.show_crew; r.updated = 'today'; menuFor = null; render(); say(`${r.brand}: ${r.show_crew ? 'the crew can see it' : 'hidden from the crew'}.`); return; }
+  if (t.dataset.remove) { menuFor = null; render(); confirmRemove(t.dataset.remove); return; }
+  if (t.dataset.testid === 'modal-cancel') { $('#mbox').innerHTML = ''; return; }
+  if (t.dataset.testid === 'modal-ok') { const r = rows.find(x => x.id === t.dataset.rmid); rows = rows.filter(x => x.id !== t.dataset.rmid); $('#mbox').innerHTML = ''; closePanel(); render(); say(`${r.brand} removed.`); return; }
+  if (t.dataset.testid === 'sup-save') { save(); return; }
+  if (t.dataset.testid === 'sup-cancel' || t.dataset.testid === 'sup-close' || t.dataset.testid === 'sup-scrim') { closePanel(); return; }
+  if (t.id === 'f_show') { t.setAttribute('aria-checked', t.getAttribute('aria-checked') === 'true' ? 'false' : 'true'); return; }
+  if (t.classList.contains('card')) { if (menuFor) { menuFor = null; render(); return; } openPanel(rows.find(r => r.id === t.dataset.id)); return; }
+});
+document.addEventListener('change', (e) => { if (e.target.id === 'f_brand') { $('#otherWrap').hidden = e.target.value !== '__other'; if (e.target.value === '__other') $('#f_other').focus(); } });
+document.addEventListener('input', (e) => { if (e.target.id === 'q') { q = e.target.value; render(); } });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if ($('#mbox').innerHTML) { $('#mbox').innerHTML = ''; return; } if (editing) closePanel(); else if (menuFor) { menuFor = null; render(); } } });
+render();
+</script>
+</body>
+</html>
