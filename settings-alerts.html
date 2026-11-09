@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 92 — Settings › Alerts — Paint Trade HQ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter:wght@400..700&family=IBM+Plex+Mono:wght@400..700&display=swap');
+:root{ --accent:#4B3E86; --accent-hover:#5C4C9E; --accent-bg:#F1EEFA; --accent-ink:#34295E; --success:#1C8A4B; --success-bg:#E7F6ED; --warning:#B45309; --warning-bg:#FCF0E1; --danger:#C6382E; --danger-bg:#FBEAEA; --bg:#FAF9F6; --surface:#FFFFFF; --surface-sunken:#F4F2EE; --border:#E7E3DA; --border-strong:#D8D3C7; --text-primary:#1E1C1A; --text-secondary:#6B675F; --text-muted:#9B968A; --font-display:'Fraunces',Georgia,serif; --font-body:'Inter',-apple-system,sans-serif; --font-mono:'IBM Plex Mono',Consolas,monospace; }
+*{ box-sizing:border-box; } html,body{ margin:0; background:var(--bg); color:var(--text-primary); font-family:var(--font-body); font-size:14px; }
+button{ font:inherit; cursor:pointer; }
+.app{ display:grid; grid-template-columns:260px 1fr; min-height:100vh; }
+.side{ background:var(--surface); border-right:1px solid var(--border); padding:18px 16px; display:flex; flex-direction:column; }
+.brand{ display:flex; align-items:center; gap:10px; padding:4px 4px 18px; } .brand .tile{ width:34px; height:34px; border-radius:9px; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; } .brand b{ font-family:var(--font-display); font-weight:600; font-size:16px; display:block; } .brand span{ font-size:11.5px; color:var(--text-secondary); }
+.grp{ font-size:11px; color:var(--text-muted); padding:12px 10px 4px; } .nav{ display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px; color:var(--text-primary); font-size:14px; } .nav i{ width:16px; height:16px; border:1.5px solid currentColor; border-radius:4px; opacity:.6; display:inline-block; }
+.side .tools{ margin-top:auto; display:flex; gap:8px; padding:8px 4px 12px; border-bottom:1px solid var(--border); } .side .tools span{ width:40px; height:40px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; color:var(--text-secondary); } .side .tools span.on{ background:var(--accent-bg); color:var(--accent-ink); }
+.side .foot{ padding-top:12px; display:flex; align-items:center; gap:10px; font-size:13px; } .side .foot .av{ width:34px; height:34px; border-radius:50%; background:var(--accent-bg); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
+/* settings shell */
+.main{ padding:32px 48px 120px; max-width:1400px; min-width:0; }
+.main h1{ font-family:var(--font-display); font-weight:600; font-size:31px; margin:0; letter-spacing:-.01em; } .main .lead{ margin:6px 0 24px; font-size:13.5px; color:var(--text-secondary); max-width:600px; line-height:1.5; }
+.shell{ display:flex; gap:32px; align-items:flex-start; }
+.rail{ width:220px; flex-shrink:0; display:flex; flex-direction:column; gap:2px; } .rail button{ display:flex; align-items:center; gap:10px; width:100%; text-align:left; border:none; background:none; padding:10px 12px; border-radius:9px; font-size:14px; color:var(--text-primary); white-space:nowrap; } .rail button.on{ background:var(--accent-bg); color:var(--accent-ink); font-weight:600; } .rail button i{ width:14px; height:14px; border:1.5px solid currentColor; border-radius:4px; opacity:.6; display:inline-block; } .rail .tag{ margin-left:auto; font-size:10px; letter-spacing:.08em; color:var(--text-muted); background:var(--surface-sunken); border-radius:999px; padding:2px 7px; font-weight:600; }
+.content{ flex:1; min-width:0; max-width:960px; }
+.content h2{ margin:0; font-family:var(--font-display); font-weight:600; font-size:24px; } .content .pagesub{ margin:6px 0 20px; font-size:14px; color:var(--text-secondary); line-height:1.5; max-width:640px; }
+.pill{ font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; font-weight:600; color:var(--text-muted); background:var(--surface-sunken); border-radius:999px; padding:3px 9px; }
+.btn{ display:inline-flex; align-items:center; gap:8px; height:40px; padding:0 18px; border-radius:10px; border:1px solid var(--border-strong); background:var(--surface); font-weight:600; font-size:14px; color:var(--text-primary); white-space:nowrap; } .btn.primary{ background:var(--accent); border-color:var(--accent); color:#fff; } .btn.primary:hover{ background:var(--accent-hover); } .btn.ghost{ border-color:transparent; background:none; color:var(--text-secondary); } .btn.sm{ height:34px; padding:0 14px; font-size:13px; } .btn[disabled]{ opacity:.5; cursor:not-allowed; }
+.muted{ font-size:12.5px; color:var(--text-muted); line-height:1.5; }
+/* hero */
+.hero{ background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+.hero .body{ display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:28px; padding:24px 26px; align-items:center; }
+.hero .state{ display:flex; align-items:center; gap:14px; } .hero .bell{ width:52px; height:52px; border-radius:16px; background:var(--accent-bg); color:var(--accent); display:flex; align-items:center; justify-content:center; flex-shrink:0; } .hero .bell.on{ background:var(--success-bg); color:var(--success); } .hero .bell.blocked{ background:var(--danger-bg); color:var(--danger); }
+.hero .state h3{ margin:0; font-family:var(--font-display); font-weight:600; font-size:22px; letter-spacing:-.01em; } .hero .state .sub{ font-size:13.5px; color:var(--text-secondary); margin-top:3px; line-height:1.45; }
+.hero .acts{ display:flex; align-items:center; gap:10px; margin-top:18px; flex-wrap:wrap; }
+.hero .note{ margin-top:12px; } .hero .note details{ margin-top:8px; } .hero .note summary{ cursor:pointer; color:var(--accent); font-weight:600; font-size:13px; list-style:none; display:inline-flex; align-items:center; gap:6px; } .hero .note summary::-webkit-details-marker{ display:none; } .hero .note summary::after{ content:'▾'; font-size:11px; }
+.steps{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px; } .steps > div{ background:var(--surface-sunken); border-radius:10px; padding:12px 14px; } .steps h5{ margin:0 0 8px; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); } .steps ol{ margin:0; padding-left:18px; font-size:13px; line-height:1.55; color:var(--text-primary); }
+/* the alert preview (what one looks like) */
+.preview{ background:linear-gradient(160deg,#EFEBFA,#F8F6FF); border:1px solid #E3DDF5; border-radius:14px; padding:16px 16px 14px; position:relative; } .preview .cap{ font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent-ink); font-weight:600; margin-bottom:10px; opacity:.8; }
+.notif{ background:#fff; border-radius:12px; box-shadow:0 10px 28px rgba(52,41,94,.14); padding:12px 14px; display:flex; gap:12px; align-items:flex-start; } .notif .tile{ width:36px; height:36px; border-radius:9px; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; flex-shrink:0; } .notif .from{ font-size:11px; color:var(--text-muted); display:flex; justify-content:space-between; gap:8px; } .notif b{ display:block; font-size:13.5px; margin-top:2px; } .notif small{ display:block; color:var(--text-secondary); font-size:12.5px; line-height:1.4; margin-top:2px; }
+.preview .tap{ font-size:12px; color:var(--accent-ink); margin-top:10px; opacity:.85; }
+/* devices strip */
+.devs{ border-top:1px solid var(--border); background:var(--surface-sunken); padding:12px 26px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:13px; } .devs .lbl{ color:var(--text-muted); font-weight:600; font-size:11px; letter-spacing:.08em; text-transform:uppercase; margin-right:4px; }
+.dev{ display:inline-flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:5px 6px 5px 12px; font-size:13px; } .dev .dot{ width:8px; height:8px; border-radius:50%; background:var(--success); } .dev .this{ font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--success); font-weight:600; } .dev .x{ border:none; background:var(--surface-sunken); color:var(--text-muted); width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:13px; padding:0; } .dev .x:hover{ background:var(--danger-bg); color:var(--danger); }
+.devs .none{ color:var(--text-muted); }
+/* what buzzes */
+.wb-head{ display:flex; align-items:baseline; gap:12px; margin:30px 0 12px; } .wb-head h3{ margin:0; font-family:var(--font-display); font-weight:600; font-size:20px; } .wb-head .cnt{ font-family:var(--font-mono); font-size:12px; color:var(--text-muted); } .wb-head .hint{ margin-left:auto; font-size:12.5px; color:var(--text-muted); }
+.groups{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; align-items:start; }
+.g{ background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+.g .gh{ display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--border); background:var(--surface-sunken); } .g .gh .ic{ width:28px; height:28px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-size:13px; } .g .gh b{ font-size:13.5px; font-weight:600; } .g .gh .n{ margin-left:auto; font-family:var(--font-mono); font-size:11.5px; color:var(--text-muted); }
+.ev{ display:grid; grid-template-columns:40px minmax(0,1fr); gap:10px; padding:11px 14px; border-top:1px solid var(--border); align-items:start; } .ev:first-of-type{ border-top:none; } .ev b{ font-size:13.5px; font-weight:600; display:block; } .ev .ex{ font-size:12px; color:var(--text-secondary); margin-top:3px; line-height:1.45; display:flex; gap:6px; align-items:flex-start; } .ev .ex i{ font-style:normal; width:14px; height:14px; border-radius:4px; background:var(--accent); color:#fff; font-family:var(--font-display); font-size:9px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; } .ev.off b{ color:var(--text-muted); } .ev.off .ex{ opacity:.5; }
+.sw{ width:40px; height:22px; border-radius:11px; border:none; padding:2px; background:var(--border-strong); display:inline-flex; justify-content:flex-start; flex-shrink:0; transition:background .15s; margin-top:1px; } .sw[aria-checked="true"]{ background:var(--accent); justify-content:flex-end; } .sw span{ width:18px; height:18px; border-radius:9px; background:#fff; display:block; }
+.g.platform .gh{ background:#FBF7EC; } .g.platform .gh .tag{ font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--warning); background:var(--warning-bg); border-radius:999px; padding:2px 7px; font-weight:600; }
+/* mocks */
+.perm{ position:fixed; top:14px; left:280px; width:360px; background:#fff; border:1px solid #D0D0D0; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,.18); padding:14px 16px; z-index:60; font-family:-apple-system,'Segoe UI',Roboto,sans-serif; font-size:13px; color:#202124; } .perm b{ display:block; margin-bottom:8px; font-size:13.5px; } .perm .ln{ display:flex; align-items:center; gap:8px; color:#5f6368; } .perm .bt{ display:flex; justify-content:flex-end; gap:8px; margin-top:12px; } .perm .bt button{ border:1px solid #DADCE0; border-radius:6px; background:#fff; padding:6px 14px; font-size:13px; } .perm .bt button.allow{ background:#1A73E8; border-color:#1A73E8; color:#fff; }
+.os-notif{ position:fixed; right:18px; bottom:18px; width:340px; z-index:60; transform:translateY(20px); opacity:0; visibility:hidden; transition:all .25s; } .os-notif.show{ transform:none; opacity:1; visibility:visible; }
+.modal-bg{ position:fixed; inset:0; background:rgba(20,16,10,.35); display:flex; align-items:center; justify-content:center; z-index:65; } .modal{ width:420px; background:var(--surface); border-radius:14px; padding:22px 24px; box-shadow:0 20px 60px rgba(20,16,10,.25); } .modal h4{ margin:0 0 6px; font-size:16px; font-weight:600; } .modal p{ margin:0 0 18px; color:var(--text-secondary); font-size:13.5px; line-height:1.5; } .modal .bt{ display:flex; justify-content:flex-end; gap:8px; }
+.proto{ margin-top:22px; padding:10px 12px; border:1px dashed var(--border-strong); border-radius:10px; font-size:12px; color:var(--text-muted); display:flex; align-items:center; gap:8px; flex-wrap:wrap; } .proto button{ border:1px solid var(--border-strong); background:var(--surface); border-radius:999px; padding:3px 10px; font-size:12px; color:var(--text-secondary); } .proto button.on{ background:var(--accent-bg); border-color:var(--accent-bg); color:var(--accent-ink); font-weight:600; }
+.toast{ position:fixed; left:50%; bottom:28px; transform:translateX(-50%); background:#1E1C1A; color:#fff; padding:10px 16px; border-radius:10px; font-size:13px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:70; } .toast.show{ opacity:1; }
+@media (max-width:1100px){ .main{ padding:24px 24px 100px; } .shell{ flex-direction:column; gap:18px; } .rail{ width:100%; flex-direction:row; gap:4px; border-bottom:1px solid var(--border); padding-bottom:6px; } .rail button{ width:auto; } .rail .tag{ margin-left:6px; } .hero .body{ grid-template-columns:minmax(0,1fr) 280px; gap:20px; padding:20px; } .groups{ grid-template-columns:repeat(2,minmax(0,1fr)); } .devs{ padding:12px 20px; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><div class="tile">P</div><div><b>Paint Trade HQ</b><span>Harbourline Painting</span></div></div>
+    <a class="nav"><i></i>Dashboard</a>
+    <div class="grp">Pipeline</div><a class="nav"><i></i>Estimates</a><a class="nav"><i></i>Invoices</a><a class="nav"><i></i>Live Projects</a><a class="nav"><i></i>CRM</a>
+    <div class="grp">Operations</div><a class="nav"><i></i>Calendar</a><a class="nav"><i></i>Daily Reports</a><a class="nav"><i></i>Timesheets</a><a class="nav"><i></i>Equipment</a>
+    <div class="grp">HR</div><a class="nav"><i></i>Employees</a><a class="nav"><i></i>Performance</a><a class="nav"><i></i>Contracts</a><a class="nav"><i></i>Training Videos</a>
+    <div class="tools"><span class="on">⚙</span><span>?</span></div>
+    <div class="foot"><div class="av">SR</div><div><b>Sam Reyes</b><div style="font-size:11.5px;color:var(--text-muted)">Owner · Admin</div></div></div>
+  </aside>
+  <main class="main">
+    <h1>Settings</h1>
+    <p class="lead">A buzz on this computer or your phone when something needs you, even with Paint Trade HQ closed. Each admin sets their own.</p>
+    <div class="shell">
+      <nav class="rail" data-testid="set-rail">
+        <button><i></i>Business</button><button><i></i>Crew app</button><button><i></i>Account</button><button class="on" data-testid="set-rail-alerts"><i></i>Alerts</button><button><i></i>Billing</button><button><i></i>Platform<span class="tag">JOSH ONLY</span></button>
+      </nav>
+      <div class="content" data-testid="set-page-alerts">
+        <h2>Alerts</h2>
+        <p class="pagesub">Turn alerts on where you want them — this computer, the app on your phone, or both — then choose what buzzes. Tapping an alert opens the record it is about; nothing piles up in the app.</p>
+
+        <!-- hero: this device -->
+        <section class="hero" data-testid="alerts-card">
+          <div class="body">
+            <div>
+              <div class="state">
+                <div class="bell" id="bell"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+                <div style="min-width:0"><h3 id="stTitle" data-testid="alerts-device-status">Alerts are off on this computer</h3><div class="sub" id="stSub">Turn them on and the buzz reaches you while Chrome is running, even with this tab closed.</div></div>
+              </div>
+              <div class="acts" id="acts"></div>
+              <div class="note" id="note"></div>
+            </div>
+            <div class="preview" data-testid="alerts-preview">
+              <div class="cap">What one looks like</div>
+              <div class="notif"><div class="tile">P</div><div style="min-width:0;flex:1"><div class="from"><span>Paint Trade HQ</span><span>now</span></div><b>Jo Okafor accepted Q-0142</b><small>$4,860 · Okafor exterior repaint</small></div></div>
+              <div class="tap">Tap it and the quote opens.</div>
+            </div>
+          </div>
+          <div class="devs" data-testid="alerts-devices"><span class="lbl">Alerts on</span><span id="devList"></span></div>
+        </section>
+
+        <!-- what buzzes -->
+        <div class="wb-head"><h3>What buzzes</h3><span class="cnt" id="wbCount" data-testid="alerts-count"></span><span class="hint">Your own list, for every device you turn on. Off here is off everywhere for you.</span></div>
+        <div class="groups" id="groups" data-testid="alerts-events"></div>
+
+        <div class="proto" data-testid="proto-states">Prototype only — see it as: <button class="on" data-state="desktop" data-testid="proto-state-desktop">This computer</button><button data-state="ios-safari" data-testid="proto-state-ios-safari">iPhone in Safari</button><button data-state="ios-app" data-testid="proto-state-ios-app">iPhone, installed app</button><button data-state="blocked" data-testid="proto-state-blocked">Blocked in the browser</button></div>
+      </div>
+    </div>
+  </main>
+</div>
+<div id="mbox"></div>
+<div class="toast" id="toast"></div>
+<div class="os-notif" id="osn" data-testid="os-notification"><div class="notif"><div class="tile">P</div><div style="min-width:0;flex:1"><div class="from"><span>Paint Trade HQ · painttradehq.co</span><span>now</span></div><b id="osnT"></b><small id="osnB"></small></div></div></div>
+<script>
+// ── data ─────────────────────────────────────────────────────────────────────
+const GROUPS = [
+  { g:'Clients', ic:'#3E86C7', glyph:'◔' },
+  { g:'Crew',    ic:'#2E9E5B', glyph:'⌂' },
+  { g:'You',     ic:'#7E6FC0', glyph:'✓' },
+];
+const EVENTS = [
+  { g:'Clients', k:'quote_answered',    t:'Quote answered',               ex:'Jo Okafor accepted Q-0142 · $4,860', on:true },
+  { g:'Clients', k:'quote_opened',      t:'Quote opened',                 ex:'Jo Okafor opened Q-0142', on:false },
+  { g:'Clients', k:'invoice_paid',      t:'Invoice paid online',          ex:'Priya Nair paid INV-0088 · $2,760', on:true },
+  { g:'Clients', k:'client_reply',      t:'Client replied',               ex:'Jo Okafor: “Can you start Monday instead?”', on:true },
+  { g:'Clients', k:'variation_answered',t:'Variation answered',           ex:'Tom Whitfield accepted variation 2 · $640', on:true },
+  { g:'Crew',    k:'daily_report',      t:'Daily report filed',           ex:'Mia filed a daily report · Whitfield interior', on:true },
+  { g:'Crew',    k:'equipment_request', t:'Equipment request',            ex:'Daniel asked for a 3.6 m ladder', on:true },
+  { g:'Crew',    k:'signin_flagged',    t:'Sign-in outside the distance', ex:'Mia signed in 1.2 km from Okafor exterior', on:true },
+  { g:'Crew',    k:'contract_signed',   t:'Document signed',              ex:'Daniel signed the Contract of employment', on:true },
+  { g:'Crew',    k:'document_expiry',   t:'Licence or ticket expiring',   ex:'Mia’s White card expires in a week', on:true },
+  { g:'You',     k:'reminder_due',      t:'Reminder due',                 ex:'Call Mia about the colour sample', on:true },
+  { g:'You',     k:'tester_feedback',   t:'Tester feedback',              ex:'Harbourline Painting: “The PDF logo is blurry”', on:true, platform:true },
+];
+const ev = Object.fromEntries(EVENTS.map(e => [e.k, e.on]));
+let devices = [ { id:'d2', name:'iPhone app', when:'3 Nov' } ];
+let proto = 'desktop', perm = 'default', on = false;
+const THIS = { desktop:'Chrome on Windows', 'ios-app':'iPhone app', 'ios-safari':'Safari on iPhone', blocked:'Chrome on Windows' };
+const WHERE = { desktop:'this computer', 'ios-app':'this iPhone', 'ios-safari':'this iPhone', blocked:'this computer' };
+
+const $ = (s) => document.querySelector(s); const $$ = (s) => Array.from(document.querySelectorAll(s));
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let tt; const say = (m) => { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 2200); };
+let ot; const osNotify = (title, body) => { $('#osnT').textContent = title; $('#osnB').textContent = body; const n = $('#osn'); n.classList.add('show'); clearTimeout(ot); ot = setTimeout(() => n.classList.remove('show'), 3200); };
+const closeBox = () => { $('#mbox').innerHTML = ''; };
+
+// ── hero ─────────────────────────────────────────────────────────────────────
+const PHONE_STEPS = `<details data-testid="alerts-phone-steps"><summary>Setting up your phone</summary><div class="steps"><div><h5>iPhone</h5><ol><li>In Safari, tap Share (the square with the arrow).</li><li>Choose “Add to Home Screen”, then Add.</li><li>Open Paint Trade HQ from the Home Screen, come here, tap Turn on alerts.</li></ol></div><div><h5>Android</h5><ol><li>Open painttradehq.co in Chrome.</li><li>Tap Turn on alerts here. Tip: ⋮ › “Add to Home screen” so alerts show as Paint Trade HQ, not Chrome.</li></ol></div></div></details>`;
+const renderHero = () => {
+  const bell = $('#bell'), title = $('#stTitle'), sub = $('#stSub'), acts = $('#acts'), note = $('#note');
+  bell.className = 'bell';
+  if (proto === 'ios-safari') {
+    title.textContent = 'On an iPhone, alerts come from the installed app';
+    sub.textContent = 'Safari on its own cannot buzz you. Three steps, once.';
+    acts.innerHTML = `<div class="steps" style="margin-top:0;grid-template-columns:1fr" data-testid="alerts-ios-steps"><div><ol><li>Tap Share in Safari (the square with the arrow).</li><li>Choose “Add to Home Screen”, then Add.</li><li>Open Paint Trade HQ from your Home Screen and tap Turn on alerts here.</li></ol></div></div>`;
+    note.innerHTML = '';
+  } else if (perm === 'denied') {
+    bell.classList.add('blocked');
+    title.textContent = 'Alerts are blocked in this browser';
+    sub.textContent = 'You said no to notifications for painttradehq.co once. The browser remembers that, not us.';
+    acts.innerHTML = `<button class="btn" disabled data-testid="alerts-device">Turn on alerts</button><span class="muted" data-testid="alerts-blocked">Click the icon left of the address, set Notifications to Allow, then reload this page.</span>`;
+    note.innerHTML = PHONE_STEPS;
+  } else if (on) {
+    bell.classList.add('on');
+    title.textContent = `Alerts are on · ${THIS[proto]}`;
+    sub.textContent = proto === 'desktop' ? 'They reach you while Chrome is running, even with this tab closed.' : 'They reach the lock screen, even with the app closed.';
+    acts.innerHTML = `<button class="btn primary" data-testid="alerts-test">Send a test</button><button class="btn ghost" data-testid="alerts-device">Turn off on ${WHERE[proto]}</button>`;
+    note.innerHTML = PHONE_STEPS;
+  } else {
+    title.textContent = `Alerts are off on ${WHERE[proto]}`;
+    sub.textContent = proto === 'desktop' ? 'Turn them on and the buzz reaches you while Chrome is running, even with this tab closed.' : 'Turn them on and the buzz reaches the lock screen, even with the app closed.';
+    acts.innerHTML = `<button class="btn primary" data-testid="alerts-device">Turn on alerts</button><span class="muted">${proto === 'desktop' ? 'Your browser asks once.' : 'Your phone asks once.'}</span>`;
+    note.innerHTML = PHONE_STEPS;
+  }
+  const pills = devices.map(d => `<span class="dev" data-testid="alerts-device-row"><span class="dot"></span>${esc(d.name)}<span class="muted" style="font-size:12px">since ${esc(d.when)}</span><button class="x" data-rm="${d.id}" data-testid="alerts-remove-${d.id}" aria-label="Remove ${esc(d.name)}">×</button></span>`);
+  if (on) pills.unshift(`<span class="dev" data-testid="alerts-device-row"><span class="dot"></span>${esc(THIS[proto])}<span class="this">this device</span></span>`);
+  $('#devList').innerHTML = pills.length ? pills.join(' ') : `<span class="none" data-testid="alerts-no-devices">no device yet — turn them on here, or in the app on your phone</span>`;
+};
+const askPermission = () => { $('#mbox').innerHTML = `<div class="perm" data-testid="perm-prompt"><b>painttradehq.co wants to</b><div class="ln">🔔 Show notifications</div><div class="bt"><button data-testid="perm-block">Block</button><button class="allow" data-testid="perm-allow">Allow</button></div></div>`; };
+
+// ── what buzzes ──────────────────────────────────────────────────────────────
+const renderEvents = () => {
+  const onN = EVENTS.filter(e => ev[e.k]).length;
+  $('#wbCount').textContent = `${onN} of ${EVENTS.length} on`;
+  $('#groups').innerHTML = GROUPS.map(G => {
+    const list = EVENTS.filter(e => e.g === G.g);
+    const n = list.filter(e => ev[e.k]).length;
+    return `<div class="g" data-testid="alerts-group-${G.g.toLowerCase()}"><div class="gh"><span class="ic" style="background:${G.ic}">${G.glyph}</span><b>${G.g}</b><span class="n">${n} of ${list.length} on</span></div>${list.map(e => `
+      <div class="ev ${ev[e.k] ? '' : 'off'} ${e.platform ? 'plat' : ''}" data-testid="alert-ev-row-${e.k}"><button class="sw" role="switch" aria-checked="${ev[e.k]}" data-ev="${e.k}" data-testid="alert-ev-${e.k}" aria-label="${esc(e.t)}"><span></span></button><div><b>${esc(e.t)}${e.platform ? ' <span class="pill" style="font-size:9px;padding:2px 6px;vertical-align:middle;color:var(--warning);background:var(--warning-bg)">Josh only</span>' : ''}</b><div class="ex"><i>P</i><span>${esc(e.ex)}</span></div></div></div>`).join('')}</div>`;
+  }).join('');
+};
+
+// ── events ───────────────────────────────────────────────────────────────────
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('button'); if (!t) return;
+  const id = t.dataset.testid;
+  if (id === 'alerts-device') { if (t.disabled) return; if (on) { on = false; renderHero(); say('Alerts are off on this device.'); } else if (perm === 'granted') { on = true; renderHero(); say('Alerts are on for this device.'); } else askPermission(); return; }
+  if (id === 'perm-allow') { perm = 'granted'; closeBox(); on = true; renderHero(); say('Alerts are on for this device.'); return; }
+  if (id === 'perm-block') { perm = 'denied'; closeBox(); renderHero(); return; }
+  if (id === 'alerts-test') { osNotify('Paint Trade HQ', 'Alerts are on. You’ll get buzzed for quotes, payments, replies and the crew.'); say('Test alert sent — check the corner of your screen.'); return; }
+  if (t.dataset.rm) { const d = devices.find(x => x.id === t.dataset.rm); $('#mbox').innerHTML = `<div class="modal-bg" data-testid="modal"><div class="modal"><h4>Remove ${esc(d.name)}?</h4><p>That device stops getting alerts until you turn them on there again.</p><div class="bt"><button class="btn sm" data-testid="modal-cancel">Cancel</button><button class="btn sm primary" data-testid="modal-ok" data-rmid="${d.id}">Remove</button></div></div></div>`; return; }
+  if (id === 'modal-cancel') { closeBox(); return; }
+  if (id === 'modal-ok') { const d = devices.find(x => x.id === t.dataset.rmid); devices = devices.filter(x => x.id !== t.dataset.rmid); closeBox(); renderHero(); say(`${d.name} removed.`); return; }
+  if (t.dataset.ev) { const k = t.dataset.ev; ev[k] = !ev[k]; renderEvents(); say(`${EVENTS.find(x => x.k === k).t}: ${ev[k] ? 'on' : 'off'}`); return; }
+  if (t.dataset.state) { proto = t.dataset.state; perm = proto === 'blocked' ? 'denied' : 'default'; on = false; $$('.proto button').forEach(b => b.classList.toggle('on', b === t)); renderHero(); return; }
+});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('#mbox').innerHTML) closeBox(); });
+renderHero(); renderEvents();
+</script>
+</body>
+</html>
