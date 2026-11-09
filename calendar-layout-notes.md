@@ -1,4 +1,4 @@
-# Round 91 — Calendar layout: one Show dropdown, no side cards, the grid full width (9 November) — DRAFT, waits for Josh's review and "send"
+# Round 91 — Calendar layout: one Show dropdown, no side cards, the grid full width (9 November) — SENT 9 Nov (`round91-message.md`; the prototype goes up as Josh's upload with "here"), building
 
 Prototype: **`calendar-layout.html`** (open at 1440: the grid fills the page; **Show ▾** → untick Money due → the red chips go and the button reads "6 of 7" → Hide all / Show all → the red **Needs attention · 4** pill → its list → click the number of the 23rd → the day by hours → Week → Month; then 1024). Playwright `tools/test_calendar.js` **22/22** at 1440 and 1024. Built from the current page (`app/admin/events.tsx`, `components/calendar/*`, the 23 Oct capture `memory/marketing/screens/22-calendar-1440.png`); everything not named here is unchanged — the views, the drawer, quick-add, the gear's Calendar settings, the Google layer. Josh's notes 9 and 10 of 7 Nov (note 8, the day click, shipped in Round 87 item 21).
 

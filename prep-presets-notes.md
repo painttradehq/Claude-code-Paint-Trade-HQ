@@ -1,4 +1,4 @@
-# Round 89 — Prep as a pop-up from the line panel (8 November) — SENT 9 Nov (`round89-message.md`; the prototype goes up as Josh's upload with "here"), building
+# Round 89 — Prep as a pop-up from the line panel (8 November) — BUILT 9 Nov (report `memory/reports/round89-prep-report.md`; results at the end of this file); waits for publish
 
 Prototype: **`estimate-builder-prep.html`** (open at 1440: click the Skirting line's summary → the Preparation row reads "Edit prep · 3" with the steps under it → click it → the pop-up: search "sand", tick Wash down, type "Remove picture hooks" + Enter, hover "Strip old wallpaper" and × it, type a one-off note, Done → Save → the paper and the Client view carry the steps; open the Walls line, tick Preparation → "Add prep"; then 1024). Playwright `tools/test_prep.js` **27/27** at 1440 and 1024. Built on the Round 88 builder (`estimate-builder-paint.html`, generator `tools/make_prep.py`); everything not named here is unchanged. Josh's note 21 of 7 Nov, with his change of flow (8 Nov): **not a Library section — a pop-up from the builder, multiple steps, add your own.**
 
@@ -58,3 +58,10 @@ A new draft, the next free number, title **"Prep, ticked off"**, one card: "Tick
 ## 8. Report
 
 `memory/reports/round89-prep-report.md`, starting "Round 89 done": the verify items, the `prep_note` migration behaviour, the suite before and after. No code review. Do not start anything else after it. Do not offer next action items.
+
+
+## Results (Emergent, 9 Nov, ~25 min; not published)
+
+- Built as written: the "Add prep / Edit prep · n" link and summary line (NOT ON THE QUOTE when printing is off); the 520 px pop-up — search, the 15 standard steps plus the business's own YOURS steps with ×, add your own by Enter, the one-off note, the print switch, "all {category} in {area} / everywhere", Cancel / Done, Escape and outside click; `prep_steps` / `prep_extra` / `prep_show` on the line with the old `prep_note` migrated on the first Done; `GET/POST/DELETE /api/prep-steps` (`routes/prep_steps.py`, `admin_settings.prep_steps`); `services/estimate_lines.prep_text` shared by the paper, client view, public page, PDF, email and the crew routes (nothing under `app/employee/*`); `validate_prep_fields` on the PUT.
+- Testing agent at 1440 and 1024: items 1–8 pass. Its three notes were fixed in the round: the pop-up now covers the sidebar too (rendered through a portal, like the Timesheets dialogs); the count ignores steps removed from the list; the toast no longer covers the apply buttons.
+- `tests/test_r89_prep.py` 4/4 (the PDF check reads the labour table's HTML before WeasyPrint subsets the fonts); estimate and crew suites green; `tsc` clean; TS_ rows torn down. Draft **n 33 "Prep, ticked off"**, unpublished. Pre-existing failures unchanged (`test_r19` test_42, `test_r46` ×2, `test_r63`, `test_r78` ×2).
