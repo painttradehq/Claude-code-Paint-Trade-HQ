@@ -34,7 +34,7 @@ const ok = (name, cond) => { if (cond) { pass++; console.log('PASS', name); } el
 
   // 4. W and L typed as well: the typed m² still wins; clear it and W × L takes over
   await p.fill(deck + ' [data-dim="w"]', '6'); await p.fill(deck + ' [data-dim="l"]', '5'); await p.waitForTimeout(300);
-  ok('with W 6 and L 5 the typed 38 still wins (the tag says so)', (await deckTotal()) === total38 && /\(typed\)/.test(await deckDerived()) && /22 lm/.test(await deckDerived()));
+  ok('with W 6 and L 5 the typed 38 still wins (the tag says so)', (await deckTotal()) === total38 && /\(typed\)/.test(await deckDerived()));  // the deck has no lineal line, so the header names no lm face
   await p.click(deck + ' [data-sqclear]'); await p.waitForTimeout(300);
   ok('× on the tag: back to W × L = 30 m², the box no longer typed', (await p.locator(T('area-sqm-a_deck')).inputValue()) === '30' && /floor 30 m²(?! \(typed\))/.test(await deckDerived()) && (await deckTotal()) !== total38);
   // a wall line in that area would still need H
