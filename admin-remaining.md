@@ -58,6 +58,11 @@ Everything the admin chat has specced so far is built, except the items below. O
 | **Launch pieces** (`pricing.md` §51) | Marketing pages and the deck (A15), the launch What's new, and the **launch-phase legal review** (the lawyer, $220 / $350 an hour inc GST): Privacy Policy, the fees and subscription terms, client-contract and employment questions — needed before the first paid subscription (`legal-terms-notes.md` §7). | A launch date. |
 | **Parked from the old list** | A12 the 30-day purge of personal data after employment ends; A13 in-app learning (the Help hub content is Adam's). | Say if either should come back. |
 
+## Parking lot (ideas, not scheduled; your word starts any of them)
+
+- **Connect your own AI account to run the app** (Josh, 10 Nov: "like how we connect to GitHub or Google — that AI can do the tasks inside the app"; Claude, GPT or another). What exists: the app already has a **remote MCP server** (`backend/routes/mcp_server.py`): the standard plug an outside Claude connects to, **16 read-only tools**, one shared `MCP_API_KEY`, one tenant fixed by `MCP_OWNER_ADMIN_ID` — yours. So the idea is three steps on top of it, each a decision: (1) **a connection per business** — a "Connect an AI" row on Settings › Connections that issues that business a key or an OAuth client, scoped to its own data, revocable; (2) **write tools** — the MCP surface is read-only by design; letting an outside AI create quotes, send emails or change jobs needs a tool list, confirmations and an audit trail (the AI audit log exists for Lucy); (3) **other vendors** — against the standing rule "AI = Claude only, via the app's own key"; a GPT or Gemini account would need its own connector per vendor, with its own data-handling terms. Lucy inside the app already does tasks with the app's key, so the gain is letting a user's own assistant, outside the app, reach in. Nothing built; no spec yet.
+- **Duplicate a quote for a repeat client** (the TS_ tester's three feedbacks, `fix-round-i-candidates.md` item 8).
+
 ## On hold by your call (specs exist)
 
 - **Round 77 — Dashboard home diet** (`dashboard-diet-notes.md`): superseded — Rounds 85 and 86 took the dashboard's server time on production from 10,094 ms to 270 ms (25 Oct).
