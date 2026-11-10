@@ -70,13 +70,25 @@ Verify, on Android Chrome at 390 and on a tablet, and at 1440: Choose a client, 
 
 Josh, 10 Nov (screenshot): in the builder's *New client* dialog the Phone box sits lower than the Email box and the two labels do not line up. Cause: `components/estimate/v2/ui.tsx:14 Row` lays its fields out with `alignItems: 'flex-end'`, and the Email field carries a hint under its input (*"Needed to send the quote. You can add it later."*, `Dialogs.tsx:46`), so the row's floor is the hint's bottom and the hint-less Phone field drops to it. Fix: `Row` aligns `flex-start` (labels on one line, inputs on one line — this also tidies the Edit client row at `:41`, the *Other contact* row at `:50` and Suburb / State / Postcode at `:47`), and the email hint moves under the whole row as one muted line (*"Email is needed to send the quote — you can add it later."*). Verify at 1440, 1024 and on a tablet: Name full width, Phone and Email level, the hint beneath them, Address, then Suburb / State / Postcode level.
 
-## 14. Not in this round, and why
+## 14. The client's document: no price on the area row
+
+Josh, 10 Nov (screenshot of the client view): *Deck & Stairs · $2,660.00* above *Decking · Deck restoration · 38 m² · $70.00 · $2,660.00* — the same money twice; the area is a label, the task is what costs. `components/estimate/v2/ClientDoc.tsx:37` prints each area group's summed total in its header row, and `services/pdf.py:351` (`_grouped_labour`) prints the same bold amount in the PDF's area row. Fix: the area row keeps the name, the dimensions and the note, and loses the amount, in the client view, the public page (same component) and the PDF; the section total *What we will do* and the Subtotal are untouched. Verify: a TS_ quote with two areas of two lines each — no amount on either area row, the lines and totals unchanged, PDF and public page the same.
+
+## 15. The client's document: an empty "Job details" box
+
+Same screenshot: a grey *Job details* card with nothing in it. `ClientDoc.tsx:34` and `pdf.py:316–326` always draw the card and only its rows (`Site`, `Est. duration`, `Start`) disappear when empty; the PDF's *Site* falls back to the client's address (`pdf.py:319`), the client view's does not. Fix, both places the same: *Site* = the job address when the quote has one, else the client's address; *Est. duration* and *Start* when set; and when there is nothing at all (no address anywhere, no duration, no start) the card is not drawn and *Prepared for* takes the row. Verify: the TS_ quote of §14 with no job address shows the client's address as Site; a quote with nothing shows one card; the PDF matches the view.
+
+## 16. New client: the state is not QLD by default
+
+`components/estimate/v2/Dialogs.tsx:34` starts a new client with `state: 'QLD'` for every business — Josh's Ivanhoe client came out as *Ivanhoe QLD* on the quote. Fix: the State field starts empty and fills from the Address finder's pick as it already does; if the business profile carries a state (the business address picked through the finder), that is the starting value instead. The same check on the CRM's New client form (`crm/v2`) and the lead-to-client conversion, so no form carries a hard-coded state. Verify: a TS_ business in Victoria opens New client — State empty; picking an address fills VIC; the quote reads *Ivanhoe VIC*.
+
+## 17. Not in this round, and why
 
 - **The CRM inbox at 390** (Round 87): code-verified only; Josh checks it on his phone after the publish — a note, not a build item.
 - **Equipment "there is no list of items"** (Josh's note 16): the page lists his one item; if he meant a standard list to add from (ladders, sprayers, drop sheets), that is a small design round, not a fix. Josh's word.
 - **Round 88's profile-defaults fix** (`admin_profile.py:281`) is already in.
 
-## 15. Verify (testing agent, 1440 then 1024; TS_ tenants; the owner's tenant read-only)
+## 18. Verify (testing agent, 1440 then 1024; TS_ tenants; the owner's tenant read-only)
 
 1. Each test file of §1 green, or the report names the case and the reason; the full suite before and after, chunked.
 2. The builder at 1024: one row, Send visible, the dot's title reads the saved time; at 1440 unchanged.
@@ -91,12 +103,15 @@ Josh, 10 Nov (screenshot): in the builder's *New client* dialog the Phone box si
 11. Every admin date field shows day/month/year on an en-AU device and stores ISO; the three former text fields open a picker.
 12. The ten forms of §12 on Android at 390 and a tablet: visible on open, keyboard only on tap, body scrolling above the keys, footer reachable; desktop unchanged.
 13. New client: Phone and Email level with the hint beneath; the other `Row`s unchanged in meaning, level in layout.
-14. `tsc` clean; no console errors; nothing under `app/employee/*`.
+14. The client view, public page and PDF: no amount on an area row; the totals unchanged.
+15. Job details: Site falls back to the client's address; the card is absent when there is nothing to say; PDF and view agree.
+16. New client's State starts empty (or the business's); a Victorian address reads VIC on the quote.
+17. `tsc` clean; no console errors; nothing under `app/employee/*`.
 
-## 16. What's new
+## 19. What's new
 
-A new draft, the next free number, title **"Small fixes"**, one card: "The calendar's Week and Day now show a multi-day job on every day it covers and open at your first appointment. A job's page shows the site address, not the client's home. Clients opening a quote are no longer offered the app. Every date is day/month/year." Draft only; never publish.
+A new draft, the next free number, title **"Small fixes"**, one card: "The calendar's Week and Day now show a multi-day job on every day it covers and open at your first appointment. A job's page shows the site address, not the client's home. Clients opening a quote are no longer offered the app. Every date is day/month/year. On the quote, an area is a heading again — the price sits on the work, not twice." Draft only; never publish.
 
-## 17. Report, and GitHub
+## 20. Report, and GitHub
 
-`memory/reports/round-fix-i-report.md`, starting "Fix Round I done": the five test files with their outcome, the twelve fixes with file:line, the suite before and after. **Then push to GitHub** (Save to GitHub) and name the commit in the report: `main` on GitHub is `1acc836`, Round 88 — Round 89's code and report (9 Nov) never arrived, and every round from here should end with a push. No code review. Do not start anything else after it. Do not offer next action items.
+`memory/reports/round-fix-i-report.md`, starting "Fix Round I done": the five test files with their outcome, the fifteen fixes with file:line, the suite before and after. **Then push to GitHub** (Save to GitHub) and name the commit in the report: `main` on GitHub is `1acc836`, Round 88 — Round 89's code and report (9 Nov) never arrived, and every round from here should end with a push. No code review. Do not start anything else after it. Do not offer next action items.
