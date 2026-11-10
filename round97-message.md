@@ -57,3 +57,7 @@ A new draft, the next free number, title **"Square metres, measured or typed"**,
 ## 9. Then publish (Josh's word, 10 Nov)
 
 When both Round 96 and Round 97 are reported, **publish the app** — the published variables stay exactly as they are (the connector's two among them). If publishing is not something you can do yourself, say so in one line and stop; Josh presses Publish. After that, stop and wait.
+
+---
+
+**Addendum sent 11 Nov (Josh, from his tablet on a real quote: "the alarm for fixing things is disabling the send option — enable it, regardless"):** `ReviewSend.tsx:68` disables `rs-send` while any red checklist item remains (`estModel.ts:54–69`). In Round 97: Send is disabled only by busy, no recipient email, or attachments over the size — never by the checklist; the items stay listed with their Fix links; the heading at `:55` reads "… to check before it goes"; no confirm step. Verify: a TS_ quote with no job address sends; one with no client email still cannot.
