@@ -1,4 +1,4 @@
-# Fix Round I — small fixes and the test debt (10 November) — READY, waits for Josh's word; no prototype needed
+# Fix Round I — small fixes and the test debt (10 November) — SENT 10 Nov (`round-fix-i-message.md`); building
 
 From `fix-round-i-candidates.md` (7 Nov) and Josh's notes of 10 Nov (`notes-triage-10nov.md`), checked against the code at `1acc836` (the latest on GitHub: Round 88; Round 89's code is not pushed yet — item 9). Backend and admin frontend only; nothing under `app/employee/*`; TS_ tenants only; the owner's tenant read-only; nothing published. Each item names the file and line as they stand.
 
