@@ -21,19 +21,19 @@ const ok = (name, cond) => { if (cond) { pass++; console.log('PASS', name); } el
   await p.click(T('project-products-toggle')); await p.waitForTimeout(150);
   ok('the picker lists each product once, with its coverage and sizes, not one row per tin', (await p.locator('.prow').count()) === 7 && /4L · 10L · 15L/.test(await p.locator(T('project-products-pick-p1')).textContent()));
   await p.fill(T('project-products-search'), 'stain'); await p.waitForTimeout(100);
-  ok('search narrows', (await p.locator('.prow').count()) === 1);
+  ok('search narrows (two products carry "stain")', (await p.locator('.prow').count()) === 2);
   await p.click(T('project-products-pick-p6')); await p.waitForTimeout(150);
   ok('picking a product asks for the litres, Add disabled until typed', await p.locator(T('picker-step-litres')).isVisible() && await p.locator(T('picker-add')).isDisabled());
   await p.fill(T('picker-litres'), '13'); await p.waitForTimeout(100);
-  ok('the fit shows as you type: 13 L of a 1 / 4 / 10 L product → 1 × 10L + 1 × 4L', /1 × 10L \+ 1 × 4L/.test(await p.locator(T('picker-fit')).textContent()) && /\$366\.00/.test(await p.locator(T('picker-fit')).textContent()));
+  ok('the fit shows as you type: 13 L of a 1 / 4 / 10 L product → 1 × 10L + 3 × 1L, the cheapest fill ($362, not 10L + 4L at $366)', /1 × 10L \+ 3 × 1L/.test(await p.locator(T('picker-fit')).textContent()) && /\$362\.00/.test(await p.locator(T('picker-fit')).textContent()));
   await p.screenshot({ path: OUT + 'r96-picker-1440.png' });
   await p.keyboard.press('Enter'); await p.waitForTimeout(200);
-  ok('Enter adds the row and closes the picker', (await p.locator('[data-testid^="product-row-"]').count()) === 3 && (await p.locator(T('project-products-picker')).count()) === 0 && (await p.locator(T('products-sum')).textContent()) === '$724.00');
+  ok('Enter adds the row and closes the picker', (await p.locator('[data-testid^="product-row-"]').count()) === 3 && (await p.locator(T('project-products-picker')).count()) === 0 && (await p.locator(T('products-sum')).textContent()) === '$720.00');
 
   // 3. change the litres on a row
   await p.click(T('row-litres-m1')); await p.waitForTimeout(100);
   await p.fill(T('row-litres-input-m1'), '22'); await p.keyboard.press('Enter'); await p.waitForTimeout(150);
-  ok('typing new litres re-fits the tins: 22 L → 1 × 15L + 1 × 10L', (await p.locator(T('row-tins-m1')).textContent()) === '1 × 15L + 1 × 10L' && (await p.locator(T('row-cost-m1')).textContent()) === '$445.00');
+  ok('typing new litres re-fits the tins: 22 L → 1 × 15L + 2 × 4L ($436, cheaper than 15L + 10L at $445)', (await p.locator(T('row-tins-m1')).textContent()) === '1 × 15L + 2 × 4L' && (await p.locator(T('row-cost-m1')).textContent()) === '$436.00');
   await p.click(T('row-litres-m1')); await p.fill(T('row-litres-input-m1'), '31'); await p.keyboard.press('Enter'); await p.waitForTimeout(150);
   ok('31 L → 2 × 15L + 1 × 4L (the remainder by the smallest tin that covers it)', (await p.locator(T('row-tins-m1')).textContent()) === '2 × 15L + 1 × 4L');
   ok('the colour fields stay as today, with the estimate mark', (await p.locator(T('row-colour-m1')).inputValue()) === 'Natural White' && /from the estimate/.test(await p.locator(T('product-row-m1')).textContent()));
