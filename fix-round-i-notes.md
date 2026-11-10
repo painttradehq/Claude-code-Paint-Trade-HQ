@@ -58,13 +58,17 @@ Josh, 10 Nov: *"go through all the pages — anywhere there is a place to add a 
 
 Josh, 10 Nov (screenshot): opening *Choose a client* in the builder focuses the search box at once, the on-screen keyboard rises and hides the list; he closes the keyboard to see it. `components/estimate/v2/Dialogs.tsx:53` autofocuses the search; the list is a fixed `maxHeight: 360` (`:54`) inside a centred dialog that does not know the keyboard is there. Fix, both halves: (a) **autofocus only with a mouse** — on a touch device (`(pointer: coarse)`) the field is not focused until tapped, so the list shows first; (b) **the dialog fits the visible viewport** — its height follows `window.visualViewport.height` (minus the margins) and the list scrolls inside it, so with the keyboard up the search stays at the top and the matching clients remain in view above the keys. The same two changes for the builder's other pickers that share `Dialog` (product and template choosers). Verify on Android Chrome at 390 and on a tablet: open Choose a client — list visible, no keyboard; tap the box — keyboard up, the list scrolls above it; desktop unchanged (focus on open).
 
-## 13. Not in this round, and why
+## 13. The New client form: Phone sinks below Email
+
+Josh, 10 Nov (screenshot): in the builder's *New client* dialog the Phone box sits lower than the Email box and the two labels do not line up. Cause: `components/estimate/v2/ui.tsx:14 Row` lays its fields out with `alignItems: 'flex-end'`, and the Email field carries a hint under its input (*"Needed to send the quote. You can add it later."*, `Dialogs.tsx:46`), so the row's floor is the hint's bottom and the hint-less Phone field drops to it. Fix: `Row` aligns `flex-start` (labels on one line, inputs on one line — this also tidies the Edit client row at `:41`, the *Other contact* row at `:50` and Suburb / State / Postcode at `:47`), and the email hint moves under the whole row as one muted line (*"Email is needed to send the quote — you can add it later."*). Verify at 1440, 1024 and on a tablet: Name full width, Phone and Email level, the hint beneath them, Address, then Suburb / State / Postcode level.
+
+## 14. Not in this round, and why
 
 - **The CRM inbox at 390** (Round 87): code-verified only; Josh checks it on his phone after the publish — a note, not a build item.
 - **Equipment "there is no list of items"** (Josh's note 16): the page lists his one item; if he meant a standard list to add from (ladders, sprayers, drop sheets), that is a small design round, not a fix. Josh's word.
 - **Round 88's profile-defaults fix** (`admin_profile.py:281`) is already in.
 
-## 14. Verify (testing agent, 1440 then 1024; TS_ tenants; the owner's tenant read-only)
+## 15. Verify (testing agent, 1440 then 1024; TS_ tenants; the owner's tenant read-only)
 
 1. Each test file of §1 green, or the report names the case and the reason; the full suite before and after, chunked.
 2. The builder at 1024: one row, Send visible, the dot's title reads the saved time; at 1440 unchanged.
@@ -78,12 +82,13 @@ Josh, 10 Nov (screenshot): opening *Choose a client* in the builder focuses the 
 10. The summary sentence on a TS_ project without dates reads naturally.
 11. Every admin date field shows day/month/year on an en-AU device and stores ISO; the three former text fields open a picker.
 12. Choose a client on Android at 390 and on a tablet: the list first, the keyboard only on tap, the list scrolling above the keys; desktop unchanged.
-13. `tsc` clean; no console errors; nothing under `app/employee/*`.
+13. New client: Phone and Email level with the hint beneath; the other `Row`s unchanged in meaning, level in layout.
+14. `tsc` clean; no console errors; nothing under `app/employee/*`.
 
-## 15. What's new
+## 16. What's new
 
 A new draft, the next free number, title **"Small fixes"**, one card: "The calendar's Week and Day now show a multi-day job on every day it covers and open at your first appointment. A job's page shows the site address, not the client's home. Clients opening a quote are no longer offered the app. Every date is day/month/year." Draft only; never publish.
 
-## 16. Report, and GitHub
+## 17. Report, and GitHub
 
-`memory/reports/round-fix-i-report.md`, starting "Fix Round I done": the five test files with their outcome, the eleven fixes with file:line, the suite before and after. **Then push to GitHub** (Save to GitHub) and name the commit in the report: `main` on GitHub is `1acc836`, Round 88 — Round 89's code and report (9 Nov) never arrived, and every round from here should end with a push. No code review. Do not start anything else after it. Do not offer next action items.
+`memory/reports/round-fix-i-report.md`, starting "Fix Round I done": the five test files with their outcome, the twelve fixes with file:line, the suite before and after. **Then push to GitHub** (Save to GitHub) and name the commit in the report: `main` on GitHub is `1acc836`, Round 88 — Round 89's code and report (9 Nov) never arrived, and every round from here should end with a push. No code review. Do not start anything else after it. Do not offer next action items.
