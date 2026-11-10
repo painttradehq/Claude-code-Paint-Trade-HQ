@@ -2,6 +2,8 @@
 
 Everything the admin chat has specced so far is built, except the items below. Order is a suggestion; Josh decides. One round at a time across both chats.
 
+**Order set by Josh, 10 Nov:** Fix Round I (sent) → Round 92 → Rounds 93 + 94 → Rounds 95, 96, 97 (prototypes first) → **the AI connection** (`connect-your-ai-exploration.md`: the write tools on the existing door first, then the sign-in for every business and the Connections section) → the rest.
+
 ## Ready now (a spec exists, waits for a word)
 
 | Item | What it is | Needs from Josh |
