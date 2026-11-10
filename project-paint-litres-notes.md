@@ -6,7 +6,11 @@ Prototype: **`project-paint-litres.html`** (open at 1440: the project's *Product
 
 `app/admin/project/[id].tsx:177`: the picker lists **one row per product per size** (`catalog … map(mt => mt.sizes.map(sz => …))`) and `POST /projects/{id}/materials` takes `{material_id, size_label, quantity: 1}` (`routes/projects.py:1238–1262`), snapshotting that size's price. The row shows *Dulux · 15L · $0.00/ea · × 1*. Round 88 built the litres logic for the quote: `services/paint.py` — `product_sizes` (your price per size), `fit_tins` (largest tins while whole ones fit, the remainder filled by the sizes below, against every all-one-size option; cheapest, then fewest tins) — and the quote's paint card lists one product once.
 
-## 2. The card (`project-products-card`)
+## 2. The card (`project-products-card`) — restyled 10 Nov at Josh's word ("as nice as the one in the estimate"): the same look as the quote's paint card (`PaintCard.tsx`, Round 88)
+
+Header **Paint for this job** in the display face with the sub-line *{n} products · {L} L · **{cost}** at your cost prices* and the 2 px rule; a table **Product · Litres · Tins · Colour · Cost** with the quote card's uppercase column heads, type and spacing: product bold with *{coverage} m²/L* under it, litres in mono (click to edit), tins text with *{L} L bought · n tins* under it, the colour and code fields in the Colour column with *✓ from the estimate* under them, the cost in mono, a quiet × to remove; a hint line under the table (*At your cost prices — what this job's paint costs you; the quote's paint card is what the client was charged …*). Build it with the same styles as `PaintCard.tsx` (or share its table pieces); the Add-paint picker sits between the header and the table.
+
+### The earlier description (the behaviour is unchanged)
 
 - **Head:** *Products on this job · n*, the sum (the tins' cost, not the litres), **+ Add paint** (`project-products-toggle`). Sub-line: *"Paint pulled from your Products catalogue, by the litre. Pick the product, type the litres — the tins and the cost work themselves out from your sizes and prices. Colour comes across from the estimate when it was chosen there; otherwise type it here so the crew know what to open."*
 - **Add paint, step 1** (`project-products-picker`): the search (`project-products-search`) and **one row per product** (`project-products-pick-{id}`): brand tile, name, *{brand} · {coverage} m² per litre per coat · 4L · 10L · 15L*, and *from $x/L* (the cheapest size per litre). No row per tin.
