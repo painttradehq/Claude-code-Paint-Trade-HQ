@@ -1,4 +1,4 @@
-# Round 96 — Paint on a job by the litre (10 November) — PROTOTYPED, waits for Josh's look, then "send" after Round 95 (needs Round 88 in the build — it is, unpublished)
+# Round 96 — Paint on a job by the litre (10 November) — SENT 10 Nov (`round96-message.md`, queued `dbpe25fq3e8s73ei0210` behind 93 + 94 and 95; the §8 defaults taken: cost price, automatic fit; Josh uploads `project-paint-litres.html` with "here")
 
 Prototype: **`project-paint-litres.html`** (open at 1440: the project's *Products on this job* card with two rows that came from the estimate → **+ Add paint** → one row per product with coverage and sizes → pick *Deck & Exterior Stain* → type 13 → the fit reads *1 × 10L + 3 × 1L · $362.00* as you type → Enter → the row → click a row's litres → type 22 → the tins re-fit; then 1024). Playwright `tools/test_litres.js` **16/16** at 1440 and 1024. Josh's note 4 of 10 Nov: *"each paint is wired to a particular litre size — let the admin choose the paint and write the litres."* Everything else on the project page is unchanged.
 
