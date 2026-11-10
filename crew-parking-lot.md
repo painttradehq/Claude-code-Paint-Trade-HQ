@@ -162,3 +162,11 @@ Closed by the 1–7 Nov rounds: crew sessions recorded/revoked (reset signs out 
 - **Back label**: `scope.tsx` calls `GET /projects/mine/{id}` only for the job name. Pass the name in the route params from the job page (`?name=`) and drop the second call.
 - **Areas with no kept line** (only a note or photos, or only an unchosen optional line) are not shown on Scope (Round E silence 3). Leave unless it bites.
 - **Crew 403 on a crew-visible attachment's PDF** (`test_r46_attachments::test_crew_switch_signed_link_rename_delete`, pre-existing before E): check the signed-link route for crew; if real, a one-fix round with the blob-route item.
+
+
+## Added 10 Nov (after Round C6b) — the next crew fix round
+- `backend/tests/test_crew_signup_audit.py::test_09` reads `GET /events` as crew (403 since C6b) and RSVPs an unshared event through the legacy route: read `/events/mine`, expect the named event only, RSVP through `POST /events/{id}/rsvp {going: true}`. Red in the suite until then.
+- `tests/c6b_api.py` (repo root) — the agent's helper with TS_ test passwords in plain text; delete.
+- `StackHdr` (`app/employee/training/index.tsx`) gains `titleTestID`; `crew-feedback-title` and `crew-events-title` rendered.
+- `components/crew/VideoPlayer.tsx` web iframe: `origin` back to `window.location.origin` (native keeps `APP_WEB_URL`).
+- Inbox: unread rows sort above read ones, so a read "Reply from …" can sit under older unread event rows (C6b silence 8) — look at it in the Inbox/invite pass.

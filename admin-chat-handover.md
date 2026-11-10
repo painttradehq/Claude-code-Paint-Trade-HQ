@@ -6,6 +6,8 @@
 Done since 25 Oct by the other chat (strike from the list below): item 9 (crew sessions recorded and revoked, 2 Nov); item 11 (SMS sender registration) still open; item 15 corrected: the birthday job is dormant (filters on `status`, never written) but still cross-tenant in its loop — fix and scope in one change, modelled on `services/doc_expiry.py`.
 
 
+**10 Nov — now blocking a crew path:** since crew Round C6b, crew see a calendar event only when the owner ticked **"Show to crew"** (`share_with_crew`, accepted by `POST /events` and `PUT /events/{id}`) or named them on it. No admin UI sets that flag yet, so until the Calendar's event form gets the tick, only named invitees see events in the crew app. One checkbox in the event form (and the drawer), default off; shared events with no invitees notify every crew member.
+
 Paste into the admin chat as its next small round or parking lot. Nothing here touches `app/employee/*`.
 
 ## Settings › Crew app
