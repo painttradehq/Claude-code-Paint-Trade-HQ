@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 96 — Paint on a job by litres — Paint Trade HQ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter:wght@400..700&family=IBM+Plex+Mono:wght@400..700&display=swap');
+:root{ --accent:#4B3E86; --accent-hover:#5C4C9E; --accent-bg:#F1EEFA; --accent-ink:#34295E; --success:#1C8A4B; --success-bg:#E7F6ED; --warning:#B45309; --warning-bg:#FCF0E1; --danger:#C6382E; --danger-bg:#FBEAEA; --bg:#FAF9F6; --surface:#FFFFFF; --surface-sunken:#F4F2EE; --border:#E7E3DA; --border-strong:#D8D3C7; --text-primary:#1E1C1A; --text-secondary:#6B675F; --text-muted:#9B968A; --font-display:'Fraunces',Georgia,serif; --font-body:'Inter',-apple-system,sans-serif; --font-mono:'IBM Plex Mono',Consolas,monospace; }
+*{ box-sizing:border-box; } html,body{ margin:0; background:var(--bg); color:var(--text-primary); font-family:var(--font-body); font-size:14px; }
+button{ font:inherit; cursor:pointer; } input{ font:inherit; }
+.app{ display:grid; grid-template-columns:260px 1fr; min-height:100vh; }
+.side{ background:var(--surface); border-right:1px solid var(--border); padding:18px 16px; display:flex; flex-direction:column; }
+.brand{ display:flex; align-items:center; gap:10px; padding:4px 4px 18px; } .brand .tile{ width:34px; height:34px; border-radius:9px; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; } .brand b{ font-family:var(--font-display); font-weight:600; font-size:16px; display:block; } .brand span{ font-size:11.5px; color:var(--text-secondary); }
+.grp{ font-size:11px; color:var(--text-muted); padding:12px 10px 4px; } .nav{ display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px; color:var(--text-primary); font-size:14px; } .nav.on{ background:var(--accent-bg); color:var(--accent-ink); font-weight:600; } .nav i{ width:16px; height:16px; border:1.5px solid currentColor; border-radius:4px; opacity:.6; display:inline-block; }
+.side .foot{ margin-top:auto; border-top:1px solid var(--border); padding-top:12px; display:flex; align-items:center; gap:10px; font-size:13px; } .side .foot .av{ width:34px; height:34px; border-radius:50%; background:var(--accent-bg); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
+.main{ padding:28px 48px 60px; min-width:0; max-width:1400px; }
+.crumb{ font-size:13px; color:var(--text-muted); margin-bottom:10px; } .crumb a{ color:var(--text-secondary); } .crumb b{ color:var(--text-primary); font-weight:600; }
+h1{ font-family:var(--font-display); font-weight:600; font-size:34px; margin:0 0 6px; letter-spacing:-.01em; } .pill{ display:inline-block; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; font-weight:600; color:var(--text-muted); background:var(--surface-sunken); border-radius:999px; padding:3px 9px; } .meta{ color:var(--text-secondary); font-size:14px; margin:8px 0 22px; }
+.card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 22px; max-width:1180px; }
+.ch{ display:flex; align-items:flex-start; gap:14px; } .ch h3{ margin:0; font-family:var(--font-display); font-weight:600; font-size:20px; } .ch h3 small{ font-family:var(--font-mono); font-size:13px; color:var(--text-muted); font-weight:400; margin-left:8px; } .ch .sub{ color:var(--text-secondary); font-size:13.5px; margin-top:4px; line-height:1.45; max-width:760px; } .ch .right{ margin-left:auto; display:flex; align-items:center; gap:14px; white-space:nowrap; } .ch .sum{ font-family:var(--font-mono); font-size:18px; font-weight:600; }
+.lnk{ border:none; background:none; color:var(--accent); font-weight:600; font-size:14px; padding:0; display:inline-flex; align-items:center; gap:4px; }
+/* picker */
+.picker{ margin-top:14px; border:1px solid var(--border); border-radius:12px; background:var(--surface-sunken); padding:12px; }
+.search{ display:flex; align-items:center; gap:8px; border:1px solid var(--border-strong); background:var(--surface); border-radius:9px; padding:0 12px; height:38px; color:var(--text-muted); } .search input{ border:none; outline:none; width:100%; background:none; font-size:14px; color:var(--text-primary); }
+.plist{ max-height:280px; overflow-y:auto; margin-top:8px; display:flex; flex-direction:column; gap:4px; }
+.prow{ display:flex; align-items:center; gap:12px; padding:9px 12px; border-radius:9px; background:var(--surface); border:1px solid var(--border); cursor:pointer; text-align:left; width:100%; } .prow:hover{ border-color:var(--accent); } .prow .sw{ width:30px; height:30px; border-radius:8px; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0; } .prow b{ font-size:14px; display:block; } .prow small{ color:var(--text-secondary); font-size:12.5px; } .prow .from{ margin-left:auto; font-family:var(--font-mono); font-size:12.5px; color:var(--text-secondary); white-space:nowrap; }
+.step2{ display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--surface); border:1px solid var(--accent); border-radius:10px; margin-top:8px; flex-wrap:wrap; } .step2 .lbl{ font-size:13px; } .step2 .lbl b{ display:block; font-size:14px; } .step2 input.l{ width:110px; height:38px; border:1px solid var(--border-strong); border-radius:8px; padding:0 10px; font-family:var(--font-mono); font-size:15px; text-align:right; } .step2 input.l:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-bg); } .step2 .unit{ font-size:13px; color:var(--text-secondary); } .step2 .fit{ font-family:var(--font-mono); font-size:12.5px; color:var(--text-secondary); margin-left:auto; } .step2 .fit b{ color:var(--text-primary); }
+.btn{ display:inline-flex; align-items:center; gap:7px; border:1px solid var(--border-strong); background:var(--surface); border-radius:9px; height:36px; padding:0 14px; font-weight:600; font-size:13.5px; color:var(--text-primary); white-space:nowrap; } .btn.primary{ background:var(--accent); border-color:var(--accent); color:#fff; } .btn.ghost{ border-color:transparent; background:none; color:var(--text-secondary); }
+/* rows */
+.rows{ margin-top:14px; border-top:1px solid var(--border); }
+.row{ display:grid; grid-template-columns:minmax(0,1fr) auto auto 40px; gap:14px; align-items:center; padding:14px 0; border-bottom:1px solid var(--border); }
+.row .nm{ font-size:15px; font-weight:600; } .row .sub{ color:var(--text-secondary); font-size:13px; margin-top:3px; } .row .sub .lit{ font-family:var(--font-mono); color:var(--text-primary); font-weight:600; cursor:pointer; border-bottom:1px dashed var(--border-strong); } .row .sub .lit:hover{ color:var(--accent); } .row .sub input.l{ width:84px; height:30px; border:1px solid var(--accent); border-radius:7px; padding:0 8px; font-family:var(--font-mono); font-size:14px; text-align:right; }
+.row .tins{ font-family:var(--font-mono); font-size:12.5px; color:var(--text-secondary); margin-top:2px; }
+.row .col{ display:flex; align-items:center; gap:8px; margin-top:8px; } .row .col input{ height:36px; border:1px solid var(--border-strong); border-radius:8px; padding:0 10px; font-size:13.5px; } .row .col .c1{ width:320px; } .row .col .c2{ width:170px; } .row .col .sq{ width:14px; height:14px; border-radius:4px; border:1px solid var(--border-strong); } .row .col .est{ font-size:12px; color:var(--success); }
+.row .cost{ font-family:var(--font-mono); font-size:16px; font-weight:600; text-align:right; min-width:90px; } .row .qty{ font-family:var(--font-mono); font-size:13px; color:var(--text-secondary); text-align:right; }
+.row .rm{ border:none; background:none; color:var(--text-muted); font-size:16px; } .row .rm:hover{ color:var(--danger); }
+.empty{ padding:24px 0 8px; color:var(--text-muted); font-size:13.5px; }
+.toast{ position:fixed; left:50%; bottom:28px; transform:translateX(-50%); background:#1E1C1A; color:#fff; padding:10px 16px; border-radius:10px; font-size:13px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:70; } .toast.show{ opacity:1; }
+@media (max-width:1100px){ .main{ padding:22px 24px 48px; } .row{ grid-template-columns:minmax(0,1fr) auto 40px; } .row .qty{ display:none; } .row .col .c1{ width:220px; } .row .col .c2{ width:130px; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><div class="tile">P</div><div><b>Paint Trade HQ</b><span>Harbourline Painting</span></div></div>
+    <a class="nav"><i></i>Dashboard</a>
+    <div class="grp">Pipeline</div><a class="nav"><i></i>Estimates</a><a class="nav"><i></i>Invoices</a><a class="nav on"><i></i>Live Projects</a><a class="nav"><i></i>CRM</a>
+    <div class="grp">Operations</div><a class="nav"><i></i>Calendar</a><a class="nav"><i></i>Daily Reports</a><a class="nav"><i></i>Timesheets</a><a class="nav"><i></i>Equipment</a>
+    <div class="grp">HR</div><a class="nav"><i></i>Employees</a><a class="nav"><i></i>Performance</a><a class="nav"><i></i>Contracts</a><a class="nav"><i></i>Training Videos</a>
+    <div class="foot"><div class="av">SR</div><div><b>Sam Reyes</b><div style="font-size:11.5px;color:var(--text-muted)">Owner · Admin</div></div></div>
+  </aside>
+  <main class="main">
+    <div class="crumb"><a>Live Projects</a> › <b>20 Convention Centre Place, South Wharf</b></div>
+    <h1>20 Convention Centre Place, South Wharf</h1>
+    <span class="pill">In progress</span>
+    <div class="meta">Commercial Exterior · EST-0028 · the page's other cards (Job site &amp; client, Crew, Job money, Labour…) are unchanged — this prototype is the Products card only.</div>
+
+    <section class="card" data-testid="project-products-card">
+      <div class="ch"><div><h3>Products on this job <small id="count"></small></h3><div class="sub">Paint pulled from your Products catalogue, by the litre. Pick the product, type the litres — the tins and the cost work themselves out from your sizes and prices. Colour comes across from the estimate when it was chosen there; otherwise type it here so the crew know what to open.</div></div>
+        <div class="right"><span class="sum" id="sum" data-testid="products-sum">$0.00</span><button class="lnk" id="toggle" data-testid="project-products-toggle">＋ Add paint</button></div></div>
+      <div id="picker"></div>
+      <div class="rows" id="rows"></div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+// ── catalogue sample: one product once, with its sizes and *your* prices (cost to the business) ──
+const CAT = [
+  { id:'p1', brand:'Dulux',  name:'Weathershield ColourGuard Low Sheen', cov:16, col:'#1F4E9A', sizes:[{label:'4L',litres:4,price:98},{label:'10L',litres:10,price:205},{label:'15L',litres:15,price:240}] },
+  { id:'p2', brand:'Dulux',  name:'Aquanamel Semi Gloss',                cov:16, col:'#1F4E9A', sizes:[{label:'1L',litres:1,price:42},{label:'4L',litres:4,price:118},{label:'10L',litres:10,price:262}] },
+  { id:'p3', brand:'Dulux',  name:'1 Step Prep Primer Sealer Undercoat',  cov:12, col:'#1F4E9A', sizes:[{label:'4L',litres:4,price:86},{label:'10L',litres:10,price:178},{label:'15L',litres:15,price:214}] },
+  { id:'p4', brand:'Haymes', name:'Solashield Low Sheen',                 cov:14, col:'#B5312A', sizes:[{label:'4L',litres:4,price:92},{label:'10L',litres:10,price:198},{label:'15L',litres:15,price:236}] },
+  { id:'p5', brand:'Haymes', name:'Ultra Premium Interior Low Sheen',     cov:16, col:'#B5312A', sizes:[{label:'4L',litres:4,price:84},{label:'10L',litres:10,price:186},{label:'15L',litres:15,price:226}] },
+  { id:'p6', brand:'Cabot’s', name:'Deck & Exterior Stain Water Based', cov:10, col:'#7A4B23', sizes:[{label:'1L',litres:1,price:38},{label:'4L',litres:4,price:118},{label:'10L',litres:10,price:248}] },
+  { id:'p7', brand:'Zinsser', name:'Cover Stain Oil Based Primer',        cov:11, col:'#8B1E24', sizes:[{label:'1L',litres:1,price:44},{label:'4L',litres:4,price:139}] },
+];
+// Round 88's fit: A = largest tins while whole ones fit, the remainder by the smallest size that covers it; B = all one size; cheapest, then fewest tins; largest first.
+function fitTins(need, sizes){ const S = [...(sizes || [])].sort((a, b) => a.litres - b.litres); if (!S.length || !(need > 0)) return []; const cost = (c) => c.reduce((s, x) => s + x.count * x.price, 0); const cnt = (c) => c.reduce((s, x) => s + x.count, 0);
+  let rem = need; const A = []; for (let k = S.length - 1; k >= 0; k--){ const s = S[k]; const n = Math.floor(rem / s.litres + 1e-9); if (n > 0){ A.push({ ...s, count: n }); rem = Math.round((rem - n * s.litres) * 1000) / 1000; } }
+  if (rem > 0.001){ const s = S.find(x => x.litres >= rem) || S[S.length - 1]; const e = A.find(x => x.label === s.label); if (e) e.count++; else A.push({ ...s, count: 1 }); }
+  const opts = [A, ...S.map(s => [{ ...s, count: Math.ceil(need / s.litres - 1e-9) }])]; opts.sort((a, b) => Math.round(cost(a) * 1e6) - Math.round(cost(b) * 1e6) || cnt(a) - cnt(b)); return opts[0].sort((a, b) => b.litres - a.litres); }
+const money = (n) => '$' + n.toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const r1 = (n) => Math.round(n * 10) / 10;
+const tinsText = (t) => t.map(x => `${x.count} × ${x.label}`).join(' + ');
+const lineCost = (t) => t.reduce((s, x) => s + x.count * x.price, 0);
+const $ = (s) => document.querySelector(s);
+let tt; const say = (m) => { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 2200); };
+
+// rows on the job (two came across from the estimate's paint card, Round 88)
+let rows = [
+  { id:'m1', pid:'p1', litres:13.4, colour:'Natural White', code:'SW1E1', fromEst:true },
+  { id:'m2', pid:'p2', litres:3,    colour:'Vivid White',   code:'SW1G1', fromEst:true },
+];
+let picking = false, q = '', chosen = null, litresIn = '';
+const prod = (id) => CAT.find(p => p.id === id);
+const mono = (b) => b.replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase();
+
+function renderPicker(){
+  if (!picking){ $('#picker').innerHTML = ''; $('#toggle').textContent = '＋ Add paint'; return; }
+  $('#toggle').textContent = '︿ Close';
+  const list = CAT.filter(p => !q || `${p.brand} ${p.name}`.toLowerCase().includes(q.toLowerCase()));
+  let h = `<div class="picker" data-testid="project-products-picker"><label class="search">🔍<input id="pq" placeholder="Search products — one row per product, pick it, then type the litres" data-testid="project-products-search" value="${q.replace(/"/g, '&quot;')}"></label>`;
+  if (chosen){ const p = prod(chosen); const L = parseFloat(litresIn); const fit = L > 0 ? fitTins(L, p.sizes) : [];
+    h += `<div class="step2" data-testid="picker-step-litres"><div class="lbl"><b>${p.brand} · ${p.name}</b>${p.cov} m² per litre per coat · ${p.sizes.map(s => s.label).join(' · ')}</div><input class="l" id="litres" type="number" step="0.1" min="0.1" placeholder="0.0" value="${litresIn}" data-testid="picker-litres" autofocus><span class="unit">litres</span><span class="fit" data-testid="picker-fit">${L > 0 ? `→ <b>${tinsText(fit)}</b> · ${money(lineCost(fit))}` : 'type the litres — tins and cost follow'}</span><button class="btn primary" data-testid="picker-add" ${L > 0 ? '' : 'disabled'}>Add</button><button class="btn ghost" data-testid="picker-back">Back</button></div>`; }
+  else {
+    h += `<div class="plist">${list.map(p => `<button class="prow" data-pick="${p.id}" data-testid="project-products-pick-${p.id}"><span class="sw" style="background:${p.col}">${mono(p.brand)}</span><span><b>${p.name}</b><small>${p.brand} · ${p.cov} m² per litre per coat · ${p.sizes.map(s => s.label).join(' · ')}</small></span><span class="from">from ${money(Math.min(...p.sizes.map(s => s.price / s.litres)))}/L</span></button>`).join('') || '<div class="empty">Nothing matches.</div>'}</div>`;
+  }
+  $('#picker').innerHTML = h + '</div>';
+  if (chosen) setTimeout(() => $('#litres')?.focus(), 20);
+}
+let editing = null;
+function renderRows(){
+  $('#count').textContent = rows.length || '';
+  let total = 0;
+  $('#rows').innerHTML = rows.length ? rows.map(r => { const p = prod(r.pid); const fit = fitTins(r.litres, p.sizes); const cost = lineCost(fit); total += cost; return `
+    <div class="row" data-testid="product-row-${r.id}">
+      <div><div class="nm">${p.name}</div><div class="sub">${p.brand} · ${editing === r.id ? `<input class="l" id="edit-l" type="number" step="0.1" min="0.1" value="${r.litres}" data-testid="row-litres-input-${r.id}"> L` : `<span class="lit" data-edit="${r.id}" data-testid="row-litres-${r.id}" title="Change the litres">${r.litres.toFixed(1)} L</span>`} → <span data-testid="row-tins-${r.id}">${tinsText(fit)}</span></div>
+        <div class="col"><span class="sq" style="background:${r.colour ? '#E4E3DC' : 'transparent'}"></span><input class="c1" placeholder="Colour / shade · e.g. Natural White, Low sheen" value="${r.colour || ''}" data-testid="row-colour-${r.id}"><input class="c2" placeholder="Code / hex" value="${r.code || ''}">${r.fromEst ? '<span class="est">✓ from the estimate</span>' : ''}</div></div>
+      <div class="qty">${fit.reduce((s, x) => s + x.count, 0)} tin${fit.reduce((s, x) => s + x.count, 0) === 1 ? '' : 's'}</div>
+      <div class="cost" data-testid="row-cost-${r.id}">${money(cost)}</div>
+      <button class="rm" data-rm="${r.id}" data-testid="row-remove-${r.id}" aria-label="Remove">🗑</button>
+    </div>`; }).join('') : '<div class="empty">No paint on this job yet — Add paint, pick the product, type the litres.</div>';
+  $('#sum').textContent = money(total);
+}
+const render = () => { renderPicker(); renderRows(); };
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('button, .lit'); if (!t) return;
+  if (t.id === 'toggle'){ picking = !picking; chosen = null; litresIn = ''; q = ''; render(); return; }
+  if (t.dataset.pick){ chosen = t.dataset.pick; litresIn = ''; render(); return; }
+  if (t.dataset.testid === 'picker-back'){ chosen = null; render(); return; }
+  if (t.dataset.testid === 'picker-add'){ const L = r1(parseFloat($('#litres').value)); if (!(L > 0)) return; const p = prod(chosen); rows.push({ id: 'n' + Math.random().toString(36).slice(2, 7), pid: chosen, litres: L, colour: '', code: '' }); picking = false; chosen = null; litresIn = ''; render(); const fit = fitTins(L, p.sizes); say(`${p.name} · ${L.toFixed(1)} L → ${tinsText(fit)} · ${money(lineCost(fit))}`); return; }
+  if (t.dataset.edit){ editing = t.dataset.edit; renderRows(); setTimeout(() => { const i = $('#edit-l'); i?.focus(); i?.select(); }, 20); return; }
+  if (t.dataset.rm){ const r = rows.find(x => x.id === t.dataset.rm); rows = rows.filter(x => x.id !== t.dataset.rm); renderRows(); say(`${prod(r.pid).name} removed.`); return; }
+});
+const commitEdit = () => { const i = $('#edit-l'); if (!i) return; const L = r1(parseFloat(i.value)); const r = rows.find(x => x.id === editing); if (L > 0 && r) r.litres = L; editing = null; renderRows(); if (L > 0 && r) say(`${prod(r.pid).name} · ${L.toFixed(1)} L → ${tinsText(fitTins(L, prod(r.pid).sizes))}`); };
+document.addEventListener('input', (e) => { if (e.target.id === 'pq'){ q = e.target.value; renderPicker(); const i = $('#pq'); i.focus(); i.setSelectionRange(q.length, q.length); } if (e.target.id === 'litres'){ litresIn = e.target.value; const p = prod(chosen); const L = parseFloat(litresIn); const fit = L > 0 ? fitTins(L, p.sizes) : []; $('[data-testid="picker-fit"]').innerHTML = L > 0 ? `→ <b>${tinsText(fit)}</b> · ${money(lineCost(fit))}` : 'type the litres — tins and cost follow'; $('[data-testid="picker-add"]').disabled = !(L > 0); } });
+document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.id === 'litres'){ $('[data-testid="picker-add"]').click(); } if (e.key === 'Enter' && e.target.id === 'edit-l'){ commitEdit(); } if (e.key === 'Escape'){ if (editing){ editing = null; renderRows(); } else if (picking){ picking = false; chosen = null; render(); } } });
+document.addEventListener('focusout', (e) => { if (e.target.id === 'edit-l') setTimeout(() => { if (editing) commitEdit(); }, 80); });
+render();
+</script>
+</body>
+</html>

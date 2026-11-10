@@ -154,7 +154,7 @@ function openDrawer(mode, e){
       <div class="pf"><button class="btn ghost" data-testid="ev-delete" style="color:var(--danger)">Delete</button><span class="sp"></span><button class="btn" data-testid="ev-edit">Edit</button></div></aside>`;
     return;
   }
-  const dates = `<div class="two"><div class="f"><label for="ev-date">Date</label><input class="inp" type="date" id="ev-date" data-testid="ev-date" value="${d.date}"></div><div class="f"><label for="ev-end">Ends on</label><input class="inp" type="date" id="ev-end" data-testid="ev-end" value="${d.end || d.date}" min="${d.date}"><div class="hint" id="ev-days" data-testid="ev-days"></div></div></div>`;
+  const dates = `<div class="two"><div class="f"><label for="ev-date">Date</label><input class="inp" type="date" lang="en-AU" id="ev-date" data-testid="ev-date" value="${d.date}"></div><div class="f"><label for="ev-end">Ends on</label><input class="inp" type="date" lang="en-AU" id="ev-end" data-testid="ev-end" value="${d.end || d.date}" min="${d.date}"><div class="hint" id="ev-days" data-testid="ev-days"></div></div></div>`;
   $('#pbox').innerHTML = `<div class="scrim" data-testid="ev-scrim"></div><aside class="panel" data-testid="ev-drawer" role="dialog" aria-label="${mode === 'new' ? 'New event' : 'Edit event'}"><div class="ph"><div><h2>${mode === 'new' ? 'New event' : 'Edit event'}</h2><div class="sub" id="ev-sub"><i style="background:${c.fg}"></i>${fmtRange(d)}</div></div><button class="x" data-testid="ev-close" aria-label="Close">×</button></div>
     <div class="pb">
       <div class="f"><label for="ev-title">Title</label><input class="inp" id="ev-title" data-testid="ev-title" placeholder="e.g. Site visit — Sarah Mitchell" value="${d.title.replace(/"/g, '&quot;')}"></div>
