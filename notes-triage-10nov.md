@@ -30,3 +30,8 @@ The 11:42 screenshot shows **Round 91 built**: the toolbar reads *Today ‹ › 
 ## E. Order
 
 Fix Round I (now with §6–§10) → Josh's word on 95 and 96 → their prototypes while 92, 93 + 94 build or wait. The crew half of Suppliers follows 93 in the crew chat.
+
+## F. Two more, later on 10 Nov
+
+- **Dates day/month/year with the slashes added** (his message was cut short; the intent is clear): 26 native date inputs already do that on an Australian device; three free-text fields with *YYYY-MM-DD* do not (the project strip's Start / Target finish, the invoice payment date, the follow-up Due). → **Fix I §11**: one shared `DateInput`, the three fields converted.
+- **The client picker under the keyboard** (screenshot, 17:00): the search autofocuses and the dialog is a fixed 360 px list that ignores the keyboard. → **Fix I §12**: autofocus only with a mouse; the dialog sized to the visible viewport so the list scrolls above the keys. My answer to "redesign or no keyboard until tapped": both halves, in that order — no autofocus on touch is the one-line part; the viewport-aware dialog is what makes typing a filter still usable.

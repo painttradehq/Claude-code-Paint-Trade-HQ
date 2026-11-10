@@ -50,13 +50,21 @@ On acceptance `routes/projects.py:505` sets `site_address = estimate.clientAddre
 
 `app/admin/project/[id].tsx:213–217` (Round 40 B46) renders every `[gap]` the model writes as the fixed phrase *not on record yet*; the 10 Nov summary read *"so the job needs a not on record yet and not on record yet"*. Fix: render the bracket's own words in muted italics (*a start date and a finish date*) with *not on record yet* as the hover title; and the summary prompt (`ai_routes.py`, the project-summary system text) says to write "no start date on record" in words rather than a bracket inside a sentence. Verify on a TS_ project with no dates: the sentence reads naturally; nothing else in the summary changes.
 
-## 11. Not in this round, and why
+## 11. Date fields: day / month / year everywhere, and no typing of dashes
+
+Josh, 10 Nov: *"go through all the pages — anywhere there is a place to add a date, make sure it is day/month/year with the slashes added for you."* Inventory at `1acc836`: **26 native `type="date"` inputs in 18 files** (CalDrawer, InvDialogs, ItemModal, the project page, MyHoursTab, XeroRow, MyobRow, AccountPage, RateModal, the builder's Dialogs, FileCard, the daily-reports FilterBar and ExportModal, the CRM Composer, IssueWizard, CountersignModal, CalRail, employee-detail) — these already show **dd/mm/yyyy on an Australian device** with a picker, and typing digits moves day → month → year by itself. **Three places are free text with an ISO placeholder** and are the ones Josh sees: the project strip's Start / Target finish (`app/admin/project/[id].tsx:30 DateIn`, the *YYYY-MM-DD* box in his screenshot), the invoice's record-payment date (`app/admin/invoices.tsx:252`), the estimate follow-up's Due (`app/admin/estimates.tsx:245`); `events.tsx:88/:161/:356` still carries DD/MM/YYYY ↔ ISO conversion code for a birthday field. Fix: one shared `components/shared/DateInput.tsx` — a native `type="date"` with `lang="en-AU"`, the app's input styling, an empty-state placeholder *dd/mm/yyyy*, and ISO `YYYY-MM-DD` in and out — used by the three text fields and by the 26 native ones as they are touched (no behaviour change for them); the birthday conversions in `events.tsx` go through it too. Verify: every date field on the admin pages shows day/month/year on a device set to en-AU and stores ISO; the project strip, the payment date and the follow-up Due open a picker and accept typed digits without a dash.
+
+## 12. The client picker on a tablet: the keyboard covers the list
+
+Josh, 10 Nov (screenshot): opening *Choose a client* in the builder focuses the search box at once, the on-screen keyboard rises and hides the list; he closes the keyboard to see it. `components/estimate/v2/Dialogs.tsx:53` autofocuses the search; the list is a fixed `maxHeight: 360` (`:54`) inside a centred dialog that does not know the keyboard is there. Fix, both halves: (a) **autofocus only with a mouse** — on a touch device (`(pointer: coarse)`) the field is not focused until tapped, so the list shows first; (b) **the dialog fits the visible viewport** — its height follows `window.visualViewport.height` (minus the margins) and the list scrolls inside it, so with the keyboard up the search stays at the top and the matching clients remain in view above the keys. The same two changes for the builder's other pickers that share `Dialog` (product and template choosers). Verify on Android Chrome at 390 and on a tablet: open Choose a client — list visible, no keyboard; tap the box — keyboard up, the list scrolls above it; desktop unchanged (focus on open).
+
+## 13. Not in this round, and why
 
 - **The CRM inbox at 390** (Round 87): code-verified only; Josh checks it on his phone after the publish — a note, not a build item.
 - **Equipment "there is no list of items"** (Josh's note 16): the page lists his one item; if he meant a standard list to add from (ladders, sprayers, drop sheets), that is a small design round, not a fix. Josh's word.
 - **Round 88's profile-defaults fix** (`admin_profile.py:281`) is already in.
 
-## 12. Verify (testing agent, 1440 then 1024; TS_ tenants; the owner's tenant read-only)
+## 14. Verify (testing agent, 1440 then 1024; TS_ tenants; the owner's tenant read-only)
 
 1. Each test file of §1 green, or the report names the case and the reason; the full suite before and after, chunked.
 2. The builder at 1024: one row, Send visible, the dot's title reads the saved time; at 1440 unchanged.
@@ -68,12 +76,14 @@ On acceptance `routes/projects.py:505` sets `site_address = estimate.clientAddre
 8. A TS_ acceptance with a job address: the project card, map and geofence at the site; the re-sync link corrects an older TS_ project.
 9. The strip never reads NaN; a project with an ISO start reads *Starts in n days*.
 10. The summary sentence on a TS_ project without dates reads naturally.
-11. `tsc` clean; no console errors; nothing under `app/employee/*`.
+11. Every admin date field shows day/month/year on an en-AU device and stores ISO; the three former text fields open a picker.
+12. Choose a client on Android at 390 and on a tablet: the list first, the keyboard only on tap, the list scrolling above the keys; desktop unchanged.
+13. `tsc` clean; no console errors; nothing under `app/employee/*`.
 
-## 13. What's new
+## 15. What's new
 
-A new draft, the next free number, title **"Small fixes"**, one card: "The calendar's Week and Day now show a multi-day job on every day it covers and open at your first appointment. A job's page shows the site address, not the client's home. Clients opening a quote are no longer offered the app." Draft only; never publish.
+A new draft, the next free number, title **"Small fixes"**, one card: "The calendar's Week and Day now show a multi-day job on every day it covers and open at your first appointment. A job's page shows the site address, not the client's home. Clients opening a quote are no longer offered the app. Every date is day/month/year." Draft only; never publish.
 
-## 14. Report, and GitHub
+## 16. Report, and GitHub
 
-`memory/reports/round-fix-i-report.md`, starting "Fix Round I done": the five test files with their outcome, the nine fixes with file:line, the suite before and after. **Then push to GitHub** (Save to GitHub) and name the commit in the report: `main` on GitHub is `1acc836`, Round 88 — Round 89's code and report (9 Nov) never arrived, and every round from here should end with a push. No code review. Do not start anything else after it. Do not offer next action items.
+`memory/reports/round-fix-i-report.md`, starting "Fix Round I done": the five test files with their outcome, the eleven fixes with file:line, the suite before and after. **Then push to GitHub** (Save to GitHub) and name the commit in the report: `main` on GitHub is `1acc836`, Round 88 — Round 89's code and report (9 Nov) never arrived, and every round from here should end with a push. No code review. Do not start anything else after it. Do not offer next action items.
