@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exploration — Connect your Claude — Paint Trade HQ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter:wght@400..700&family=IBM+Plex+Mono:wght@400..700&display=swap');
+:root{ --accent:#4B3E86; --accent-hover:#5C4C9E; --accent-bg:#F1EEFA; --accent-ink:#34295E; --success:#1C8A4B; --success-bg:#E7F6ED; --warning:#B45309; --warning-bg:#FCF0E1; --danger:#C6382E; --danger-bg:#FBEAEA; --bg:#FAF9F6; --surface:#FFFFFF; --surface-sunken:#F4F2EE; --border:#E7E3DA; --border-strong:#D8D3C7; --text-primary:#1E1C1A; --text-secondary:#6B675F; --text-muted:#9B968A; --font-display:'Fraunces',Georgia,serif; --font-body:'Inter',-apple-system,sans-serif; --font-mono:'IBM Plex Mono',Consolas,monospace; }
+*{ box-sizing:border-box; } html,body{ margin:0; background:var(--bg); color:var(--text-primary); font-family:var(--font-body); font-size:14px; }
+button{ font:inherit; cursor:pointer; } input{ font:inherit; }
+.views{ position:sticky; top:0; z-index:5; background:var(--surface); border-bottom:1px solid var(--border); padding:10px 24px; display:flex; gap:8px; align-items:center; font-size:12.5px; color:var(--text-muted); } .views button{ border:1px solid var(--border-strong); background:var(--surface); border-radius:999px; padding:5px 12px; font-size:12.5px; color:var(--text-secondary); } .views button.on{ background:var(--accent-bg); border-color:var(--accent-bg); color:var(--accent-ink); font-weight:600; }
+.app{ display:grid; grid-template-columns:260px 1fr; min-height:calc(100vh - 45px); }
+.side{ background:var(--surface); border-right:1px solid var(--border); padding:18px 16px; display:flex; flex-direction:column; }
+.brand{ display:flex; align-items:center; gap:10px; padding:4px 4px 18px; } .brand .tile{ width:34px; height:34px; border-radius:9px; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; } .brand b{ font-family:var(--font-display); font-weight:600; font-size:16px; display:block; } .brand span{ font-size:11.5px; color:var(--text-secondary); }
+.grp{ font-size:11px; color:var(--text-muted); padding:12px 10px 4px; } .nav{ display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px; color:var(--text-primary); font-size:14px; } .nav i{ width:16px; height:16px; border:1.5px solid currentColor; border-radius:4px; opacity:.6; display:inline-block; }
+.side .tools{ margin-top:auto; display:flex; gap:8px; padding:8px 4px 12px; border-bottom:1px solid var(--border); } .side .tools span{ width:40px; height:40px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; color:var(--text-secondary); } .side .tools span.on{ background:var(--accent-bg); color:var(--accent-ink); }
+.side .foot{ padding-top:12px; display:flex; align-items:center; gap:10px; font-size:13px; } .side .foot .av{ width:34px; height:34px; border-radius:50%; background:var(--accent-bg); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
+.main{ padding:32px 48px 120px; max-width:1400px; min-width:0; }
+.main h1{ font-family:var(--font-display); font-weight:600; font-size:31px; margin:0; letter-spacing:-.01em; } .main .lead{ margin:6px 0 24px; font-size:13.5px; color:var(--text-secondary); max-width:600px; line-height:1.5; }
+.shell{ display:flex; gap:32px; align-items:flex-start; }
+.rail{ width:220px; flex-shrink:0; display:flex; flex-direction:column; gap:2px; } .rail .gl{ font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); font-weight:600; padding:14px 12px 4px; } .rail .gl:first-child{ padding-top:0; } .rail button{ display:flex; align-items:center; gap:10px; width:100%; text-align:left; border:none; background:none; padding:10px 12px; border-radius:9px; font-size:14px; color:var(--text-primary); white-space:nowrap; } .rail button.on{ background:var(--accent-bg); color:var(--accent-ink); font-weight:600; } .rail button i{ width:14px; height:14px; border:1.5px solid currentColor; border-radius:4px; opacity:.6; display:inline-block; } .rail .tag{ margin-left:auto; font-size:10px; letter-spacing:.08em; color:var(--text-muted); background:var(--surface-sunken); border-radius:999px; padding:2px 7px; font-weight:600; }
+.content{ flex:1; min-width:0; max-width:960px; }
+.content h2{ margin:0; font-family:var(--font-display); font-weight:600; font-size:24px; } .content .pagesub{ margin:6px 0 10px; font-size:14px; color:var(--text-secondary); line-height:1.5; max-width:640px; }
+section.sec{ padding:26px 0; border-top:1px solid var(--border); } section.sec.first{ border-top:none; } .sec .ttl{ display:flex; align-items:center; gap:10px; } .sec h3{ margin:0; font-weight:600; font-size:16px; } .pill{ font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; font-weight:600; color:var(--text-muted); background:var(--surface-sunken); border-radius:999px; padding:3px 9px; } .pill.new{ color:var(--warning); background:var(--warning-bg); }
+.sec .desc{ margin:6px 0 18px; font-size:13.5px; line-height:1.5; color:var(--text-secondary); max-width:640px; }
+.muted{ font-size:12.5px; color:var(--text-muted); line-height:1.5; }
+.btn{ display:inline-flex; align-items:center; gap:7px; height:36px; padding:0 14px; border-radius:9px; border:1px solid var(--border-strong); background:var(--surface); font-weight:600; font-size:13.5px; color:var(--text-primary); white-space:nowrap; } .btn.primary{ background:var(--accent); border-color:var(--accent); color:#fff; } .btn.danger{ border:none; background:none; color:var(--danger); padding:0 8px; } .btn.sm{ height:32px; padding:0 11px; font-size:13px; }
+.card{ border:1px solid var(--border); border-radius:14px; background:var(--surface); overflow:hidden; }
+.hero{ display:flex; gap:16px; padding:18px 20px; align-items:center; } .hero .ic{ width:48px; height:48px; border-radius:14px; background:var(--accent-bg); color:var(--accent); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; font-size:20px; flex-shrink:0; } .hero b{ font-size:15px; display:block; } .hero .s{ font-size:13px; color:var(--text-secondary); margin-top:3px; line-height:1.45; }
+.conn{ display:flex; align-items:center; gap:12px; padding:12px 20px; border-top:1px solid var(--border); font-size:13.5px; } .conn .logo{ width:30px; height:30px; border-radius:8px; background:#1E1C1A; color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; font-size:14px; flex-shrink:0; } .conn b{ display:block; } .conn .s{ font-size:12px; color:var(--text-muted); margin-top:1px; } .conn .scope{ margin-left:auto; font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; font-weight:600; border-radius:999px; padding:3px 8px; color:var(--success); background:var(--success-bg); white-space:nowrap; } .conn .scope.drafts{ color:var(--warning); background:var(--warning-bg); }
+.foot{ padding:12px 20px; border-top:1px solid var(--border); background:var(--surface-sunken); font-size:12.5px; color:var(--text-secondary); display:flex; gap:8px; align-items:center; } .foot a{ color:var(--accent); font-weight:600; cursor:pointer; margin-left:auto; }
+.lim{ margin-top:12px; display:grid; grid-template-columns:1fr 1fr; gap:12px; } .lim > div{ border:1px solid var(--border); border-radius:12px; padding:12px 14px; font-size:13px; line-height:1.5; } .lim h5{ margin:0 0 4px; font-size:11px; letter-spacing:.08em; text-transform:uppercase; } .lim .can h5{ color:var(--success); } .lim .cant h5{ color:var(--danger); }
+/* dialogs */
+.modal-bg{ position:fixed; inset:0; background:rgba(20,16,10,.4); display:flex; align-items:center; justify-content:center; z-index:50; }
+.modal{ width:520px; background:var(--surface); border-radius:16px; padding:24px 26px; box-shadow:0 20px 60px rgba(20,16,10,.25); } .modal h4{ margin:0 0 6px; font-family:var(--font-display); font-weight:600; font-size:20px; } .modal p{ margin:0 0 14px; color:var(--text-secondary); font-size:13.5px; line-height:1.5; } .modal .bt{ display:flex; justify-content:flex-end; gap:8px; margin-top:16px; }
+.urlrow{ display:flex; gap:8px; align-items:center; } .urlrow code{ flex:1; font-family:var(--font-mono); font-size:13px; background:var(--surface-sunken); border:1px solid var(--border); border-radius:8px; padding:9px 12px; }
+.steps{ display:flex; flex-direction:column; gap:8px; margin-top:14px; } .steps div{ display:flex; gap:10px; align-items:flex-start; font-size:13.5px; line-height:20px; } .steps div i{ width:22px; height:22px; border-radius:11px; background:var(--accent-bg); color:var(--accent-ink); font-style:normal; font-weight:600; font-size:12px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+/* consent screen (what Claude opens) */
+.consent-wrap{ min-height:calc(100vh - 45px); display:flex; align-items:center; justify-content:center; background:var(--bg); padding:40px 20px; } .consent{ width:480px; background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:28px 30px; box-shadow:0 20px 60px rgba(20,16,10,.1); } .consent .logos{ display:flex; align-items:center; gap:14px; justify-content:center; margin-bottom:18px; } .consent .logos .t{ width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; font-size:20px; color:#fff; } .consent h3{ margin:0; font-family:var(--font-display); font-weight:600; font-size:22px; text-align:center; letter-spacing:-.01em; } .consent .who{ text-align:center; color:var(--text-secondary); font-size:13.5px; margin:6px 0 20px; }
+.scopes{ display:flex; flex-direction:column; gap:10px; } .sc{ display:flex; gap:12px; padding:12px 14px; border:1px solid var(--border); border-radius:12px; align-items:flex-start; } .sc input{ width:18px; height:18px; accent-color:var(--accent); margin-top:2px; } .sc b{ display:block; font-size:14px; } .sc .s{ font-size:12.5px; color:var(--text-secondary); margin-top:2px; line-height:1.45; }
+.never{ margin-top:12px; padding:10px 14px; background:var(--surface-sunken); border-radius:10px; font-size:12.5px; color:var(--text-secondary); line-height:1.5; } .never b{ color:var(--text-primary); }
+.consent .bt{ display:flex; gap:10px; margin-top:18px; } .consent .bt .btn{ flex:1; justify-content:center; height:42px; } .consent .fine{ text-align:center; font-size:11.5px; color:var(--text-muted); margin-top:12px; }
+/* claude chat illustration */
+.chat-wrap{ min-height:calc(100vh - 45px); display:flex; align-items:center; justify-content:center; background:#F5F4EF; padding:40px 20px; } .chat{ width:720px; background:#fff; border:1px solid #E6E3DC; border-radius:18px; overflow:hidden; box-shadow:0 20px 60px rgba(20,16,10,.08); } .chat .hd{ padding:12px 18px; border-bottom:1px solid #EEE; font-size:12.5px; color:#777; display:flex; gap:8px; align-items:center; } .chat .hd b{ color:#222; font-weight:600; } .chat .hd .c{ margin-left:auto; display:inline-flex; align-items:center; gap:6px; background:#F1EEFA; color:#34295E; border-radius:999px; padding:3px 9px; font-weight:600; }
+.chat .msgs{ padding:20px 22px; display:flex; flex-direction:column; gap:16px; font-size:14.5px; line-height:1.55; } .u{ align-self:flex-end; background:#F0EEE8; border-radius:14px; padding:10px 14px; max-width:70%; } .a{ max-width:88%; } .a .tool{ display:inline-flex; align-items:center; gap:8px; font-size:12.5px; color:#555; background:#F7F6F2; border:1px solid #EAE7E0; border-radius:8px; padding:5px 10px; margin-bottom:10px; } .a .tool .ok{ color:var(--success); font-weight:600; } .a table{ border-collapse:collapse; margin:8px 0; font-size:13.5px; } .a td{ padding:5px 12px 5px 0; border-bottom:1px solid #EEE; } .a td.n{ font-family:var(--font-mono); text-align:right; }
+.chat .perm{ margin:0 22px 18px; border:1px solid #E6E3DC; border-radius:12px; padding:12px 14px; font-size:13px; color:#333; display:flex; align-items:center; gap:12px; background:#FBFAF7; } .chat .perm .bt{ margin-left:auto; display:flex; gap:8px; } .chat .perm button{ border:1px solid #D8D3C7; background:#fff; border-radius:8px; padding:6px 12px; font-size:12.5px; font-weight:600; } .chat .perm button.allow{ background:#1E1C1A; color:#fff; border-color:#1E1C1A; }
+.toast{ position:fixed; left:50%; bottom:28px; transform:translateX(-50%); background:#1E1C1A; color:#fff; padding:10px 16px; border-radius:10px; font-size:13px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:70; } .toast.show{ opacity:1; }
+@media (max-width:1100px){ .main{ padding:24px 24px 100px; } .shell{ flex-direction:column; gap:18px; } .rail{ width:100%; flex-direction:row; flex-wrap:wrap; gap:4px; border-bottom:1px solid var(--border); padding-bottom:6px; } .rail .gl{ display:none; } .rail button{ width:auto; } .rail .tag{ margin-left:6px; } .lim{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="views">Exploration mock-up — three views: <button class="on" data-view="settings" data-testid="view-settings">1 · Settings › Connections</button><button data-view="consent" data-testid="view-consent">2 · What Claude opens to connect</button><button data-view="chat" data-testid="view-chat">3 · Inside Claude afterwards</button></div>
+
+<!-- view 1: settings -->
+<div id="v-settings" data-testid="v-settings">
+<div class="app">
+  <aside class="side">
+    <div class="brand"><div class="tile">P</div><div><b>Paint Trade HQ</b><span>Harbourline Painting</span></div></div>
+    <a class="nav"><i></i>Dashboard</a>
+    <div class="grp">Pipeline</div><a class="nav"><i></i>Estimates</a><a class="nav"><i></i>Invoices</a><a class="nav"><i></i>Live Projects</a><a class="nav"><i></i>CRM</a>
+    <div class="grp">Operations</div><a class="nav"><i></i>Calendar</a><a class="nav"><i></i>Daily Reports</a><a class="nav"><i></i>Timesheets</a><a class="nav"><i></i>Equipment</a>
+    <div class="grp">HR</div><a class="nav"><i></i>Employees</a><a class="nav"><i></i>Performance</a><a class="nav"><i></i>Contracts</a><a class="nav"><i></i>Training Videos</a>
+    <div class="tools"><span class="on">⚙</span><span>?</span></div>
+    <div class="foot"><div class="av">SR</div><div><b>Sam Reyes</b><div style="font-size:11.5px;color:var(--text-muted)">Owner · Admin</div></div></div>
+  </aside>
+  <main class="main">
+    <h1>Settings</h1>
+    <p class="lead">The outside services this business is connected to: where files are kept, which accounting software invoices go to, and the AI assistants that may read your business.</p>
+    <div class="shell">
+      <nav class="rail" data-testid="set-rail">
+        <div class="gl">Your business</div>
+        <button><i></i>Business</button><button><i></i>Suppliers</button><button class="on"><i></i>Connections</button><button><i></i>Crew app</button>
+        <div class="gl">You</div><button><i></i>Account</button><button><i></i>Alerts</button>
+        <div class="gl">Plan</div><button><i></i>Billing</button>
+        <div class="gl">Paint Trade HQ</div><button><i></i>Platform<span class="tag">JOSH ONLY</span></button>
+      </nav>
+      <div class="content">
+        <h2>Connections</h2>
+        <p class="pagesub">Files &amp; storage and Accounting sit above (Round 94). The new section below is the exploration.</p>
+        <section class="sec" data-testid="sec-ai">
+          <div class="ttl"><h3>AI assistants</h3><span class="pill">Saves at once</span><span class="pill new">Exploration</span></div>
+          <p class="desc">Let your own Claude read your business — and, if you allow it, leave drafts for you — from the Claude app on your phone or computer. Each admin connects their own. Nothing is sent, charged or deleted from outside the app.</p>
+          <div class="card" data-testid="ai-card">
+            <div class="hero"><div class="ic">C</div><div style="flex:1;min-width:0"><b>Your Claude</b><div class="s">Works with the Claude app on every plan — web, desktop, phone and Claude Code. You connect it from Claude; it signs in to Paint Trade HQ as you.</div></div><button class="btn primary" data-testid="ai-connect">Connect your Claude</button></div>
+            <div id="conns"></div>
+            <div class="foot"><span id="calls">48 calls this week</span><a data-testid="ai-audit">See the AI audit log</a></div>
+          </div>
+          <div class="lim">
+            <div class="can"><h5>What a connected Claude can do</h5>Read quotes, invoices and what is owed · clients and the Inbox · jobs, daily reports and who is on site · the crew and their documents · the calendar · products. With <b>drafts</b> allowed: start a draft quote, draft a reply, add a reminder or a note, add a calendar entry — for you to finish with a click.</div>
+            <div class="cant"><h5>What it can never do from outside</h5>Send a quote or an invoice · take or record money · pay crew · delete anything · change rates, prices or settings · reach another business. Every call is logged with who and which assistant.</div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</div>
+
+<!-- view 2: consent -->
+<div id="v-consent" data-testid="v-consent" hidden>
+  <div class="consent-wrap">
+    <div class="consent" data-testid="consent">
+      <div class="logos"><div class="t" style="background:#1E1C1A">C</div><span style="color:var(--text-muted)">→</span><div class="t" style="background:var(--accent)">P</div></div>
+      <h3>Claude wants to connect to Harbourline Painting</h3>
+      <div class="who">Signed in as <b>Sam Reyes</b> · Owner · <a style="color:var(--accent);font-weight:600">not you?</a></div>
+      <div class="scopes">
+        <label class="sc"><input type="checkbox" checked disabled data-testid="scope-read"><div><b>Read your business</b><div class="s">Quotes, invoices and money owed · clients and the Inbox · jobs, reports and the time clock · crew and documents · calendar · products. Only what your access in Paint Trade HQ already lets you see.</div></div></label>
+        <label class="sc"><input type="checkbox" data-testid="scope-drafts"><div><b>Leave drafts for you</b><div class="s">Start a draft quote, draft a reply, add a reminder, a client note or a calendar entry. Nothing goes out until you finish it in the app.</div></div></label>
+      </div>
+      <div class="never"><b>It will never</b> send a quote or an invoice, take or record money, pay crew, delete anything or change your settings. You can revoke this any time in Settings › Connections.</div>
+      <div class="bt"><button class="btn" data-testid="consent-cancel">Cancel</button><button class="btn primary" data-testid="consent-allow">Allow</button></div>
+      <div class="fine">You will be sent back to claude.ai. Paint Trade HQ shares no data with Anthropic beyond what Claude asks for in your chats.</div>
+    </div>
+  </div>
+</div>
+
+<!-- view 3: chat -->
+<div id="v-chat" data-testid="v-chat" hidden>
+  <div class="chat-wrap">
+    <div class="chat" data-testid="chat">
+      <div class="hd">Claude · <b>New chat</b><span class="c">● Paint Trade HQ connected</span></div>
+      <div class="msgs">
+        <div class="u">What's owed to us this week, and who's on site today?</div>
+        <div class="a">
+          <div class="tool"><span>Used <b>Paint Trade HQ</b> › money_owed, who_is_signed_in_today</span><span class="ok">✓</span></div>
+          <div>Three invoices are outstanding, <b>$6,450</b> in all, two of them overdue:</div>
+          <table><tr><td>INV-0088 · Priya Nair</td><td class="n">$2,760</td><td>due Fri</td></tr><tr><td>INV-0081 · Jo Okafor</td><td class="n">$2,760</td><td>9 days late</td></tr><tr><td>INV-0079 · Tom Whitfield</td><td class="n">$930</td><td>16 days late</td></tr></table>
+          <div>On site right now: <b>Mia</b> and <b>Daniel</b> at Whitfield interior (signed in 7:05), <b>Sam</b> at Okafor exterior (7:40). Want me to draft a reminder to Jo Okafor? I can leave it in your Inbox for you to send.</div>
+        </div>
+        <div class="u">Yes, draft it — polite.</div>
+      </div>
+      <div class="perm" data-testid="chat-perm"><span>Allow <b>Paint Trade HQ › draft_reply</b> for this chat? It writes a draft in your Inbox; it cannot send it.</span><div class="bt"><button data-testid="chat-deny">Deny</button><button class="allow" data-testid="chat-allow">Allow</button></div></div>
+    </div>
+  </div>
+</div>
+
+<div id="mbox"></div>
+<div class="toast" id="toast"></div>
+<script>
+const $ = (s) => document.querySelector(s); const $$ = (s) => Array.from(document.querySelectorAll(s));
+let tt; const say = (m) => { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 2400); };
+let conns = [
+  { id:'c1', client:'Claude', who:'Sam Reyes', when:'connected 3 Nov · last used 2 h ago', drafts:true },
+  { id:'c2', client:'Claude', who:'Priya Nair', when:'connected 8 Nov · last used yesterday', drafts:false },
+];
+const renderConns = () => {
+  $('#conns').innerHTML = conns.length ? conns.map(c => `<div class="conn" data-testid="ai-conn-${c.id}"><div class="logo">${c.client[0]}</div><div><b>${c.client} · ${c.who}</b><div class="s">${c.when}</div></div><span class="scope ${c.drafts ? 'drafts' : ''}">${c.drafts ? 'Read + drafts' : 'Read only'}</span><button class="btn danger sm" data-revoke="${c.id}" data-testid="ai-revoke-${c.id}">Revoke</button></div>`).join('') : `<div class="conn" style="color:var(--text-muted)" data-testid="ai-none">No assistant connected yet.</div>`;
+};
+const connectDialog = () => {
+  $('#mbox').innerHTML = `<div class="modal-bg" data-testid="modal"><div class="modal"><h4>Connect your Claude</h4><p>Claude connects from its own app, like any connector. Three steps, once per device signed in to your Claude account.</p>
+    <div class="urlrow"><code data-testid="ai-url">https://painttradehq.co/api/mcp</code><button class="btn sm" data-copy="https://painttradehq.co/api/mcp" data-testid="ai-copy">Copy</button></div>
+    <div class="steps"><div><i>1</i><span>In Claude, open <b>Customize › Connectors › Add custom connector</b>.</span></div><div><i>2</i><span>Paste the address above. Keep <b>Sign in now</b>. Click Add.</span></div><div><i>3</i><span>Claude opens Paint Trade HQ in your browser — tick what it may do, press <b>Allow</b>, and you are back in Claude.</span></div></div>
+    <p class="muted" style="margin-top:14px">The same address works in Claude on the web, Claude Desktop, the phone app and Claude Code. Claude asks you before it uses a tool the first time; you can block any tool in Claude's own settings.</p>
+    <div class="bt"><button class="btn" data-testid="modal-close">Done</button></div></div></div>`;
+};
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('button, a'); if (!t) return;
+  if (t.dataset.view) { $$('.views button').forEach(b => b.classList.toggle('on', b === t)); ['settings', 'consent', 'chat'].forEach(v => { $('#v-' + v).hidden = v !== t.dataset.view; }); return; }
+  if (t.dataset.testid === 'ai-connect') { connectDialog(); return; }
+  if (t.dataset.copy) { try { navigator.clipboard?.writeText(t.dataset.copy); } catch {} say('Address copied.'); return; }
+  if (t.dataset.testid === 'modal-close' || t.dataset.testid === 'modal-cancel') { $('#mbox').innerHTML = ''; return; }
+  if (t.dataset.revoke) { const c = conns.find(x => x.id === t.dataset.revoke); $('#mbox').innerHTML = `<div class="modal-bg" data-testid="modal"><div class="modal"><h4>Revoke ${c.client} for ${c.who}?</h4><p>That Claude stops reaching Paint Trade HQ on its next call. ${c.who} can connect again from Claude any time.</p><div class="bt"><button class="btn" data-testid="modal-cancel">Cancel</button><button class="btn primary" data-testid="modal-ok" data-rmid="${c.id}">Revoke</button></div></div></div>`; return; }
+  if (t.dataset.testid === 'modal-ok') { const c = conns.find(x => x.id === t.dataset.rmid); conns = conns.filter(x => x.id !== t.dataset.rmid); $('#mbox').innerHTML = ''; renderConns(); say(`${c.client} for ${c.who} revoked.`); return; }
+  if (t.dataset.testid === 'ai-audit') { say('Opens /admin/ai-audit-log filtered to “via connector”.'); return; }
+  if (t.dataset.testid === 'consent-allow') { const d = $('[data-testid="scope-drafts"]').checked; say(`Allowed — back to claude.ai with ${d ? 'read + drafts' : 'read only'}.`); return; }
+  if (t.dataset.testid === 'consent-cancel') { say('Cancelled — nothing connected.'); return; }
+  if (t.dataset.testid === 'chat-allow') { $('[data-testid="chat-perm"]').innerHTML = '<span>Draft left in your Inbox thread with Jo Okafor — <b>“Draft · not sent”</b>. Open the app to read it and send.</span>'; return; }
+  if (t.dataset.testid === 'chat-deny') { $('[data-testid="chat-perm"]').innerHTML = '<span>Not drafted. Nothing changed in Paint Trade HQ.</span>'; return; }
+});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('#mbox').innerHTML) $('#mbox').innerHTML = ''; });
+renderConns();
+</script>
+</body>
+</html>
