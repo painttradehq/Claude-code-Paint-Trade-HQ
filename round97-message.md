@@ -52,4 +52,8 @@ A new draft, the next free number, title **"Square metres, measured or typed"**,
 
 ## 8. Report, and GitHub
 
-`memory/reports/round97-area-sqm-report.md`, starting "Round 97 done": the verify items with screenshots at both widths, the face rule as built, the suite before and after, and the commit hash at the end so Josh can click **Save to GitHub**. No code review. Do not start anything else after it — stop and wait. Do not offer next action items.
+`memory/reports/round97-area-sqm-report.md`, starting "Round 97 done": the verify items with screenshots at both widths, the face rule as built, the suite before and after, and the commit hash at the end so Josh can click **Save to GitHub**. No code review. Do not offer next action items.
+
+## 9. Then publish (Josh's word, 10 Nov)
+
+When both Round 96 and Round 97 are reported, **publish the app** — the published variables stay exactly as they are (the connector's two among them). If publishing is not something you can do yourself, say so in one line and stop; Josh presses Publish. After that, stop and wait.
