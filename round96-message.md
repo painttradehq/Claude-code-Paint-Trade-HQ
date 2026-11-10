@@ -46,3 +46,7 @@ A new draft, the next free number, title **"Paint on a job, by the litre"**, one
 ## 7. Report, and GitHub
 
 `memory/reports/round96-paint-litres-report.md`, starting "Round 96 done": the verify items with screenshots at both widths, the fit table, the suite before and after, and the commit hash at the end so Josh can click **Save to GitHub**. No code review. Do not start anything else after it. Do not offer next action items.
+
+---
+
+**Correction sent 10 Nov (queued behind 93 + 94 and 95):** §3's bullet on acceptance rows had a wrong premise — today `_copy_estimate_colours` (`projects.py:422`, `:566`) copies only products with a colour, quantity 1, one size; Round 88's `paint_summary` is not written to the job; `projects.py:830` is the crew view's grouping. Round 96 builds it: on acceptance and from-estimate, one row per product in the quote's `paint_summary().products` with its litres, the tins fitted at cost price, `colour_from=estimate` when the quote chose a colour; `_copy_estimate_colours` replaced, not duplicated; one verify item added (a TS_ quote with two products, one coloured).
