@@ -1,6 +1,6 @@
 # Fix Round I — small fixes and the test debt (10 November) — READY, waits for Josh's word; no prototype needed
 
-From `fix-round-i-candidates.md` (7 Nov) checked against the code at `1acc836` (the latest on GitHub: Round 88; Round 89's code is not pushed yet — item 9). Backend and admin frontend only; nothing under `app/employee/*`; TS_ tenants only; the owner's tenant read-only; nothing published. Each item names the file and line as they stand.
+From `fix-round-i-candidates.md` (7 Nov) and Josh's notes of 10 Nov (`notes-triage-10nov.md`), checked against the code at `1acc836` (the latest on GitHub: Round 88; Round 89's code is not pushed yet — item 9). Backend and admin frontend only; nothing under `app/employee/*`; TS_ tenants only; the owner's tenant read-only; nothing published. Each item names the file and line as they stand.
 
 ## 1. The five test files that fail before any round touches them
 
@@ -30,25 +30,50 @@ After the fixes the suite runs chunked, as Rounds 85–89, and the report lists 
 
 The five feedbacks parked as *"let me duplicate a quote for a repeat client"* (FB-3f26b1ee, FB-36b69c40, FB-c809a766 on 22 Oct, 25 Oct, 2 Nov; FB-0db440e9 7 Nov; FB-a75f7ea5 8 Nov — `memory/PARKING_LOT.md:1501–1516`) all come from **TS_ Alpha Owner (TS_ Alpha Painting)** with the title *"R17b test idea"*: the testing agent's seeded idea from Round 17b, re-created on test runs, surviving the TS_ teardown, and then parked by the routine as though a painter had written it. Fix: (a) the TS_ teardown deletes feedback threads and messages whose tenant or author is `TS_`; (b) the platform feedback list and the sidebar's unread count (`/platform/feedback/unread`) exclude TS_ tenants; (c) the five rows are removed from the platform inbox and from `memory/PARKING_LOT.md`; (d) the Round 17b test keeps working against its own TS_ tenant. For the record: **Duplicate estimate already exists** in the builder's ⋯ menu (`Builder.tsx:91`, `more('dup')`) — it copies the quote for the same client; nothing to build.
 
-## 6. Not in this round, and why
+## 6. Week and Day: a multi-day entry on every day it covers, and the view opens where the day starts
+
+`components/calendar/WeekGrid.tsx:157` places all-day and multi-day entries with `allDay.filter(e => e.date === iso(d))`, so a job or any entry with an `end_date` shows on its **first day only** in Week and Day, while Month draws the whole bar (`calModel.ts:36 isSpan`). Fix: the predicate becomes `startOf(e) <= iso(d) && iso(d) <= endOf(e)` (the helpers at `calModel.ts:37–38`), and a bar that continues from the previous day or into the next shows a small › / ‹ at its edge. Second: the hour grid starts at 06:00 and opens at the top, so on a tablet the timed items of the day sit below the fold (Josh's 10 Nov screenshot, "3 things in view", one visible). Fix: on opening Day or Week, scroll the grid so the first timed item of the day is at the top, and to the business's operating-hours start when there is none. If Josh names another oddity (`notes-triage-10nov.md` §B 2), it joins here.
+
+## 7. No "install the app" on the client's pages
+
+`app/+html.tsx:35–39` links the admin manifest on every non-crew page, and `app/_layout.tsx:87` mounts `InstallAppBanner` everywhere but crew paths (`InstallAppBanner.tsx:16`), so the public quote, invoice, variation and report pages (`app/quote/[token].tsx`, `app/invoice/[token].tsx`, `app/variation/[token].tsx`, `app/report/[token].tsx`) and `/`, `/signup`, `/welcome`, `/terms`, `/privacy` are installable and show the banner — Josh saw it opening his own quote as the client. Fix: the manifest link and the apple-title meta only under `/admin` (admin manifest) and `/crew`, `/employee` (crew manifest) — in the head script and in the root layout's route-change re-apply; the banner mounts only there; on every other path `beforeinstallprompt` gets `preventDefault()` so Chrome's own bar stays away too. The service worker registration is untouched (asset cache). Verify: open a TS_ quote link in Chrome on Android and desktop — no banner, no install bar, the page works; the admin and crew doors still install.
+
+## 8. The project's site address is the job's, not the client's home
+
+On acceptance `routes/projects.py:505` sets `site_address = estimate.clientAddress`, geocodes it and writes `address`, `location_address`, `location_label` and the coordinates from it (`:553–558`), while the project's name (`:513`) already uses the estimate's job address (`jobAddressDetails`). Result (Josh's 10 Nov screenshot): title *20 Convention Centre Place, South Wharf*, card and map at the client's home. Fix: `site_address` = the job address when `jobAddressDetails` has a street (street, suburb, state, postcode joined), else the client address; geocode that; `_crew_address` (`:779`) follows unchanged; the *Job site & client* card shows the site under the client's name and *Open customer record* keeps the home. Existing projects: **no backfill**; the card gets a small **Re-sync from the estimate** link (the card already says *Synced from EST-…*) that re-derives address, coordinates and label for that one job on a click. Verify: a TS_ estimate with a job address different from the client's → accept → the project shows the site; the re-sync link fixes a TS_ project created before.
+
+## 9. "Starts in NaN days"
+
+`app/admin/project/[id].tsx:71` shows `Starts in ${daysUntil(p.start_date)} days`; `components/lists/ListKit.tsx:17 sod` runs `new Date(x)` on whatever is stored. Find what that project's `start_date` holds (Josh's job *20 Convention Centre Place* showed *09/10/2026* in the field and NaN in the strip); save ISO `YYYY-MM-DD` from the date input in every path that writes `start_date` / `target_end_date`; and when the days cannot be computed show *Starts {long date}*, never NaN. The same guard on `daysAgo` / `ago` where the strip uses them.
+
+## 10. The AI summary's gaps read as a sentence
+
+`app/admin/project/[id].tsx:213–217` (Round 40 B46) renders every `[gap]` the model writes as the fixed phrase *not on record yet*; the 10 Nov summary read *"so the job needs a not on record yet and not on record yet"*. Fix: render the bracket's own words in muted italics (*a start date and a finish date*) with *not on record yet* as the hover title; and the summary prompt (`ai_routes.py`, the project-summary system text) says to write "no start date on record" in words rather than a bracket inside a sentence. Verify on a TS_ project with no dates: the sentence reads naturally; nothing else in the summary changes.
+
+## 11. Not in this round, and why
 
 - **The CRM inbox at 390** (Round 87): code-verified only; Josh checks it on his phone after the publish — a note, not a build item.
 - **Equipment "there is no list of items"** (Josh's note 16): the page lists his one item; if he meant a standard list to add from (ladders, sprayers, drop sheets), that is a small design round, not a fix. Josh's word.
 - **Round 88's profile-defaults fix** (`admin_profile.py:281`) is already in.
 
-## 7. Verify (testing agent, 1440 then 1024; TS_ tenants; the owner's tenant read-only)
+## 12. Verify (testing agent, 1440 then 1024; TS_ tenants; the owner's tenant read-only)
 
 1. Each test file of §1 green, or the report names the case and the reason; the full suite before and after, chunked.
 2. The builder at 1024: one row, Send visible, the dot's title reads the saved time; at 1440 unchanged.
 3. A TS_ quote with one product on Walls and Trim: the client view, the public page and the PDF all read *Walls · Trim*.
 4. The payment flow of §4 without a reload.
 5. The platform feedback inbox shows no TS_ rows; the unread count ignores them; the teardown removes a seeded TS_ idea; Round 17b's own test still passes.
-6. `tsc` clean; no console errors; nothing under `app/employee/*`.
+6. Week and Day: a TS_ job over three days shows on all three; the day opens at its first timed item.
+7. A TS_ quote link on Android Chrome and desktop: no install banner, no install bar; the admin and crew doors still install.
+8. A TS_ acceptance with a job address: the project card, map and geofence at the site; the re-sync link corrects an older TS_ project.
+9. The strip never reads NaN; a project with an ISO start reads *Starts in n days*.
+10. The summary sentence on a TS_ project without dates reads naturally.
+11. `tsc` clean; no console errors; nothing under `app/employee/*`.
 
-## 8. What's new
+## 13. What's new
 
-No draft — nothing a user sees changes except the builder bar at 1024 and the money card refreshing, which need no note.
+A new draft, the next free number, title **"Small fixes"**, one card: "The calendar's Week and Day now show a multi-day job on every day it covers and open at your first appointment. A job's page shows the site address, not the client's home. Clients opening a quote are no longer offered the app." Draft only; never publish.
 
-## 9. Report, and GitHub
+## 14. Report, and GitHub
 
-`memory/reports/round-fix-i-report.md`, starting "Fix Round I done": the five test files with their outcome, the four fixes with file:line, the suite before and after. **Then push to GitHub** (Save to GitHub) and name the commit in the report: `main` on GitHub is `1acc836`, Round 88 — Round 89's code and report (9 Nov) never arrived, and every round from here should end with a push. No code review. Do not start anything else after it. Do not offer next action items.
+`memory/reports/round-fix-i-report.md`, starting "Fix Round I done": the five test files with their outcome, the nine fixes with file:line, the suite before and after. **Then push to GitHub** (Save to GitHub) and name the commit in the report: `main` on GitHub is `1acc836`, Round 88 — Round 89's code and report (9 Nov) never arrived, and every round from here should end with a push. No code review. Do not start anything else after it. Do not offer next action items.

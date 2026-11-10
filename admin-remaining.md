@@ -6,7 +6,7 @@ Everything the admin chat has specced so far is built, except the items below. O
 
 | Item | What it is | Needs from Josh |
 |---|---|---|
-| **Fix Round I** (`fix-round-i-notes.md`, 10 Nov; no prototype needed) | The five test files that fail before any round (r78, tier gating, r46, r63, r19 test_42 — fix behaviour or test, never delete); the builder's top bar on one row at 1024; the client document's product rows printing every surface; the project's Job money card refreshing on return from a payment; the "R17b test idea" feedbacks are TS_ test residue, not a tester — teardown and the platform inbox exclude TS_, the five rows go; Round 89's code pushed to GitHub at the end of the round. | One word, then "send" (after 92, 93 + 94, or before them — Josh's order) |
+| **Fix Round I** (`fix-round-i-notes.md`, 10 Nov; no prototype needed) | The five test files that fail before any round (r78, tier gating, r46, r63, r19 test_42 — fix behaviour or test, never delete); the builder's top bar on one row at 1024; the client document's product rows printing every surface; the project's Job money card refreshing on return from a payment; the "R17b test idea" feedbacks are TS_ test residue, not a tester — teardown and the platform inbox exclude TS_, the five rows go; **from Josh's 10 Nov notes:** Week and Day showing a multi-day job on every day and opening at the first appointment; no install banner on the client's quote, invoice, variation and report pages; the project's site address from the estimate's job address, not the client's home (+ a Re-sync link); "Starts in NaN days"; the AI summary's "not on record yet" mid-sentence; Round 89's code pushed to GitHub at the end of the round. | One word, then "send" (after 92, 93 + 94, or before them — Josh's order) |
 | **Contracts by email only** (`contracts-email-only.md`) | The signed contract PDF is attached to both the crew's and the owner's email (today the crew email says "Attached" and attaches nothing); the PDF stops being stored as text in the record and is rendered on request. | One word: yes/no. Then "send". |
 | **Fix Round G** | The fixes found by the check rounds (`admin-check-rounds.md`), plus what is already known: the help bubble covering the builder's bottom line at 1024; the four open questions (admin shell bouncing `/terms` and `/privacy`; Timesheets drawer "General" shown as "On site"; what the dashboard lost with the sign-in widget; the job drawer's crew-notes toggle). | Run Check 1–7, send the findings here. |
 
@@ -14,6 +14,8 @@ Everything the admin chat has specced so far is built, except the items below. O
 
 | Item | What it is | Needs from Josh |
 |---|---|---|
+| **Round 95 — Event with an end date** (`notes-triage-10nov.md` §C; Josh's note 1 of 10 Nov) | *Ends on* in the New / Edit event drawers (the model already has `start_date / end_date`); the month draws the joined bar it already draws for jobs; Week and Day show it on every day covered (with Fix I §6). | "go" → prototype → "send" |
+| **Round 96 — Paint on a job by litres** (`notes-triage-10nov.md` §C; Josh's note 4 of 10 Nov) | Project › Products on this job › Add paint lists each product once, then a Litres field; the server fits the tins with Round 88's `fit_tins`; the row reads *13.4 L → 1 × 15 L · $240*; the crew's materials list shows litres and tins. | "go" → prototype → "send" (after Round 88 is published) |
 
 ## From the security audit (21 October, run by Josh in Emergent)
 
