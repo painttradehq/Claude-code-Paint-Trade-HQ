@@ -2,7 +2,7 @@
 
 Everything the admin chat has specced so far is built, except the items below. Order is a suggestion; Josh decides. One round at a time across both chats.
 
-**Order set by Josh, 10 Nov:** Fix Round I (sent) → Round 92 → Rounds 93 + 94 → Rounds 95, 96, 97 (prototypes first) → **as of 10 Nov evening:** Fix I, 92, 93 + 94, 95 and **98 (Connect your Claude, owner only) are BUILT** at Emergent, HEAD `e1d4b4f`, none pushed or published yet — Josh clicks Save to GitHub, adds the two connector variables to the published app and publishes; **Round 96 is on hold** (credit); then 97, then the sign-in for every business → the rest.
+**Order set by Josh, 10 Nov:** Fix Round I (sent) → Round 92 → Rounds 93 + 94 → Rounds 95, 96, 97 (prototypes first) → **as of 10 Nov night:** Fix I, 92, 93 + 94, 95 and **98 are PUBLISHED** (`/api/mcp/health` → 2.0.0, configured, 51 tools; Josh's own key); Save to GitHub for `e1d4b4f` is Josh's click if not yet done; **Round 96 is on hold** (credit); then 97, then the sign-in for every business → the rest.
 
 ## Ready now (a spec exists, waits for a word)
 
