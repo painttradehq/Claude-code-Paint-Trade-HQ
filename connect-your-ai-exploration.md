@@ -91,6 +91,7 @@ Settings › **Connections** gains a third section, **AI assistants** (*Saves at
 2. **Per person (recommended) or owner only.**
 3. **Which actions, if any, in the first version** — reads only is a complete, useful first release.
 4. **Directory listing** ("Paint Trade HQ" in Anthropic's Connectors Directory) later — a marketing step with its own review.
+5. **Decided 10 Nov (Josh): no second gate inside the app for riskier edits** such as changing a quote already sent. Claude's own confirmation in front of the admin is the gate; the admin approving in Claude is the admin's own act. The audit log still records every call.
 
 ## 9. Recommendation and a staged path (when Josh wants it; none of this is scheduled)
 
