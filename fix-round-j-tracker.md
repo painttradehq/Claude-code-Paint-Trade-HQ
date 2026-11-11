@@ -4,7 +4,13 @@ Emergent is out of credit, so the fixes are written here, one commit per bug, on
 
 Order: Josh's *Fix first* (B-001, B-002, B-003, B-025, B-033, B-035, B-042, B-044, B-051, B-058), then by area.
 
-**11 Nov, evening — the ten *Fix first* items are all on the branch** (plus B-037 and B-052, which fell out of the same root causes). Branch `claude/fix-round-j` is pushed: `f9d37af` (B-001) → `6f89dce` → `7c1896c` → `7d5ee79` → `bf81dc8` → `c5042ab` → `15981d2` → `4ddd7af`. Checked here: every touched backend file compiles; the pure tests run green (27: 8 quote terms + 5 pricing source + 14 quote guard); `tsc --noEmit` on the frontend shows only the one error that was already on `main` (`CoverageBar.tsx:86`). Not checked here: the Mongo-backed suite, the testing agent, the screens in a browser — that is Emergent's merge step (§ below) and then Josh's Publish.
+**11 Nov, evening — the ten *Fix first* items are all on the branch** (plus B-037 and B-052, which fell out of the same root causes). Branch `claude/fix-round-j` is pushed: `f9d37af` (B-001) → `6f89dce` → `7c1896c` → `7d5ee79` → `bf81dc8` → `c5042ab` → `15981d2` → `4ddd7af`. **Second batch, same evening:** `2cdc57e` (B-029 / B-047 / B-055 / B-012 / B-039 — one job-money truth in `services/job_money.py`), `79fffc2` (B-005), `22ab1c4` (B-038) — 11 commits on top of `main` `5e16d97`, 20 bugs. Checked here: every touched backend file compiles; the pure tests run green (34: 8 quote terms + 5 pricing source + 14 quote guard + 7 job money); `tsc --noEmit` on the frontend shows only the one error that was already on `main` (`CoverageBar.tsx:86`). Not checked here: the Mongo-backed suite, the testing agent, the screens in a browser — that is Emergent's merge step and then Josh's Publish.
+
+**Handover:** Josh (11 Nov, evening): *"Emergent has credit now. When you're done ask it to fix these issues."* The brief sent to Emergent is `fix-round-j-emergent-brief.md`: Part A merges and verifies this branch, Part B is every remaining line below with my read and a code pointer; seven items are marked **ask Josh** (B-023, B-060, B-046, B-048) or **hold for a prototype from this chat** (B-026, B-040) or **not this round** (B-014 crew path; B-041/B-054/B-057 features).
+
+- **B-029 / B-047 / B-055 / B-012 / B-039 (`2cdc57e`)** — `services/job_money.py` is now the one snapshot the job page, the jobs list and the connector read: revenue to date = what is invoiced (raised invoices less credits), never the whole quote; overhead accrues as overhead % × invoiced instead of in full on day one; profit so far = invoiced − cost to date, shown as "Nothing invoiced yet" until something is (the chip and the list say "quoted"/"est" until then, "so far" after); the projection keeps the full overhead. The list counts a job as invoiced only once an invoice is *raised*, so the deposit auto-drafted on accept reads "Deposit invoice drafted · not sent" instead of "Invoiced $0.00 · paid in full". `money()` prints a loss as "-$595.19" and Expected profit turns red when negative. *Confirm:* a started job with nothing invoiced, then with the deposit sent — see Part A of the brief.
+- **B-005 (`79fffc2`)** — Business performance income was the quoted total of jobs marked done/invoiced at their completion month; it is now every payment recorded on the tenant's invoices in the month it was paid. *Confirm:* record a payment → the month's income bar equals it.
+- **B-038 (`22ab1c4`)** — Dashboard "on the books" now sums live jobs plus accepted-not-started jobs (the card already counted the latter as "not started").
 
 ### What each fix does and how Josh confirms it (after merge + publish)
 
@@ -53,24 +59,24 @@ Order: Josh's *Fix first* (B-001, B-002, B-003, B-025, B-033, B-035, B-042, B-04
 | B-031 | Invoices | Low | Long email address runs over the next card | open |
 | B-032 | Invoices | Low | Deposit invoice isn't linked to the job in the data | open |
 | B-043 | Invoices | Medium | Paid invoice moved back to draft keeps its payment and won't recalculate | open |
-| B-005 | Jobs | Medium | Business performance shows $0 income despite paid invoices | open |
-| B-012 | Jobs | Low | Cards say "paid in full" when nothing is invoiced | open |
+| B-005 | Jobs | Medium | Business performance shows $0 income despite paid invoices | **FIXED** `79fffc2` — income = payments by month |
+| B-012 | Jobs | Low | Cards say "paid in full" when nothing is invoiced | **FIXED** `2cdc57e` — raised invoices only; drafted deposit says so |
 | B-018 | Jobs | Low | Target finish can be set before the start date | open |
 | B-027 | Jobs | Medium | Internal quote notes show as "Site access" (crew may see them) | open |
 | B-028 | Jobs | Medium | Timeline says "from the client" for manual accepts; wrong times and order | open |
-| B-029 | Jobs | Medium | Job money counts the whole quote as revenue already earned | open |
+| B-029 | Jobs | Medium | Job money counts the whole quote as revenue already earned | **FIXED** `2cdc57e` — revenue to date = invoiced (`services/job_money.py`) |
 | B-034 | Jobs | Medium | Completion report promises a 2-year warranty | open |
 | B-036 | Jobs | Low–medium | "Text client" texts a landline | open |
 | B-037 | Jobs | Low | New job is named after the client, so the name shows twice | **FIXED** `7d5ee79` — same root as B-025 (name = job tag → street + suburb → Estimate number) |
-| B-038 | Jobs | Medium | "On the books" leaves out accepted jobs that haven't started | open |
-| B-039 | Jobs | Low | Negative profit shows as "$-595.19" in green | open |
+| B-038 | Jobs | Medium | "On the books" leaves out accepted jobs that haven't started | **FIXED** `22ab1c4` — dashboard sums live + accepted-not-started |
+| B-039 | Jobs | Low | Negative profit shows as "$-595.19" in green | **FIXED** `2cdc57e` — "-$595.19", red when negative |
 | B-040 | Jobs | Low–medium | Job page squashed at tablet width | open |
 | B-045 | Jobs | Medium | Starting a job sets a target finish date on its own | open |
 | B-046 | Jobs | Low | A past start date doesn't start the job | open |
-| B-047 | Jobs | Low–medium | Actual cost includes the full overhead from day one | open |
+| B-047 | Jobs | Low–medium | Actual cost includes the full overhead from day one | **FIXED** `2cdc57e` — overhead % × invoiced so far |
 | B-052 | Jobs | Low–medium | Crew with no hourly rate are costed at a guessed $55/h | **FIXED** `7c1896c` — Quote setup's average crew cost, still flagged "est." |
 | B-053 | Jobs | Low | Deleting an expense has no confirmation | open |
-| B-055 | Jobs | Medium | Job profit on the page disagrees with the data | open |
+| B-055 | Jobs | Medium | Job profit on the page disagrees with the data | **FIXED** `2cdc57e` — page, list and connector read the same snapshot |
 | B-004 | Timesheets | Medium | Dashboard crew hours (53.2) don't match Timesheets (32.92) | open |
 | B-048 | Timesheets | Medium | Daily reports can't be backdated; no per-person hours | open |
 | B-049 | Timesheets | Low | Timesheet change log doesn't show job changes; saving re-rounds hours | open |
