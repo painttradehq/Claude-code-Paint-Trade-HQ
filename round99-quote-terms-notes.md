@@ -24,6 +24,8 @@ Settings › Quote setup › **Terms** (`components/estimates/QsTermsTab.tsx`) s
 
 A **Terms** picker in the builder's Quote details: a select of the business's templates with the default pre-chosen, writing `terms_template_id`; the Client view updates at once. Until then the choice per quote is only through the API (or the connector's `update_quote`, which passes the field through), and every quote prints the default template — which is what Josh asked for first.
 
+**Widened by Josh on 12 Nov (parking lot, `admin-remaining.md`):** not just a picker — a *Terms & conditions* card in the builder itself, under "Paint for this quote", framed as the Client view prints it and **editable per quote**; edits save to the quote's own `contract_terms` (already first in this module's order), with *Reset to template* and the picker in the card header. Prototype first.
+
 ## 5. What Josh does now
 
 Settings › Quote setup › **Terms**: write the wording as numbered lines (`1. Title — text`), one template, **Set default**. Nothing changes on the live app until the branch is merged and published; until then the placeholders still print.
