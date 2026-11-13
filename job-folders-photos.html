@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job folder — photos and videos filed by phase — Paint Trade HQ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter:wght@400..700&family=IBM+Plex+Mono:wght@400..700&display=swap');
+:root{ --accent:#4B3E86; --accent-hover:#5C4C9E; --accent-bg:#F1EEFA; --accent-ink:#34295E; --success:#1C8A4B; --success-bg:#E7F6ED; --warning:#B45309; --warning-bg:#FCF0E1; --danger:#C6382E; --danger-bg:#FBEAEA; --bg:#FAF9F6; --surface:#FFFFFF; --surface-sunken:#F4F2EE; --border:#E7E3DA; --border-strong:#D8D3C7; --text-primary:#1E1C1A; --text-secondary:#6B675F; --text-muted:#9B968A; --font-display:'Fraunces',Georgia,serif; --font-body:'Inter',-apple-system,sans-serif; --font-mono:'IBM Plex Mono',Consolas,monospace; }
+*{ box-sizing:border-box; } html,body{ margin:0; background:#ECE9E2; color:var(--text-primary); font-family:var(--font-body); font-size:14px; }
+button{ font:inherit; cursor:pointer; color:inherit; } select{ font:inherit; }
+svg{ display:block; }
+
+/* ── prototype bar (not part of the app) ── */
+.protobar{ position:sticky; top:0; z-index:40; background:#1E1C1A; color:#fff; padding:10px 16px; display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center; font-size:12.5px; }
+.protobar .lab{ color:#B9B4A8; margin-right:6px; }
+.seg{ display:inline-flex; background:#34312D; border-radius:9px; padding:3px; gap:2px; flex-wrap:wrap; }
+.seg button{ border:none; background:none; color:#D9D5CC; padding:6px 10px; border-radius:7px; font-size:12.5px; font-weight:600; }
+.seg button.on{ background:#fff; color:#1E1C1A; } .seg button:disabled{ opacity:.35; cursor:not-allowed; }
+.stagewrap{ display:flex; gap:28px; align-items:flex-start; justify-content:center; padding:26px 20px 60px; flex-wrap:wrap; }
+
+/* ── crew phone ── */
+.phone{ width:390px; max-width:100%; background:var(--bg); border-radius:30px; border:1px solid var(--border-strong); box-shadow:0 18px 50px rgba(30,28,26,.18); overflow:hidden; position:relative; }
+.phone .pad{ padding:22px 16px 26px; }
+.back{ display:inline-flex; align-items:center; gap:6px; color:var(--accent); font-weight:600; font-size:15px; border:none; background:none; padding:0; }
+.jt{ font-family:var(--font-display); font-weight:600; font-size:27px; line-height:1.12; margin:14px 0 4px; letter-spacing:-.01em; }
+.ja{ color:var(--text-secondary); font-size:15px; }
+.two{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0 6px; }
+.bigbtn{ height:46px; border-radius:12px; border:1px solid var(--border-strong); background:var(--surface); font-weight:600; font-size:15px; }
+.bigbtn.pri{ background:var(--accent); border-color:var(--accent); color:#fff; }
+.sect{ font-size:12px; letter-spacing:.09em; text-transform:uppercase; color:var(--text-muted); font-weight:600; margin:22px 4px 8px; }
+.pcard{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:14px; }
+.help{ font-size:13px; color:var(--text-muted); line-height:1.4; }
+.cam{ width:100%; margin-top:12px; height:48px; border-radius:12px; border:1.5px solid var(--accent); background:var(--accent-bg); color:var(--accent-ink); font-weight:600; font-size:15px; display:flex; align-items:center; justify-content:center; gap:9px; }
+.cam:active{ background:#E6E0F7; }
+.goes{ display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--text-secondary); margin-top:8px; }
+.goes b{ color:var(--text-primary); font-weight:600; }
+.dot{ width:8px; height:8px; border-radius:50%; flex:none; }
+.k-before{ background:#2E7DA1; } .k-process{ background:#B7791F; } .k-after{ background:#1C8A4B; }
+.chips{ display:flex; gap:6px; margin:14px 0 12px; flex-wrap:wrap; }
+.chip{ height:32px; padding:0 11px; border-radius:9px; border:1px solid var(--border); background:#fff; font-weight:600; font-size:13px; white-space:nowrap; }
+.chip.on{ background:var(--accent-bg); border-color:var(--accent); color:var(--accent); }
+.grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.tile{ position:relative; aspect-ratio:1; border-radius:10px; overflow:hidden; border:none; padding:0; background:#ddd; }
+.tile .ph{ position:absolute; inset:0; }
+.tile .tag{ position:absolute; left:5px; bottom:5px; font-size:10px; font-weight:600; padding:2px 6px; border-radius:99px; background:rgba(255,255,255,.92); color:var(--text-primary); display:flex; align-items:center; gap:4px; }
+.tile .vid{ position:absolute; right:5px; top:5px; font-size:10px; font-weight:600; padding:2px 6px; border-radius:99px; background:rgba(30,28,26,.78); color:#fff; display:flex; align-items:center; gap:4px; font-family:var(--font-mono); }
+.tile .up{ position:absolute; inset:0; background:rgba(255,255,255,.72); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; font-size:11px; font-weight:600; color:var(--accent-ink); }
+.tile .bar{ width:60%; height:4px; border-radius:2px; background:#DCD6EF; overflow:hidden; } .tile .bar i{ display:block; height:100%; width:40%; background:var(--accent); animation:up 0.9s linear forwards; }
+@keyframes up{ from{ width:5%; } to{ width:100%; } }
+.none{ grid-column:1/-1; font-size:13px; color:var(--text-muted); padding:6px 2px; }
+
+/* bottom sheet + viewer */
+.scrim{ position:absolute; inset:0; background:rgba(30,28,26,.45); z-index:20; display:flex; align-items:flex-end; }
+.sheet{ width:100%; background:var(--surface); border-radius:20px 20px 0 0; padding:10px 14px 18px; }
+.sheet .grab{ width:38px; height:4px; border-radius:2px; background:var(--border-strong); margin:2px auto 10px; }
+.sheet h4{ margin:0 4px 2px; font-family:var(--font-display); font-weight:600; font-size:18px; }
+.sheet .sub{ margin:0 4px 10px; font-size:12.5px; color:var(--text-secondary); }
+.opt{ width:100%; display:flex; align-items:center; gap:12px; padding:13px 10px; border:none; background:none; border-top:1px solid var(--border); font-size:15.5px; font-weight:600; text-align:left; }
+.opt .ic{ width:36px; height:36px; border-radius:10px; background:var(--accent-bg); color:var(--accent); display:flex; align-items:center; justify-content:center; flex:none; }
+.opt small{ display:block; font-weight:400; font-size:12px; color:var(--text-muted); margin-top:1px; }
+.cancel{ width:100%; height:46px; margin-top:8px; border-radius:12px; border:1px solid var(--border-strong); background:var(--surface); font-weight:600; font-size:15px; }
+.viewer{ width:100%; background:var(--surface); border-radius:20px 20px 0 0; padding:14px; }
+.viewer .big{ height:230px; border-radius:12px; position:relative; overflow:hidden; }
+.meta{ margin-top:12px; display:grid; gap:8px; font-size:13.5px; }
+.meta .row{ display:flex; gap:10px; } .meta .row span:first-child{ width:92px; color:var(--text-muted); flex:none; }
+.meta .path{ font-family:var(--font-mono); font-size:12px; }
+.note{ margin-top:10px; background:var(--surface-sunken); border-radius:10px; padding:10px 12px; font-size:13px; color:var(--text-secondary); }
+
+/* ── office job page ── */
+.office{ width:100%; max-width:1180px; background:var(--bg); border:1px solid var(--border-strong); border-radius:16px; box-shadow:0 18px 50px rgba(30,28,26,.12); padding:26px 30px 32px; position:relative; overflow:hidden; flex:1 1 640px; min-width:0; }
+.crumb{ font-size:13px; color:var(--text-muted); } .crumb b{ color:var(--text-primary); font-weight:600; }
+.office h1{ font-family:var(--font-display); font-weight:600; font-size:30px; margin:8px 0 2px; letter-spacing:-.01em; }
+.office .sub1{ color:var(--text-secondary); font-size:14px; margin-bottom:18px; }
+.ocard{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 20px 20px; }
+.ohead{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; }
+.ohead h3{ margin:0; font-family:var(--font-display); font-weight:600; font-size:19px; } .ohead h3 span{ font-family:var(--font-body); font-size:13px; color:var(--text-muted); font-weight:500; margin-left:6px; }
+.ohead p{ margin:4px 0 0; font-size:12.5px; color:var(--text-secondary); }
+.oacts{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.btn{ display:inline-flex; align-items:center; gap:7px; height:34px; padding:0 12px; border-radius:9px; border:1px solid var(--border-strong); background:var(--surface); font-weight:600; font-size:13px; white-space:nowrap; }
+.btn.pri{ background:var(--accent); border-color:var(--accent); color:#fff; } .btn.danger{ color:var(--danger); border-color:#EBC9C6; }
+.flink{ color:var(--accent); font-weight:600; font-size:13px; text-decoration:none; display:inline-flex; align-items:center; gap:5px; }
+.fpath{ font-family:var(--font-mono); font-size:11.5px; color:var(--text-muted); margin-top:4px; text-align:right; }
+.office .goes{ margin-top:12px; padding:9px 12px; background:var(--surface-sunken); border-radius:10px; font-size:13px; }
+.office .grid{ grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px; }
+.office .tile{ aspect-ratio:4/3; } .office .tile .tag{ font-size:11px; left:7px; bottom:7px; } .office .tile .vid{ font-size:11px; right:7px; top:7px; }
+.tile .by{ position:absolute; right:6px; bottom:6px; font-size:10.5px; padding:2px 6px; border-radius:99px; background:rgba(30,28,26,.6); color:#fff; }
+.oscrim{ position:absolute; inset:0; background:rgba(30,28,26,.45); z-index:20; display:flex; justify-content:flex-end; }
+.drawer{ width:420px; max-width:100%; height:100%; background:var(--surface); padding:20px; overflow:auto; box-shadow:-16px 0 40px rgba(0,0,0,.18); }
+.drawer h4{ margin:0 0 12px; font-family:var(--font-display); font-weight:600; font-size:20px; display:flex; justify-content:space-between; align-items:center; }
+.drawer .x{ border:none; background:none; font-size:20px; color:var(--text-muted); }
+.field{ margin-top:14px; } .field label{ display:block; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); font-weight:600; margin-bottom:5px; }
+.field select{ width:100%; height:38px; border-radius:9px; border:1px solid var(--border-strong); padding:0 10px; background:#fff; }
+.omenu{ position:absolute; z-index:30; background:var(--surface); border:1px solid var(--border); border-radius:12px; box-shadow:0 12px 30px rgba(30,28,26,.16); padding:6px; width:250px; }
+.omenu button{ width:100%; display:flex; align-items:center; gap:10px; padding:9px 10px; border:none; background:none; border-radius:8px; font-weight:600; font-size:13.5px; text-align:left; } .omenu button:hover{ background:var(--surface-sunken); }
+
+/* ── reference tree (not a screen) ── */
+.ref{ width:330px; max-width:100%; background:#fff; border:1px dashed var(--border-strong); border-radius:14px; padding:16px 16px 14px; font-size:13px; }
+.ref h5{ margin:0 0 2px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); }
+.ref .cap{ font-size:12px; color:var(--text-secondary); margin-bottom:10px; }
+.tree{ font-family:var(--font-mono); font-size:12.5px; line-height:1.75; white-space:pre; overflow-x:auto; }
+.tree .f{ color:var(--text-primary); font-weight:600; } .tree .n{ color:var(--accent); font-weight:600; } .tree .m{ color:var(--text-muted); }
+.tree .hl{ background:var(--accent-bg); border-radius:4px; padding:0 3px; }
+.rules{ margin:12px 0 0; padding:10px 0 0; border-top:1px solid var(--border); display:grid; gap:6px; font-size:12.5px; color:var(--text-secondary); }
+.rules div{ display:flex; gap:8px; align-items:baseline; } .rules b{ color:var(--text-primary); }
+
+.toast{ position:fixed; left:50%; bottom:22px; transform:translateX(-50%); background:#1E1C1A; color:#fff; padding:10px 16px; border-radius:10px; font-size:13px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:70; max-width:92vw; text-align:center; } .toast.show{ opacity:1; }
+[hidden]{ display:none !important; }
+
+@media (max-width:480px){ .stagewrap{ padding:0 0 40px; gap:16px; } .phone{ border-radius:0; border:none; box-shadow:none; width:100%; } .ref{ margin:0 12px; width:auto; } .protobar{ padding:8px 10px; gap:8px; position:static; } .protobar .lab{ display:block; margin:0 0 4px; } .seg button{ font-size:11.5px; padding:6px 7px; }
+  .phone .scrim{ position:fixed; }  /* on a real phone the sheet and the viewer sit on the screen's bottom edge */ }
+@media (max-width:1100px){ .office{ padding:20px 18px 24px; } .office h1{ font-size:26px; } .fpath{ text-align:left; } }
+</style>
+</head>
+<body>
+
+<div class="protobar" data-testid="protobar">
+  <div><span class="lab">Prototype · screen</span><span class="seg"><button data-testid="view-crew" class="on" onclick="setView('crew')">Crew phone</button><button data-testid="view-office" onclick="setView('office')">Office job page</button></span></div>
+  <div><span class="lab">Where the job is</span><span class="seg"><button data-testid="stage-quote" onclick="setStage('quote')">Quote not accepted</button><button data-testid="stage-job" class="on" onclick="setStage('job')">Job under way</button><button data-testid="stage-last" onclick="setStage('last')">Last invoice raised</button></span></div>
+</div>
+
+<div class="stagewrap">
+  <!-- ═════════ CREW PHONE ═════════ -->
+  <div class="phone" id="crew" data-testid="crew">
+    <div class="pad">
+      <button class="back"><svg width="10" height="16" viewBox="0 0 10 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1 2 8l6 7"/></svg>Jobs</button>
+      <div class="jt">Owners Corporation 2 – 20 Convention Centre Place</div>
+      <div class="ja">20 Convention Centre Place, South Wharf VIC 3006</div>
+      <div class="two"><button class="bigbtn">Directions</button><button class="bigbtn pri">Daily report</button></div>
+
+      <div class="sect" data-testid="crew-photos-title">Photos · 0</div>
+      <div class="pcard" data-testid="crew-photos">
+        <div class="help">Photos and videos of this job. Tap one to see marks and notes from the office.</div>
+        <button class="cam" data-testid="crew-add" onclick="openSheet()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.6-2.4h6.8L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.2" r="3.4"/></svg>Add photo or video</button>
+        <div class="goes" data-testid="crew-goes"></div>
+        <div class="chips" data-testid="crew-chips"></div>
+        <div class="grid" data-testid="crew-grid"></div>
+      </div>
+
+      <div class="sect">My reports</div>
+      <div class="pcard"><div class="help" style="text-align:center;padding:10px 0">No reports for this job yet.</div></div>
+    </div>
+    <div id="crew-overlay"></div>
+  </div>
+
+  <!-- ═════════ OFFICE JOB PAGE ═════════ -->
+  <div class="office" id="office" data-testid="office" hidden>
+    <div class="crumb">Live Projects › <b>20 Convention Centre Place, South Wharf</b></div>
+    <h1>20 Convention Centre Place, South Wharf</h1>
+    <div class="sub1">Exterior repaint · <span style="font-family:var(--font-mono)">EST-0031</span> · Owners Corporation 2</div>
+    <div class="ocard" data-testid="office-photos">
+      <div class="ohead">
+        <div><h3>Photos <span data-testid="office-count">0</span></h3><p>Quote, site and report photos and videos in one place. Crew see this grid in their app.</p></div>
+        <div>
+          <div class="oacts">
+            <button class="btn">⇄ Pair before / after</button>
+            <button class="btn pri" data-testid="office-add" onclick="openMenu(event)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.6-2.4h6.8L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.2" r="3.4"/></svg>Add photo or video</button>
+            <a class="flink" data-testid="office-folder" href="#" onclick="say('Opens the job folder in your storage');return false">Open folder ↗</a>
+          </div>
+          <div class="fpath" data-testid="office-path">Paint Trade HQ › EST-0031 South Wharf</div>
+        </div>
+      </div>
+      <div class="goes" data-testid="office-goes"></div>
+      <div class="chips" data-testid="office-chips"></div>
+      <div class="grid" data-testid="office-grid"></div>
+    </div>
+    <div id="office-overlay"></div>
+  </div>
+
+  <!-- ═════════ REFERENCE: the folder this builds ═════════ -->
+  <aside class="ref" data-testid="tree">
+    <h5>Reference · not a screen</h5>
+    <div class="cap">The folder in your storage (Google Drive, OneDrive or the app's own). Counts follow what you add here.</div>
+    <div class="tree" data-testid="tree-body"></div>
+    <div class="rules">
+      <div><span class="dot k-before"></span><span><b>Before</b> — captured before the quote is accepted</span></div>
+      <div><span class="dot k-process"></span><span><b>Process</b> — captured once the job exists</span></div>
+      <div><span class="dot k-after"></span><span><b>After</b> — captured once the last invoice is created or scheduled</span></div>
+      <div><span style="width:8px"></span><span>The app picks the folder. Chips only filter. Only the office can delete.</span></div>
+    </div>
+  </aside>
+</div>
+<div class="toast" id="toast" data-testid="toast"></div>
+
+<script>
+const KIND = { before: 'Before', process: 'Process', after: 'After' };
+const STAGE_KIND = { quote: 'before', job: 'process', last: 'after' };
+const STAGE_WHY = { quote: 'the quote is not accepted yet', job: 'the job is under way', last: 'the last invoice has been raised' };
+const HUES = [[28, 30], [210, 22], [150, 20], [42, 36], [265, 18], [12, 34], [190, 26], [95, 20]];
+let seq = 0;
+const mk = (kind, type, by, at, extra = {}) => ({ id: 'c' + (++seq), n: seq, kind, type, by, at, hue: HUES[seq % HUES.length], dur: type === 'video' ? '0:' + String(12 + (seq * 7) % 45).padStart(2, '0') : null, ...extra });
+const S = {
+  view: 'crew', stage: 'job', filter: 'all', me: { crew: 'Sam R.', office: 'Josh' },
+  items: [
+    mk('before', 'photo', 'Josh', '2 Nov', { note: 'Peeling on the garden wall cap — scrape back to sound paint.' }), mk('before', 'photo', 'Josh', '2 Nov'), mk('before', 'video', 'Josh', '2 Nov'), mk('before', 'photo', 'Josh', '2 Nov'),
+    mk('process', 'photo', 'Ali M.', '10 Nov'), mk('process', 'photo', 'Sam R.', '11 Nov'), mk('process', 'video', 'Sam R.', '11 Nov'), mk('process', 'photo', 'Ali M.', '12 Nov'),
+  ],
+  reports: ['2026-11-10 Ali M.pdf', '2026-11-11 Sam R.pdf', '2026-11-12 Ali M.pdf'],
+  docs: ['EST-0031 quote.pdf', 'EST-0031 accepted.pdf', 'INV-0042.pdf'],
+  final: null, last: null,
+};
+const $ = (id) => document.querySelector(`[data-testid="${id}"]`);
+const say = (m) => { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(say.t); say.t = setTimeout(() => t.classList.remove('show'), 2200); };
+const count = (k) => S.items.filter((i) => i.kind === k).length;
+const phBg = (i) => `background:linear-gradient(135deg, hsl(${i.hue[0]} ${i.hue[1]}% 78%), hsl(${i.hue[0] + 18} ${i.hue[1] + 6}% 58%))`;
+const camIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.6-2.4h6.8L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.2" r="3.4"/></svg>';
+const vidIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="12.5" height="12" rx="2"/><path d="m15.5 10.5 5.5-3v9l-5.5-3"/></svg>';
+const galIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m4 18 5.5-5 4 3.5 2.5-2 4 3.5"/></svg>';
+
+function tileHTML(i, office) {
+  return `<button class="tile" data-testid="tile-${i.id}" data-kind="${i.kind}" data-type="${i.type}" onclick="openItem('${i.id}')">
+    <span class="ph" style="${phBg(i)}"></span>
+    ${i.type === 'video' ? `<span class="vid" data-testid="vid-${i.id}">▶ ${i.dur}</span>` : ''}
+    <span class="tag"><span class="dot k-${i.kind}"></span>${KIND[i.kind]}</span>
+    ${office ? `<span class="by">${i.by}</span>` : ''}
+    ${i.uploading ? `<span class="up" data-testid="up-${i.id}">${i.type === 'video' ? 'Uploading video…' : 'Saving…'}<span class="bar"><i></i></span></span>` : ''}
+  </button>`;
+}
+function chipsHTML(prefix) {
+  return [['all', 'All'], ['before', `Before · ${count('before')}`], ['process', `Process · ${count('process')}`], ['after', `After · ${count('after')}`]]
+    .map(([k, l]) => `<button class="chip ${S.filter === k ? 'on' : ''}" data-testid="${prefix}-chip-${k}" onclick="setFilter('${k}')">${l}</button>`).join('');
+}
+function goesHTML() {
+  const k = STAGE_KIND[S.stage];
+  return `<span class="dot k-${k}"></span><span>New photos and videos are saved to <b>${KIND[k]}</b> — ${STAGE_WHY[S.stage]}.</span>`;
+}
+function treeHTML() {
+  const hl = (k) => (S.last && S.last.kind === k ? ' hl' : '');
+  const k = STAGE_KIND[S.stage];
+  const row = (kind, branch) => `   │  ${branch} <span class="f${hl(kind)}">${KIND[kind]}</span> <span class="n" data-testid="tree-${kind}">${count(kind)}</span>${k === kind ? ' <span class="m">← new captures</span>' : ''}`;
+  return [
+    `<span class="f">Paint Trade HQ</span>`,
+    `└─ <span class="f" data-testid="tree-root">EST-0031 South Wharf</span>`,
+    `   ├─ <span class="f">Content</span>`,
+    row('before', '├─'), row('process', '├─'), row('after', '└─'),
+    `   ├─ <span class="f">Crew reports</span> <span class="n" data-testid="tree-reports">${S.reports.length}</span>`,
+    ...S.reports.slice(-2).map((r) => `   │     <span class="m">${r}</span>`),
+    `   ├─ <span class="f">Final project report</span> <span class="n" data-testid="tree-final">${S.final ? 1 : 0}</span>`,
+    `   │     <span class="m">${S.final || 'saved when the report is sent'}</span>`,
+    `   └─ <span class="f">Quotes and invoices</span> <span class="n" data-testid="tree-docs">${S.docs.length}</span>`,
+    ...S.docs.map((r) => `         <span class="m">${r}</span>`),
+  ].join('\n');
+}
+function render() {
+  const list = S.items.filter((i) => S.filter === 'all' || i.kind === S.filter);
+  const empty = (who) => `<div class="none" data-testid="${who}-none">Nothing here yet.</div>`;
+  $('crew-photos-title').textContent = `Photos · ${S.items.length}`;
+  $('crew-goes').innerHTML = goesHTML(); $('crew-chips').innerHTML = chipsHTML('crew');
+  $('crew-grid').innerHTML = list.map((i) => tileHTML(i, false)).join('') || empty('crew');
+  $('office-count').textContent = S.items.length;
+  $('office-goes').innerHTML = goesHTML(); $('office-chips').innerHTML = chipsHTML('office');
+  $('office-grid').innerHTML = list.map((i) => tileHTML(i, true)).join('') || empty('office');
+  $('tree-body').innerHTML = treeHTML();
+  document.getElementById('crew').hidden = S.view !== 'crew'; document.getElementById('office').hidden = S.view !== 'office';
+  $('view-crew').classList.toggle('on', S.view === 'crew'); $('view-office').classList.toggle('on', S.view === 'office');
+  [['quote', 'stage-quote'], ['job', 'stage-job'], ['last', 'stage-last']].forEach(([s, id]) => $(id).classList.toggle('on', S.stage === s));
+  $('stage-quote').disabled = S.view === 'crew';  // a crew member only has a job page once the job exists
+  $('stage-quote').title = S.view === 'crew' ? 'Crew see a job only once it exists' : '';
+}
+function setView(v) { S.view = v; if (v === 'crew' && S.stage === 'quote') S.stage = 'job'; closeAll(); render(); }
+function setStage(s) { if (s === 'quote' && S.view === 'crew') return; S.stage = s; closeAll(); render(); }
+function setFilter(k) { S.filter = k; render(); }
+function closeAll() { document.getElementById('crew-overlay').innerHTML = ''; document.getElementById('office-overlay').innerHTML = ''; }
+
+/* add — the app files it by phase; nobody picks a folder */
+function add(type, how) {
+  closeAll();
+  const kind = STAGE_KIND[S.stage];
+  const it = mk(kind, type, S.me[S.view], 'Today', { uploading: true });
+  S.items.unshift(it); S.last = it; if (S.filter !== 'all' && S.filter !== kind) S.filter = 'all';
+  render();
+  setTimeout(() => { it.uploading = false; render(); say(`${type === 'video' ? 'Video' : 'Photo'} saved to ${KIND[kind]}`); }, type === 'video' ? 950 : 350);
+}
+function openSheet() {
+  const k = STAGE_KIND[S.stage];
+  document.getElementById('crew-overlay').innerHTML = `<div class="scrim" data-testid="sheet-scrim" onclick="if(event.target===this)closeAll()"><div class="sheet" data-testid="sheet">
+    <div class="grab"></div><h4>Add to this job</h4><div class="sub" data-testid="sheet-sub">Goes to <b>${KIND[k]}</b> — ${STAGE_WHY[S.stage]}.</div>
+    <button class="opt" data-testid="src-photo" onclick="add('photo','camera')"><span class="ic">${camIcon}</span><span>Take photo</span></button>
+    <button class="opt" data-testid="src-video" onclick="add('video','camera')"><span class="ic">${vidIcon}</span><span>Record video<small>Up to 200 MB a clip</small></span></button>
+    <button class="opt" data-testid="src-gallery" onclick="add('photo','gallery')"><span class="ic">${galIcon}</span><span>Choose from gallery<small>Photos or videos already on this phone</small></span></button>
+    <button class="cancel" data-testid="sheet-cancel" onclick="closeAll()">Cancel</button></div></div>`;
+  if (window.innerWidth > 480) document.querySelector('[data-testid="sheet"]').scrollIntoView({ block: 'end', behavior: 'smooth' });  // in the framed view the sheet sits at the frame's foot
+}
+function openMenu(ev) {
+  const r = ev.currentTarget.getBoundingClientRect(), o = document.getElementById('office').getBoundingClientRect();
+  document.getElementById('office-overlay').innerHTML = `<div style="position:absolute;inset:0;z-index:25" onclick="closeAll()"></div><div class="omenu" data-testid="office-menu" style="top:${r.bottom - o.top + 6}px;left:${Math.max(8, Math.min(r.left - o.left, o.width - 262))}px">
+    <button data-testid="office-src-photo" onclick="add('photo','file')">${galIcon}Upload photos</button>
+    <button data-testid="office-src-video" onclick="add('video','file')">${vidIcon}Upload a video <span style="font-weight:400;color:var(--text-muted);font-size:12px">· up to 200 MB</span></button></div>`;
+}
+function openItem(id) {
+  const i = S.items.find((x) => x.id === id); if (!i) return;
+  const path = `EST-0031 South Wharf › Content › ${KIND[i.kind]}`;
+  const big = `<div class="big" style="${phBg(i)}">${i.type === 'video' ? `<span class="vid" style="position:absolute;right:10px;top:10px;font-size:12px;padding:3px 8px;border-radius:99px;background:rgba(30,28,26,.78);color:#fff;font-family:var(--font-mono)">▶ ${i.dur}</span>` : ''}</div>`;
+  const meta = `<div class="meta"><div class="row"><span>Added by</span><span data-testid="item-by">${i.by} · ${i.at}</span></div><div class="row"><span>Filed under</span><span class="path" data-testid="item-path">${path}</span></div></div>`;
+  if (S.view === 'crew') {
+    document.getElementById('crew-overlay').innerHTML = `<div class="scrim" onclick="if(event.target===this)closeAll()"><div class="viewer" data-testid="viewer">${big}${meta}
+      <div class="note" data-testid="item-note">${i.note ? `<b>Note from the office:</b> ${i.note}` : 'No note from the office on this one.'}</div>
+      <button class="cancel" data-testid="viewer-close" onclick="closeAll()">Close</button></div></div>`;
+  } else {
+    document.getElementById('office-overlay').innerHTML = `<div class="oscrim" onclick="if(event.target===this)closeAll()"><div class="drawer" data-testid="viewer">
+      <h4>${i.type === 'video' ? 'Video' : 'Photo'} · Site ${i.n}<button class="x" data-testid="viewer-close" onclick="closeAll()">×</button></h4>${big}${meta}
+      <div class="field"><label>Filed as</label><select data-testid="item-move" onchange="move('${i.id}', this.value)">${Object.keys(KIND).map((k) => `<option value="${k}" ${k === i.kind ? 'selected' : ''}>${KIND[k]}</option>`).join('')}</select><div class="help" style="margin-top:6px">Changing this moves the file to that folder, so the tag and the folder always agree.</div></div>
+      <div class="field"><label>Note for the crew</label><div class="note" style="margin-top:0">${i.note || 'No note yet.'}</div></div>
+      <div style="display:flex;gap:8px;margin-top:18px"><button class="btn">✎ Edit marks</button><button class="btn danger" data-testid="item-delete" onclick="del('${i.id}')">Delete</button></div>
+      <div class="help" style="margin-top:10px">Only the office can delete. Crew can add and view.</div></div></div>`;
+  }
+}
+function move(id, kind) { const i = S.items.find((x) => x.id === id); if (!i || i.kind === kind) return; i.kind = kind; S.last = i; render(); openItem(id); say(`Moved to ${KIND[kind]}`); }
+function del(id) { if (S.view !== 'office') return; S.items = S.items.filter((x) => x.id !== id); if (S.last && S.last.id === id) S.last = null; closeAll(); render(); say('Deleted'); }
+render();
+</script>
+</body>
+</html>
