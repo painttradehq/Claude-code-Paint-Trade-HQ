@@ -1,0 +1,1394 @@
+diff --git a/backend/routes/admin_profile.py b/backend/routes/admin_profile.py
+index 4696bc44999865942d8c4e8f3515638d466f872f..4a5dc0ce57d54cf164322d41e50ef09a6aca22d3 100644
+--- a/backend/routes/admin_profile.py
++++ b/backend/routes/admin_profile.py
+@@ -446,8 +446,12 @@ async def put_personal_profile(payload: AdminPersonalProfile, admin: dict = Depe
+ @router.put("/business")
+ async def put_business(payload: BusinessProfile, admin: dict = Depends(get_current_admin)):
+     admin_id = admin.get("_id") or admin.get("id")
+-    before = ((await db.admin_settings.find_one({"_id": admin_id}, {"business_profile.address": 1}) or {}).get("business_profile") or {}).get("address")
+-    body = payload.dict(exclude_none=True)
++    current = ((await db.admin_settings.find_one({"_id": admin_id}, {"business_profile": 1}) or {}).get("business_profile") or {})
++    before = current.get("address")
++    # Fix Round J B-002 — `_set_section` replaces the section whole, so a save from Settings › Business (which sends only its own
++    # fields) used to drop the logo, the signature, their upload stamps and anything another screen had written. Now the request
++    # changes only the fields it carries: a field sent as null is cleared, a field not sent is kept.
++    body = {**current, **payload.dict(exclude_unset=True)}
+     if payload.ratings is not None:  # Round 74 part 2 — validated rows; the Google fields follow the google row
+         from services.presentation_pages import BlockError, google_mirror, validate_ratings
+         try:
+diff --git a/backend/routes/estimates.py b/backend/routes/estimates.py
+index afe8c3db0277cf29af24c33849b508a4649e459b..49f6178638d48fc967f05713996ac8fe6b70eb8b 100644
+--- a/backend/routes/estimates.py
++++ b/backend/routes/estimates.py
+@@ -223,6 +223,11 @@ async def update_estimate(estimate_id: str, estimate: Estimate, current_admin: d
+     # §11.1 status guard — saves never change status or identity fields.
+     for k in ("status", "share_token", "events", "estimate_number", "accepted_options", "signer_name", "signature_data_url", "sent_at", "viewed_at", "accepted_at", "declined_at"):
+         estimate_dict.pop(k, None)
++    if (existing.get("status") or "draft") == "accepted":
++        from services.quote_guard import money_change_block  # Fix Round J B-042 — accepted + invoiced: the money is locked, the rest still saves
++        block = await money_change_block(admin_id, existing, {**existing, **estimate_dict})
++        if block:
++            raise HTTPException(status_code=409, detail=block)
+     estimate_dict["updatedAt"] = _utcnow().isoformat()
+     estimate_dict["updatedBy"] = current_admin["id"]
+ 
+@@ -313,12 +318,13 @@ async def update_estimate_status(
+         raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of {sorted(allowed)}")
+ 
+     now_iso = _utcnow().isoformat()
+-    if new_status == "archived":
+-        cur = await db.estimates.find_one({"_id": estimate_id, "owner_admin_id": admin_id}, {"status": 1})
+-        if not cur:
+-            raise HTTPException(status_code=404, detail="Estimate not found")
+-        if (cur.get("status") or "draft") == "accepted":
+-            raise HTTPException(status_code=409, detail="Accepted estimates can't be archived.")
++    cur = await db.estimates.find_one({"_id": estimate_id, "owner_admin_id": admin_id}, {"status": 1, "estimate_number": 1})
++    if not cur:
++        raise HTTPException(status_code=404, detail="Estimate not found")
++    from services.quote_guard import status_change_block  # Fix Round J B-044 — an accepted quote with a job or a raised invoice keeps its status; nothing with either can be archived
++    block = await status_change_block(admin_id, cur, new_status)
++    if block:
++        raise HTTPException(status_code=409, detail=block)
+     update_fields: dict = {"status": new_status, "updatedAt": now_iso}
+     ts_field = {
+         "sent": "sent_at", "viewed": "viewed_at", "accepted": "accepted_at",
+@@ -374,81 +380,22 @@ async def update_estimate_status(
+ 
+ 
+ async def _auto_create_project_from_estimate(estimate: dict, admin_id: str, now_iso: str) -> None:
+-    """Spawn a project from a just-accepted estimate and drop a notification
+-    in the admin's inbox. Kept intentionally decoupled from the projects
+-    route so the estimate PATCH stays snappy."""
+-    from services.geo import geocode_address  # local import to avoid cycles
+-
+-    materials = estimate.get("materials") or []
+-    est_cost = sum(float(m.get("cost_price", 0)) * float(m.get("quantity", 0)) for m in materials)
+-
+-    site_address = estimate.get("clientAddress") or ""
+-    geo = await geocode_address(site_address) if site_address else None
+-
+-    project_id = str(uuid.uuid4())
+-    # Derive a real project name (estimates often carry no jobTag/clientName).
+-    # Fall through: jobTag → clientName → linked customer → site address → number.
+-    project_name = estimate.get("jobTag") or estimate.get("clientName")
+-    if not project_name and estimate.get("customer_id"):
+-        cust = await db.customers.find_one({"_id": estimate["customer_id"]})
+-        if cust:
+-            project_name = cust.get("name") or cust.get("full_name") or cust.get("company")
+-    if not project_name:
+-        project_name = site_address or (
+-            f"Estimate {estimate.get('estimate_number')}" if estimate.get("estimate_number") else None
+-        )
+-    project_name = project_name or "Untitled job"
+-    project_doc = {
+-        "_id": project_id,
+-        "owner_admin_id": admin_id,
+-        "estimate_id": estimate.get("_id"),
+-        "customer_id": estimate.get("customer_id"),
+-        "name": project_name,
+-        "status": "quoted",
+-        "estimated_revenue": float(estimate.get("totalPrice") or 0),
+-        "estimated_cost": est_cost,
+-        "estimated_hours": int(estimate.get("totalTime") or 0),
+-        "actual_revenue": None,
+-        "materials": materials,
+-        "expenses": [],
+-        "assigned_employee_ids": [],
+-        "activity_log": [{
+-            "id": str(uuid.uuid4()),
+-            "type": "created",
+-            "message": f"Project auto-created from accepted estimate {estimate.get('estimate_number') or ''}".strip(),
+-            "at": now_iso,
+-        }],
+-        "ai_summary": None,
+-        "ai_summary_generated_at": None,
+-        "start_date": None,
+-        "target_end_date": None,
+-        "completed_date": None,
+-        "notes": estimate.get("notes"),
+-        "client_snapshot": {
+-            "name": estimate.get("clientName"),
+-            "phone": estimate.get("clientPhone"),
+-            "address": site_address,
+-        },
+-        "location_address": site_address or None,
+-        "location_lat": (geo or {}).get("lat"),
+-        "location_lng": (geo or {}).get("lng"),
+-        "location_label": (geo or {}).get("label"),
+-        "location_source": (geo or {}).get("source") if geo else None,
+-        "created_at": now_iso,
+-        "updated_at": now_iso,
+-    }
+-    await db.projects.insert_one(project_doc)
+-    from services.attachments import link_project  # Round 46: the quote's files now live on the job too
+-    await link_project(estimate["_id"], project_doc["_id"])
+-    from routes.projects import write_quote_paint  # Round 96 — the quote's paint card becomes the job's paint rows
+-    await write_quote_paint(admin_id, project_id, estimate, now_iso)
+-
+-    # Round 35: no admin notification — the new project shows in Recent activity.
+-
+-    # Also log the conversion on the estimate itself.
+-    await db.estimates.update_one(
+-        {"_id": estimate.get("_id"), "owner_admin_id": admin_id},
+-        {"$push": {"events": {"type": "project_created", "at": now_iso, "project_id": project_id}}},
++    """Spawn the job for a quote the admin just marked accepted.
++
++    Fix Round J B-025 / B-037 — this used to be a second copy of the job-creation code that took the client's address
++    (`clientAddress`) as the job site and named the job after the client, while the manual conversion and the client's own
++    accept had moved to `routes.projects._spawn_project_from_estimate` (Fix Round I §8). All three paths now share it: site
++    address from the quote's job address (the client's only when the quote has none), name from the job tag → street +
++    suburb → "Estimate EST-xxxx" (never the bare client name), the quote's start date and duration, Quote setup pricing,
++    materials, attachments and the paint rows. The job's activity log keeps its "auto-created" first line.
++    Round 35: no admin notification — the new project shows in Recent activity."""
++    from routes.projects import _spawn_project_from_estimate  # local import avoids the cycle
++
++    doc = await _spawn_project_from_estimate(estimate, admin_id)
++    await db.projects.update_one(
++        {"_id": doc["_id"], "owner_admin_id": admin_id},
++        {"$push": {"activity_log": {"id": str(uuid.uuid4()), "type": "created",
++                                    "message": f"Project auto-created from accepted estimate {estimate.get('estimate_number') or ''}".strip(), "at": now_iso}}},
+     )
+ 
+ 
+@@ -463,7 +410,7 @@ async def patch_estimate(
+     estimates-list drawer (Photos link, etc.) without round-tripping the
+     full estimate body. Returns the updated doc."""
+     admin_id = current_admin.get("_id") or current_admin.get("id")
+-    ALLOWED = {"photos_link", "notes", "estimator_name", "crew_notes", "presentation_enabled", "photos"}
++    ALLOWED = {"photos_link", "notes", "estimator_name", "crew_notes", "crew_visible", "presentation_enabled", "photos"}  # Fix Round J B-033 — crew_visible rides with crew_notes (the builder and the job drawer both send it)
+     update: dict = {k: v for k, v in (payload or {}).items() if k in ALLOWED}
+     if not update:
+         raise HTTPException(status_code=400, detail=f"No editable fields supplied. Allowed: {sorted(ALLOWED)}")
+diff --git a/backend/routes/projects.py b/backend/routes/projects.py
+index 3ac53b3171fd55ea288000d8a94b55491cedbf35..4fd0569db3388a7761694b9c43fe3fa8f3e343ca 100644
+--- a/backend/routes/projects.py
++++ b/backend/routes/projects.py
+@@ -111,13 +111,11 @@ def compute_labour_cost(timeclock_docs, daily_reports, employees, default_rate:
+ 
+ 
+ async def _pricing(admin_id: str, settings_doc: dict | None = None) -> dict:
+-    """overhead_pct + labor_hourly_rate from Settings › Pricing (with the model defaults)."""
+-    doc = settings_doc if settings_doc is not None else (await db.admin_settings.find_one({"_id": admin_id}, {"pricing": 1}) or {})
+-    pr = doc.get("pricing") or {}
+-    return {
+-        "overhead_pct": float(pr.get("overhead_pct") if pr.get("overhead_pct") is not None else 3.0),
+-        "labor_hourly_rate": float(pr.get("labor_hourly_rate") if pr.get("labor_hourly_rate") is not None else 75.0),
+-    }
++    """overhead_pct + labor_hourly_rate for the job money — Fix Round J B-003 / B-051: from Settings › Quote setup › Pricing
++    (`estimate_defaults`), then the legacy `pricing` section, then the model defaults (see services/job_pricing.py)."""
++    from services.job_pricing import pricing_from_settings
++    doc = settings_doc if settings_doc is not None else (await db.admin_settings.find_one({"_id": admin_id}, {"pricing": 1, "estimate_defaults": 1}) or {})
++    return pricing_from_settings(doc)
+ 
+ 
+ async def _list_pre(admin_id: str, projects: list[dict]) -> dict:
+@@ -135,7 +133,7 @@ async def _list_pre(admin_id: str, projects: list[dict]) -> dict:
+                 src("invoices", {"owner_admin_id": admin_id, "$or": inv_or}),
+                 src("estimates", {"_id": {"$in": eids}}, {"total": 1, "totalPrice": 1, "estimate_number": 1, "accepted_at": 1, "estimate_type": 1, "photos_link": 1, "clientEmail": 1}),
+                 src("employees", {"owner_admin_id": admin_id})]
+-    settings, rows = await asyncio.gather(db.admin_settings.find_one({"_id": admin_id}, {"pricing": 1, "operations": 1, "calendar": 1}), db.timeclock.aggregate(pipeline).to_list(None))
++    settings, rows = await asyncio.gather(db.admin_settings.find_one({"_id": admin_id}, {"pricing": 1, "estimate_defaults": 1, "operations": 1, "calendar": 1}), db.timeclock.aggregate(pipeline).to_list(None))
+     by: dict[str, list] = {}
+     for r in rows:
+         by.setdefault(r.pop("_src"), []).append(r)
+@@ -191,7 +189,9 @@ async def _gather_actuals(project: dict, pre: dict | None = None) -> dict:
+     from services.operations_settings import get_operations
+     from services.tenant_tz import tz_for
+     ops = pre["ops"] if pre is not None else await get_operations(admin_id)
+-    lab = compute_labour_cost(timeclock_docs, daily_reports, emps, thresholds={
++    pricing = pre["pricing"] if pre is not None else await _pricing(admin_id)
++    # Fix Round J B-052 — crew with no pay rate are costed at Quote setup's average crew cost (flagged "est."), not a hard-coded $55
++    lab = compute_labour_cost(timeclock_docs, daily_reports, emps, default_rate=pricing["labor_hourly_rate"], thresholds={
+         "per_day": ops.get("overtime_threshold_hours_per_day"), "per_week": ops.get("overtime_threshold_hours_per_week"),
+         "start_day": ops.get("work_week_start_day"), "tz": pre["tz"] if pre is not None else await tz_for(admin_id)})
+     labour_cost = lab["labour_cost"]
+@@ -251,10 +251,9 @@ async def _gather_actuals(project: dict, pre: dict | None = None) -> dict:
+                        and f"variation:{v.get('id')}" not in on_raised]
+ 
+     equipment_cost = sum(float(e.get("cost") or 0) for e in (project.get("equipment") or []))
+-    pricing = pre["pricing"] if pre is not None else await _pricing(admin_id)
+     approved = sum(float(v.get("price") or 0) for v in (project.get("variations") or []) if v.get("status") == "approved")
+     revenue = float(project.get("estimated_revenue") or 0)
+-    overhead = revenue * pricing["overhead_pct"] / 100.0
++    overhead = revenue * pricing["overhead_pct"] / 100.0  # the budget's full overhead; services/job_money.py accrues it to date against what is invoiced (Fix Round J B-047)
+     started = (project.get("status") or "quoted") != "quoted"
+ 
+     return {
+@@ -271,79 +270,22 @@ async def _gather_actuals(project: dict, pre: dict | None = None) -> dict:
+         "billable_total": billable,
+         "still_to_invoice": to_invoice,
+         "started": started,
+-        "actual_cost": round(labour_cost + materials_cost + expenses_total + equipment_cost + (overhead if started else 0), 2),
++        "actual_cost": round(labour_cost + materials_cost + expenses_total + equipment_cost + (round(invoiced * pricing["overhead_pct"] / 100.0, 2) if started else 0), 2),
+         "invoiced": round(invoiced, 2),
+         "invoice_paid": round(invoice_paid, 2),
+         "invoice_count": len(invoices),
++        "raised_invoice_count": len(raised),  # Fix Round J B-012 — the list's "invoiced" wording counts raised invoices, not the auto-drafted deposit
+         "retire_at": retires,
+         "open_variations": open_variations,
+     }
+ 
+ 
+ def _compute_margin_snapshot(project: dict, actuals: dict) -> dict:
+-    """Budget vs actual snapshot. Uses labour + materials + expenses for
+-    real cost, and paid invoices for real revenue (falls back to estimated
+-    revenue if nothing invoiced yet)."""
+-    est_rev = float(project.get("estimated_revenue") or 0)
+-    est_materials = project.get("estimated_materials")
+-    est_labour = project.get("estimated_labour")
+-    if est_materials is None:
+-        est_materials = float(project.get("estimated_cost") or 0)
+-    if est_labour is None:
+-        est_labour = float(project.get("estimated_hours") or 0) * float(actuals.get("labor_hourly_rate") or 0)
+-    est_cost = float(est_materials) + float(est_labour) + float(actuals.get("overhead") or 0)
+-    est_margin_pct = ((est_rev - est_cost) / est_rev * 100) if est_rev > 0 else 0
+-
+-    actual_cost = float(actuals.get("actual_cost") or 0)
+-    # Revenue priority: (1) explicit actual_revenue override, (2) invoiced
+-    # to date, (3) fall back to estimated so an early-stage job doesn't
+-    # display a scary -100% margin before any invoice goes out.
+-    actual_rev_value = project.get("actual_revenue")
+-    if actual_rev_value is not None:
+-        actual_rev = float(actual_rev_value)
+-    elif actuals.get("invoiced"):
+-        actual_rev = float(actuals["invoiced"])
+-    else:
+-        actual_rev = est_rev
+-    actual_margin_pct = ((actual_rev - actual_cost) / actual_rev * 100) if actual_rev > 0 else 0
+-
+-    cost_variance = actual_cost - est_cost
+-    cost_variance_pct = (cost_variance / est_cost * 100) if est_cost > 0 else 0
+-
+-    return {
+-        "estimated_revenue": round(est_rev, 2),
+-        "estimated_cost": round(est_cost, 2),
+-        "estimated_margin_pct": round(est_margin_pct, 2),
+-        "actual_revenue": round(actual_rev, 2),
+-        "actual_cost": round(actual_cost, 2),
+-        "actual_profit": round(actual_rev - actual_cost, 2),
+-        "actual_margin_pct": round(actual_margin_pct, 2),
+-        "cost_variance": round(cost_variance, 2),
+-        "cost_variance_pct": round(cost_variance_pct, 2),
+-        # Iter 92 — expose the ingredients so the UI can render a P&L breakdown
+-        "labour_cost": round(actuals.get("labour_cost") or 0, 2),
+-        "labour_hours": round(actuals.get("labour_hours") or 0, 2),
+-        "labour_rate_estimated": bool(actuals.get("labour_rate_estimated")),
+-        "materials_cost": round(actuals.get("materials_cost") or 0, 2),
+-        "expenses_total": round(actuals.get("expenses_total") or 0, 2),
+-        "equipment_cost": round(actuals.get("equipment_cost") or 0, 2),
+-        "overhead": round(actuals.get("overhead") or 0, 2),
+-        "overhead_pct": actuals.get("overhead_pct") or 0,
+-        "estimated_materials": round(float(est_materials), 2),
+-        "estimated_labour": round(float(est_labour), 2),
+-        "estimated_hours": float(project.get("estimated_hours") or 0),
+-        "labor_hourly_rate": actuals.get("labor_hourly_rate") or 0,
+-        "variations_approved": round(actuals.get("variations_approved") or 0, 2),
+-        "projected_profit": round(est_rev - max(est_cost, actual_cost), 2),
+-        "invoiced": round(actuals.get("invoiced") or 0, 2),
+-        "invoice_paid": round(actuals.get("invoice_paid") or 0, 2),
+-        "invoice_count": actuals.get("invoice_count") or 0,
+-        "invoice_outstanding": round((actuals.get("invoiced") or 0) - (actuals.get("invoice_paid") or 0), 2),
+-        "billable_total": round(actuals.get("billable_total") or 0, 2),
+-        "still_to_invoice": round(actuals.get("still_to_invoice") or 0, 2),
+-        "retire_at": actuals.get("retire_at"),
+-        "open_variations": actuals.get("open_variations") or [],
+-    }
++    """Budget vs actual snapshot — Fix Round J B-029 / B-047 / B-055: the rules live in services/job_money.py (revenue to date =
++    invoiced, overhead accrues with the billing, the projection keeps the full overhead), shared by the page, the list and the
++    connector so they can't disagree."""
++    from services.job_money import compute_margin_snapshot
++    return compute_margin_snapshot(project, actuals)
+ 
+ 
+ async def _serialize(project: dict, include_margin: bool = True, pre: dict | None = None) -> dict:
+@@ -695,13 +637,26 @@ async def yearly_stats(
+         for r in await db.project_materials.find({"owner_admin_id": admin_id, "project_id": {"$in": project_ids}}).to_list(5000):
+             pm_cost_by_project[r.get("project_id")] = pm_cost_by_project.get(r.get("project_id"), 0.0) + float(r.get("unit_cost") or 0) * float(r.get("quantity") or 0)
+ 
++    # Fix Round J B-005 — income is money received: every payment recorded on the tenant's invoices, in the month it was paid
++    # (an invoice paid with no payment rows — older data — counts its amount_paid at its paid_at). It used to be the quoted total of
++    # jobs marked done/invoiced at their completion month, so paid invoices on running jobs showed $0 income.
++    for inv in await db.invoices.find({"owner_admin_id": admin_id, "status": {"$nin": ["cancelled"]}}, {"payments": 1, "amount_paid": 1, "paid_at": 1, "updatedAt": 1}).to_list(10000):
++        pays = [p for p in (inv.get("payments") or []) if isinstance(p, dict)]
++        if pays:
++            for pay in pays:
++                m = month_of(str(pay.get("date") or pay.get("recorded_at") or "")[:10] or None)
++                if m:
++                    income[m - 1] += float(pay.get("amount") or 0)
++        elif float(inv.get("amount_paid") or 0) > 0:
++            m = month_of(str(inv.get("paid_at") or inv.get("updatedAt") or "")[:10] or None)
++            if m:
++                income[m - 1] += float(inv.get("amount_paid") or 0)
++
+     for p in projects:
+-        # income at completion month
++        # jobs finished this year (count only; the income above is by payment)
+         if p.get("status") in ("done", "invoiced"):
+             m = month_of(p.get("completed_date") or p.get("updated_at") or p.get("created_at"))
+             if m:
+-                rev = p.get("actual_revenue")
+-                income[m - 1] += float(rev if rev is not None else (p.get("estimated_revenue") or 0))
+                 jobs_done += 1
+         # logged expenses at their own date
+         for e in p.get("expenses") or []:
+@@ -743,9 +698,11 @@ async def yearly_stats(
+                 if e.get("admin_id") or str(e.get("role_label") or "").lower().startswith("owner")
+             }
+ 
++        fallback_rate = (await _pricing(admin_id))["labor_hourly_rate"]  # Fix Round J B-052 — Quote setup's average crew cost, not $55
++
+         def _month_rate(eid):
+             r = (emp_rates.get(eid) or {}).get("hourly") or 0
+-            return r if r > 0 else DEFAULT_LABOUR_RATE
++            return r if r > 0 else fallback_rate
+ 
+         seen_days: set = set()
+         for tc in timeclock_docs:
+@@ -1707,7 +1664,7 @@ async def generate_ai_summary(
+ 
+     facts = {
+         "client_name": client.get("name"),
+-        "site_address": client.get("address"),
++        "site_address": project.get("location_address") or client.get("address"),  # Fix Round J B-035 — the job site, not the client's address
+         # THIS project (design/pricing/dates/status are project-specific)
+         "project_name": project.get("name"),
+         "project_status": project.get("status"),
+@@ -1871,6 +1828,7 @@ async def get_project_labor(
+     from services.timesheets import local_dt, parse_utc, week_start_for
+     ops = await get_operations(admin_id); tz = await tz_for(admin_id)
+     per_day = float(ops.get("overtime_threshold_hours_per_day") or 8); per_week = float(ops.get("overtime_threshold_hours_per_week") or 38); start_day = str(ops.get("work_week_start_day") or "Monday")
++    fallback_rate = (await _pricing(admin_id))["labor_hourly_rate"]  # Fix Round J B-052 — crew with no pay rate: Quote setup's average crew cost, flagged "est."
+ 
+     hours_by: dict[str, dict] = {}
+     seen_days: set = set()
+@@ -1894,11 +1852,11 @@ async def get_project_labor(
+         e = emp_by_id.get(eid) or {}
+         reg, ot = split_days(by_day, per_day, per_week, lambda d: week_start_for(d, start_day))
+         days_worked = sum(1 for h in by_day.values() if h > 0)
+-        cost, est = _money(reg, ot, days_worked, e, DEFAULT_LABOUR_RATE)
++        cost, est = _money(reg, ot, days_worked, e, fallback_rate)
+         rr = rates_of(e)
+         per_emp.append({"employee_id": eid, "name": e.get("name") or (f"{e.get('first_name', '')} {e.get('last_name', '')}".strip()) or "Employee",
+                         "hours": round(reg + ot, 2), "regular": reg, "overtime": ot, "days_worked": days_worked,
+-                        "rate": rr["hourly_rate"] if rr["hourly_rate"] is not None else (rr["daily_rate"] if rr["daily_rate"] is not None else DEFAULT_LABOUR_RATE),
++                        "rate": rr["hourly_rate"] if rr["hourly_rate"] is not None else (rr["daily_rate"] if rr["daily_rate"] is not None else fallback_rate),
+                         "overtime_rate": rr["overtime_rate"] or rr["hourly_rate"], "daily": rr["hourly_rate"] is None and rr["daily_rate"] is not None,
+                         "cost": cost, "rate_estimated": est})
+         rate_estimated = rate_estimated or est
+diff --git a/backend/services/dashboard_home.py b/backend/services/dashboard_home.py
+index 090eab658674869e7183e7363fe718596aa051c3..9f4a611a0ba611b751936b2f5e9979c7d8b456a8 100644
+--- a/backend/services/dashboard_home.py
++++ b/backend/services/dashboard_home.py
+@@ -277,7 +277,9 @@ async def home_payload(admin: dict, keep_facts: bool = False) -> dict[str, Any]:
+         planned = max(1, _days_between(s, e_))
+         pcts.append(min(100.0, max(0.0, _days_between(s, td) / planned * 100)))
+     jc = job_counts(projs, invs, now_utc)
+-    live_projects = {"count": jc["live"], "revenue": round(sum(_n(p.get("estimated_revenue")) for p in live), 2), "on_hold": jc["on_hold"], "not_started": jc["not_started"],
++    live_ids = {p["_id"] for p in live}
++    on_books = [p for p in projs if p.get("status") == "quoted" or p["_id"] in live_ids]  # Fix Round J B-038 — accepted jobs not yet started are on the books too
++    live_projects = {"count": jc["live"], "revenue": round(sum(_n(p.get("estimated_revenue")) for p in on_books), 2), "on_hold": jc["on_hold"], "not_started": jc["not_started"],
+                      "late": len(late), "completion_pct": round(sum(pcts) / len(pcts)) if pcts else None,
+                      "late_job": ({"id": late[0]["_id"], "name": late[0].get("name"), "client": (late[0].get("client_snapshot") or {}).get("name"), "days": _days_between(str(late[0]["target_end_date"])[:10], td)} if late else None)}
+ 
+diff --git a/backend/services/job_money.py b/backend/services/job_money.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..54fbe4d0924ee771467e051d6fdb5bba0e79c9a7
+--- /dev/null
++++ b/backend/services/job_money.py
+@@ -0,0 +1,93 @@
++"""Job money — one snapshot the job page, the jobs list and the connector all read.
++
++Fix Round J B-029 / B-047 / B-055 (11 Nov 2026). The rules, in words:
++
++  Quoted (the budget)      revenue = the accepted quote + approved variations; budgeted cost = materials + labour + the FULL
++                            overhead (overhead % × quoted revenue). Expected profit = revenue − budgeted cost.
++  Actual to date           direct cost = labour + materials + equipment + expenses logged so far; overhead to date = overhead %
++                            × the revenue invoiced so far (overhead is a share of revenue, so it accrues with the billing, not on
++                            day one — B-047); cost to date = direct + overhead to date (overhead only once the job has started).
++                            Revenue to date = what has been invoiced (raised invoices, less credits) — never the whole quote
++                            (B-029). Profit so far = revenue to date − cost to date; margin to date = profit / revenue to date,
++                            0 while nothing is invoiced (the screens say "nothing invoiced yet").
++  Projected                profit = quoted revenue − max(budgeted cost, direct cost so far + full overhead).
++
++`actual_revenue` on the project, when set by hand, still overrides the invoiced figure. Pure: no Mongo, so it is unit-tested.
++"""
++from __future__ import annotations
++
++from typing import Any
++
++
++def _f(v: Any) -> float:
++    try:
++        return float(v or 0)
++    except (TypeError, ValueError):
++        return 0.0
++
++
++def compute_margin_snapshot(project: dict[str, Any], actuals: dict[str, Any]) -> dict[str, Any]:
++    est_rev = _f(project.get("estimated_revenue"))
++    est_materials = project.get("estimated_materials")
++    est_labour = project.get("estimated_labour")
++    if est_materials is None:
++        est_materials = _f(project.get("estimated_cost"))
++    if est_labour is None:
++        est_labour = _f(project.get("estimated_hours")) * _f(actuals.get("labor_hourly_rate"))
++    overhead_full = _f(actuals.get("overhead"))
++    est_cost = _f(est_materials) + _f(est_labour) + overhead_full
++    est_margin_pct = ((est_rev - est_cost) / est_rev * 100) if est_rev > 0 else 0
++
++    started = bool(actuals.get("started"))
++    direct_cost = _f(actuals.get("labour_cost")) + _f(actuals.get("materials_cost")) + _f(actuals.get("expenses_total")) + _f(actuals.get("equipment_cost"))
++    invoiced = _f(actuals.get("invoiced"))
++    overhead_to_date = round(invoiced * _f(actuals.get("overhead_pct")) / 100.0, 2) if started else 0.0
++    actual_cost = direct_cost + overhead_to_date
++
++    actual_rev_value = project.get("actual_revenue")
++    actual_rev = _f(actual_rev_value) if actual_rev_value is not None else invoiced
++    actual_profit = actual_rev - actual_cost
++    actual_margin_pct = (actual_profit / actual_rev * 100) if actual_rev > 0 else 0
++
++    projected_cost = max(est_cost, direct_cost + overhead_full)
++    cost_variance = actual_cost - est_cost
++    cost_variance_pct = (cost_variance / est_cost * 100) if est_cost > 0 else 0
++
++    return {
++        "estimated_revenue": round(est_rev, 2),
++        "estimated_cost": round(est_cost, 2),
++        "estimated_margin_pct": round(est_margin_pct, 2),
++        "actual_revenue": round(actual_rev, 2),          # revenue to date (invoiced), or the hand-set override
++        "revenue_to_date": round(actual_rev, 2),
++        "actual_cost": round(actual_cost, 2),            # cost to date
++        "direct_cost": round(direct_cost, 2),
++        "actual_profit": round(actual_profit, 2),        # profit so far
++        "actual_margin_pct": round(actual_margin_pct, 2),
++        "cost_variance": round(cost_variance, 2),
++        "cost_variance_pct": round(cost_variance_pct, 2),
++        # Iter 92 — the ingredients, so the UI can render a P&L breakdown
++        "labour_cost": round(_f(actuals.get("labour_cost")), 2),
++        "labour_hours": round(_f(actuals.get("labour_hours")), 2),
++        "labour_rate_estimated": bool(actuals.get("labour_rate_estimated")),
++        "materials_cost": round(_f(actuals.get("materials_cost")), 2),
++        "expenses_total": round(_f(actuals.get("expenses_total")), 2),
++        "equipment_cost": round(_f(actuals.get("equipment_cost")), 2),
++        "overhead": round(overhead_full, 2),              # the budget's full overhead
++        "overhead_to_date": round(overhead_to_date, 2),
++        "overhead_pct": actuals.get("overhead_pct") or 0,
++        "estimated_materials": round(_f(est_materials), 2),
++        "estimated_labour": round(_f(est_labour), 2),
++        "estimated_hours": _f(project.get("estimated_hours")),
++        "labor_hourly_rate": actuals.get("labor_hourly_rate") or 0,
++        "variations_approved": round(_f(actuals.get("variations_approved")), 2),
++        "projected_profit": round(est_rev - projected_cost, 2),
++        "invoiced": round(invoiced, 2),
++        "invoice_paid": round(_f(actuals.get("invoice_paid")), 2),
++        "invoice_count": actuals.get("invoice_count") or 0,
++        "raised_invoice_count": actuals.get("raised_invoice_count") or 0,
++        "invoice_outstanding": round(invoiced - _f(actuals.get("invoice_paid")), 2),
++        "billable_total": round(_f(actuals.get("billable_total")), 2),
++        "still_to_invoice": round(_f(actuals.get("still_to_invoice")), 2),
++        "retire_at": actuals.get("retire_at"),
++        "open_variations": actuals.get("open_variations") or [],
++    }
+diff --git a/backend/services/job_pricing.py b/backend/services/job_pricing.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..06d0c1b109758788a5411ed0dca07ca7aa355c56
+--- /dev/null
++++ b/backend/services/job_pricing.py
+@@ -0,0 +1,31 @@
++"""Job pricing inputs — overhead % and the average crew cost the job money uses.
++
++Fix Round J B-003 / B-051 (11 Nov 2026). Settings › Quote setup › Pricing saves these as `estimate_defaults.overhead_pct`
++and `estimate_defaults.labor_hourly_rate`; the job money read a `pricing` section no screen ever wrote, so every job used
++3 % and $75/h whatever the owner had typed. Order: estimate_defaults → the legacy `pricing` section → the model defaults.
++Pure, no Mongo, so it is unit-tested on its own.
++"""
++from __future__ import annotations
++
++from typing import Any
++
++DEFAULT_OVERHEAD_PCT = 3.0
++DEFAULT_LABOR_HOURLY_RATE = 75.0
++
++
++def pricing_from_settings(doc: dict[str, Any] | None) -> dict[str, float]:
++    doc = doc or {}
++    sources = (doc.get("estimate_defaults") or {}, doc.get("pricing") or {})
++
++    def pick(key: str, default: float) -> float:
++        for src in sources:
++            v = src.get(key)
++            if v is None or (isinstance(v, str) and not v.strip()):
++                continue
++            try:
++                return float(v)
++            except (TypeError, ValueError):
++                continue
++        return default
++
++    return {"overhead_pct": pick("overhead_pct", DEFAULT_OVERHEAD_PCT), "labor_hourly_rate": pick("labor_hourly_rate", DEFAULT_LABOR_HOURLY_RATE)}
+diff --git a/backend/services/quote_guard.py b/backend/services/quote_guard.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..8c6653b2458a05640723b7735147c6411e041e6f
+--- /dev/null
++++ b/backend/services/quote_guard.py
+@@ -0,0 +1,112 @@
++"""Quote guard — what can still change on a quote once a job or an invoice depends on it.
++
++Fix Round J B-042 / B-044 (11 Nov 2026).
++
++  • money_signature(est) — the money the client agreed to: every line's qty × rate (auto-measured lines through their
++    area), optional flags, the discount, the tax mode, the payment plan percentages and the paint settings. Notes, photos,
++    dates, terms, labels and the client details are NOT in it, so those still save.
++  • money_change_block(admin_id, existing, proposed) — a reason when `existing` is accepted, a raised invoice (sent or
++    paid — never a draft) exists against it or its job, and `proposed` changes the money signature. Extra or changed work
++    goes on the job as a variation instead.
++  • status_change_block(admin_id, cur, new_status) — a reason when an accepted quote would move to any other status while
++    a job or a raised invoice depends on it, or when any quote would be archived while a job or a raised invoice depends
++    on it. Accepted quotes can't be archived at all (the rule since Round 40).
++
++The async helpers take an optional `db` so they can be tested without Mongo.
++"""
++from __future__ import annotations
++
++import json
++from typing import Any
++
++RAISED_EXCLUDED = ("draft", "cancelled", "credited", "archived")  # = services.crm_stats.NOT_INVOICED
++STATUS_LABEL = {"draft": "Draft", "sent": "Sent", "viewed": "Viewed", "accepted": "Accepted", "declined": "Declined", "on_hold": "On hold", "archived": "Archived"}
++
++
++def _db():
++    from database import db
++    return db
++
++
++def _num(v: Any) -> float | None:
++    try:
++        return None if v is None or v == "" else round(float(v), 4)
++    except (TypeError, ValueError):
++        return None
++
++
++def money_signature(est: dict[str, Any] | None) -> str:
++    """A string that changes only when the client's money changes (see the module docstring)."""
++    from services.estimate_lines import compute_line
++    est = est or {}
++    areas = {a.get("id"): a for a in (est.get("areas") or []) if isinstance(a, dict)}
++    lines = []
++    for ln in est.get("lines") or []:
++        if not isinstance(ln, dict):
++            continue
++        c = compute_line(ln, areas.get(ln.get("area_id")))
++        lines.append([str(ln.get("id") or ""), c["qty"], c["rate"], c["total"], bool(ln.get("optional"))])
++    lines.sort(key=lambda r: r[0])
++    disc = est.get("discount") if isinstance(est.get("discount"), dict) else {}
++    tax = est.get("tax") if isinstance(est.get("tax"), dict) else {}
++    plan = est.get("payment_plan") if isinstance(est.get("payment_plan"), dict) else {}
++    items = None
++    if not lines:  # legacy quotes priced by `items`
++        items = sorted([str(i.get("name") or ""), _num(i.get("quantity")), _num(i.get("price") if i.get("price") is not None else i.get("rate"))]
++                       for i in (est.get("items") or []) if isinstance(i, dict))
++    sig = {
++        "lines": lines,
++        "items": items,
++        "discount": [bool(disc.get("enabled")), str(disc.get("type") or "percent"), _num(disc.get("value")) or 0.0] if disc.get("enabled") else None,
++        "tax": [tax.get("enabled") is not False, _num(tax.get("rate")), bool(tax.get("inclusive"))],
++        "payment_plan": [_num(plan.get("deposit_pct")), [_num(s.get("pct")) for s in (plan.get("stages") or []) if isinstance(s, dict)]] if plan else None,
++        "paint_charge": bool(est.get("paint_charge")),
++        "paint_tins": est.get("paint_tins") if est.get("paint_charge") else None,
++    }
++    return json.dumps(sig, sort_keys=True, default=str)
++
++
++async def _job_for(admin_id: str, estimate_id: str, *, db) -> dict | None:
++    return await db.projects.find_one({"owner_admin_id": admin_id, "estimate_id": estimate_id}, {"name": 1, "status": 1})
++
++
++async def _raised_invoice(admin_id: str, estimate_id: str, project_id: str | None, *, db) -> dict | None:
++    links: list[dict] = [{"estimate_id": estimate_id}] + ([{"project_id": project_id}] if project_id else [])
++    return await db.invoices.find_one({"owner_admin_id": admin_id, "status": {"$nin": list(RAISED_EXCLUDED)}, "$or": links}, {"number": 1, "status": 1, "amount_paid": 1})
++
++
++async def money_change_block(admin_id: str, existing: dict[str, Any], proposed: dict[str, Any], *, db=None) -> str | None:
++    if (existing.get("status") or "draft") != "accepted":
++        return None
++    if money_signature(existing) == money_signature(proposed):
++        return None
++    db = db or _db()
++    job = await _job_for(admin_id, existing["_id"], db=db)
++    inv = await _raised_invoice(admin_id, existing["_id"], (job or {}).get("_id"), db=db)
++    if not inv:
++        return None
++    num = existing.get("estimate_number") or "This quote"
++    paid = (_num(inv.get("amount_paid")) or 0) > 0
++    where = f" on the job «{job.get('name')}»" if job and job.get("name") else " on the job"
++    return (f"{num} is accepted and invoice {inv.get('number') or ''} has been {'paid' if paid else 'sent'} against it, so its prices, "
++            f"discount, GST and payment plan are locked. Price extra or changed work as a variation{where}.").replace("  ", " ")
++
++
++async def status_change_block(admin_id: str, cur: dict[str, Any], new_status: str, *, db=None) -> str | None:
++    cur_status = cur.get("status") or "draft"
++    if new_status == cur_status:
++        return None
++    if new_status == "archived" and cur_status == "accepted":
++        return "Accepted estimates can't be archived."
++    if new_status != "archived" and cur_status != "accepted":
++        return None
++    db = db or _db()
++    num = cur.get("estimate_number") or "This quote"
++    job = await _job_for(admin_id, cur["_id"], db=db)
++    inv = await _raised_invoice(admin_id, cur["_id"], (job or {}).get("_id"), db=db)
++    what = "archived" if new_status == "archived" else f"moved back to {STATUS_LABEL.get(new_status, new_status)}"
++    if job:
++        return f"{num} has the job «{job.get('name') or 'Untitled job'}», so it can't be {what}. Delete the job first if the acceptance was a mistake."
++    if inv:
++        return f"{num} has invoice {inv.get('number') or ''} raised against it, so it can't be {what}. Cancel or credit the invoice first.".replace("  ", " ")
++    return None
+diff --git a/backend/tests/test_fixj_job_money.py b/backend/tests/test_fixj_job_money.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..3435cf5bc405de714eca2c7d55145f5990994e28
+--- /dev/null
++++ b/backend/tests/test_fixj_job_money.py
+@@ -0,0 +1,57 @@
++"""Fix Round J B-029 / B-047 / B-055 — the job money snapshot: revenue to date is what is invoiced, overhead accrues with the
++billing, the projection keeps the full overhead. Pure: no Mongo."""
++import os
++import sys
++
++sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
++from services.job_money import compute_margin_snapshot  # noqa: E402
++
++PROJECT = {"estimated_revenue": 10000.0, "estimated_materials": 1500.0, "estimated_labour": 4000.0, "estimated_hours": 50, "status": "in_progress"}
++BASE = {"labour_cost": 1200.0, "materials_cost": 600.0, "expenses_total": 100.0, "equipment_cost": 100.0, "overhead_pct": 12.0, "overhead": 1200.0,
++        "labor_hourly_rate": 80.0, "started": True, "invoiced": 0.0, "invoice_paid": 0.0, "invoice_count": 1, "raised_invoice_count": 0}
++
++
++def test_budget_keeps_the_full_overhead():
++    m = compute_margin_snapshot(PROJECT, BASE)
++    assert m["estimated_cost"] == 1500 + 4000 + 1200
++    assert m["overhead"] == 1200.0
++    assert m["estimated_margin_pct"] == 33.0
++
++
++def test_nothing_invoiced_means_no_revenue_and_no_overhead_yet():
++    m = compute_margin_snapshot(PROJECT, BASE)
++    assert m["revenue_to_date"] == 0.0 and m["actual_revenue"] == 0.0
++    assert m["overhead_to_date"] == 0.0
++    assert m["direct_cost"] == 2000.0 and m["actual_cost"] == 2000.0
++    assert m["actual_profit"] == -2000.0 and m["actual_margin_pct"] == 0
++
++
++def test_overhead_accrues_with_what_is_invoiced():
++    m = compute_margin_snapshot(PROJECT, {**BASE, "invoiced": 3000.0, "invoice_paid": 3000.0})
++    assert m["overhead_to_date"] == 360.0          # 12 % of the $3,000 billed, not 12 % of the $10,000 quote
++    assert m["actual_cost"] == 2360.0
++    assert m["revenue_to_date"] == 3000.0
++    assert m["actual_profit"] == 640.0
++    assert m["actual_margin_pct"] == 21.33
++
++
++def test_projection_uses_the_full_overhead_and_the_worse_of_budget_or_run_rate():
++    m = compute_margin_snapshot(PROJECT, {**BASE, "invoiced": 3000.0})
++    assert m["projected_profit"] == 10000 - 6700      # budget still the bigger cost
++    over = compute_margin_snapshot(PROJECT, {**BASE, "labour_cost": 6000.0, "invoiced": 3000.0})
++    assert over["projected_profit"] == round(10000 - (6000 + 600 + 100 + 100 + 1200), 2)
++
++
++def test_not_started_job_carries_no_overhead_to_date():
++    m = compute_margin_snapshot({**PROJECT, "status": "quoted"}, {**BASE, "started": False, "invoiced": 2000.0})
++    assert m["overhead_to_date"] == 0.0 and m["actual_cost"] == 2000.0
++
++
++def test_hand_set_actual_revenue_still_wins():
++    m = compute_margin_snapshot({**PROJECT, "actual_revenue": 9500.0}, {**BASE, "invoiced": 3000.0})
++    assert m["revenue_to_date"] == 9500.0 and m["actual_profit"] == round(9500 - 2360, 2)
++
++
++def test_legacy_project_without_split_estimates_still_computes():
++    m = compute_margin_snapshot({"estimated_revenue": 5000, "estimated_cost": 900, "estimated_hours": 10}, {**BASE, "overhead": 150.0, "overhead_pct": 3.0})
++    assert m["estimated_cost"] == 900 + 10 * 80 + 150
+diff --git a/backend/tests/test_fixj_pricing_source.py b/backend/tests/test_fixj_pricing_source.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..1bb972a2c9753cd25800db1948383fdd4ec71469
+--- /dev/null
++++ b/backend/tests/test_fixj_pricing_source.py
+@@ -0,0 +1,30 @@
++"""Fix Round J B-003 / B-051 — the job money reads overhead % and the average crew cost from Settings › Quote setup › Pricing
++(`estimate_defaults`), not from a `pricing` section no screen writes. Pure: no Mongo."""
++import os
++import sys
++
++sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
++from services.job_pricing import pricing_from_settings  # noqa: E402
++
++
++def test_quote_setup_values_win():
++    doc = {"estimate_defaults": {"overhead_pct": 12, "labor_hourly_rate": 62.5}, "pricing": {"overhead_pct": 3.0, "labor_hourly_rate": 75.0}}
++    assert pricing_from_settings(doc) == {"overhead_pct": 12.0, "labor_hourly_rate": 62.5}
++
++
++def test_legacy_pricing_section_is_only_a_fallback():
++    assert pricing_from_settings({"pricing": {"overhead_pct": 5, "labor_hourly_rate": 80}}) == {"overhead_pct": 5.0, "labor_hourly_rate": 80.0}
++    assert pricing_from_settings({"estimate_defaults": {"overhead_pct": 9}, "pricing": {"labor_hourly_rate": 80}}) == {"overhead_pct": 9.0, "labor_hourly_rate": 80.0}
++
++
++def test_nothing_saved_gives_the_model_defaults():
++    assert pricing_from_settings(None) == {"overhead_pct": 3.0, "labor_hourly_rate": 75.0}
++    assert pricing_from_settings({"estimate_defaults": {"overhead_pct": "", "labor_hourly_rate": None}}) == {"overhead_pct": 3.0, "labor_hourly_rate": 75.0}
++
++
++def test_zero_is_a_real_value_not_a_gap():
++    assert pricing_from_settings({"estimate_defaults": {"overhead_pct": 0, "labor_hourly_rate": 0}}) == {"overhead_pct": 0.0, "labor_hourly_rate": 0.0}
++
++
++def test_bad_text_is_skipped():
++    assert pricing_from_settings({"estimate_defaults": {"overhead_pct": "twelve"}, "pricing": {"overhead_pct": "4"}})["overhead_pct"] == 4.0
+diff --git a/backend/tests/test_fixj_quote_guard.py b/backend/tests/test_fixj_quote_guard.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..47675c4d6a7fc64b89e9621129aaca86102d2556
+--- /dev/null
++++ b/backend/tests/test_fixj_quote_guard.py
+@@ -0,0 +1,165 @@
++"""Fix Round J B-042 / B-044 — an accepted quote with a raised invoice keeps its money; an accepted quote with a job or a
++raised invoice keeps its status; nothing with a job or a raised invoice can be archived. No Mongo: a fake db."""
++import copy
++import os
++import sys
++
++import pytest
++
++sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
++from services.quote_guard import money_change_block, money_signature, status_change_block  # noqa: E402
++
++AID = "tenant-a"
++
++
++def _match(r, q):
++    for k, v in q.items():
++        if k == "$or":
++            if not any(_match(r, sub) for sub in v):
++                return False
++        elif isinstance(v, dict) and "$nin" in v:
++            if r.get(k) in v["$nin"]:
++                return False
++        elif r.get(k) != v:
++            return False
++    return True
++
++
++class _Coll:
++    def __init__(self, rows):
++        self.rows = rows
++
++    async def find_one(self, q, proj=None):
++        return next((r for r in self.rows if _match(r, q)), None)
++
++
++class _DB:
++    def __init__(self, projects=(), invoices=()):
++        self.projects = _Coll(list(projects))
++        self.invoices = _Coll(list(invoices))
++
++
++AREA = {"id": "a1", "name": "Lounge", "width": 4, "length": 5, "height": 2.7}
++QUOTE = {
++    "_id": "e1", "owner_admin_id": AID, "estimate_number": "EST-0006", "status": "accepted",
++    "areas": [AREA],
++    "lines": [{"id": "l1", "area_id": "a1", "kind": "custom", "name": "Walls", "qty": 40, "rate": 12.5, "unit": "m2"},
++              {"id": "l2", "area_id": "a1", "kind": "custom", "name": "Ceiling", "qty": 20, "rate": 10, "unit": "m2", "optional": True}],
++    "discount": {"enabled": True, "type": "percent", "value": 5, "reason": "repeat"},
++    "tax": {"enabled": True, "rate": 10, "label": "GST", "inclusive": False},
++    "payment_plan": {"deposit_pct": 30, "progress_count": 0, "stages": [{"label": "Deposit", "pct": 30}, {"label": "Final", "pct": 70}]},
++    "notes": "Side gate", "crew_notes": "Dog in the yard",
++}
++JOB = {"_id": "p1", "owner_admin_id": AID, "estimate_id": "e1", "name": "12 Ivanhoe Pde, Ivanhoe", "status": "in_progress"}
++SENT = {"_id": "i1", "owner_admin_id": AID, "estimate_id": "e1", "number": "INV-0004", "status": "sent", "amount_paid": 0}
++PAID = {**SENT, "_id": "i2", "number": "INV-0005", "status": "paid", "amount_paid": 500}
++DRAFT = {**SENT, "_id": "i3", "number": "INV-0006", "status": "draft"}
++ON_JOB_ONLY = {"_id": "i4", "owner_admin_id": AID, "project_id": "p1", "number": "INV-0007", "status": "sent", "amount_paid": 0}
++
++
++def _with(**changes):
++    q = copy.deepcopy(QUOTE)
++    q.update(changes)
++    return q
++
++
++# ── the signature ─────────────────────────────────────────────────────────────
++def test_notes_photos_labels_and_order_are_not_money():
++    same = _with(notes="New notes", crew_notes="", photos=[{"id": "x"}], valid_until="2026-12-01")
++    same["tax"]["label"] = "VAT"
++    same["payment_plan"]["stages"][0]["label"] = "Booking"
++    same["lines"].reverse()
++    assert money_signature(same) == money_signature(QUOTE)
++
++
++def test_price_qty_discount_tax_plan_and_new_lines_are_money():
++    for q in (
++        _with(lines=[{**QUOTE["lines"][0], "rate": 13}, QUOTE["lines"][1]]),
++        _with(lines=[{**QUOTE["lines"][0], "qty": 41}, QUOTE["lines"][1]]),
++        _with(lines=QUOTE["lines"] + [{"id": "l3", "area_id": "a1", "kind": "custom", "name": "Doors", "qty": 2, "rate": 90}]),
++        _with(lines=[QUOTE["lines"][0]]),
++        _with(discount={"enabled": True, "type": "percent", "value": 10}),
++        _with(discount={"enabled": False, "type": "percent", "value": 5}),
++        _with(tax={"enabled": True, "rate": 10, "label": "GST", "inclusive": True}),
++        _with(payment_plan={"deposit_pct": 50, "progress_count": 0, "stages": [{"label": "Deposit", "pct": 50}, {"label": "Final", "pct": 50}]}),
++        _with(paint_charge=True),
++    ):
++        assert money_signature(q) != money_signature(QUOTE)
++
++
++def test_auto_measured_line_follows_its_area():
++    auto = _with(lines=[{"id": "l1", "area_id": "a1", "kind": "custom", "name": "Walls", "qty_auto": True, "measure": "walls", "rate": 12.5, "unit": "m2"}])
++    bigger = copy.deepcopy(auto)
++    bigger["areas"][0]["height"] = 3.0
++    assert money_signature(auto) != money_signature(bigger)
++
++
++# ── B-042: money on an accepted, invoiced quote ───────────────────────────────
++@pytest.mark.asyncio
++async def test_not_accepted_quotes_are_never_locked():
++    db = _DB([JOB], [PAID])
++    assert await money_change_block(AID, _with(status="sent"), _with(status="sent", discount={"enabled": False}), db=db) is None
++
++
++@pytest.mark.asyncio
++async def test_accepted_with_only_a_draft_invoice_can_still_change():
++    db = _DB([JOB], [DRAFT])
++    assert await money_change_block(AID, QUOTE, _with(discount={"enabled": False}), db=db) is None
++
++
++@pytest.mark.asyncio
++async def test_accepted_and_sent_locks_money_but_not_notes():
++    db = _DB([JOB], [SENT])
++    assert await money_change_block(AID, QUOTE, _with(notes="Gate code 4471"), db=db) is None
++    msg = await money_change_block(AID, QUOTE, _with(discount={"enabled": False}), db=db)
++    assert msg and "EST-0006" in msg and "INV-0004" in msg and "sent" in msg and "variation" in msg and "Ivanhoe" in msg
++
++
++@pytest.mark.asyncio
++async def test_paid_invoice_says_paid_and_an_invoice_linked_only_to_the_job_counts():
++    assert "paid" in (await money_change_block(AID, QUOTE, _with(tax={"enabled": False}), db=_DB([JOB], [PAID])) or "")
++    assert await money_change_block(AID, QUOTE, _with(tax={"enabled": False}), db=_DB([JOB], [ON_JOB_ONLY])) is not None
++
++
++@pytest.mark.asyncio
++async def test_partial_save_that_omits_the_lines_keeps_the_stored_ones():
++    db = _DB([JOB], [PAID])
++    proposed = {**QUOTE, "crew_notes": "Key under the pot plant"}  # what a connector update_quote with only notes merges to
++    assert await money_change_block(AID, QUOTE, proposed, db=db) is None
++
++
++# ── B-044: status moves ───────────────────────────────────────────────────────
++@pytest.mark.asyncio
++async def test_accepted_cannot_be_archived_at_all():
++    assert await status_change_block(AID, QUOTE, "archived", db=_DB()) == "Accepted estimates can't be archived."
++
++
++@pytest.mark.asyncio
++async def test_accepted_with_a_job_cannot_go_back_to_draft():
++    msg = await status_change_block(AID, QUOTE, "draft", db=_DB([JOB], []))
++    assert msg and "Ivanhoe" in msg and "Draft" in msg and "Delete the job" in msg
++
++
++@pytest.mark.asyncio
++async def test_accepted_with_only_a_raised_invoice_cannot_be_unaccepted():
++    msg = await status_change_block(AID, QUOTE, "declined", db=_DB([], [SENT]))
++    assert msg and "INV-0004" in msg and "Declined" in msg
++
++
++@pytest.mark.asyncio
++async def test_accepted_with_nothing_depending_on_it_can_still_move():
++    assert await status_change_block(AID, QUOTE, "draft", db=_DB([], [DRAFT])) is None
++
++
++@pytest.mark.asyncio
++async def test_archiving_any_quote_with_a_job_or_invoice_is_refused():
++    sent_quote = _with(status="sent")
++    assert await status_change_block(AID, sent_quote, "archived", db=_DB([JOB], [])) is not None
++    assert await status_change_block(AID, sent_quote, "archived", db=_DB([], [PAID])) is not None
++    assert await status_change_block(AID, sent_quote, "archived", db=_DB([], [DRAFT])) is None
++
++
++@pytest.mark.asyncio
++async def test_ordinary_moves_need_no_lookup():
++    assert await status_change_block(AID, _with(status="sent"), "viewed", db=None) is None
++    assert await status_change_block(AID, QUOTE, "accepted", db=None) is None
+diff --git a/frontend/app/admin/project/[id].tsx b/frontend/app/admin/project/[id].tsx
+index 107ba3430aee03909c3a5deda3fbb85370c06ee4..d6b5926ccbfffadd6955c4db799e4ff3c8021ab7 100644
+--- a/frontend/app/admin/project/[id].tsx
++++ b/frontend/app/admin/project/[id].tsx
+@@ -38,7 +38,7 @@ export default function ProjectDetailPage() {
+   const [p, setP] = useState<any>(null); const [est, setEst] = useState<any>(null); const [labor, setLabor] = useState<any>(null); const [mats, setMats] = useState<any[]>([]); const [emps, setEmps] = useState<any[]>([]); const [comms, setComms] = useState<any[]>([]);
+   const [drawer, setDrawer] = useState<{ open: boolean; tab?: string }>({ open: !!details, tab: details || 'activity' });
+   const [varOpen, setVarOpen] = useState(false); const [eqForm, setEqForm] = useState(false); const [exForm, setExForm] = useState(false); const [crewPick, setCrewPick] = useState(false); const [paintPick, setPaintPick] = useState(false); const [catalog, setCatalog] = useState<any[]>([]); const [pq, setPq] = useState('');
+-  const [eq, setEq] = useState({ name: '', status: 'on_site', details: '', supplier: '', from: today(), to: today(), cost: '' });
++  const [eq, setEq] = useState({ name: '', status: 'on_site', details: '', supplier: '', from: today(), to: today(), cost: '' }); const [eqEdit, setEqEdit] = useState<string | null>(null);  // Fix Round J B-058 — the hire row being edited (null = adding)
+   const [ex, setEx] = useState({ label: '', amount: '', category: 'materials', date: today() });
+   const [reportOpen, setReportOpen] = useState(false); const [doneHint, setDoneHint] = useState(false); const [photoStats, setPhotoStats] = useState<PhotoStats>({ total: 0, before: 0, after: 0, pairs: 0 });
+   const [toast, setToast] = useState<string | null>(null); const say = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2400); };
+@@ -87,7 +87,16 @@ export default function ProjectDetailPage() {
+     try { const r = await api.post(`/projects/${id}/variations`, v); const created = r.data?.variation || (r.data?.variations || []).slice(-1)[0]; if (send && created?.id) { const sr = await api.post(`/projects/${id}/variations/${created.id}/send`, { via: ['email'] }); say(sr.data?.sent ? `Sent to ${cs.email || 'client'} for approval` : `Saved as draft — ${sr.data?.results?.email?.error || 'could not send'}`); } else say('Variation saved as draft'); await load(); }
+     catch (e: any) { say(e?.response?.data?.detail || 'Could not save variation'); }
+   };
+-  const addEq = async () => { if (!eq.name.trim()) return; try { const r = await api.post(`/projects/${id}/equipment`, { name: eq.name, status: eq.status, details: eq.details, supplier: eq.supplier, from_date: eq.from, to_date: eq.to, cost: Number(eq.cost) || 0 }); setP(r.data); setEqForm(false); setEq({ name: '', status: 'on_site', details: '', supplier: '', from: today(), to: today(), cost: '' }); say('Equipment added'); } catch { say('Could not add equipment'); } };
++  const closeEq = () => { setEqForm(false); setEqEdit(null); setEq({ name: '', status: 'on_site', details: '', supplier: '', from: today(), to: today(), cost: '' }); };
++  const editEq = (e: any) => { setEq({ name: e.name || '', status: e.status || 'on_site', details: e.details || '', supplier: e.supplier || '', from: e.from || today(), to: e.to || today(), cost: e.cost ? String(e.cost) : '' }); setEqEdit(e.id); setEqForm(true); };  // Fix Round J B-058 — a hire row opens in the same form
++  const saveEq = async () => {
++    if (!eq.name.trim()) return;
++    const body = { name: eq.name, status: eq.status, details: eq.details, supplier: eq.supplier, cost: Number(eq.cost) || 0 };
++    try {
++      const r = eqEdit ? await api.patch(`/projects/${id}/equipment/${eqEdit}`, { ...body, from: eq.from, to: eq.to }) : await api.post(`/projects/${id}/equipment`, { ...body, from_date: eq.from, to_date: eq.to });
++      setP(r.data); say(eqEdit ? 'Equipment updated' : 'Equipment added'); closeEq();
++    } catch { say(eqEdit ? 'Could not update equipment' : 'Could not add equipment'); }
++  };
+   const addEx = async () => { if (!ex.label.trim() || !(Number(ex.amount) > 0)) return; try { await api.post(`/projects/${id}/expenses`, { label: ex.label, amount: Number(ex.amount), category: ex.category, date: ex.date }); setExForm(false); setEx({ label: '', amount: '', category: 'materials', date: today() }); await load(); } catch { say('Could not add expense'); } };
+   const setCrew = async (ids: string[]) => { try { const r = await api.put(`/projects/${id}/crew`, { assigned_employee_ids: ids }); setP(r.data?.project || r.data); await load(); } catch { say('Could not update crew'); } };
+   const openCustomer = () => p.customer_id ? router.push({ pathname: '/admin/customer-detail', params: { id: p.customer_id } } as any) : say('No customer record linked');
+@@ -160,9 +169,9 @@ export default function ProjectDetailPage() {
+           </Card>
+ 
+           <Card testID="project-equipment-card">
+-            <CardHead title="Equipment hire" n={equip.length} sub="Scaffold, boom lifts, sprayers — anything hired or brought to site. Costs roll into Actual to date." right={<><Sum v={money(m.equipment)} testID="equipment-total" /><LinkBtn icon={eqForm ? 'chevron-up' : 'add'} label={eqForm ? 'Close' : 'Add equipment'} onPress={() => setEqForm((v) => !v)} testID="equipment-add" /></>} />
+-            {eqForm && <View style={d.form} testID="equipment-form"><View style={d.fr}><Field w2 label="Equipment" value={eq.name} onChange={(v) => setEq({ ...eq, name: v })} placeholder="e.g. Scaffold — rear elevation" testID="equipment-name" /><Select label="Status" value={eq.status} options={[['booked', 'Booked'], ['on_site', 'On site'], ['returned', 'Returned']]} onChange={(v) => setEq({ ...eq, status: v })} testID="equipment-status" /></View><View style={d.fr}><Field w2 label="Details" value={eq.details} onChange={(v) => setEq({ ...eq, details: v })} placeholder="Size, model, what it's for" testID="equipment-details" /><Field label="Source / supplier" value={eq.supplier} onChange={(v) => setEq({ ...eq, supplier: v })} placeholder="e.g. Kennards Hire, Rozelle" testID="equipment-supplier" /></View><View style={d.fr}><Field label="From" value={eq.from} onChange={(v) => setEq({ ...eq, from: v })} type="date" testID="equipment-from" /><Field label="To" value={eq.to} onChange={(v) => setEq({ ...eq, to: v })} type="date" testID="equipment-to" /><Field label="Cost ($, total)" value={eq.cost} onChange={(v) => setEq({ ...eq, cost: v })} placeholder="0" kb="decimal-pad" testID="equipment-cost" /></View><View style={d.fa}><Btn ghost small label="Cancel" onPress={() => setEqForm(false)} /><Btn small label="Add" onPress={addEq} testID="equipment-save" /></View></View>}
+-            {equip.length ? equip.map((e) => { const days = e.from && e.to ? Math.max(1, Math.round((new Date(e.to).getTime() - new Date(e.from).getTime()) / 86400000) + 1) : null; return <RowItem key={e.id} title={e.name} chip={<Chip label={ECHIP[e.status]?.[0] || e.status} tone={ECHIP[e.status]?.[1] || 'neutral'} />} sub={[e.details, e.supplier].filter(Boolean).join(' · ')} when={e.from ? `${fmtDay(e.from)} → ${fmtDay(e.to)}${days ? ` · ${days}d` : ''}` : undefined} amt={e.cost ? money(e.cost) : 'Own'} right={<XBtn onPress={async () => { const r = await api.delete(`/projects/${id}/equipment/${e.id}`); setP(r.data); }} testID={`equipment-delete-${e.id}`} />} testID={`equipment-row-${e.id}`} />; }) : <Empty text="Nothing hired for this job yet." />}
++            <CardHead title="Equipment hire" n={equip.length} sub="Scaffold, boom lifts, sprayers — anything hired or brought to site. Costs roll into Actual to date." right={<><Sum v={money(m.equipment)} testID="equipment-total" /><LinkBtn icon={eqForm ? 'chevron-up' : 'add'} label={eqForm ? 'Close' : 'Add equipment'} onPress={() => (eqForm ? closeEq() : setEqForm(true))} testID="equipment-add" /></>} />
++            {eqForm && <View style={d.form} testID="equipment-form">{eqEdit ? <Text style={d.k} testID="equipment-form-editing">Editing {eq.name || 'this item'}</Text> : null}<View style={d.fr}><Field w2 label="Equipment" value={eq.name} onChange={(v) => setEq({ ...eq, name: v })} placeholder="e.g. Scaffold — rear elevation" testID="equipment-name" /><Select label="Status" value={eq.status} options={[['booked', 'Booked'], ['on_site', 'On site'], ['returned', 'Returned']]} onChange={(v) => setEq({ ...eq, status: v })} testID="equipment-status" /></View><View style={d.fr}><Field w2 label="Details" value={eq.details} onChange={(v) => setEq({ ...eq, details: v })} placeholder="Size, model, what it's for" testID="equipment-details" /><Field label="Source / supplier" value={eq.supplier} onChange={(v) => setEq({ ...eq, supplier: v })} placeholder="e.g. Kennards Hire, Rozelle" testID="equipment-supplier" /></View><View style={d.fr}><Field label="From" value={eq.from} onChange={(v) => setEq({ ...eq, from: v })} type="date" testID="equipment-from" /><Field label="To" value={eq.to} onChange={(v) => setEq({ ...eq, to: v })} type="date" testID="equipment-to" /><Field label="Cost ($, total)" value={eq.cost} onChange={(v) => setEq({ ...eq, cost: v })} placeholder="0" kb="decimal-pad" testID="equipment-cost" /></View><View style={d.fa}><Btn ghost small label="Cancel" onPress={closeEq} /><Btn small label={eqEdit ? 'Save changes' : 'Add'} onPress={saveEq} testID="equipment-save" /></View></View>}
++            {equip.length ? equip.map((e) => { const days = e.from && e.to ? Math.max(1, Math.round((new Date(e.to).getTime() - new Date(e.from).getTime()) / 86400000) + 1) : null; return <RowItem key={e.id} title={e.name} chip={<Chip label={ECHIP[e.status]?.[0] || e.status} tone={ECHIP[e.status]?.[1] || 'neutral'} />} sub={[e.details, e.supplier].filter(Boolean).join(' · ')} when={e.from ? `${fmtDay(e.from)} → ${fmtDay(e.to)}${days ? ` · ${days}d` : ''}` : undefined} amt={e.cost ? money(e.cost) : 'Own'} right={<View style={{ flexDirection: 'row', gap: 2 }}><XBtn icon="create-outline" onPress={() => editEq(e)} testID={`equipment-edit-${e.id}`} /><XBtn onPress={async () => { const r = await api.delete(`/projects/${id}/equipment/${e.id}`); setP(r.data); }} testID={`equipment-delete-${e.id}`} /></View>} testID={`equipment-row-${e.id}`} />; }) : <Empty text="Nothing hired for this job yet." />}
+           </Card>
+ 
+           <Card testID="project-expenses-card">
+@@ -202,7 +211,7 @@ export default function ProjectDetailPage() {
+       </ScrollView>
+ 
+       <VariationModal visible={varOpen} onClose={() => setVarOpen(false)} areas={areas} onSave={saveVar} />
+-      <ProjectDrawer project={p} estimate={est} visible={drawer.open} tab={drawer.tab} photoStats={photoStats} onJumpPhotos={() => setTimeout(scrollToPhotos, 450)} onClose={() => setDrawer({ open: false, tab: drawer.tab })} onStatus={setStatus} onLog={log} onEstimatePatched={(patch) => { setEst((e: any) => ({ ...(e || {}), ...patch })); if (patch.photos_link !== undefined) setP((x: any) => ({ ...x, photos_link: patch.photos_link })); }} />
++      <ProjectDrawer project={p} estimate={est} visible={drawer.open} tab={drawer.tab} photoStats={photoStats} say={say} onJumpPhotos={() => setTimeout(scrollToPhotos, 450)} onClose={() => setDrawer({ open: false, tab: drawer.tab })} onStatus={setStatus} onLog={log} onEstimatePatched={(patch) => { setEst((e: any) => ({ ...(e || {}), ...patch })); if (patch.photos_link !== undefined) setP((x: any) => ({ ...x, photos_link: patch.photos_link })); }} />
+       {reportOpen && <ReportModal project={p} onClose={() => setReportOpen(false)} onSent={() => { setDoneHint(false); load(); }} say={say} />}
+       {doneHint && !reportOpen && <DoneHint onOpen={() => { setDrawer({ open: false, tab: drawer.tab }); setReportOpen(true); }} onClose={() => setDoneHint(false)} />}
+       <Toast msg={toast} />
+diff --git a/frontend/app/admin/projects.tsx b/frontend/app/admin/projects.tsx
+index 5668906ab0d4c306ce41db773ecb7c842f3ff5c6..0fe3ffe0f2b5dcae4629655b7fe9870a13461185 100644
+--- a/frontend/app/admin/projects.tsx
++++ b/frontend/app/admin/projects.tsx
+@@ -30,8 +30,13 @@ function derive(p: P) {
+   const m = p.margin || {};
+   const revenue = num(m.estimated_revenue), estCost = num(m.estimated_cost), actualCost = num(m.actual_cost);
+   const invoiced = num(m.invoiced), paid = num(m.invoice_paid), outstanding = Math.max(0, invoiced - paid);
+-  const projectedProfit = revenue - Math.max(estCost, actualCost);
+-  const mo = { revenue, estCost, actualCost, invoiced, paid, outstanding, projectedProfit, projectedMargin: revenue ? projectedProfit / revenue * 100 : 0, actualMargin: revenue ? (revenue - actualCost) / revenue * 100 : 0, costPct: estCost ? actualCost / estCost * 100 : 0, hasInvoice: (m.invoice_count || 0) > 0 };
++  // Fix Round J B-029 / B-055 — the server's snapshot (services/job_money.py) is the one truth: projected profit as it computes it,
++  // margin "so far" against what is invoiced, "est" until something is. B-012 — a job counts as invoiced only once an invoice is raised
++  // (the deposit auto-drafted on accept is not an invoice yet).
++  const projectedProfit = m.projected_profit !== undefined && m.projected_profit !== null ? num(m.projected_profit) : revenue - Math.max(estCost, actualCost);
++  const revenueToDate = m.revenue_to_date !== undefined && m.revenue_to_date !== null ? num(m.revenue_to_date) : invoiced; const toDate = revenueToDate > 0;
++  const raised = m.raised_invoice_count !== undefined && m.raised_invoice_count !== null ? num(m.raised_invoice_count) : invoiced > 0 ? 1 : 0;
++  const mo = { revenue, estCost, actualCost, invoiced, paid, outstanding, projectedProfit, projectedMargin: revenue ? projectedProfit / revenue * 100 : 0, toDate, actualMargin: toDate ? (revenueToDate - actualCost) / revenueToDate * 100 : 0, costPct: estCost ? actualCost / estCost * 100 : 0, hasInvoice: raised > 0 || invoiced > 0, hasDraft: (m.invoice_count || 0) > 0 && raised === 0 && invoiced <= 0 };
+   const flags: { key: string; cls: 'danger' | 'warning'; text: string }[] = [];
+   const st = p.status, crew = p.assigned_employee_ids || [];
+   if (st === 'in_progress' && p.target_end_date && daysUntil(p.target_end_date) < 0) { const n = -daysUntil(p.target_end_date); flags.push({ key: 'late', cls: 'danger', text: `${n} day${n === 1 ? '' : 's'} over target` }); }
+@@ -56,9 +61,10 @@ function dateLine(p: P): { cls: Tone; icon: any; text: string } {
+ }
+ function InvLine({ p, d }: { p: P; d: D }) {
+   const m = d.m;
+-  if (!m.hasInvoice) return p.status === 'done' ? <Act icon="receipt-outline" text="Not invoiced yet" tone="danger" /> : p.status === 'in_progress' ? <Act icon="receipt-outline" text="No deposit invoiced" /> : null;
++  if (!m.hasInvoice) return p.status === 'done' ? <Act icon="receipt-outline" text={m.hasDraft ? 'Invoice drafted · not sent' : 'Not invoiced yet'} tone="danger" /> : p.status === 'in_progress' ? <Act icon="receipt-outline" text={m.hasDraft ? 'Deposit invoice drafted · not sent' : 'No deposit invoiced'} /> : null;
+   if (m.outstanding > 0) return <Act icon="receipt-outline" text={`Invoiced ${money(m.invoiced)} · ${money(m.outstanding)} owed`} tone="warning" />;
+-  return <Act icon="checkmark-circle-outline" text={`Invoiced ${money(m.invoiced)} · paid in full`} tone="success" />;
++  if (m.invoiced > 0) return <Act icon="checkmark-circle-outline" text={`Invoiced ${money(m.invoiced)} · paid in full`} tone="success" />;
++  return <Act icon="receipt-outline" text="Invoiced · nothing owing" />;
+ }
+ function Avatars({ ids, emps }: { ids: string[]; emps: Record<string, any> }) {
+   if (!ids.length) return <View style={s.avNone}><Text style={s.avNoneText}>No crew</Text></View>;
+@@ -127,8 +133,8 @@ export default function ProjectsPage() {
+       <Text style={s.pc} numberOfLines={1}><Text onPress={(e: any) => { e?.stopPropagation?.(); openCustomer(p); }} style={s.pcLink}>{cs.name || '—'}</Text>{cs.address ? ` · ${cs.address}` : ''}</Text>
+       <View style={{ marginTop: 12 }}><Act icon={dl.icon} text={dl.text} tone={dl.cls} /></View>
+       <View style={s.pm}><Text style={s.pq}>{money(m.revenue)}<Text style={s.pqs}> quoted</Text></Text>
+-        {p.status === 'quoted' ? <View style={[s.mg, s.mgNeutral]}><Text style={[s.mgText, { color: t.colors.textSecondary }]}>est {m.projectedMargin.toFixed(0)}%</Text></View>
+-          : <View style={[s.mg, mgBg(mgTone(m.actualMargin))]}><Text style={[s.mgText, { color: mgFg(mgTone(m.actualMargin)) }]}>{m.actualMargin.toFixed(0)}% margin</Text></View>}
++        {p.status === 'quoted' || !m.toDate ? <View style={[s.mg, s.mgNeutral]}><Text style={[s.mgText, { color: t.colors.textSecondary }]}>est {m.projectedMargin.toFixed(0)}%</Text></View>
++          : <View style={[s.mg, mgBg(mgTone(m.actualMargin))]}><Text style={[s.mgText, { color: mgFg(mgTone(m.actualMargin)) }]}>{m.actualMargin.toFixed(0)}% margin so far</Text></View>}
+       </View>
+       {p.status !== 'quoted' && (<>
+         <View style={s.bar}><View style={[s.barFill, { width: `${Math.min(100, m.costPct)}%` }, m.costPct > 100 && { backgroundColor: t.colors.danger }]} /></View>
+@@ -199,7 +205,7 @@ export default function ProjectsPage() {
+                 <Cell w={96}><Avatars ids={p.assigned_employee_ids || []} emps={emps} /></Cell>
+                 <Cell w={92} right><L1 style={k.mono}>{money(m.revenue)}</L1></Cell>
+                 <Cell w={110} right><L1 style={[k.mono, m.actualCost > m.estCost && { color: t.colors.danger }]}>{p.status === 'quoted' ? '—' : money(m.actualCost)}</L1><L2>of {money(m.estCost)}</L2></Cell>
+-                <Cell w={72} right><L1 style={[k.mono, { color: p.status === 'quoted' ? t.colors.textMuted : mgFg(mgTone(m.actualMargin)) }]}>{(p.status === 'quoted' ? m.projectedMargin : m.actualMargin).toFixed(0)}%</L1></Cell>
++                <Cell w={72} right><L1 style={[k.mono, { color: p.status === 'quoted' || !m.toDate ? t.colors.textMuted : mgFg(mgTone(m.actualMargin)) }]}>{(p.status === 'quoted' || !m.toDate ? m.projectedMargin : m.actualMargin).toFixed(0)}%</L1></Cell>
+                 <Cell w={150}><InvLine p={p} d={d} /></Cell>
+                 <View style={k.cmenu}>{nx && <Pressable onPress={(e: any) => { e?.stopPropagation?.(); advance(p); }} style={k.rowmenu} testID={`advance-${p.id}`}><Ionicons name="arrow-forward" size={16} color={t.colors.accent} /></Pressable>}</View>
+               </Row>
+diff --git a/frontend/app/employee/(tabs)/_layout.tsx b/frontend/app/employee/(tabs)/_layout.tsx
+index 5d11c11cfefb4895205d2a3e09783d050eb01a10..6ff10a2ac756a10a0b8405f3520c93af40cb8b01 100644
+--- a/frontend/app/employee/(tabs)/_layout.tsx
++++ b/frontend/app/employee/(tabs)/_layout.tsx
+@@ -12,18 +12,19 @@ import api from '../../../utils/api';
+ // Round C1 — crew shell: four tabs (Today · Inbox · Learn · Me). Jobs arrives in C2.
+ 
+ type Notif = { id: string; title: string; message?: string; notification_type?: string; type?: string; link?: string | null; related_id?: string | null; read: boolean; created_at: string };
+-type CrewState = { notifs: Notif[]; unread: number; reset: () => void; load: (userId: string) => Promise<void>; markRead: (id: string) => Promise<void>; markAll: (userId: string) => Promise<void> };
++type CrewState = { notifs: Notif[]; unread: number; loaded: boolean; reset: () => void; load: (userId: string) => Promise<void>; markRead: (id: string) => Promise<void>; markAll: (userId: string) => Promise<void> };
+ 
+ export const useCrewStore = create<CrewState>((set, get) => ({
+   notifs: [],
+   unread: 0,
+-  reset: () => set({ notifs: [], unread: 0 }),
++  loaded: false, // true once the first load has answered (or failed) — "You're up to date" is only true after that
++  reset: () => set({ notifs: [], unread: 0, loaded: false }),
+   load: async (userId) => {
+     try {
+       const r = await api.get(`/notifications/${userId}`, { params: { recipient_type: 'employee' } });
+       const list: Notif[] = Array.isArray(r.data) ? r.data : [];
+-      set({ notifs: list, unread: list.filter((n) => n.read === false).length });
+-    } catch { /* keep the last list */ }
++      set({ notifs: list, unread: list.filter((n) => n.read === false).length, loaded: true });
++    } catch { set({ loaded: true }); /* keep the last list */ }
+   },
+   markRead: async (id) => {
+     set((s) => { const notifs = s.notifs.map((n) => (n.id === id ? { ...n, read: true } : n)); return { notifs, unread: notifs.filter((n) => n.read === false).length }; });
+diff --git a/frontend/app/employee/(tabs)/dashboard.tsx b/frontend/app/employee/(tabs)/dashboard.tsx
+index a963fbb9e95bef67bb5dc363a7b336bd98e13ee4..fa0d7b26c738a997c4967fff29f9b725b66a7b33 100644
+--- a/frontend/app/employee/(tabs)/dashboard.tsx
++++ b/frontend/app/employee/(tabs)/dashboard.tsx
+@@ -35,8 +35,10 @@ export default function CrewToday() {
+   const [weather, setWeather] = useState<CrewWeather | null>(null);
+   const router = useRouter();
+   const { user } = useAuthStore();
+-  const { notifs, unread, load, markRead } = useCrewStore();
++  const { notifs, unread, loaded: notifsLoaded, load, markRead } = useCrewStore();
+   const { jobs, loaded: jobsLoaded, loadJobs } = useCrewJobs();
++  const [waited, setWaited] = useState(false); // first paint: never hold the screen longer than 4 s on a slow connection
++  useEffect(() => { const id = setTimeout(() => setWaited(true), 4000); return () => clearTimeout(id); }, []);
+   const [jobCard, setJobCard] = useState<{ crew: { id: string; name: string }[]; access_notes: { text: string }[] } | null>(null);
+   const [status, setStatus] = useState<Status | null>(null);
+   const [busy, setBusy] = useState(false);
+@@ -176,12 +178,17 @@ export default function CrewToday() {
+   const noGps = signedIn && !!s!.location && s!.location.latitude == null;
+   const top = notifs.filter((n) => n.read === false).slice(0, 3);
+   const first = (user?.name || '').trim().split(/\s+/)[0] || 'there';
++  // First paint fix (13 Nov): the cards wait for the first answers — the clock status, the jobs list and the inbox — and then appear
++  // together in their real state. Before, for about a second after the splash, Today showed a half-loaded screen: a spinner in a short
++  // clock card, a "Today's job" heading with nothing under it and "You're up to date." with a message unread, then everything jumped.
++  const ready = waited || ((!!status || !!err) && jobsLoaded && (notifsLoaded || !user?.id));
+ 
+   return (
+     <View style={ui.screen} testID="crew-pane-today">
+       <StatusBar style="dark" />
+       <TabHeader kicker={fmtDateLine(new Date())} title={`${greeting()}, ${first}`} />
+       <Body>
++        {!ready ? <View style={{ paddingVertical: 56, alignItems: 'center' }} testID="crew-today-loading"><ActivityIndicator color={t.colors.accent} /></View> : (<>
+         <Sect>Time clock</Sect>
+         <View style={[ui.card, { padding: 18, paddingBottom: 16 }]} testID="crew-today-clock">
+           {!status && !err ? <ActivityIndicator color={t.colors.accent} style={{ marginVertical: 24 }} /> : (
+@@ -230,7 +237,7 @@ export default function CrewToday() {
+ 
+         <CrewAlertsCard cardStyle={[ui.card, { marginTop: 14 }]} />
+ 
+-        <Sect>Today&apos;s job</Sect>
++        {jobsLoaded && <Sect>Today&apos;s job</Sect>}
+         {!jobsLoaded ? null : !todayJob ? (
+           <View style={ui.card}><Text style={ui.empty} testID="crew-today-nojob">No jobs assigned to you yet.</Text></View>
+         ) : (() => {
+@@ -278,7 +285,7 @@ export default function CrewToday() {
+ 
+         <Sect right={<Pressable onPress={() => router.push('/employee/inbox')} hitSlop={10} testID="crew-today-notifs-all"><Text style={ui.sectLink}>Inbox</Text></Pressable>}>{unread ? `Unread · ${unread}` : 'Inbox'}</Sect>
+         <List testID="crew-today-notifs">
+-          {top.length === 0 ? <Text style={ui.empty} testID="crew-today-notifs-empty">You&apos;re up to date.</Text> : top.map((n, i) => (
++          {top.length === 0 ? <Text style={ui.empty} testID="crew-today-notifs-empty">{notifsLoaded ? 'You’re up to date.' : 'Checking your inbox…'}</Text> : top.map((n, i) => (
+             <Row key={n.id} first={i === 0} icon={notifIcon(n)} title={n.title} sub={n.message} onPress={() => openNotif(n)} testID="crew-notif-row" dot right={<Text style={ui.when}>{fmtWhen(n.created_at)}</Text>} />
+           ))}
+         </List>
+@@ -289,6 +296,7 @@ export default function CrewToday() {
+           <Row first icon="chatbubble-ellipses-outline" title="Daily report" sub="Send today's report and photos" onPress={() => router.push('/employee/daily-report')} testID="crew-today-report" />
+         </List>
+         </>)}
++        </>)}
+       </Body>
+       <AccomplishmentPopup visible={!!popup} reason={popup?.reason || ''} onClose={async () => { if (popup) await markRead(popup.id); setPopup(null); }} />
+     </View>
+diff --git a/frontend/components/crew/CrewAlerts.tsx b/frontend/components/crew/CrewAlerts.tsx
+index 776c1162f4bf961329a81274067cfa3a5ca513fa..752d16ffa8c1f8c72ecef1aa14f7bad40a3d8dec 100644
+--- a/frontend/components/crew/CrewAlerts.tsx
++++ b/frontend/components/crew/CrewAlerts.tsx
+@@ -10,11 +10,15 @@ import { disablePush, enablePush, pushSupport, PushSupport, syncPush, thisPhoneS
+ export const useCrewPush = () => {
+   const [support, setSupport] = useState<PushSupport>(() => pushSupport());
+   const [on, setOn] = useState(false);
++  const [known, setKnown] = useState(false); // false until this phone's alert state has been read once — nothing is offered before that
+   const [busy, setBusy] = useState(false);
+   const [msg, setMsg] = useState<string | null>(null);
+ 
+-  const refresh = useCallback(async () => { setSupport(pushSupport()); setOn(await thisPhoneSubscribed()); }, []);
+-  useEffect(() => { syncPush().finally(refresh); }, [refresh]);
++  const refresh = useCallback(async () => { setSupport(pushSupport()); setOn(await thisPhoneSubscribed()); setKnown(true); }, []);
++  // First paint fix (13 Nov): read this phone's own subscription first (local, a few ms); the server re-save (`syncPush`, a network
++  // call) runs after it in the background. It used to run first, so for about a second a phone with alerts ON looked like one with
++  // alerts off and the Today tab flashed the "Get buzzed for new jobs" card.
++  useEffect(() => { refresh().finally(() => { syncPush().finally(refresh); }); }, [refresh]);
+ 
+   const turnOn = useCallback(async () => {
+     setBusy(true); setMsg(null);
+@@ -29,7 +33,7 @@ export const useCrewPush = () => {
+     catch (e: any) { setMsg(e?.response?.data?.detail || 'Could not send a test alert.'); }
+     finally { setBusy(false); }
+   }, []);
+-  return { support, on, busy, msg, turnOn, turnOff, sendTest };
++  return { support, on, known, busy, msg, turnOn, turnOff, sendTest };
+ };
+ 
+ const DISMISS = 'pthq_crew_alerts_dismissed';
+@@ -42,9 +46,9 @@ const Step = ({ n, text }: { n: number; text: string }) => (
+ 
+ // Today tab card: shown until this phone has alerts on (or the crew member hides it).
+ export const CrewAlertsCard = ({ cardStyle }: { cardStyle: any }) => {
+-  const { support, on, busy, msg, turnOn } = useCrewPush();
++  const { support, on, known, busy, msg, turnOn } = useCrewPush();
+   const [hidden, setHidden] = useState(() => { try { return typeof localStorage !== 'undefined' && localStorage.getItem(DISMISS) === '1'; } catch { return false; } });
+-  if (!support.supported || on || hidden || support.permission === 'denied') return null;
++  if (!known || !support.supported || on || hidden || support.permission === 'denied') return null;
+   const hide = () => { try { localStorage.setItem(DISMISS, '1'); } catch { /* private mode */ } setHidden(true); };
+   return (
+     <View style={[cardStyle, { padding: 16, paddingHorizontal: 18 }]} testID="crew-alerts-card">
+diff --git a/frontend/components/estimate/v2/Builder.tsx b/frontend/components/estimate/v2/Builder.tsx
+index ca60e0925a1b30b46a123f80af7ed3a3b6120755..8c5414fceb5b7b4e2ada47c6032bead897f8c2b6 100644
+--- a/frontend/components/estimate/v2/Builder.tsx
++++ b/frontend/components/estimate/v2/Builder.tsx
+@@ -146,7 +146,7 @@ export default function Builder({ id, initialSend, initialView, initialContact,
+       {dlg?.kind === 'details' && <DetailsDialog est={est} days={tot.days} onClose={() => setDlg(null)} onSave={(d) => { update((e) => ({ ...e, ...d })); setDlg(null); }} />}
+       {dlg?.kind === 'addarea' && <AreaPicker est={est} side={dlg.extra} onAdd={(n, side) => addArea(n, side as any)} onClose={() => setDlg(null)} />}
+       {dlg?.kind === 'areanote' && <AreaNoteDialog area={areas.find((a) => a.id === dlg.id)!} onClose={() => setDlg(null)} onSave={(p) => { patchArea(dlg.id!, p); setDlg(null); }} />}
+-            {dlg?.kind === 'review' && <ReviewSend preTickContact={initialContact} est={est} tot={tot} settings={settings} checks={checks} preview={clientNode} onFix={fix} onSent={(e) => { setEst(e); say(`Quote ${e.estimate_number} sent`); }} onClose={() => setDlg(null)} beforeSend={async () => { await flush(); }} />}
++            {dlg?.kind === 'review' && <ReviewSend preTickContact={initialContact} est={est} tot={tot} settings={settings} checks={checks} preview={clientNode} onFix={fix} onSent={(e) => { setEst(e); say(`Quote ${e.estimate_number} sent`); }} onClose={() => setDlg(null)} onDone={() => { setDlg(null); router.push('/admin/estimates' as any); }} beforeSend={async () => { await flush(); }} />}
+       {dlg?.kind === 'details2' && <QuoteDetailsDrawer est={est} total={tot.total} update={update} onClose={() => setDlg(null)} say={say} />}
+       {dlg?.kind === 'template' && <TemplateDialog est={est} onClose={() => setDlg(null)} say={say} />}
+       {dlg?.kind === 'photos' && <PhotosDialog est={est} storage={storage} areaId={dlg.id || null} lineId={dlg.extra || null} onChange={(e) => { const merge = (cur: Est) => ({ ...cur, photos: e.photos || [], lines: (cur.lines || []).map((l: Line) => { const s = (e.lines || []).find((x: any) => x.id === l.id); return s ? { ...l, photo_url: s.photo_url ?? null } : l; }) }); setEst((cur: Est) => merge(cur)); if (pending.current) pending.current = merge(pending.current); }} onClose={() => setDlg(null)} say={say} />}
+diff --git a/frontend/components/estimate/v2/ReviewSend.tsx b/frontend/components/estimate/v2/ReviewSend.tsx
+index f8db8eb79c7f1511e80622ff78f8e55187d0feb0..f7db0636283e775bb349de13c0edbdd3f52156b3 100644
+--- a/frontend/components/estimate/v2/ReviewSend.tsx
++++ b/frontend/components/estimate/v2/ReviewSend.tsx
+@@ -10,12 +10,12 @@ import { money } from '../../../utils/format';
+ import { PlanCard, usePlan, hasFeature } from '../../PlanCard';
+ /** Round 61 — the invoice builder reuses this window. `invoice` swaps the wording, the recipients list kind, the PDF tick (no attachment homes on an invoice) and the send call. */
+ export type InvoiceSend = { mode: 'send' | 'resend' | 'reminder'; number: string; subject: string; body: string; smsText: string; summary: string; send: (p: { to: string[]; cc: string[]; subject: string; body: string; attachPdf: boolean; sms?: { to: string; body: string } }) => Promise<string> };
+-type Props = { est: Est; tot: any; settings: any; checks: Check[]; preview: React.ReactNode; onFix: (c: Check) => void; onSent: (e: Est) => void; onClose: () => void; beforeSend: () => Promise<void>; preTickContact?: string; invoice?: InvoiceSend };
++type Props = { est: Est; tot: any; settings: any; checks: Check[]; preview: React.ReactNode; onFix: (c: Check) => void; onSent: (e: Est) => void; onClose: () => void; onDone?: () => void; beforeSend: () => Promise<void>; preTickContact?: string; invoice?: InvoiceSend };  // onDone — where the sent window's Done button goes (the quote builder sends you to the Quotes list); absent = close only
+ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+ const L = ({ t }: { t: string }) => <div style={{ fontSize: 11, letterSpacing: 0.8, textTransform: 'uppercase', fontFamily: FONT.bodySemi, color: C.textMuted, marginBottom: 4 }}>{t}</div>;
+ const TONE = { red: C.danger, amber: '#B7791F', green: '#1C8A4B' } as const;
+ 
+-export function ReviewSend({ est, tot, settings, checks, preview, onFix, onSent, onClose, beforeSend, preTickContact, invoice }: Props) {
++export function ReviewSend({ est, tot, settings, checks, preview, onFix, onSent, onClose, onDone, beforeSend, preTickContact, invoice }: Props) {
+   const biz = settings.business_profile?.business_name || settings.business_name || 'us'; const first = (est.clientName || '').split(' ')[0] || 'there';
+   const resend = invoice ? invoice.mode !== 'send' : ['sent', 'viewed', 'accepted', 'declined'].includes(est.status); const reds = checks.filter((c) => c.tone === 'red');
+   const docWord = invoice ? 'invoice' : 'quote';
+@@ -48,7 +48,7 @@ export function ReviewSend({ est, tot, settings, checks, preview, onFix, onSent,
+   return <div onMouseDown={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(20,18,30,0.55)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+     <div role="dialog" aria-label={title} data-testid="review-and-send-modal" onMouseDown={(e) => e.stopPropagation()} style={{ width: 1400, maxWidth: '100%', height: 'calc(100vh - 40px)', background: '#fff', borderRadius: 16, display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.3)', fontFamily: FONT.body, color: C.text }}>
+       <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 22px', borderBottom: `1px solid ${C.border}` }}><div style={{ flex: 1 }}><div style={{ fontFamily: FONT.display, fontSize: 21 }} data-testid="rs-title">{title}</div><div style={{ fontSize: 13, color: C.textSecondary }}>Compose the email on the left · the client sees the {docWord} on the right</div></div><button data-testid="rs-close" aria-label="Close" onClick={onClose} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: 22, lineHeight: 1, color: C.textSecondary }}>×</button></div>
+-      {done ? <div data-testid="rs-sent" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ width: 520, background: C.sunken, borderRadius: 14, padding: 24, display: 'grid', gap: 12 }}><div style={{ fontFamily: FONT.display, fontSize: 22 }}>{invoice ? (invoice.mode === 'reminder' ? 'Reminder sent' : 'Invoice sent!') : 'Estimate sent!'}</div><div style={{ fontSize: 13.5, lineHeight: 1.5 }}>Emailed {rcp.emails.join(', ')}{rcp.cc.length ? ` · cc ${rcp.cc.join(', ')}` : ''}{sms && phone ? ` (and texted ${phone})` : ''}. {invoice ? `They can view the invoice and the bank transfer details at the link below${attachPdf ? ', with the PDF attached' : ''}.` : "They'll receive a link to review, accept and sign online, with the PDF attached."}</div>{invoice && <L t="Invoice link" />}<div style={{ display: 'flex', gap: 8 }}><input data-testid="rs-link" readOnly value={url} style={{ ...inp, flex: 1, fontFamily: FONT.mono, fontSize: 12 }} /><button data-testid="rs-copy-link" onClick={() => navigator.clipboard?.writeText(url)} style={btn('ghost')}>Copy</button></div><div style={{ display: 'flex', justifyContent: 'flex-end' }}><button data-testid="rs-done" onClick={onClose} style={btn('primary')}>Done</button></div></div></div>
++      {done ? <div data-testid="rs-sent" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ width: 520, background: C.sunken, borderRadius: 14, padding: 24, display: 'grid', gap: 12 }}><div style={{ fontFamily: FONT.display, fontSize: 22 }}>{invoice ? (invoice.mode === 'reminder' ? 'Reminder sent' : 'Invoice sent!') : 'Estimate sent!'}</div><div style={{ fontSize: 13.5, lineHeight: 1.5 }}>Emailed {rcp.emails.join(', ')}{rcp.cc.length ? ` · cc ${rcp.cc.join(', ')}` : ''}{sms && phone ? ` (and texted ${phone})` : ''}. {invoice ? `They can view the invoice and the bank transfer details at the link below${attachPdf ? ', with the PDF attached' : ''}.` : "They'll receive a link to review, accept and sign online, with the PDF attached."}</div>{invoice && <L t="Invoice link" />}<div style={{ display: 'flex', gap: 8 }}><input data-testid="rs-link" readOnly value={url} style={{ ...inp, flex: 1, fontFamily: FONT.mono, fontSize: 12 }} /><button data-testid="rs-copy-link" onClick={() => navigator.clipboard?.writeText(url)} style={btn('ghost')}>Copy</button></div><div style={{ display: 'flex', justifyContent: 'flex-end' }}><button data-testid="rs-done" onClick={onDone || onClose} style={btn('primary')}>Done</button></div></div></div>
+       : <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
+         <div data-testid="rs-left" style={{ width: 'min(520px, 48%)', flexShrink: 0, overflowY: 'auto', padding: 20, borderRight: `1px solid ${C.border}`, display: 'grid', gap: 14, alignContent: 'start' }}>
+           <div data-testid="rs-checklist" style={{ border: `1px solid ${reds.length ? C.danger : '#1C8A4B'}`, background: reds.length ? C.dangerBg : '#F1FAF4', borderRadius: 12, padding: '12px 14px' }}>
+diff --git a/frontend/components/project/ProjectDrawer.tsx b/frontend/components/project/ProjectDrawer.tsx
+index 4a45b448803edc919abb8236ffe0c1dce943b03c..593584e124874a1f509482a2e2ea80f43ac52355 100644
+--- a/frontend/components/project/ProjectDrawer.tsx
++++ b/frontend/components/project/ProjectDrawer.tsx
+@@ -11,7 +11,6 @@ import { k, Drawer, FooterBtn, MarkAsList, Btn } from '../lists/ListKit';
+ import { d, initials } from './detail/ui';
+ 
+ import { fmtDate, fmtDay } from '../../utils/format';
+-type Note = { id: string; text: string; crew_visible?: boolean; created_at: string; by?: string };
+ const ORDER = ['quoted', 'in_progress', 'done', 'invoiced'];
+ const LABEL: Record<string, string> = { quoted: 'Accepted', in_progress: 'In progress', done: 'Done', invoiced: 'Invoiced' };
+ const DOT: Record<string, string> = { note: t.colors.accent, status: t.colors.success, variation: t.colors.warning, invoice: '#1E9E82', payment: '#1E9E82', equipment: '#C1652E', date: t.colors.textMuted, reminder: t.colors.warning };
+@@ -19,26 +18,38 @@ const DOT: Record<string, string> = { note: t.colors.accent, status: t.colors.su
+ type PhotoStats = { total: number; before: number; after: number; pairs: number };
+ const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? '' : 's'}`;
+ 
+-export function ProjectDrawer({ project, estimate, visible, tab, onClose, onStatus, onLog, onEstimatePatched, photoStats, onJumpPhotos }: { project: any; estimate: any; visible: boolean; tab?: string; onClose: () => void; onStatus: (s: string, reason?: string) => void; onLog: (msg: string, type?: string) => Promise<void>; onEstimatePatched: (patch: any) => void; photoStats?: PhotoStats; onJumpPhotos?: () => void }) {
++export function ProjectDrawer({ project, estimate, visible, tab, onClose, onStatus, onLog, onEstimatePatched, photoStats, onJumpPhotos, say }: { project: any; estimate: any; visible: boolean; tab?: string; onClose: () => void; onStatus: (s: string, reason?: string) => void; onLog: (msg: string, type?: string) => Promise<void>; onEstimatePatched: (patch: any) => void; photoStats?: PhotoStats; onJumpPhotos?: () => void; say?: (m: string) => void }) {
+   const [dtab, setTab] = useState(tab || 'activity');
+   const [markOpen, setMark] = useState(false);
+-  const [noteIn, setNoteIn] = useState(''); const [cnote, setCnote] = useState('');
++  const [noteIn, setNoteIn] = useState(''); const [cnote, setCnote] = useState(''); const [cvis, setCvis] = useState(true); const [noteSaving, setNoteSaving] = useState(false);
+   const [reports, setReports] = useState<any[]>([]);
+   const [remindFor, setRemind] = useState<string | null>(null); const [remDate, setRemDate] = useState(new Date(Date.now() + 86400000).toISOString().slice(0, 10));
++  // Fix Round J B-033 — the quote keeps crew notes as ONE text (`crew_notes` + `crew_visible`), the field the builder's Quote details
++  // edits. This tab treated it as a list and called .map on the string → the page went blank. An older list this drawer wrote reads
++  // as lines; saving writes the text back.
++  const rawNotes = estimate?.crew_notes;
++  const noteText: string = typeof rawNotes === 'string' ? rawNotes : Array.isArray(rawNotes) ? rawNotes.map((n: any) => (typeof n === 'string' ? n : n?.text || '')).filter(Boolean).join('\n') : '';
++  const noteVis: boolean = Array.isArray(rawNotes) ? rawNotes.some((n: any) => n?.crew_visible === true) : estimate?.crew_visible !== false;
+   useEffect(() => { if (tab) setTab(tab); }, [tab, visible]);
+   useEffect(() => { if (visible && project?.id) api.get(`/daily-reports?project_id=${project.id}`).then((r) => setReports(Array.isArray(r.data) ? r.data : r.data?.items || [])).catch(() => {}); }, [visible, project?.id]);
++  useEffect(() => { setCnote(noteText); setCvis(noteVis); setRemind(null); }, [noteText, noteVis, visible]);
+   if (!project) return null;
+-  const notes: Note[] = estimate?.crew_notes || [];
+   const acts = [...(project.activity_log || [])].sort((a, b) => String(b.at || b.timestamp || '').localeCompare(String(a.at || a.timestamp || '')));
+   const cur = project.status === 'on_hold' ? 'in_progress' : project.status; const idx = ORDER.indexOf(cur);
+   const invAct = acts.filter((a) => a.type === 'invoice').pop();
+   const dates: Record<string, string | null> = { quoted: project.accepted_at, in_progress: project.start_date, done: project.completed_date, invoiced: project.status === 'invoiced' ? (invAct?.at || project.updated_at) : null };
+-  const persistNotes = async (next: Note[]) => { if (!project.estimate_id) return; await api.patch(`/estimates/${project.estimate_id}`, { crew_notes: next }); onEstimatePatched({ crew_notes: next }); };
+-  const addNote = async () => { const txt = cnote.trim(); if (!txt) return; setCnote(''); await persistNotes([{ id: `${Date.now()}`, text: txt, crew_visible: false, created_at: new Date().toISOString() }, ...notes]); };
+-  const setReminder = async (n: Note) => { try { await api.post('/reminders', { text: n.text, remind_at: `${remDate}T09:00:00`, related_type: 'project', related_id: project.id }); await onLog(`Reminder set for ${fmtDay(remDate)}: ${n.text}`, 'reminder'); setRemind(null); } catch { /* noop */ } };
++  const noteDirty = cnote !== noteText || cvis !== noteVis;
++  const saveNotes = async () => {
++    if (!project.estimate_id) { say?.('This job has no quote to keep the notes on'); return; }
++    setNoteSaving(true);
++    try { await api.patch(`/estimates/${project.estimate_id}`, { crew_notes: cnote, crew_visible: cvis }); onEstimatePatched({ crew_notes: cnote, crew_visible: cvis }); say?.('Crew notes saved'); }
++    catch (e: any) { const dt = e?.response?.data?.detail; say?.(typeof dt === 'string' ? dt : 'Could not save the notes'); }
++    finally { setNoteSaving(false); }
++  };
++  const setReminder = async (text: string) => { try { await api.post('/reminders', { text, remind_at: `${remDate}T09:00:00`, related_type: 'project', related_id: project.id }); await onLog(`Reminder set for ${fmtDay(remDate)}: ${text}`, 'reminder'); setRemind(null); } catch { /* noop */ } };
+   const changePhotos = async () => { const v = window.prompt('Google Drive folder link', project.photos_link || ''); if (v === null || !project.estimate_id) return; await api.patch(`/estimates/${project.estimate_id}`, { photos_link: v.trim() }); onEstimatePatched({ photos_link: v.trim() }); };
+   const ps = photoStats || { total: 0, before: 0, after: 0, pairs: 0 };
+-  const tabs: [string, string, any, number][] = [['activity', 'Activity', 'trending-up-outline', acts.length], ['notes', 'Notes', 'create-outline', notes.length], ['reports', 'Reports', 'time-outline', reports.length], ['photos', 'Photos', 'images-outline', ps.total]];
++  const tabs: [string, string, any, number][] = [['activity', 'Activity', 'trending-up-outline', acts.length], ['notes', 'Notes', 'create-outline', noteText.trim() ? 1 : 0], ['reports', 'Reports', 'time-outline', reports.length], ['photos', 'Photos', 'images-outline', ps.total]];
+   const hold = () => { const r = window.prompt('Why is the job going on hold?'); if (r === null) return; onStatus('on_hold', r.trim() || 'No reason given'); };
+   return (
+     <Drawer visible={visible} onClose={onClose} title="Project details" sub={`${project.name} · ${project.client_snapshot?.name || ''}`} testID="project-drawer"
+@@ -73,12 +84,16 @@ export function ProjectDrawer({ project, estimate, visible, tab, onClose, onStat
+         <View style={{ flexDirection: 'row', gap: 8 }}><TextInput value={noteIn} onChangeText={setNoteIn} placeholder="Add a note (e.g. client confirmed start Monday)" placeholderTextColor={t.colors.textMuted} style={[d.finput, { flex: 1 }]} onSubmitEditing={async () => { const m = noteIn.trim(); if (!m) return; setNoteIn(''); await onLog(m, 'note'); }} testID="project-activity-input" /><Pressable onPress={async () => { const m = noteIn.trim(); if (!m) return; setNoteIn(''); await onLog(m, 'note'); }} style={{ backgroundColor: t.colors.accent, borderRadius: 8, paddingHorizontal: 12, alignItems: 'center', justifyContent: 'center' }} testID="project-activity-add"><Ionicons name="add" size={18} color="#fff" /></Pressable></View>
+         {acts.length ? acts.map((a, i) => <View key={a.id || i} style={{ flexDirection: 'row', gap: 10 }} testID={`project-activity-${a.id || i}`}><View style={{ width: 8, height: 8, borderRadius: 4, marginTop: 6, backgroundColor: DOT[a.type] || t.colors.textMuted }} /><View style={{ flex: 1 }}><Text style={{ fontSize: 13, color: t.colors.textPrimary, fontFamily: t.fonts.body, lineHeight: 18 }}>{a.message}</Text><Text style={d.rowSub}>{fmtDate(a.at || a.timestamp)}{a.by ? ` · ${a.by}` : ''}</Text></View></View>) : <Text style={d.dempty}>No activity yet.</Text>}
+       </View>)}
+-      {dtab === 'notes' && (<View style={{ gap: 10 }}>
+-        <Text style={d.dempty}>Crew notes are shared with the estimate, so whoever opens the quote or this job sees the same list.</Text>
+-        <View style={{ flexDirection: 'row', gap: 8 }}><TextInput value={cnote} onChangeText={setCnote} placeholder="e.g. Key under the pot plant, alarm code 4471" placeholderTextColor={t.colors.textMuted} style={[d.finput, { flex: 1 }]} onSubmitEditing={addNote} testID="project-note-input" /><Pressable onPress={addNote} style={{ backgroundColor: t.colors.accent, borderRadius: 8, paddingHorizontal: 12, alignItems: 'center', justifyContent: 'center' }} testID="project-note-add"><Ionicons name="add" size={18} color="#fff" /></Pressable></View>
+-        {notes.length ? notes.map((n) => <View key={n.id} style={{ backgroundColor: t.colors.surface, borderWidth: 1, borderColor: t.colors.border, borderRadius: 10, padding: 10, gap: 4 }} testID={`project-note-${n.id}`}><Text style={{ fontSize: 13, color: t.colors.textPrimary, fontFamily: t.fonts.body }}>{n.text}</Text><Text style={d.rowSub}>{fmtDate(n.created_at)}</Text>
+-          {remindFor === n.id ? <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}><DateBox value={remDate} onChange={setRemDate} testID="note-reminder-date" style={{ width: 150, height: 32, border: `1px solid ${t.colors.border}`, borderRadius: 8, padding: '0 8px', fontSize: 13, fontFamily: t.fonts.body, color: t.colors.textPrimary, background: t.colors.surface, outline: 'none' }} /><Btn small label="Set reminder" onPress={() => setReminder(n)} testID={`note-reminder-save-${n.id}`} /><Btn ghost small label="Cancel" onPress={() => setRemind(null)} /></View>
+-          : <Pressable onPress={() => setRemind(n.id)} style={d.link} testID={`note-reminder-${n.id}`}><Ionicons name="notifications-outline" size={13} color={t.colors.accent} /><Text style={d.linkText}>Remind me</Text></Pressable>}</View>) : <Text style={d.dempty}>No crew notes yet.</Text>}
++      {dtab === 'notes' && (<View style={{ gap: 10 }} testID="project-notes-tab">
++        <Text style={d.dempty}>Crew notes live on the quote, so Quote details in the builder and this job show the same text. Tick “Visible to crew” and it shows on the job in the crew app.</Text>
++        <TextInput value={cnote} onChangeText={setCnote} multiline placeholder="e.g. Key under the pot plant, alarm code 4471" placeholderTextColor={t.colors.textMuted} style={[d.finput, { minHeight: 96, textAlignVertical: 'top' }]} testID="project-note-input" />
++        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
++          <Pressable onPress={() => setCvis((v) => !v)} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }} testID="project-note-visible"><Ionicons name={cvis ? 'checkbox' : 'square-outline'} size={18} color={cvis ? t.colors.accent : t.colors.textMuted} /><Text style={{ fontSize: 13, color: t.colors.textPrimary, fontFamily: t.fonts.body }}>Visible to crew</Text></Pressable>
++          <View style={{ flex: 1 }} />
++          <Btn small label={noteSaving ? 'Saving…' : 'Save notes'} onPress={saveNotes} disabled={noteSaving || !noteDirty} testID="project-note-add" />
++        </View>
++        {noteText.trim() ? (remindFor ? <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}><DateBox value={remDate} onChange={setRemDate} testID="note-reminder-date" style={{ width: 150, height: 32, border: `1px solid ${t.colors.border}`, borderRadius: 8, padding: '0 8px', fontSize: 13, fontFamily: t.fonts.body, color: t.colors.textPrimary, background: t.colors.surface, outline: 'none' }} /><Btn small label="Set reminder" onPress={() => setReminder(noteText.trim())} testID="note-reminder-save" /><Btn ghost small label="Cancel" onPress={() => setRemind(null)} /></View>
++          : <Pressable onPress={() => setRemind('note')} style={d.link} testID="note-reminder"><Ionicons name="notifications-outline" size={13} color={t.colors.accent} /><Text style={d.linkText}>Remind me about these notes</Text></Pressable>) : null}
+       </View>)}
+       {dtab === 'reports' && (<View style={{ gap: 10 }}>
+         <Text style={d.dempty}>Daily reports the crew ticked to this job. Hours feed the labour cost.</Text>
+diff --git a/frontend/components/project/detail/JobMoneyCard.tsx b/frontend/components/project/detail/JobMoneyCard.tsx
+index 84166f8a67383b7b4f7d3964972fcfbc9c44d800..1565db10eab6839e1be50d236d325f52d4fcea0a 100644
+--- a/frontend/components/project/detail/JobMoneyCard.tsx
++++ b/frontend/components/project/detail/JobMoneyCard.tsx
+@@ -15,11 +15,19 @@ export function jobMoney(p: any) {
+   const estCost = estMat + estLab + estOverhead;
+   const labour = n(m.labour_cost), labourHrs = Math.round(n(m.labour_hours) * 10) / 10, materials = n(m.materials_cost), expenses = n(m.expenses_total), equipment = n(m.equipment_cost);
+   const started = (p?.status || 'quoted') !== 'quoted';
+-  const overhead = started ? estOverhead : 0;
+-  const actualCost = labour + materials + expenses + equipment + overhead;
+   const invoiced = n(m.invoiced), paid = n(m.invoice_paid), outstanding = Math.max(0, invoiced - paid);
+-  const projectedCost = Math.max(estCost, actualCost);
+-  return { revenue, approved, estOverhead, estCost, estMat, estLab, estHours: n(m.estimated_hours), rate: n(m.labor_hourly_rate), pct: n(m.overhead_pct), estMargin: revenue ? (revenue - estCost) / revenue * 100 : 0, labour, labourHrs, materials, expenses, equipment, overhead, actualCost, actualProfit: revenue - actualCost, actualMargin: revenue ? (revenue - actualCost) / revenue * 100 : 0, invoiced, paid, outstanding, uninvoiced: m.still_to_invoice !== undefined && m.still_to_invoice !== null ? n(m.still_to_invoice) : revenue - invoiced, projectedProfit: revenue - projectedCost, costPct: estCost ? actualCost / estCost * 100 : 0, started };
++  // Fix Round J B-029 / B-047 / B-055 — the same rules as the server's services/job_money.py, so the page, the list and the
++  // connector agree: revenue to date = what is invoiced (never the whole quote); overhead accrues with the billing (overhead % ×
++  // invoiced), not in full on day one; the projection keeps the full overhead.
++  const pct = n(m.overhead_pct);
++  const directCost = labour + materials + expenses + equipment;
++  const overhead = m.overhead_to_date !== undefined && m.overhead_to_date !== null ? n(m.overhead_to_date) : started ? Math.round(invoiced * pct) / 100 : 0;
++  const actualCost = directCost + overhead;
++  const revenueToDate = m.revenue_to_date !== undefined && m.revenue_to_date !== null ? n(m.revenue_to_date) : invoiced;
++  const toDate = revenueToDate > 0;
++  const actualProfit = revenueToDate - actualCost;
++  const projectedCost = Math.max(estCost, directCost + estOverhead);
++  return { revenue, approved, estOverhead, estCost, estMat, estLab, estHours: n(m.estimated_hours), rate: n(m.labor_hourly_rate), pct, estMargin: revenue ? (revenue - estCost) / revenue * 100 : 0, labour, labourHrs, materials, expenses, equipment, overhead, directCost, actualCost, revenueToDate, toDate, actualProfit, actualMargin: toDate ? actualProfit / revenueToDate * 100 : 0, invoiced, paid, outstanding, uninvoiced: m.still_to_invoice !== undefined && m.still_to_invoice !== null ? n(m.still_to_invoice) : revenue - invoiced, projectedProfit: revenue - projectedCost, costPct: estCost ? actualCost / estCost * 100 : 0, started };
+ }
+ 
+ export function DonutStats({ segs, marginPct, revenue, note }: { segs: { l: string; v: number; c: string }[]; marginPct: number; revenue: number; note?: string }) {
+@@ -46,25 +54,26 @@ const ML = ({ l, v, tot, cls }: { l: string; v: string; tot?: boolean; cls?: str
+ export function JobMoneyCard({ p }: { p: any }) {
+   const router = useRouter(); const { width } = useWindowDimensions();
+   const m = jobMoney(p); const inv: any[] = p.invoices || [];
+-  const segs = m.started ? [{ l: 'Materials', v: m.materials, c: '#5C4C9E' }, { l: 'Labour', v: m.labour, c: '#C1652E' }, { l: 'Equipment & expenses', v: m.equipment + m.expenses, c: '#1E9E82' }, { l: 'Overhead', v: m.overhead, c: '#9B968A' }, { l: m.actualProfit >= 0 ? 'Profit' : 'Loss', v: Math.abs(m.actualProfit), c: m.actualProfit >= 0 ? '#D8D3C7' : '#C6382E' }]
++  const live = m.started && m.toDate;  // Fix Round J B-029 — "so far" figures only once something is invoiced; until then the card shows the budget
++  const segs = live ? [{ l: 'Materials', v: m.materials, c: '#5C4C9E' }, { l: 'Labour', v: m.labour, c: '#C1652E' }, { l: 'Equipment & expenses', v: m.equipment + m.expenses, c: '#1E9E82' }, { l: 'Overhead so far', v: m.overhead, c: '#9B968A' }, { l: m.actualProfit >= 0 ? 'Profit so far' : 'Loss so far', v: Math.abs(m.actualProfit), c: m.actualProfit >= 0 ? '#D8D3C7' : '#C6382E' }]
+     : [{ l: 'Materials (est.)', v: m.estMat, c: '#5C4C9E' }, { l: 'Labour (est.)', v: m.estLab, c: '#C1652E' }, { l: 'Overhead', v: m.estOverhead, c: '#9B968A' }, { l: 'Expected profit', v: Math.max(0, m.revenue - m.estCost), c: '#D8D3C7' }];
+-  const pct = m.started ? m.actualMargin : m.estMargin;
++  const pct = live ? m.actualMargin : m.estMargin;
+   const col = { flex: 1, minWidth: 220, gap: 2 } as const;
+   const MK = ({ icon, l }: { icon: any; l: string }) => <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}><Ionicons name={icon} size={13} color={t.colors.textMuted} /><Text style={d.k}>{l}</Text></View>;
+   const MV = ({ v, cls }: { v: string; cls?: string }) => <Text style={{ fontFamily: t.fonts.monoMedium, fontWeight: '700', fontSize: 22, color: cls ? toneFg(cls) : t.colors.textPrimary, marginBottom: 6 }}>{v}</Text>;
+   const owedInv = inv.find((i) => i.paid < i.total);
+   return (
+     <Card testID="project-money">
+-      <CardHead title="Job money" sub={`Budget breakdown, then quoted vs actual to date vs invoiced. Overhead ${m.pct}% comes from Settings › Pricing.`} right={<Chip label={`${pct.toFixed(0)}% margin ${m.started ? 'to date' : 'quoted'}`} tone={mgTone(pct)} testID="project-margin-chip" />} />
+-      <DonutStats segs={segs} marginPct={pct} revenue={m.revenue} note={m.approved ? ' (incl. approved variations)' : ''} />
++      <CardHead title="Job money" sub={`Budget breakdown, then quoted vs actual to date vs invoiced. Overhead ${m.pct}% and the crew cost rate come from Settings › Quote setup › Pricing.`} right={<Chip label={`${pct.toFixed(0)}% margin ${live ? 'so far' : 'quoted'}`} tone={mgTone(pct)} testID="project-margin-chip" />} />
++      <DonutStats segs={segs} marginPct={pct} revenue={live ? m.revenueToDate : m.revenue} note={live ? ' invoiced so far' : m.approved ? ' (incl. approved variations)' : ''} />
+       <View style={{ flexDirection: width < 1100 ? 'column' : 'row', gap: 18, borderTopWidth: 1, borderTopColor: t.colors.border, paddingTop: 14 }}>
+         <View style={col} testID="project-money-quoted"><MK icon="document-text-outline" l="Quoted" /><MV v={money(m.revenue)} />
+           <ML l={`Estimate ${p.estimate_number || ''}`} v={money(m.revenue - m.approved)} />{m.approved > 0 && <ML l="Approved variations" v={`+${money(m.approved)}`} cls="success" />}
+           <ML l="Materials (est.)" v={money(m.estMat)} /><ML l={`Labour ${m.estHours}h × $${m.rate}`} v={money(m.estLab)} /><ML l={`Overhead ${m.pct}%`} v={money(m.estOverhead)} />
+-          <ML l="Budgeted cost" v={money(m.estCost)} tot /><ML l="Expected profit" v={`${money(m.revenue - m.estCost)} · ${m.estMargin.toFixed(0)}%`} cls="success" /></View>
++          <ML l="Budgeted cost" v={money(m.estCost)} tot /><ML l="Expected profit" v={`${money(m.revenue - m.estCost)} · ${m.estMargin.toFixed(0)}%`} cls={m.revenue - m.estCost < 0 ? 'danger' : 'success'} /></View>
+         <View style={col} testID="project-money-actual"><MK icon="trending-up-outline" l="Actual to date" /><MV v={m.started ? money(m.actualCost) : '—'} cls={m.started && m.actualCost > m.estCost ? 'danger' : m.started ? undefined : 'muted'} />
+-          <ML l={`Labour ${m.labourHrs}h`} v={money(m.labour)} /><ML l="Materials" v={money(m.materials)} /><ML l="Equipment hire" v={money(m.equipment)} /><ML l="Expenses" v={money(m.expenses)} /><ML l={`Overhead ${m.pct}%`} v={money(m.overhead)} />
+-          <ML l="Cost to date" v={money(m.actualCost)} tot cls={m.actualCost > m.estCost ? 'danger' : undefined} /><ML l="Profit so far" v={`${money(m.actualProfit)} · ${m.actualMargin.toFixed(0)}%`} cls={m.actualProfit < 0 ? 'danger' : 'success'} /></View>
++          <ML l={`Labour ${m.labourHrs}h`} v={money(m.labour)} /><ML l="Materials" v={money(m.materials)} /><ML l="Equipment hire" v={money(m.equipment)} /><ML l="Expenses" v={money(m.expenses)} /><ML l={`Overhead ${m.pct}% on what's invoiced`} v={money(m.overhead)} />
++          <ML l="Cost to date" v={money(m.actualCost)} tot cls={m.actualCost > m.estCost ? 'danger' : undefined} /><ML l="Invoiced so far" v={money(m.revenueToDate)} /><ML l="Profit so far" v={live ? `${money(m.actualProfit)} · ${m.actualMargin.toFixed(0)}%` : 'Nothing invoiced yet'} cls={live ? (m.actualProfit < 0 ? 'danger' : 'success') : 'muted'} /></View>
+         <View style={col} testID="project-money-invoiced"><MK icon="receipt-outline" l="Invoiced" /><MV v={m.invoiced ? money(m.invoiced) : 'Nothing yet'} cls={m.outstanding > 0 ? 'warning' : m.invoiced ? 'success' : 'muted'} />
+           <ML l={inv.length ? `${inv.length} invoice${inv.length === 1 ? '' : 's'} · see Linked records` : 'No invoices for this job'} v={inv.length ? money(m.invoiced) : '—'} />
+           <ML l="Paid" v={money(m.paid)} tot cls="success" /><ML l="Outstanding" v={money(m.outstanding)} cls={m.outstanding > 0 ? 'danger' : undefined} /><ML l="Still to invoice" v={money(Math.max(0, m.uninvoiced))} />
+diff --git a/frontend/components/project/detail/JobSiteCard.tsx b/frontend/components/project/detail/JobSiteCard.tsx
+index daaf6a2b41e9c6aa3d74d1302f531cc3dc87d203..0259e2b67e28d6cb6b5c5f11f2fa420ca1944bcc 100644
+--- a/frontend/components/project/detail/JobSiteCard.tsx
++++ b/frontend/components/project/detail/JobSiteCard.tsx
+@@ -22,7 +22,8 @@ export function JobSiteCard({ p, estimate, onSaved, say }: { p: any; estimate: a
+   const [edit, setEdit] = useState(false);
+   const c = p.client_snapshot || {};
+   const lat = Number(p.location_lat), lng = Number(p.location_lng), hasLoc = !!(lat && lng);
+-  const [f, setF] = useState<any>({ address: c.address || '', lat: hasLoc ? String(lat) : '', lng: hasLoc ? String(lng) : '', location: (p as any).location || null });
++  const site: string = p.location_address || c.address || '';  // Fix Round J B-035 — the job site (what Edit location and Re-sync write); the snapshot's address only when there is none
++  const [f, setF] = useState<any>({ address: site, lat: hasLoc ? String(lat) : '', lng: hasLoc ? String(lng) : '', location: (p as any).location || null });
+   const areas: string[] = (estimate?.areas || []).map((a: any) => a.name).filter(Boolean);
+   const open = (u: string) => Linking.openURL(u);
+   const save = async () => {
+@@ -47,7 +48,7 @@ export function JobSiteCard({ p, estimate, onSaved, say }: { p: any; estimate: a
+           <View style={{ gap: 6 }}>
+             {!!c.phone && <Pressable onPress={() => open(`tel:${c.phone}`)} style={d.link}><Ionicons name="call-outline" size={14} color={t.colors.textMuted} /><Text style={{ fontSize: 13.5, color: t.colors.textPrimary, fontFamily: t.fonts.body }}>{c.phone}</Text></Pressable>}
+             {!!c.email && <Pressable onPress={() => open(`mailto:${c.email}`)} style={d.link}><Ionicons name="mail-outline" size={14} color={t.colors.textMuted} /><Text style={{ fontSize: 13.5, color: t.colors.textPrimary, fontFamily: t.fonts.body }}>{c.email}</Text></Pressable>}
+-            <View style={d.link}><Ionicons name="location-outline" size={14} color={t.colors.textMuted} /><Text style={{ fontSize: 13.5, color: t.colors.textPrimary, fontFamily: t.fonts.bodySemi, flex: 1 }} testID="project-location-address">{c.address || 'No address'}</Text></View>
++            <View style={d.link}><Ionicons name="location-outline" size={14} color={t.colors.textMuted} /><Text style={{ fontSize: 13.5, color: t.colors.textPrimary, fontFamily: t.fonts.bodySemi, flex: 1 }} testID="project-location-address">{site || 'No address'}</Text></View>
+           </View>
+           {!!p.notes && <View style={{ flexDirection: 'row', gap: 8, backgroundColor: t.colors.warningBg, borderWidth: 1, borderColor: '#F1D9B8', borderRadius: 10, padding: 10 }}><Ionicons name="warning-outline" size={14} color={t.colors.warning} /><Text style={{ flex: 1, fontSize: 12.5, color: '#6B3F0A', fontFamily: t.fonts.body }}><Text style={{ fontFamily: t.fonts.bodySemi }}>Site access: </Text>{p.notes}</Text></View>}
+           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+@@ -65,7 +66,7 @@ export function JobSiteCard({ p, estimate, onSaved, say }: { p: any; estimate: a
+             <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontFamily: t.fonts.body, cursor: 'pointer' }}><input data-testid="project-geofence-none" type="checkbox" checked={p.geofence_radius_m === null} onChange={(e: any) => saveGeofence(e.target.checked ? null : (gf || 150))} />No geofence for this job</label>
+           </View>}
+           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+-            <Btn ghost small icon="map-outline" label="Directions" onPress={() => open(`https://maps.google.com/?q=${encodeURIComponent(c.address || '')}`)} testID="project-directions" />
++            <Btn ghost small icon="map-outline" label="Directions" onPress={() => { const q = site || (hasLoc ? `${lat},${lng}` : ''); if (!q) { say('No site address yet — set one with Edit location'); return; } open(`https://maps.google.com/?q=${encodeURIComponent(q)}`); }} testID="project-directions" />
+             <Btn ghost small icon="chatbubble-outline" label="Text client" onPress={() => c.phone ? open(`sms:${c.phone}`) : say('No phone on file')} testID="project-text-client" />
+             <Btn ghost small icon="create-outline" label="Edit location" onPress={() => setEdit((v) => !v)} testID="project-location-edit" />
+           </View>
+@@ -79,7 +80,7 @@ export function JobSiteCard({ p, estimate, onSaved, say }: { p: any; estimate: a
+         </View>
+         <View style={{ flex: 1.3, minWidth: 300, minHeight: 260, borderRadius: 12, overflow: 'hidden', backgroundColor: '#EFEDE6', borderWidth: 1, borderColor: t.colors.border, position: 'relative' }} testID="project-map">
+           {!hasLoc && <View style={{ position: 'absolute', inset: 0 } as any}>{[60, 105, 150, 220].map((y) => <View key={y} style={{ position: 'absolute', left: 0, right: 0, top: `${y / 2.6}%` as any, height: y === 105 ? 3 : 7, backgroundColor: y === 105 ? '#E5E2D9' : '#DCD8CE' }} />)}{[22, 37, 53, 78, 90].map((x) => <View key={x} style={{ position: 'absolute', top: 0, bottom: 0, left: `${x}%` as any, width: x === 37 || x === 90 ? 3 : 7, backgroundColor: x === 37 || x === 90 ? '#E5E2D9' : '#DCD8CE' }} />)}</View>}
+-          {hasLoc && <SiteMap lat={lat} lng={lng} label={c.address || c.name} testID="project-site-map" />}
++          {hasLoc && <SiteMap lat={lat} lng={lng} label={site || c.name} testID="project-site-map" />}
+           <View style={{ position: 'absolute', left: 10, bottom: 10, zIndex: 1001, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,255,255,.92)', borderRadius: 999, paddingVertical: 5, paddingHorizontal: 10 }}><Ionicons name="shield-checkmark-outline" size={13} color={hasLoc ? t.colors.success : t.colors.textMuted} /><Text style={{ fontSize: 11.5, fontFamily: t.fonts.bodySemi, color: t.colors.textSecondary }}>{hasLoc ? 'Geofence on · crew clock-ins checked against this pin' : 'No pin yet · set a location to enable the geofence'}</Text></View>
+         </View>
+       </View>
+diff --git a/frontend/utils/format.ts b/frontend/utils/format.ts
+index 9a09016ddc25c3f69cac9ea68e600c347d327b83..bdb8eb50732c8d86e073ee18d67f0614b01df5fe 100644
+--- a/frontend/utils/format.ts
++++ b/frontend/utils/format.ts
+@@ -23,7 +23,9 @@ export const parseDate = (v: DateInput): Date | null => {
+ export const money = (v?: number | string | null): string => {
+   const n = typeof v === 'string' ? Number(v) : v;
+   if (n === null || n === undefined || Number.isNaN(n)) return '—';
+-  return '$' + (Math.round(n * 100) / 100).toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
++  const r = Math.round(n * 100) / 100;
++  // Fix Round J B-039 — a loss reads "-$595.19", never "$-595.19"
++  return (r < 0 ? '-$' : '$') + Math.abs(r).toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+ };
+ 
+ const fallback = (v: DateInput, empty: string) => (v === null || v === undefined || v === '' ? empty : String(v));
