@@ -1,4 +1,4 @@
-# Fix — a quote that has been sent can't be saved in the builder ("Could not save — check your connection") — READY TO SEND on Josh's word
+# Fix — a quote that has been sent can't be saved in the builder ("Could not save — check your connection") — SENT 15 Nov as §1 of Round 101 (`round101-quote-edit-rules-message.md`)
 
 Josh, 15 Nov, on the **published** app: in Leanne's estimate every change ends in "Could not save — check your connection". Root cause found by reading the code (this chat has no access to the live data, so "Leanne's quote has been sent" is the inference; the mechanism is certain for any sent quote).
 

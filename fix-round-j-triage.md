@@ -45,7 +45,7 @@ Josh's own Claude account for the painting business works in the published app t
 | B-039 | "$-595.19" in green | FIXED | `2cdc57e` |
 | B-040 | Job page squashed at tablet width | PARK | legitimate; a 1024 layout pass with a prototype from this chat, not a one-line fix |
 | B-041 | Materials expense category with receipt photos; quoted access to the job; Variations picker like the quote picker | PARK | three feature asks, all sensible |
-| B-042 / B-044 | Accepted quote money / status guards | FIXED | `15981d2` (locks from a *sent* invoice; Josh to confirm paid-only or not) |
+| B-042 / B-044 | Accepted quote money / status guards | FIXED, rule widened | `15981d2`; **Josh's rule, 15 Nov: a sent quote can be changed, an accepted quote is final** — acceptance alone locks (price and wording), with the right error; sent to Emergent as Round 101 §2 |
 | B-043 | Paid invoice back to draft keeps its payment | FIX | real: `patch_invoice_status` refuses *archiving* with payments (409) but not *draft*; the same rule belongs there |
 | B-045 | Starting a job sets a target finish by itself | FIX | real: `projects.py:1088` adds 5 days when none is set |
 | B-046 | A past start date doesn't start the job | FIXED (Emergent) | Josh's pick: a nudge + Start job button, auto-start off (Emergent `7cc25b5`) |
