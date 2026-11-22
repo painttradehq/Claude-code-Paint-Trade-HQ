@@ -10,17 +10,18 @@
  * (Adam's line as the headline; "Sound familiar?" after the strip; Watch it work moved up above the plans;
  * plans with two buttons; questions rebuilt; every connection shown as working because Josh says they are all
  * connected by go-live, see the launch checklist's go-live checks).
+ * 22 Nov 2026, Josh's comments on the preview: the hero is the kicker, the headline and two buttons; the
+ * Watch it work videos, the plans section and the "Also in the app" card are gone (prices live on Pricing);
+ * the live-job card now sits beside Timesheets; the dark band's centre is the big P.
  * The ribbon drifts slowly in CSS and stops under reduced motion; nothing else moves on its own
  * except the quote→sign→run→paid stage in the first card, which pauses on hover, focus, tap or
  * when it scrolls out of view.
  */
 import Base from '../layouts/Base.astro';
 import Button from '../components/Button.astro';
-import Clip from '../components/Clip.astro';
 import Faq from '../components/Faq.astro';
-import { site, faqs, testimonials, videoFeedback, plans, aud, incGst } from '../data/site';
+import { site, faqs, testimonials, videoFeedback } from '../data/site';
 import { getCollection } from 'astro:content';
-import { clips } from '../data/screens';
 import { showSamples } from '../data/directory';
 
 const W = '/screens/webp';
@@ -39,16 +40,6 @@ const cards = [
   { id: 'timesheets', title: 'Timesheets ready for payroll', line: "Hours come straight from your crew's sign-ins, with overtime split out. Lock the week, then download it as a spreadsheet file for payroll.", href: '/features#timesheets', full: `${W}/17-timesheets-week-1440.webp`, fullAlt: 'Timesheets: a pay-week grid with regular and overtime hours', plan: 'Small business plan and up' },
   { id: 'jobs', title: 'Every job on its own page', line: "The site on a map, who's on it, photos, and what the job is costing you in labour.", href: '/features#projects', full: `${W}/16-job-drawer-1440.webp`, fullAlt: 'A live job: the site on a map, the client, the crew and the project drawer', plan: '' },
 ];
-/** The "Also in the app" card: the parts the big cards don't cover, each linking to its place on Features. */
-const also = [
-  { href: '/features#library', label: 'Your price list' },
-  { href: '/features#calendar', label: 'Calendar' },
-  { href: '/features#crm', label: 'Clients and follow-ups' },
-  { href: '/features#employees', label: 'Staff records' },
-  { href: '/features#crew-app', label: "The crew app, in the phone's browser" },
-  { href: '/features#files', label: 'Files and photos, in our cloud, Google Drive or OneDrive' },
-  { href: '/features#employees', label: 'Contracts, training and equipment (Enterprise plan)' },
-];
 
 /** "Sound familiar?": three everyday problems, each with what changes. General, not claims about anyone. */
 const pains = [
@@ -57,16 +48,6 @@ const pains = [
   { id: 'records', t: 'No record when it counts.', w: 'A client asks what was done on Tuesday, or queries the hours, and the answer is in somebody\'s memory.', fix: "Here every sign-in and sign-out is kept with the time and where it happened, and your crew's daily reports and photos are filed on the job, so the answer is a tap away. Daily reports are on the Enterprise plan." },
 ];
 
-/** Plans, in a painter's words: who it suits, the people included, one line of what's in it. */
-const planWho: Record<string, string> = { starter: 'Just you, or you and a couple of hands', 'small-business': 'A crew with someone in the office', enterprise: 'A bigger crew, with HR to run' };
-const planSum: Record<string, string> = {
-  starter: 'Quotes, jobs, invoices, the crew time clock, clients and calendar.',
-  'small-business': 'Everything in Starter, plus Lucy, timesheets, texts to clients, and invoices raised for you on schedule.',
-  enterprise: 'Everything in Small business, plus daily site reports, staff contracts in your own wording signed on the phone, training videos, equipment, and free data migration from your old software.',
-};
-const people = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
-const planSeats = (admins: number, employees: number) =>
-  admins > 1 ? `You, ${people(admins - 1, 'office person', 'office people')} and ${employees} crew included` : `You and ${employees} crew included`;
 
 const homeFaqs = ['What happens when I press Start free trial?', 'What happens when the 30 days are up?', "What's involved in setting up?", 'What do my crew need?', 'Can I run it from my phone?', 'Does it connect to Xero or MYOB?', 'Can someone in the office use it too?']
   .map((q) => faqs.find((f) => f.q === q))
@@ -87,14 +68,6 @@ const worksWith = [
 const videos = videoFeedback.filter((v) => showSamples || !v.sample).slice(0, 3);
 const posts = (await getCollection('blog')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf() || a.data.order - b.data.order).slice(0, 3);
 const fmt = (d: Date) => d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
-const chapters = clips.filter((c) => ['new-quote-to-sent', 'client-accepts-quote', 'crew-clock-in-and-daily-report', 'invoice-payment-to-client-page'].includes(c.id));
-/** Home-page wording for the four videos (Features keeps the wording in screens.ts). */
-const chapterText: Record<string, { title: string; caption: string }> = {
-  'new-quote-to-sent': { title: 'You build and send a quote', caption: 'Pick the client, add rooms and lines from your price list, attach photos, check it over and send.' },
-  'client-accepts-quote': { title: 'Your client accepts on their phone', caption: 'Your client reads the quote, ticks the agreement and signs.' },
-  'crew-clock-in-and-daily-report': { title: "Your crew sign in and write the day's report", caption: "Your crew sign in on site, then write the day's report with photos. Daily reports are on the Enterprise plan." },
-  'invoice-payment-to-client-page': { title: 'You invoice and record the payment', caption: "Raise the invoice, record the payment, and see it on your client's page." },
-};
 ---
 <Base title="Paint Trade HQ" fullTitle="Paint Trade HQ · Software for Australian painting businesses" description="Software for Australian painting businesses. Quotes your client signs on their phone, the job, your crew's time clock and invoices. 30 days free, no card.">
   <!-- Hero: white page, one ribbon -->
@@ -107,7 +80,7 @@ const chapterText: Record<string, { title: string; caption: string }> = {
       </h1>
       <div class="nh__cta">
         <Button href={site.status.ctaHref} size="lg">{site.status.cta} <span aria-hidden="true">›</span></Button>
-        <a class="btn btn--ghost btn--lg nh__ghostbtn" href="#watch">Watch it work</a>
+        <a class="btn btn--ghost btn--lg nh__ghostbtn" href="/features">See what it does</a>
       </div>
     </div>
   </section>
@@ -232,16 +205,6 @@ const chapterText: Record<string, { title: string; caption: string }> = {
           <figure class="mock mock--browser bcard__crop"><img src={`${W}/17-timesheets-week-1440.webp`} alt="Timesheets: a pay-week grid with regular and overtime hours" width="1200" height="750" loading="lazy" decoding="async" /></figure>
         </article>
 
-        <!-- G: also in the app, in the gap beside Timesheets -->
-        <article class="bcard bcard--g reveal">
-          <div class="bcard__head"><h3>Also in the app</h3></div>
-          <p class="bcard__line">The rest of what comes with it. Each one has its own section on the Features page.</p>
-          <div class="bcard__wash bcard__wash--g" aria-hidden="true"></div>
-          <ul class="also">
-            {also.map((a) => <li><a href={a.href}>{a.label}</a></li>)}
-          </ul>
-          <a class="bcard__more" href="/pricing#compare">What's on each plan <span aria-hidden="true">→</span></a>
-        </article>
 
         <!-- F: live jobs, wide -->
         <article class="bcard bcard--f reveal">
@@ -269,47 +232,7 @@ const chapterText: Record<string, { title: string; caption: string }> = {
     </div>
   </section>
 
-  <!-- Watch it work -->
-  <section class="section section--sunken watch" id="watch">
-    <div class="container">
-      <h2 class="bento__h reveal"><span class="nh__dark">Watch it work.</span> <span class="nh__light">Four short videos, no sound.</span></h2>
-      <div class="watch__in">
-        <ol class="chapters" id="chapters">
-          {chapters.map((c, i) => (
-            <li><button type="button" class={`chapter ${i === 0 ? 'is-on' : ''}`} data-i={i} aria-pressed={i === 0 ? 'true' : 'false'}><span class="chapter__n mono">{String(i + 1).padStart(2, '0')}</span><span class="chapter__t">{chapterText[c.id]?.title ?? c.title}</span><span class="chapter__d mono">{Math.floor(c.seconds / 60)}:{String(c.seconds % 60).padStart(2, '0')}</span></button></li>
-          ))}
-        </ol>
-        <div class="player" id="player">
-          {chapters.map((c, i) => (
-            <div class="player__slot" data-i={i} hidden={i !== 0}><Clip id={c.id} title={chapterText[c.id]?.title} caption={chapterText[c.id]?.caption} /></div>
-          ))}
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- What it costs -->
-  <section class="section sizes" id="sizes">
-    <div class="container">
-      <h2 class="bento__h reveal"><span class="nh__dark">What it costs.</span> <span class="nh__light">Three plans. Pick by the size of your crew and what you need.</span></h2>
-      <div class="sizes__grid">
-        {plans.map((p) => (
-          <article class="size reveal">
-            <span class="size__who">{planWho[p.id]}</span>
-            <h3 class="size__name">{p.name}</h3>
-            <span class="size__price"><strong class="mono">{aud(p.price)}</strong> a month + GST <span class="size__inc">· {aud(incGst(p.price))} with GST</span></span>
-            <span class="size__seats small">{planSeats(p.admins, p.employees)}</span>
-            <p class="size__sum">{planSum[p.id]}</p>
-            <div class="size__cta">
-              <Button href={`${site.status.ctaHref}?plan=${p.id}`} size="sm" variant={p.highlight ? 'primary' : 'ghost'}>{site.status.cta}</Button>
-              <a class="size__more" href={`/pricing#${p.id}`}>See what's included <span aria-hidden="true">→</span></a>
-            </div>
-          </article>
-        ))}
-      </div>
-      <p class="sizes__note small reveal">Every plan starts with 30 days free, no card needed. Pay monthly, or a year up front for 10% off. Need more people? Extra seats from {aud(15)} a month + GST.</p>
-    </div>
-  </section>
 
   <!-- Connects to what you already use (dark band) -->
   <section class="section ink" id="connect">
@@ -323,7 +246,7 @@ const chapterText: Record<string, { title: string; caption: string }> = {
           <li class="node is-live"><span>Google Drive</span><em>Live</em></li>
           <li class="node is-live"><span>OneDrive</span><em>Live</em></li>
         </ul>
-        <div class="hub__core"><img src="/brand/logo.svg" alt="" width="40" height="40" /><span>Paint Trade HQ</span><small>your business only</small></div>
+        <div class="hub__core"><img src="/brand/logo.svg" alt="Paint Trade HQ" width="128" height="128" /></div>
         <ul class="hub__col hub__col--r">
           <li class="node is-live"><span>Email: Gmail, Microsoft 365 or another mailbox</span><em>Live</em></li>
           <li class="node is-live"><span>Texts to clients from your own SMS number</span><em>Small business and up</em></li>
@@ -535,7 +458,6 @@ const chapterText: Record<string, { title: string; caption: string }> = {
   .bcard__wash--b { left: -20%; bottom: -20%; width: 120%; height: 60%; background: radial-gradient(closest-side, rgba(138, 121, 214, 0.55), rgba(233, 165, 200, 0.35) 60%, transparent); }
   .bcard__wash--c { right: -30%; top: 30%; width: 100%; height: 90%; background: radial-gradient(closest-side, rgba(246, 201, 162, 0.85), rgba(240, 180, 142, 0.35) 60%, transparent); }
   .bcard__wash--e { left: -10%; bottom: -40%; width: 90%; height: 90%; background: radial-gradient(closest-side, rgba(154, 140, 216, 0.5), transparent 70%); }
-  .bcard__wash--g { right: -12%; bottom: -45%; width: 60%; height: 110%; background: radial-gradient(closest-side, rgba(154, 140, 216, 0.4), rgba(246, 201, 162, 0.3) 60%, transparent); }
   .bcard__wash--f { right: -10%; top: -20%; width: 70%; height: 120%; background: radial-gradient(closest-side, rgba(233, 165, 200, 0.55), rgba(246, 201, 162, 0.45) 50%, transparent); }
 
   .mock { position: relative; z-index: 1; margin: 0; background: #fff; border: 1px solid rgba(30, 28, 26, 0.08); border-radius: 12px; overflow: hidden; box-shadow: 0 24px 48px -18px rgba(52, 41, 94, 0.35), 0 8px 20px -10px rgba(0, 0, 0, 0.18); }
@@ -575,8 +497,7 @@ const chapterText: Record<string, { title: string; caption: string }> = {
   .bcard--d { grid-column: span 4; }
   .bcard--e { grid-column: span 4; }
   /* card F wide */
-  .bcard--f { grid-column: span 12; flex-direction: row; gap: 28px; align-items: center; }
-  .bcard--g { grid-column: span 8; min-height: 0; }
+  .bcard--f { grid-column: span 8; flex-direction: row; gap: 28px; align-items: center; }
   .chat__intro { margin: 0; color: var(--muted); position: relative; z-index: 1; }
   .bcard__text { flex: 0 0 38%; display: flex; flex-direction: column; gap: 10px; }
   .bcard__media { position: relative; flex: 1 1 auto; min-width: 0; }
@@ -591,20 +512,8 @@ const chapterText: Record<string, { title: string; caption: string }> = {
   .chat__a { background: var(--sunken); color: var(--text); border-bottom-left-radius: 4px; }
   .chat__src { background: none !important; padding: 0 2px !important; color: var(--muted); }
 
-  .also { list-style: none; margin: 8px 0 12px; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 10px; align-items: center; font-size: 15px; position: relative; z-index: 1; }
-  .also a { display: inline-block; font-weight: 600; color: var(--accent-ink); background: var(--accent-bg); border-radius: var(--r-pill); padding: 8px 14px; }
-  .also a:hover { background: var(--accent); color: #fff; text-decoration: none; }
 
   /* ---------- watch ---------- */
-  .watch__in { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(20px, 4vw, 40px); align-items: start; }
-  .chapters { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
-  .chapter { width: 100%; display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; text-align: left; font: inherit; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); cursor: pointer; color: var(--text); }
-  .chapter:hover { border-color: rgba(75, 62, 134, 0.35); }
-  .chapter.is-on { border-color: var(--accent); background: var(--accent-bg); }
-  .chapter__n { font-size: 12px; color: var(--muted); }
-  .chapter__t { font-weight: 600; }
-  .chapter__d { font-size: 12px; color: var(--text-2); }
-  .player__slot[hidden] { display: none; }
 
   /* ---------- feedback / faq ---------- */
   .fb__row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
@@ -652,14 +561,6 @@ const chapterText: Record<string, { title: string; caption: string }> = {
   html.js .reveal.is-in { opacity: 1; transform: none; }
 
 
-  /* ---------- sizes ---------- */
-  .sizes__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .size { display: flex; flex-direction: column; gap: 6px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; color: inherit; }
-  .size__who { font-size: 13px; font-weight: 600; color: var(--accent-ink); letter-spacing: 0.02em; }
-  .size__name { font-family: var(--font-display); font-weight: 600; font-size: 28px; line-height: 1.1; margin: 0; }
-  .size__sum { margin: 6px 0 0; color: var(--text-2); font-size: 15px; line-height: 1.5; }
-  .size__cta { margin-top: auto; padding-top: 16px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .sizes__note { margin: 20px 0 0; color: var(--text-2); }
   /* sound familiar */
   .pains__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
   .pain { display: flex; flex-direction: column; gap: 8px; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow-card); }
@@ -669,11 +570,6 @@ const chapterText: Record<string, { title: string; caption: string }> = {
   /* closing steps and the ask line */
   .nend__steps { margin: 0 0 24px; padding-left: 22px; display: grid; gap: 6px; color: var(--text-2); font-size: clamp(16px, 1.3vw, 18px); max-width: 46ch; }
   .faq-ask { color: var(--text-2); margin-top: 4px; }
-  .size__price { color: var(--text-2); }
-  .size__price strong { color: var(--text); font-size: 20px; }
-  .size__inc { white-space: nowrap; }
-  .size__seats { color: var(--muted); }
-  .size__more { font-weight: 600; color: var(--accent-ink); }
 
   /* ---------- dark connect band ---------- */
   .ink { background: #1f183d; color: #fff; position: relative; overflow: hidden; }
@@ -689,8 +585,8 @@ const chapterText: Record<string, { title: string; caption: string }> = {
   .node::after { content: ''; position: absolute; top: 50%; width: 28px; border-top: 1px dashed rgba(195, 183, 236, 0.55); }
   .hub__col--l .node::after { left: 100%; }
   .hub__col--r .node::after { right: 100%; }
-  .hub__core { display: grid; justify-items: center; gap: 6px; padding: 22px 26px; border-radius: 16px; background: #fff; color: var(--text); font-family: var(--font-display); font-weight: 600; font-size: 18px; box-shadow: 0 20px 40px -16px rgba(0, 0, 0, 0.5); text-align: center; }
-  .hub__core small { font-family: var(--font-body); font-weight: 400; font-size: 12px; color: var(--text-2); }
+  .hub__core { display: grid; place-items: center; }
+  .hub__core img { width: clamp(88px, 9vw, 128px); height: auto; display: block; border-radius: 22.6%; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28), 0 24px 44px -16px rgba(0, 0, 0, 0.6); }
   .ink__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
   .ink__card p, .pain__w, .pain__fix, .nend__steps li { text-wrap: pretty; }
   .ink__card { padding: 22px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.04); }
@@ -728,7 +624,7 @@ const chapterText: Record<string, { title: string; caption: string }> = {
   .updates__note { margin: 10px 0 0; color: var(--text-2); }
 
   @media (max-width: 1024px) {
-    .sizes__grid, .ink__grid, .pains__grid { grid-template-columns: 1fr; }
+    .ink__grid, .pains__grid { grid-template-columns: 1fr; }
     .wshop__grid { grid-template-columns: 1fr 1fr; }
     .wpost--lead { grid-column: span 2; min-height: 260px; }
   }
@@ -748,7 +644,7 @@ const chapterText: Record<string, { title: string; caption: string }> = {
     .bcard--a { grid-column: span 12; }
     .bcard--b { grid-column: span 6; grid-row: auto; }
     .bcard--c, .bcard--d, .bcard--e { grid-column: span 6; }
-    .bcard--g { grid-column: span 12; }
+    .bcard--f { grid-column: span 12; }
   }
   @media (max-width: 860px) {
     .ribbon__a { left: 38%; width: 64vw; }
@@ -758,8 +654,6 @@ const chapterText: Record<string, { title: string; caption: string }> = {
     .nh::after { background: linear-gradient(180deg, rgba(250, 249, 246, 0.2), var(--bg) 85%); }
     .bcard--f { flex-direction: column; align-items: stretch; }
     .bcard__text { flex-basis: auto; }
-    .watch__in { grid-template-columns: minmax(0, 1fr); }
-    .chapters { grid-template-columns: 1fr 1fr; }
     .fb__row { grid-template-columns: minmax(0, 1fr); }
     .fb__vrow { grid-template-columns: minmax(0, 1fr); }
     .nend__in { text-align: left; margin-left: 0; }
@@ -768,13 +662,12 @@ const chapterText: Record<string, { title: string; caption: string }> = {
     .sticky[hidden] { display: none; }
   }
   @media (max-width: 600px) {
-    .bcard--b, .bcard--c, .bcard--d, .bcard--e, .bcard--g { grid-column: span 12; }
+    .bcard--b, .bcard--c, .bcard--d, .bcard--e { grid-column: span 12; }
     .nh__in > * { max-width: 88%; }
     .nh__in > .nh__kicker { max-width: 75%; }
     .bcard { min-height: 0; }
     .stage__frames { padding-right: 18%; }
     .stage__phone { width: 30%; }
-    .chapters { grid-template-columns: 1fr; }
     .works__in { gap: 14px; padding: 12px 0; }
     .mq__track { gap: 30px; padding-left: 30px; }
     .mq__item { font-size: 14px; }
@@ -878,16 +771,6 @@ const chapterText: Record<string, { title: string; caption: string }> = {
     els.forEach((e) => io.observe(e));
   })();
 
-  // ---- one player, four chapters
-  (() => {
-    const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('#chapters .chapter'));
-    const slots = Array.from(document.querySelectorAll<HTMLElement>('#player .player__slot'));
-    buttons.forEach((b) => b.addEventListener('click', () => {
-      const n = Number(b.dataset.i);
-      buttons.forEach((x, k) => { x.classList.toggle('is-on', k === n); x.setAttribute('aria-pressed', String(k === n)); });
-      slots.forEach((s, k) => { s.hidden = k !== n; if (k !== n) s.querySelector('video')?.pause(); });
-    }));
-  })();
 
   // ---- sticky bar on phones once the hero buttons scroll away; hidden near the closing CTA
   (() => {
