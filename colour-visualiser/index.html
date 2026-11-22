@@ -116,8 +116,9 @@ input[type=range]{accent-color:var(--tape);width:100%;min-width:0}
           <button id="tBrush" type="button" aria-pressed="false">Brush</button>
           <button id="tErase" type="button" aria-pressed="false">Eraser</button>
         </div>
-        <div class="slider" id="tolWrap"><label for="tol">Sensitivity</label><input id="tol" type="range" min="4" max="70" value="18"></div>
+        <div class="slider" id="tolWrap"><label for="tol">Sensitivity</label><input id="tol" type="range" min="1" max="100" value="45"></div>
         <div class="slider" id="sizeWrap" hidden><label for="size">Brush size</label><input id="size" type="range" min="4" max="120" value="28"></div>
+        <button id="guardBtn" type="button" aria-pressed="true" hidden title="Paint spreads only from where your stroke started and stops at edges">Stay inside edges</button>
         <div class="right">
           <button id="undoBtn" type="button" disabled>Undo</button>
           <button id="clearBtn" type="button">Clear surface</button>
@@ -130,7 +131,7 @@ input[type=range]{accent-color:var(--tape);width:100%;min-width:0}
         <div class="ring" id="ring" hidden></div>
       </div>
       <p class="status" id="status" role="status" aria-live="polite"></p>
-      <p class="hint">Tap a wall to paint it. If colour leaks onto the ceiling or trim, slide Sensitivity down and it re-fills from the same tap. Tidy edges with the brush and eraser. You can also drop or paste a photo here.</p>
+      <p class="hint">Tap a wall to paint it. The fill stops at corners, trim and frames. If it leaks, slide Sensitivity down; if it stops short, slide it up. It re-fills from the same tap. With Stay inside edges on, start a brush stroke on the wall and scrub right over the trim without painting it. You can also drop or paste a photo here.</p>
     </div>
 
     <aside class="rail">
@@ -171,6 +172,7 @@ const STARTER=[["Soft white","#F3F1EA"],["Warm white","#EFE9DC"],["Cool white","
 ["Blush","#E3C4BB"],["Mustard","#C99A2E"],["Burgundy","#6B2A34"]];
 
 let W=0,H=0,N=0, src=null, Y=null,Cb=null,Cr=null, out=null;
+let sY=null,sB=null,sR=null,G=null,noise=1, guard=true, ref=null, strokeSet=null, strokeFirst=false;
 let layers=[], active=0, nextId=1, undo=[], lastFill=null;
 let tool="fill", drawing=false, lastPt=null, showOrig=false, raf=0, isSample=false;
 
@@ -187,6 +189,7 @@ function setImage(drawable,w,h,sample){
   const d=src.data;
   for(let i=0,p=0;i<N;i++,p+=4){const r=d[p],g=d[p+1],b=d[p+2];
     Y[i]=0.299*r+0.587*g+0.114*b; Cb[i]=128-0.169*r-0.331*g+0.5*b; Cr[i]=128+0.5*r-0.419*g-0.081*b;}
+  sY=smooth(Y);sB=smooth(Cb);sR=smooth(Cr);edges();
   layers=[newLayer("Walls","#6F8F80"),newLayer("Trim","#F3F1EA")]; active=0; undo=[]; lastFill=null;
   isSample=!!sample; $("tag").hidden=!isSample; showOrig=false; $("cmpBtn").setAttribute("aria-pressed","false");
   drawLayers(); syncPicker(); syncUndo(); schedule();
@@ -248,54 +251,139 @@ function loadSample(){
   say("Sample room loaded with the walls already filled. Try another colour.");
 }
 
-/* ---------- selection ---------- */
-function flood(sx,sy,tol){
-  const m=new Uint8Array(N), stack=new Int32Array(N); let sp=0;
-  let aY=0,aB=0,aR=0,n=0;
-  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const x=sx+dx,y=sy+dy;if(x<0||y<0||x>=W||y>=H)continue;const i=y*W+x;aY+=Y[i];aB+=Cb[i];aR+=Cr[i];n++}
-  aY/=n;aB/=n;aR/=n;
-  const t2=tol*tol, e=6+tol*0.3, e2=e*e, s0=sy*W+sx;
-  m[s0]=1;stack[sp++]=s0;
-  while(sp){
-    const p=stack[--sp], x=p%W, py=Y[p],pb=Cb[p],pr=Cr[p];
-    for(let k=0;k<4;k++){
-      let q; if(k===0){if(x===0)continue;q=p-1}else if(k===1){if(x===W-1)continue;q=p+1}else if(k===2){q=p-W;if(q<0)continue}else{q=p+W;if(q>=N)continue}
-      if(m[q])continue;
-      const qy=Y[q],qb=Cb[q],qr=Cr[q];
-      let a=qy-aY,b=qb-aB,c=qr-aR; if(0.5*a*a+2*(b*b+c*c)>t2)continue;
-      a=qy-py;b=qb-pb;c=qr-pr; if(a*a+3*(b*b+c*c)>e2)continue;
-      m[q]=1;stack[sp++]=q;
-    }
+/* ---------- wall detection ----------
+   1. Smooth the photo to take out camera grain, then map where the edges are (corners, trim, frames).
+   2. Fill outward from the tap, stopping at edges and at colours that are too different.
+   3. The fill travels as a small disc, so it cannot squeeze through a pin-sized gap in an edge.
+   4. Grow the last few pixels up to the edge line and close grain specks.
+   The paint line is then snapped to the photo's edges when the surface is drawn (see refine). */
+function smooth(srcArr){
+  const a=new Float32Array(N),b=new Float32Array(N);
+  for(let pass=0;pass<2;pass++){const s=pass?b:srcArr;
+    for(let y=0;y<H;y++){const r=y*W;a[r]=s[r];a[r+W-1]=s[r+W-1];for(let i=r+1,e=r+W-1;i<e;i++)a[i]=(s[i-1]+2*s[i]+s[i+1])*0.25}
+    for(let i=0;i<W;i++){b[i]=a[i];b[N-W+i]=a[N-W+i]}
+    for(let i=W,e=N-W;i<e;i++)b[i]=(a[i-W]+2*a[i]+a[i+W])*0.25}
+  return b;
+}
+function edges(){
+  // Edge strength = the colour step across a pixel, measured between two small averaged patches either
+  // side of it. Averaging beats camera grain, and the wide stance catches soft, slightly blurred edges.
+  const wide=W>900,r=wide?2:1,D=wide?3:2,tmp=new Float32Array(N),bY=new Float32Array(N),bB=new Float32Array(N),bR=new Float32Array(N);
+  boxMean(Y,W,H,r,tmp,bY);boxMean(Cb,W,H,r,tmp,bB);boxMean(Cr,W,H,r,tmp,bR);
+  G=new Float32Array(N);const hist=new Uint32Array(256);let n=0;const DW=D*W;
+  for(let y=D;y<H-D;y++)for(let x=D,i=y*W+D;x<W-D;x++,i++){
+    const ax=bY[i+D]-bY[i-D],ay=bY[i+DW]-bY[i-DW],bx=bB[i+D]-bB[i-D],by=bB[i+DW]-bB[i-DW],cx=bR[i+D]-bR[i-D],cy=bR[i+DW]-bR[i-DW];
+    const g=Math.sqrt(ax*ax+ay*ay+2*(bx*bx+by*by+cx*cx+cy*cy));G[i]=g;
+    if((i&7)===0){hist[Math.min(255,g*10|0)]++;n++}
   }
-  // close pinholes left by grain
-  const o=new Uint8Array(N);
-  for(let y=1;y<H-1;y++)for(let x=1,i=y*W+1;x<W-1;x++,i++){
-    const c=m[i-W-1]+m[i-W]+m[i-W+1]+m[i-1]+m[i+1]+m[i+W-1]+m[i+W]+m[i+W+1];
-    o[i]=m[i]?(c>=3?1:0):(c>=5?1:0);
+  let acc=0;noise=1;for(let v=0;v<256;v++){acc+=hist[v];if(acc>=n*0.5){noise=v/10;break}}
+  noise=Math.min(6,Math.max(0.5,noise));
+}
+function params(){const s=+$("tol").value/100;return{T:6+s*50,gth:noise*1.5+1+s*s*s*30}}
+function meanAt(x,y){let a=0,b=0,c=0,n=0;
+  for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){const xx=x+dx,yy=y+dy;if(xx<0||yy<0||xx>=W||yy>=H)continue;const i=yy*W+xx;a+=sY[i];b+=sB[i];c+=sR[i];n++}
+  return[a/n,b/n,c/n]}
+function floodOn(map,seed,stack){
+  const m=new Uint8Array(N);let sp=0;m[seed]=1;stack[sp++]=seed;
+  while(sp){const p=stack[--sp],x=p%W;
+    if(x>0&&map[p-1]&&!m[p-1]){m[p-1]=1;stack[sp++]=p-1}
+    if(x<W-1&&map[p+1]&&!m[p+1]){m[p+1]=1;stack[sp++]=p+1}
+    if(p>=W&&map[p-W]&&!m[p-W]){m[p-W]=1;stack[sp++]=p-W}
+    if(p<N-W&&map[p+W]&&!m[p+W]){m[p+W]=1;stack[sp++]=p+W}}
+  return m;
+}
+function grow(m,steps,ok,climb){
+  // climb: only step to a pixel whose edge strength is at least its neighbour's, so growth walks up
+  // the edge and stops on its crest (the true edge line) instead of spilling down the far side.
+  for(let s=0;s<steps;s++){const add=[];
+    for(let y=0;y<H;y++)for(let x=0,i=y*W;x<W;x++,i++){
+      if(m[i]||!ok[i])continue;
+      if(climb){const g=G[i]*1.03+0.2;
+        if((x>0&&m[i-1]&&g>=G[i-1])||(x<W-1&&m[i+1]&&g>=G[i+1])||(y>0&&m[i-W]&&g>=G[i-W])||(y<H-1&&m[i+W]&&g>=G[i+W]))add.push(i)}
+      else if((x>0&&m[i-1])||(x<W-1&&m[i+1])||(y>0&&m[i-W])||(y<H-1&&m[i+W]))add.push(i)}
+    if(!add.length)break;for(let k=0;k<add.length;k++)m[add[k]]=1}
+}
+function closeHoles(m,val,stack){
+  // close specks: enclosed gaps smaller than a light switch
+  const seen=new Uint8Array(N),maxHole=Math.max(40,N*0.0003|0);
+  for(let s0=0;s0<N;s0++){
+    if(m[s0]||seen[s0])continue;
+    let head=0,tail=0,border=false;stack[tail++]=s0;seen[s0]=1;
+    while(head<tail){const p=stack[head++],x=p%W;
+      if(x===0||x===W-1||p<W||p>=N-W)border=true;
+      if(x>0&&!m[p-1]&&!seen[p-1]){seen[p-1]=1;stack[tail++]=p-1}
+      if(x<W-1&&!m[p+1]&&!seen[p+1]){seen[p+1]=1;stack[tail++]=p+1}
+      if(p>=W&&!m[p-W]&&!seen[p-W]){seen[p-W]=1;stack[tail++]=p-W}
+      if(p<N-W&&!m[p+W]&&!seen[p+W]){seen[p+W]=1;stack[tail++]=p+W}}
+    if(!border&&tail<=maxHole)for(let k=0;k<tail;k++)m[stack[k]]=val;
   }
-  return o;
+}
+function flood(sx,sy){
+  const {T,gth}=params(),[aY,aB,aR]=meanAt(sx,sy),t2=T*T,t3=t2*1.6;
+  const A=new Uint8Array(N),near=new Uint8Array(N);
+  for(let i=0;i<N;i++){const a=sY[i]-aY,b=sB[i]-aB,c=sR[i]-aR,d=0.3*a*a+2.5*(b*b+c*c);
+    if(d<=t3){near[i]=1;if(d<=t2&&G[i]<=gth)A[i]=1}}
+  // disc erosion: a pixel is passable only if everything within r of it is passable
+  const r=W>900?2:1,t=new Uint8Array(N),E=new Uint8Array(N);
+  for(let y=0;y<H;y++){const row=y*W;let run=0;
+    for(let x=0;x<W;x++){run=A[row+x]?run+1:0;if(run>2*r)t[row+x-r]=1}}
+  for(let x=0;x<W;x++){let run=0;for(let y=0;y<H;y++){run=t[y*W+x]?run+1:0;if(run>2*r)E[(y-r)*W+x]=1}}
+  const stack=new Int32Array(N);let seed=sy*W+sx,map=E;
+  if(!E[seed]){let best=-1,bd=1e9;
+    for(let dy=-8;dy<=8;dy++)for(let dx=-8;dx<=8;dx++){const x=sx+dx,y=sy+dy;if(x<0||y<0||x>=W||y>=H)continue;const i=y*W+x,d=dx*dx+dy*dy;if(E[i]&&d<bd){bd=d;best=i}}
+    if(best>=0)seed=best;else{map=A;A[seed]=1}}
+  const m=floodOn(map,seed,stack);
+  if(map===E)grow(m,r+1,A);   // give back what the disc erosion shaved off
+  grow(m,8,near,true);        // walk up the soft edge ramp to the edge line
+  closeHoles(m,1,stack);
+  return m;
 }
 function applyFill(x,y){
-  const m=flood(x,y,+$("tol").value), L=layers[active]; let added=0;
+  const m=flood(x,y), L=layers[active]; let added=0;
   for(let i=0;i<N;i++) if(m[i]){ if(!L.mask[i])added++; L.mask[i]=255; }
   for(const o of layers) if(o!==L){ for(let i=0;i<N;i++) if(m[i]&&o.mask[i]) o.mask[i]=0; o.dirty=true; }
   L.dirty=true; return added;
 }
+function putPix(i,L,erase){ if(erase) L.mask[i]=0; else { L.mask[i]=255; for(const o of layers) if(o!==L&&o.mask[i]) o.mask[i]=0; } }
+/* Brush with "Stay inside edges": paint spreads inside the brush circle only through pixels that are
+   connected to where the stroke started, never across an edge or onto a clearly different colour. */
+function guardedStamp(cx,cy,r,L,erase,g2,gth){
+  const x0=Math.max(0,Math.floor(cx-r)),x1=Math.min(W-1,Math.ceil(cx+r)),y0=Math.max(0,Math.floor(cy-r)),y1=Math.min(H-1,Math.ceil(cy+r)),r2=r*r;
+  const st=new Int32Array((x1-x0+1)*(y1-y0+1)*2+4);let sp=0;
+  if(strokeFirst){strokeFirst=false;const ci=Math.round(cy)*W+Math.round(cx);strokeSet[ci]=1;putPix(ci,L,erase)}
+  for(let y=y0;y<=y1;y++)for(let x=x0,i=y*W+x0;x<=x1;x++,i++)if(strokeSet[i]&&(x-cx)*(x-cx)+(y-cy)*(y-cy)<=r2)st[sp++]=i;
+  const tryPix=(q,x,y)=>{
+    if(strokeSet[q]||G[q]>gth||(x-cx)*(x-cx)+(y-cy)*(y-cy)>r2)return;
+    const a=sY[q]-ref[0],b=sB[q]-ref[1],c=sR[q]-ref[2];if(0.3*a*a+2.5*(b*b+c*c)>g2)return;
+    strokeSet[q]=1;putPix(q,L,erase);st[sp++]=q};
+  while(sp){const p=st[--sp],x=p%W,y=(p-x)/W;
+    if(x>x0)tryPix(p-1,x-1,y);if(x<x1)tryPix(p+1,x+1,y);if(y>y0)tryPix(p-W,x,y-1);if(y<y1)tryPix(p+W,x,y+1)}
+}
 function stamp(a,b){
   const r=Math.max(1,(+$("size").value)*W/cv.getBoundingClientRect().width/2), L=layers[active], erase=tool==="erase";
+  const pr=params(),g2=strokeSet?Math.pow(pr.T*1.25,2):0;
   const dist=Math.hypot(b.x-a.x,b.y-a.y), steps=Math.max(1,Math.ceil(dist/(r/2)));
   for(let s=0;s<=steps;s++){
     const cx=a.x+(b.x-a.x)*s/steps, cy=a.y+(b.y-a.y)*s/steps;
+    if(g2){guardedStamp(cx,cy,r,L,erase,g2,pr.gth);continue}
     const y0=Math.max(0,Math.floor(cy-r)), y1=Math.min(H-1,Math.ceil(cy+r));
     for(let y=y0;y<=y1;y++){
       const half=Math.sqrt(Math.max(0,r*r-(y-cy)*(y-cy)));
       const x0=Math.max(0,Math.round(cx-half)), x1=Math.min(W-1,Math.round(cx+half));
-      for(let i=y*W+x0,e=y*W+x1;i<=e;i++){
-        if(erase) L.mask[i]=0; else { L.mask[i]=255; for(const o of layers) if(o!==L&&o.mask[i]) o.mask[i]=0; }
-      }
+      for(let i=y*W+x0,e=y*W+x1;i<=e;i++)putPix(i,L,erase);
     }
   }
   for(const o of layers) o.dirty=true;
+}
+function endStroke(){
+  if(!strokeSet)return;
+  // finish a guarded stroke: walk the paint up to the edge line, then close grain specks
+  const L=layers[active],erase=tool==="erase",pr=params(),g3=Math.pow(pr.T*1.25,2)*1.6,ok=new Uint8Array(N);
+  for(let i=0;i<N;i++){if(G[i]<=pr.gth)continue;const a=sY[i]-ref[0],b=sB[i]-ref[1],c=sR[i]-ref[2];if(0.3*a*a+2.5*(b*b+c*c)<=g3)ok[i]=1}
+  grow(strokeSet,8,ok,true);
+  for(let i=0;i<N;i++)if(strokeSet[i])putPix(i,L,erase);
+  if(!erase)closeHoles(L.mask,255,new Int32Array(N));
+  strokeSet=null;
 }
 
 /* ---------- undo ---------- */
@@ -304,7 +392,33 @@ function restore(snap){for(const s of snap){const l=layers.find(l=>l.id===s.id);
 function syncUndo(){$("undoBtn").disabled=!undo.length}
 
 /* ---------- render: keep the wall's own light and shadow, swap its colour ---------- */
+function boxMean(a,w,h,r,tmp,dst){
+  for(let y=0;y<h;y++){const row=y*w;let s=0;for(let x=0;x<=r&&x<w;x++)s+=a[row+x];
+    for(let x=0;x<w;x++){const lo=x-r,hi=x+r;tmp[row+x]=s/(Math.min(hi,w-1)-Math.max(lo,0)+1);if(hi+1<w)s+=a[row+hi+1];if(lo>=0)s-=a[row+lo]}}
+  for(let x=0;x<w;x++){let s=0;for(let y=0;y<=r&&y<h;y++)s+=tmp[y*w+x];
+    for(let y=0;y<h;y++){const lo=y-r,hi=y+r;dst[y*w+x]=s/(Math.min(hi,h-1)-Math.max(lo,0)+1);if(hi+1<h)s+=tmp[(hi+1)*w+x];if(lo>=0)s-=tmp[lo*w+x]}}
+}
+/* Snap the paint line to the photo's own edges (guided filter): near the boundary, the surface's
+   outline is re-drawn to follow the brightness edge in the photo, with a soft anti-aliased line. */
+function refine(L){
+  const m=L.mask,s=L.soft;let x0=W,y0=H,x1=-1,y1=-1;
+  for(let y=0;y<H;y++)for(let x=0,i=y*W;x<W;x++,i++)if(m[i]){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+  s.fill(0);L.dirty=false;L.count=0;if(x1<0)return;
+  const r=Math.max(3,Math.round(W/230)),pad=2*r+1;
+  x0=Math.max(0,x0-pad);y0=Math.max(0,y0-pad);x1=Math.min(W-1,x1+pad);y1=Math.min(H-1,y1+pad);
+  const w=x1-x0+1,h=y1-y0+1,n=w*h,F=()=>new Float32Array(n);
+  const I=F(),p=F(),Ip=F(),II=F(),tmp=F(),mI=F(),mp=F(),a=F(),b=F();
+  for(let y=0;y<h;y++)for(let x=0,j=y*w,i=(y+y0)*W+x0;x<w;x++,j++,i++){const v=Y[i]/255,q=m[i]?1:0;I[j]=v;p[j]=q;Ip[j]=v*q;II[j]=v*v}
+  boxMean(I,w,h,r,tmp,mI);boxMean(p,w,h,r,tmp,mp);boxMean(Ip,w,h,r,tmp,a);boxMean(II,w,h,r,tmp,b);
+  for(let j=0;j<n;j++){const k=(a[j]-mI[j]*mp[j])/(b[j]-mI[j]*mI[j]+4e-4);b[j]=mp[j]-k*mI[j];a[j]=k}
+  boxMean(a,w,h,r,tmp,Ip);boxMean(b,w,h,r,tmp,II);
+  let c=0;
+  for(let y=0;y<h;y++)for(let x=0,j=y*w,i=(y+y0)*W+x0;x<w;x++,j++,i++){
+    let q=(Ip[j]*I[j]+II[j]-0.12)/0.76;q=q<0?0:q>1?1:q;const v=q*255;s[i]=v;if(v>=1)c++}
+  L.count=c;
+}
 function soften(L){
+  if(!drawing){refine(L);return}
   const m=L.mask,s=L.soft,t=new Uint8Array(N);let c=0;
   for(let y=0;y<H;y++){const r=y*W;t[r]=m[r];t[r+W-1]=m[r+W-1];for(let i=r+1,e=r+W-1;i<e;i++)t[i]=(m[i-1]+m[i]+m[i+1])/3}
   for(let i=0;i<W;i++){s[i]=t[i];s[N-W+i]=t[N-W+i]}
@@ -345,10 +459,10 @@ cv.addEventListener("pointerdown",e=>{
   if(tool==="fill"){
     pushUndo(); const added=applyFill(p.x,p.y); lastFill={x:p.x,y:p.y,len:undo.length}; schedule();
     say(added?"Filled "+layers[active].name+". Adjust Sensitivity if it went too far or not far enough.":"That area is already painted.");
-  }else{ cv.setPointerCapture(e.pointerId); pushUndo(); lastFill=null; drawing=true; lastPt=p; stamp(p,p); schedule(); }
+  }else{ cv.setPointerCapture(e.pointerId); pushUndo(); lastFill=null; drawing=true; lastPt=p; ref=meanAt(p.x,p.y); strokeSet=guard?new Uint8Array(N):null; strokeFirst=true; stamp(p,p); schedule(); }
 });
 cv.addEventListener("pointermove",e=>{ring(e); if(!drawing)return; const p=pos(e); stamp(lastPt,p); lastPt=p; schedule()});
-const stop=()=>{drawing=false};
+const stop=()=>{if(!drawing)return;drawing=false;endStroke();for(const l of layers)l.dirty=true;schedule()};
 cv.addEventListener("pointerup",stop);cv.addEventListener("pointercancel",stop);
 cv.addEventListener("pointerleave",()=>{$("ring").hidden=true});
 
@@ -359,7 +473,8 @@ $("undoBtn").onclick=()=>{const s=undo.pop();if(s){restore(s);lastFill=null;sync
 $("clearBtn").onclick=()=>{const L=layers[active];if(!L.count)return;pushUndo();lastFill=null;L.mask.fill(0);L.dirty=true;schedule();say("Cleared "+L.name+". Undo brings it back.")};
 $("cmpBtn").onclick=()=>{showOrig=!showOrig;$("cmpBtn").setAttribute("aria-pressed",showOrig);$("cmpBtn").textContent=showOrig?"Show painted":"Show original";schedule()};
 function setTool(t){tool=t;[["tFill","fill"],["tBrush","brush"],["tErase","erase"]].forEach(([id,v])=>$(id).setAttribute("aria-pressed",v===t));
-  $("tolWrap").hidden=t!=="fill";$("sizeWrap").hidden=t==="fill";$("ring").hidden=true}
+  $("sizeWrap").hidden=$("guardBtn").hidden=t==="fill";$("ring").hidden=true}
+$("guardBtn").onclick=()=>{guard=!guard;$("guardBtn").setAttribute("aria-pressed",guard)};
 $("tFill").onclick=()=>setTool("fill");$("tBrush").onclick=()=>setTool("brush");$("tErase").onclick=()=>setTool("erase");
 
 /* ---------- surfaces ---------- */
