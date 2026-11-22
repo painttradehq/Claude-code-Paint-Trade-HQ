@@ -104,9 +104,7 @@ const chapterText: Record<string, { title: string; caption: string }> = {
       <p class="nh__kicker">Software for Australian painting businesses</p>
       <h1 class="nh__h1">
         <span class="nh__dark">Everything you need to run your painting business.</span>
-        <span class="nh__light">From the quote your client signs to the invoice, made by a painter.</span>
       </h1>
-      <p class="nh__sub">You run it on a laptop or tablet. Your crew use their phones. From a sole trader to a crew of 15 or more.</p>
       <div class="nh__cta">
         <Button href={site.status.ctaHref} size="lg">{site.status.cta} <span aria-hidden="true">›</span></Button>
         <a class="btn btn--ghost btn--lg nh__ghostbtn" href="#watch">Watch it work</a>
@@ -490,8 +488,6 @@ const chapterText: Record<string, { title: string; caption: string }> = {
   .nh__h1 { font-size: clamp(34px, 4.6vw, 58px); line-height: 1.08; letter-spacing: -0.015em; margin: 0 0 32px; font-weight: 600; }
   .nh__dark { color: var(--text); }
   .nh__light { color: #5c4c9e; font-weight: 500; }
-  .nh__h1 .nh__light { display: block; font-size: 0.6em; line-height: 1.2; margin-top: 12px; }
-  .nh__in > .nh__sub { margin: -14px 0 28px; font-size: clamp(16px, 1.3vw, 18px); line-height: 1.55; color: var(--text-2); max-width: min(40ch, 62%); }
   .nh__in > .nh__fine { max-width: min(46ch, 62%); }
   .nh__cta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
   .nh__ghostbtn { background: rgba(255, 255, 255, 0.75); }
@@ -776,9 +772,8 @@ const chapterText: Record<string, { title: string; caption: string }> = {
   }
   @media (max-width: 600px) {
     .bcard--b, .bcard--c, .bcard--d, .bcard--e, .bcard--g { grid-column: span 12; }
-    .nh__in > *, .nh__in > .nh__sub, .nh__in > .nh__fine { max-width: 88%; }
+    .nh__in > *, .nh__in > .nh__fine { max-width: 88%; }
     .nh__in > .nh__kicker { max-width: 75%; }
-    .nh__in > .nh__sub { color: var(--text); }
     .bcard { min-height: 0; }
     .stage__frames { padding-right: 18%; }
     .stage__phone { width: 30%; }
