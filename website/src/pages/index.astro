@@ -53,8 +53,8 @@ const also = [
 /** "Sound familiar?": three everyday problems, each with what changes. General, not claims about anyone. */
 const pains = [
   { id: 'evenings', t: 'Your evenings go on quotes.', w: "You measure up on site, then type it all out at night on a template that doesn't know your prices.", fix: 'Here you build it room by room from your own price list, and send it as a link.' },
-  { id: 'deposit', t: 'The deposit drifts.', w: 'The client says yes on the phone, then chasing the paperwork and the deposit takes days.', fix: 'Here your client signs on their phone, and the deposit invoice is created the moment they do.' },
-  { id: 'hours', t: 'Hours on scraps of paper.', w: "Friday comes and the week's hours arrive by text, from memory, or not at all.", fix: 'Here your crew sign in and out on their phones, so the hours are already recorded. On the Small business plan and up, the Timesheets page adds up the week for payroll.' },
+  { id: 'project', t: 'The job lives in five places.', w: "The quote is in your email, the colours in a text, the extras on a scrap of paper. Finding any of it takes a phone call.", fix: "Here every job gets its own page the moment your client signs: the signed quote, the crew, the colours, the photos, the variations and what it's costing you, all in one place." },
+  { id: 'records', t: 'No record when it counts.', w: 'A client asks what was done on Tuesday, or queries the hours, and the answer is in somebody\'s memory.', fix: "Here every sign-in and sign-out is kept with the time and where it happened, and your crew's daily reports and photos are filed on the job, so the answer is a tap away. Daily reports are on the Enterprise plan." },
 ];
 
 /** Plans, in a painter's words: who it suits, the people included, one line of what's in it. */
@@ -109,7 +109,6 @@ const chapterText: Record<string, { title: string; caption: string }> = {
         <Button href={site.status.ctaHref} size="lg">{site.status.cta} <span aria-hidden="true">›</span></Button>
         <a class="btn btn--ghost btn--lg nh__ghostbtn" href="#watch">Watch it work</a>
       </div>
-      <p class="nh__fine">Free for 30 days on every plan, no card needed. We set up your account and email you the login.</p>
     </div>
   </section>
 
@@ -488,10 +487,8 @@ const chapterText: Record<string, { title: string; caption: string }> = {
   .nh__h1 { font-size: clamp(34px, 4.6vw, 58px); line-height: 1.08; letter-spacing: -0.015em; margin: 0 0 32px; font-weight: 600; }
   .nh__dark { color: var(--text); }
   .nh__light { color: #5c4c9e; font-weight: 500; }
-  .nh__in > .nh__fine { max-width: min(46ch, 62%); }
   .nh__cta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
   .nh__ghostbtn { background: rgba(255, 255, 255, 0.75); }
-  .nh__fine { margin-top: 18px; font-size: 14px; color: var(--text-2); }
 
   /* the ribbon: bold, purple only, several shades folded into one band plus three thinner ones */
   .ribbon { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
@@ -772,7 +769,7 @@ const chapterText: Record<string, { title: string; caption: string }> = {
   }
   @media (max-width: 600px) {
     .bcard--b, .bcard--c, .bcard--d, .bcard--e, .bcard--g { grid-column: span 12; }
-    .nh__in > *, .nh__in > .nh__fine { max-width: 88%; }
+    .nh__in > * { max-width: 88%; }
     .nh__in > .nh__kicker { max-width: 75%; }
     .bcard { min-height: 0; }
     .stage__frames { padding-right: 18%; }
