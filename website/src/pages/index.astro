@@ -57,13 +57,12 @@ const quotes = testimonials.filter((t) => showSamples || !t.sample).slice(0, 3);
  *  go-live checks say to take any item out that isn't. No supplier names (Anthropic stays in the Lucy card). */
 const worksWith = [
   { name: 'Google Calendar' },
-  { name: 'Outlook calendar' },
   { name: 'Google Drive' },
-  { name: 'OneDrive' },
   { name: 'Gmail' },
+  { name: 'Outlook calendar' },
+  { name: 'OneDrive' },
   { name: 'Microsoft 365' },
   { name: 'Xero' },
-  { name: 'Your Google review link' },
 ];
 const videos = videoFeedback.filter((v) => showSamples || !v.sample).slice(0, 3);
 const posts = (await getCollection('blog')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf() || a.data.order - b.data.order).slice(0, 3);
@@ -74,7 +73,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-AU', { day: 'numeric', month: 
   <section class="nh" id="top">
     <div class="ribbon" aria-hidden="true"><i class="ribbon__a"></i><i class="ribbon__b"></i><i class="ribbon__c"></i><i class="ribbon__d"></i></div>
     <div class="container nh__in">
-      <p class="nh__kicker">Software for Australian painting businesses</p>
+      <p class="nh__kicker">Built in Melbourne for Australian painting businesses</p>
       <h1 class="nh__h1">
         <span class="nh__dark">Everything you need to run your painting business.</span>
       </h1>
@@ -240,26 +239,41 @@ const fmt = (d: Date) => d.toLocaleDateString('en-AU', { day: 'numeric', month: 
       <h2 class="bento__h ink__h reveal"><span>Fits the way you already work.</span> <span class="ink__light">Your calendar, your email, your files and Xero. Bring your data across, and take it with you.</span></h2>
 
       <div class="hub reveal" aria-label="What Paint Trade HQ connects to">
-        <ul class="hub__col hub__col--l">
-          <li class="node is-live"><span>Google Calendar</span><em>Live</em></li>
-          <li class="node is-live"><span>Outlook calendar</span><em>Live</em></li>
-          <li class="node is-live"><span>Google Drive</span><em>Live</em></li>
-          <li class="node is-live"><span>OneDrive</span><em>Live</em></li>
-        </ul>
+        <div class="hub__group hub__group--l">
+          <p class="hub__label">Google</p>
+          <ul class="hub__col hub__col--l">
+            <li class="node is-live"><span>Google Calendar</span><em>Live</em></li>
+            <li class="node is-live"><span>Google Drive</span><em>Live</em></li>
+            <li class="node is-live"><span>Gmail</span><em>Live</em></li>
+          </ul>
+        </div>
         <div class="hub__core"><img src="/brand/logo.svg" alt="Paint Trade HQ" width="128" height="128" /></div>
-        <ul class="hub__col hub__col--r">
-          <li class="node is-live"><span>Email: Gmail, Microsoft 365 or another mailbox</span><em>Live</em></li>
-          <li class="node is-live"><span>Texts to clients from your own SMS number</span><em>Small business and up</em></li>
-          <li class="node is-live"><span>Review requests with your Google review link</span><em>Live</em></li>
-          <li class="node is-live"><span>Xero</span><em>Live</em></li>
-        </ul>
+        <div class="hub__group hub__group--r">
+          <p class="hub__label">Microsoft</p>
+          <ul class="hub__col hub__col--r">
+            <li class="node is-live"><span>Outlook calendar</span><em>Live</em></li>
+            <li class="node is-live"><span>OneDrive</span><em>Live</em></li>
+            <li class="node is-live"><span>Microsoft 365 email</span><em>Live</em></li>
+          </ul>
+        </div>
+        <div class="hub__group hub__group--b">
+          <ul class="hub__col hub__col--b">
+            <li class="node is-live"><span>Xero</span><em>Live</em></li>
+          </ul>
+          <p class="hub__label">Accounting</p>
+        </div>
       </div>
 
       <div class="ink__grid">
         <article class="ink__card reveal">
-          <h3>Moving from other software?</h3>
-          <p>We bring your clients across from your old software. Free on Enterprise; on Starter and Small business we give you a price first.</p>
-          <a href="/pricing#compare">How plans compare <span aria-hidden="true">→</span></a>
+          <h3>What connecting them gets you.</h3>
+          <ul class="ink__list">
+            <li><strong>Calendar:</strong> your Google or Outlook calendar shows alongside your jobs, so you book around what's already on.</li>
+            <li><strong>Files:</strong> job photos, PDFs and signed documents save to your own Drive or OneDrive, a folder per job, and stay yours if you ever leave.</li>
+            <li><strong>Email:</strong> emails to clients go out from your own mailbox, and replies land in that client's thread.</li>
+            <li><strong>Xero:</strong> invoices you send appear in Xero with their GST, and a payment you reconcile there marks the invoice paid here.</li>
+          </ul>
+          <a href="/features">See it on the Features page <span aria-hidden="true">→</span></a>
         </article>
         <article class="ink__card reveal">
           <h3>Your crew and clients need only a phone.</h3>
@@ -576,8 +590,16 @@ const fmt = (d: Date) => d.toLocaleDateString('en-AU', { day: 'numeric', month: 
   .ink::before { content: ''; position: absolute; inset: 0; background: radial-gradient(60% 50% at 80% 10%, rgba(138, 121, 214, 0.25), transparent 70%); pointer-events: none; }
   .ink__h, .ink__h .nh__dark { color: #fff; }
   .ink__light { color: #c3b7ec; font-weight: 500; display: block; font-size: 0.72em; margin-top: 6px; }
-  .hub { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 28px; align-items: center; padding: 28px; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 18px; background-color: rgba(255, 255, 255, 0.02); background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px); background-size: 18px 18px; }
+  .hub { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-areas: 'l core r' 'b b b'; gap: 28px; align-items: center; padding: 28px; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 18px; background-color: rgba(255, 255, 255, 0.02); background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px); background-size: 18px 18px; }
   .hub__col { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .hub__group { display: grid; gap: 10px; min-width: 0; }
+  .hub__group--l { grid-area: l; }
+  .hub__group--r { grid-area: r; }
+  .hub__group--b { grid-area: b; justify-self: center; width: min(320px, 100%); text-align: center; }
+  .hub__core { grid-area: core; }
+  .hub__label { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #c3b7ec; }
+  .hub__group--l .hub__label { text-align: left; }
+  .hub__group--r .hub__label { text-align: right; }
   .node { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-radius: 10px; background: #4b3e86; border: 1px solid rgba(255, 255, 255, 0.18); font-size: 14px; font-weight: 600; }
   .node em { font-style: normal; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: var(--r-pill); background: rgba(255, 255, 255, 0.16); white-space: nowrap; }
   .node.is-soon { background: rgba(255, 255, 255, 0.05); border-style: dashed; color: #c3b7ec; }
@@ -585,6 +607,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-AU', { day: 'numeric', month: 
   .node::after { content: ''; position: absolute; top: 50%; width: 28px; border-top: 1px dashed rgba(195, 183, 236, 0.55); }
   .hub__col--l .node::after { left: 100%; }
   .hub__col--r .node::after { right: 100%; }
+  .hub__col--b .node::after { top: auto; bottom: 100%; left: 50%; width: 0; height: 28px; border-top: 0; border-left: 1px dashed rgba(195, 183, 236, 0.55); }
   .hub__core { display: grid; place-items: center; }
   .hub__core img { width: clamp(88px, 9vw, 128px); height: auto; display: block; border-radius: 22.6%; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28), 0 24px 44px -16px rgba(0, 0, 0, 0.6); }
   .ink__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
@@ -593,6 +616,8 @@ const fmt = (d: Date) => d.toLocaleDateString('en-AU', { day: 'numeric', month: 
   .ink__card h3 { margin: 0 0 8px; font-size: 20px; color: #fff; }
   .ink__card p { margin: 0 0 12px; color: #d6cff0; }
   .ink__card a { font-weight: 600; color: #e6dffa; }
+  .ink__list { margin: 0 0 12px; padding-left: 18px; display: grid; gap: 8px; color: #d6cff0; }
+  .ink__list strong { color: #fff; font-weight: 600; }
 
   /* ---------- workshop ---------- */
   .wshop__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
@@ -629,8 +654,11 @@ const fmt = (d: Date) => d.toLocaleDateString('en-AU', { day: 'numeric', month: 
     .wpost--lead { grid-column: span 2; min-height: 260px; }
   }
   @media (max-width: 860px) {
-    .hub { grid-template-columns: minmax(0, 1fr); }
-    .hub__core { order: -1; justify-self: start; }
+    .hub { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'core' 'l' 'r' 'b'; }
+    .hub__core { justify-self: start; }
+    .hub__group--b { justify-self: stretch; width: auto; text-align: left; }
+    .hub__group--b .hub__label { order: -1; }
+    .hub__group--r .hub__label { text-align: left; }
     .node::after { display: none; }
     .updates__in { grid-template-columns: minmax(0, 1fr); }
   }
