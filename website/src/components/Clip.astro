@@ -8,7 +8,7 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { clips } from '../data/screens';
 
-/** `title` and `caption` override the screens.ts wording for one page (the home page uses its own). */
+/** Optional `title` and `caption` override the screens.ts wording (no page uses them since the home-page videos were removed on 22 Nov 2026). */
 interface Props { id: string; class?: string; title?: string; caption?: string }
 const { id, class: cls = '', title: titleOverride, caption: captionOverride } = Astro.props;
 const found = clips.find((x) => x.id === id);
