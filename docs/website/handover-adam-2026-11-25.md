@@ -19,10 +19,10 @@ Hi Adam. Josh has asked you to take over the website work. This is everything in
 | Josh | What the site says (claims, prices, offers), the knowledge file, access to accounts | software@joshsano.com.au |
 | Adam (you) | The website: words, pages, layout, and getting it live with Jay | (not written here: anyone can read this repo) |
 | Jay Guinto, nForce IT (web developer) | Hosting on Cloudflare Pages, domains and DNS, spam protection on the form, go-live and upkeep | jay@nforceit.com.au |
-| Bobby Jafari, nForce IT | Jay's colleague; an administrator on the Cloudflare account | bobby@nforceit.com.au |
+| Bobby Jafari, owner of nForce IT (Jay's manager) | Backs Jay up on hosting and domains; an administrator on the Cloudflare account | bobby@nforceit.com.au |
 | The app builder (an AI agent Josh runs on Emergent) | The app itself, and new app screenshots and videos | through Josh |
 
-There's an email thread for you and Jay: **"Adam and Jay - Paint Trade HQ website (all related communication)"**. Keep website, hosting and domain conversation there so it's all in one place. Anything for Josh goes in your existing thread with him.
+There's an email thread for you, Jay, Bobby and Josh: **"Adam and Jay - Paint Trade HQ website (all related communication)"**. Keep website, hosting and domain conversation there, and use Reply all so all four of you see every message.
 
 ## 3. Access: what you have and what's coming
 
@@ -126,4 +126,4 @@ From the launch checklist; the full steps are in `docs/website/launch-checklist.
   - the connections diagram regrouped into Google, Microsoft and Xero;
   - a card on what connecting them gets you.
 
-Questions about the website: ask Josh in your thread with him. Hosting, domain or DNS: Jay, in your thread with him.
+Questions about what the site says: Josh. Hosting, domain or DNS: Jay. Both on the shared thread, with Reply all.
