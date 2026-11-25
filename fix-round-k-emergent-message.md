@@ -1,14 +1,14 @@
-# Fix Round K — 27 fixes from the bug log to 26 November (one patch) — NOT SENT; waits for Josh's "send"
+# Fix Round K — 27 fixes from the bug log to 26 November (one patch) — SENT to Emergent 25 Nov on Josh's word ("send the work and I will upload the three files")
 
 The patch is `emergent-uploads/pthq-fixes-26nov.patch` in this repo (56 files, +1316 −166), built against GitHub `main` `0165cde` (your Save to GitHub of 15 Nov). Josh uploads it to the Emergent chat with the message below. The full verdict table is `fix-round-k-tracker.md`.
 
 ---
 
-## The message as it will be sent
+## The message as sent
 
 # Fix Round K — apply one patch, then check it on screen
 
-Josh is uploading **`pthq-fixes-26nov.patch`**. It is 27 fixes from his bug log (B-062 to B-088 and the contracts set), written outside against GitHub `main` `0165cde`. Nothing else is asked for in this round.
+Josh is uploading three files to this chat: **`pthq-fixes-26nov.patch`** (the one to apply), `fix-round-k-tracker.md` (the verdict on every entry of his bug log, for reference) and `fix-round-k-emergent-message.md` (this message as a file). The patch is 27 fixes from his bug log (B-062 to B-088 and the contracts set), written outside against GitHub `main` `0165cde`. Nothing else is asked for in this round.
 
 ## Step 0 — apply
 
@@ -61,7 +61,7 @@ Josh is uploading **`pthq-fixes-26nov.patch`**. It is 27 fixes from his bug log 
 11. **Due date.** Invoice details: type a due date 3 days after the issue date → the card, the Review & send message and the PDF all show that date and "3 days".
 12. **Greeting.** A client named "Owners Corporation PS 1234" with a contact "Priya Nair" ticked for quotes → the quote message opens "Hi Priya,"; with no contact → "Hi there,".
 13. **Resize.** Open Settings › Crew app at 1440, drag the window to 600 px and back → no blank page, no React error in the console. Same on the quote builder.
-14. **Drive.** With a test Drive connected: put the app's "Paint Trade HQ" folder in the bin, upload a quote photo → it lands under a live "Paint Trade HQ", and `drive_integrations.root_folder_id` now holds the live folder.
+14. **Drive.** With a test Drive connected: put the app's "Paint Trade HQ" folder in the bin, upload a quote photo → it lands under a live "Paint Trade HQ", and `drive_integrations.root_folder_id` now holds the live folder. If a test Drive still can't be connected on the preview (as you reported in Round 101), say so and skip this one — `tests/test_fixk_drive_root.py` covers the decision; do not connect anything to Josh's own tenant.
 15. **Contracts.** Issue an Employment agreement to a casual with a template that has no `[NOTICE PERIOD]` → Next works with Notice empty; a template using `[CASUAL LOADING PERCENT]` and `$[CASUAL HOURLY RATE]` with rate 38.90 and loading 25 fills "25%" and "$48.63"; at 800 px wide the editor is full width under the list.
 16. **Connector.** `update_quote` with `areas: [{id, name, note: "x", note_show_on_quote: true}]` saves the note; an unknown key comes back in `extra.warnings`; `update_variation` and `save_contract_template` work and are in the activity list.
 17. No horizontal scroll at 1440 and 1024 on the job page, the invoice editor and Contracts.
