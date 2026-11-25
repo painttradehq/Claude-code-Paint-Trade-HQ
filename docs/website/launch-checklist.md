@@ -66,13 +66,13 @@ On 4 Nov you said to write the home page as if everything is connected by go-liv
 
 | The home page says | Where on the site | Try this in the live app | Knowledge file on 23 Oct |
 |---|---|---|---|
-| Xero connects from your settings | Works-with strip, the dark "Fits the way you already work" band, the question "Does it connect to Xero or MYOB?" (also on Pricing) | Settings › Business › Accounting: Xero connects and stays connected | §4.7, §9, §11: "not yet set up on the server" |
+| Xero connects from your settings | Works-with strip, the dark connections band ("Your calendar, your email, your files and Xero…") and its "What connecting them gets you" card, the question "Does it connect to Xero or MYOB?" (also on Pricing) | Settings › Business › Accounting: Xero connects and stays connected | §4.7, §9, §11: "not yet set up on the server" |
 | OneDrive | Strip, dark band | Settings › Business › Files & storage: OneDrive connects and a job photo lands in it | §9: "Not yet" |
 | Outlook calendar | Strip, dark band | Calendar settings: Outlook connects and your events show | §9: "Not yet" |
 | Choose your plan on the app's Billing page | The question "What happens when the 30 days are up?" | Billing page is switched on, shows $98 / $178 / $249, and offers a year up front at 10% off | §6: "built but not switched on" |
-| Gmail, Microsoft 365, Google Calendar, Google Drive, your Google review link | Strip, dark band | Connect each once | Live on 23 Oct; a quick check is enough |
+| Gmail, Microsoft 365, Google Calendar, Google Drive | Strip, dark band | Connect each once | Live on 23 Oct; a quick check is enough |
 
-So the site doesn't contradict itself, the same assumption was carried to the other pages that mentioned these services on 4 Nov: the Features page (Files and storage: "our cloud, your own Google Drive or OneDrive"; Calendar: "Google Calendar or Outlook") and the blog post "Where your photos and paperwork live" (OneDrive "from the same page"). **If one of them isn't live on launch day, every place it appears comes off together:** the home page strip, dark band and "Also in the app" card, the Xero answer (home and Pricing), the day-31 answer (Billing page), the two Features modules and the blog post.
+So the site doesn't contradict itself, the same assumption was carried to the other pages that mentioned these services on 4 Nov: the Features page (Files and storage: "our cloud, your own Google Drive or OneDrive"; Calendar: "Google Calendar or Outlook") and the blog post "Where your photos and paperwork live" (OneDrive "from the same page"). **If one of them isn't live on launch day, every place it appears comes off together:** the home page strip, dark band and its "What connecting them gets you" card, the Xero answer (home and Pricing), the day-31 answer (Billing page), the two Features modules and the blog post.
 
 Still to sort, whichever way it goes:
 
@@ -81,7 +81,7 @@ Still to sort, whichever way it goes:
 
 - **The Terms of Service before billing goes on.** Terms v1.2 (22 Oct) were written for the free tester program: they say no fee is charged and, apart from §2's promise of 30 days' notice and your consent before any paid plan, have nothing on fees, cancelling or refunds. Before the first painter pays, the Terms need a fees, cancelling and refunds section (your lawyer; the refund on a prepaid year is still undecided). Until then the site says nothing about cancelling or refunds; the only pointer to the Terms is "Ending your account is covered in the Terms of Service", which §11 does cover.
 
-**Videos to re-record (ask the builder, same demo business, any made-up client email such as mia@example.com):** all four play from the home page's "Watch it work".
+**Videos to re-record (ask the builder, same demo business, any made-up client email such as mia@example.com):** the home page's "Watch it work" section was removed on 22 Nov, so today only clip 02 plays on the site (the Quotes card on the Features page). Re-record 02, 03 and 07 before any of them is used again.
 
 | Clip | What shows that shouldn't |
 |---|---|
@@ -90,7 +90,7 @@ Still to sort, whichever way it goes:
 | 07, invoice and payment | The demo invoice shows a red "150% of the quote · over the quote" warning, which reads like a billing mistake. |
 | 05, crew clock-in | Fine. |
 
-Until they are re-recorded, the cheaper option is to hide clips 02 and 03 from the home page (the stage card above still shows quote to signed). Your call.
+Until 02 is re-recorded, the cheaper option is to swap the Features page's Quotes clip for a cropped screen. Your call.
 
 ## After launch
 
