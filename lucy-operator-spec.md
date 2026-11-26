@@ -196,3 +196,15 @@ The trade, said plainly: without the card a mistake lands and is fixed afterward
 
 `lucy-conversation-first-message.md` was **sent to Emergent on 26 Nov** on Josh's "send it", queued behind L2.
 
+## 14. L2 and conversation first — Emergent's report (checked 26 Nov on Josh's "check")
+
+Read from Emergent's chat only. **Neither is on GitHub yet** (`main` is still `640c20d`, round 1), so the code is unread here. Emergent's own L2 summary had scrolled out of what the chat returns; what follows is from its conversation-first report and the test counts in it.
+
+- **Built:** L2 (sending and recording a payment) and then conversation first (its commits `b65d78d` server, `c83b16a` panel, `7828498` tests, a fix, `41538a0` report). "Ask me before changes" is the first row of her setup and off; a change is made and told with a plain Open button; the send card and the payment card stay; testers' reports log at once.
+- **Its checks:** pure 11; in-process L1 17, L2 20, conversation first 16; regression 166 pass, 13 skipped; type check clean. Its own screen run passed all ten checks at 1440 and 1024 (TS_ data, sends as a dry run). The testing agent passed all ten at both sizes, two of them on a second try, and ran out of time while finishing (`test_reports/iteration_lucy_cf.json`).
+- **A fix it made on the way:** with the day's allowance used up the typing box was locked, so a tester could not type a report; it now stays open for testers.
+- **Open, its words:** (1) on an accepted quote Lucy changed the notes and refused only the price — the app itself allows that (Fix Round J, B-042: "the money is locked, the rest still saves"). (2) L2's check 9 (a send asked for inside a longer task, with the switch on) was not repeated by the testing agent.
+- **Seen in its test output, not raised by it:** the small chips under her answer show raw names for the connector's tools ("get projects", "add job expense"); and in one run her answer added a remark about the late hour and a draft invoice after "Done" — her existing manner, not new.
+- What's new draft #47 now has three cards; still a draft. Two TS_ draft quotes from 21 Oct with no owner sit in the preview database; not from this round.
+- Its own suggestions (Accepted Quote Lock, Step 9 Retest, L3, Undo Last Change) wait for Josh's word like any other.
+
