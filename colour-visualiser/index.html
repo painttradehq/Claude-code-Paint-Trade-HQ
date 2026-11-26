@@ -3,143 +3,159 @@
 <!--APP-->
 <title>Wall Colour Visualiser</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
 <style>
-/* Layout: a work bench. Photo stage on the left with its tools on top; surfaces and colours in a side rail. Stacks on phones. */
+/* Layout: an editing workspace. Slim title bar, tool strip, the photo on a dark light-table that always
+   fits the screen, and an inspector on the right for surfaces and colour. Stacks on phones. */
 :root{
-  --bg:#eceeed; --surface:#ffffff; --sunk:#e1e5e3; --line:#cdd3d0;
-  --ink:#19211f; --muted:#5a6663;
-  --tape:#1a63c9; --tape-ink:#ffffff; --tape-soft:#dbe8fa;
-  --warn:#a23a22;
-  --display:"Space Grotesk","Segoe UI",system-ui,sans-serif;
-  --body:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;
-  --r:8px;
+  --bg:#f4f5f5; --panel:#ffffff; --table:#23282a; --table-ink:#c9d0d2; --table-strong:#ffffff; --line:#dfe3e4; --line-strong:#c3cacc;
+  --ink:#171c1e; --muted:#5f6b70; --faint:#7d888c;
+  --accent:#1f5fbf; --accent-ink:#ffffff; --accent-soft:#e6eefb;
+  --warn:#a5341d;
+  --ui:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  --r:6px;
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --bg:#131716; --surface:#1c2220; --sunk:#262d2b; --line:#36403d;
-  --ink:#e9eeec; --muted:#9aa7a3;
-  --tape:#5c9df2; --tape-ink:#0b1420; --tape-soft:#1f3350;
-  --warn:#f08a70; color-scheme:dark } }
+  --bg:#121516; --panel:#1a1e20; --table:#0c0e0f; --table-ink:#aab3b6; --table-strong:#ffffff; --line:#2a3033; --line-strong:#3b4347;
+  --ink:#e8ecee; --muted:#9aa5aa; --faint:#7f8a8f;
+  --accent:#6ea6f5; --accent-ink:#0a1422; --accent-soft:#1b2a40;
+  --warn:#f08c72; color-scheme:dark } }
 :root[data-theme="dark"]{
-  --bg:#131716; --surface:#1c2220; --sunk:#262d2b; --line:#36403d;
-  --ink:#e9eeec; --muted:#9aa7a3;
-  --tape:#5c9df2; --tape-ink:#0b1420; --tape-soft:#1f3350;
-  --warn:#f08a70; color-scheme:dark }
+  --bg:#121516; --panel:#1a1e20; --table:#0c0e0f; --table-ink:#aab3b6; --table-strong:#ffffff; --line:#2a3033; --line-strong:#3b4347;
+  --ink:#e8ecee; --muted:#9aa5aa; --faint:#7f8a8f;
+  --accent:#6ea6f5; --accent-ink:#0a1422; --accent-soft:#1b2a40;
+  --warn:#f08c72; color-scheme:dark }
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 var(--body);
-  padding-block:16px 32px;
+body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 var(--ui);-webkit-font-smoothing:antialiased;
+  padding-block:0 20px;
   padding-left:max(16px, env(safe-area-inset-left, 0px));
   padding-right:max(16px, env(safe-area-inset-right, 0px));}
-.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
-header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
-h1{font:700 22px/1.1 var(--display);margin:0;letter-spacing:-.01em;text-wrap:balance}
-header .sub{color:var(--muted);margin:0;flex:1 1 220px;min-width:0}
-.actions{display:flex;flex-wrap:wrap;gap:8px}
-h2{font:500 12px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.app{max-width:1440px;margin:0 auto;display:flex;flex-direction:column}
+.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:12px}
+h1{font:600 15px/1.2 var(--ui);margin:0;letter-spacing:-.005em}
+.bar .sub{color:var(--faint);margin:0;flex:1 1 160px;min-width:0}
+.actions{display:flex;gap:8px}
+h2{font:600 11px/1 var(--ui);letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:0}
 
-button,.btn{font:500 14px/1 var(--body);color:var(--ink);background:var(--surface);border:1px solid var(--line);
-  border-radius:var(--r);padding:9px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;min-height:38px}
-button:hover,.btn:hover{border-color:var(--muted)}
-button.primary{background:var(--tape);color:var(--tape-ink);border-color:var(--tape)}
-button[aria-pressed="true"]{background:var(--tape-soft);border-color:var(--tape);color:var(--ink)}
-button:disabled{opacity:.45;cursor:default}
-:focus-visible{outline:2px solid var(--tape);outline-offset:2px}
-input[type=text]{font:14px var(--body);color:var(--ink);background:var(--surface);border:1px solid var(--line);
-  border-radius:6px;padding:7px 8px;min-width:0;width:100%}
-input[type=range]{accent-color:var(--tape);width:100%;min-width:0}
+button,.btn{font:500 13px/1 var(--ui);color:var(--ink);background:var(--panel);border:1px solid var(--line-strong);
+  border-radius:var(--r);padding:0 11px;height:32px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+button:hover,.btn:hover{background:var(--bg)}
+button.primary,.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.primary:hover,.btn.primary:hover{filter:brightness(1.08);background:var(--accent)}
+button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+button:disabled{opacity:.4;cursor:default}
+button svg,.btn svg{width:15px;height:15px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=text]{font:13px var(--ui);color:var(--ink);background:transparent;border:1px solid transparent;border-radius:4px;padding:3px 6px;min-width:0;width:100%}
+input[type=text]:hover{border-color:var(--line)}
+input[type=text]:focus{border-color:var(--accent);background:var(--panel);outline:none}
+input[type=text]::placeholder{color:var(--faint)}
+input[type=range]{accent-color:var(--accent);width:100%;min-width:0;height:18px}
 
-.bench{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:14px;align-items:start}
-@media (max-width:860px){.bench{grid-template-columns:minmax(0,1fr)}}
-
-.tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;background:var(--surface);border:1px solid var(--line);
-  border-radius:var(--r) var(--r) 0 0;border-bottom:0;padding:8px}
-.seg{display:inline-flex}
+.work{display:grid;grid-template-columns:minmax(0,1fr) 312px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel)}
+@media (max-width:900px){.work{grid-template-columns:minmax(0,1fr)}}
+.left{min-width:0;display:flex;flex-direction:column}
+.tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:8px 10px;border-bottom:1px solid var(--line)}
+.seg{display:inline-flex;flex-wrap:wrap}
 .seg button{border-radius:0;margin-left:-1px}
 .seg button:first-child{border-radius:var(--r) 0 0 var(--r);margin-left:0}
 .seg button:last-child{border-radius:0 var(--r) var(--r) 0}
 .seg button[aria-pressed="true"]{position:relative;z-index:1}
-.slider{display:flex;align-items:center;gap:8px;flex:1 1 180px;min-width:0;color:var(--muted);font-size:13px}
+.slider{display:flex;align-items:center;gap:8px;flex:1 1 150px;max-width:230px;min-width:0;color:var(--muted);font-size:12px}
 .slider label{white-space:nowrap}
-.tools .right{display:flex;gap:8px;flex-wrap:wrap}
+.tools .right{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
 
-.stage{position:relative;background:var(--sunk);border:1px solid var(--line);border-radius:0 0 var(--r) var(--r);overflow:hidden;line-height:0}
-.stage canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}
-.stage.drop{outline:3px dashed var(--tape);outline-offset:-6px}
-.tag{position:absolute;left:10px;top:10px;font:500 12px/1 var(--body);background:var(--surface);color:var(--ink);
-  border:1px solid var(--line);border-radius:999px;padding:6px 10px}
-.ring{position:absolute;border:1.5px solid #fff;box-shadow:0 0 0 1px #000;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%)}
-.hint{color:var(--muted);margin:8px 2px 0;max-width:70ch}
-.status{min-height:1.45em;margin:4px 2px 0;font-weight:500}
+.stage{position:relative;background:var(--table);display:grid;place-items:center;min-height:min(62vh,560px);padding:14px;line-height:0}
+.stage canvas{display:block;max-width:100%;max-height:min(72vh,820px);width:auto;height:auto;touch-action:none;cursor:crosshair;border-radius:2px}
+.stage.drop{outline:2px dashed var(--accent);outline-offset:-8px}
+.empty{line-height:1.5;text-align:center;color:var(--table-ink);max-width:380px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.empty>svg{width:40px;height:40px;stroke:var(--table-ink);fill:none;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round;opacity:.8}
+.empty strong{font:600 16px/1.3 var(--ui);color:var(--table-strong)}
+.empty p{margin:0}
+.ring{position:absolute;border:1.5px solid var(--table-strong);border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);mix-blend-mode:difference}
+.foot{display:flex;gap:6px 16px;flex-wrap:wrap;justify-content:space-between;padding:8px 12px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;min-height:34px}
+.status{margin:0;font-weight:500;color:var(--ink)}
 .status.err{color:var(--warn)}
+.tip{margin:0}
 
-.rail{display:flex;flex-direction:column;gap:18px;min-width:0}
-.rail section{display:flex;flex-direction:column;gap:10px;min-width:0}
-.layers{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
-.layer{display:grid;grid-template-columns:34px minmax(0,1fr) 34px;gap:8px;align-items:center;background:var(--surface);
-  border:1px solid var(--line);border-radius:var(--r);padding:8px;cursor:pointer}
-.layer.on{border-color:var(--tape);box-shadow:inset 3px 0 0 var(--tape)}
-.layer .chip{width:34px;height:34px;border-radius:6px;border:1px solid var(--line)}
-.layer .fields{display:flex;flex-direction:column;gap:5px;min-width:0}
-.layer .nm{font-weight:600}
-.layer .del{padding:0;width:34px;min-height:34px;justify-content:center;color:var(--muted)}
-.pick{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:8px;align-items:center}
-.pick input[type=color]{width:52px;height:38px;padding:0;border:1px solid var(--line);border-radius:6px;background:var(--surface);cursor:pointer}
-.pick input[type=text]{font-variant-numeric:tabular-nums;text-transform:uppercase}
-.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:6px}
-.sw{padding:0;min-height:0;aspect-ratio:1;border-radius:6px;border:1px solid var(--line);position:relative}
-.sw:hover{transform:scale(1.08)}
-.sw .x{position:absolute;right:-5px;top:-5px;width:16px;height:16px;border-radius:50%;background:var(--ink);color:var(--bg);
-  font:600 11px/16px var(--body);text-align:center}
-.note{color:var(--muted);font-size:12.5px;margin:0}
-@media (prefers-reduced-motion: reduce){.sw:hover{transform:none}}
+.rail{display:flex;flex-direction:column;min-width:0;border-left:1px solid var(--line)}
+@media (max-width:900px){.rail{border-left:0;border-top:1px solid var(--line)}}
+.rail section{display:flex;flex-direction:column;gap:10px;min-width:0;padding:14px;border-bottom:1px solid var(--line)}
+.rail section:last-child{border-bottom:0}
+.rail .head{display:flex;align-items:center;justify-content:space-between}
+.rail .head button{height:26px;padding:0 8px;font-size:12px}
+.layers{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.layer{display:grid;grid-template-columns:26px minmax(0,1fr) 24px;gap:8px;align-items:center;border-radius:var(--r);padding:5px 6px;cursor:pointer;border:1px solid transparent}
+.layer:hover{background:var(--bg)}
+.layer.on{background:var(--accent-soft);border-color:var(--accent)}
+.layer .chip{width:26px;height:26px;border-radius:5px;border:1px solid var(--line-strong)}
+.layer .fields{display:flex;flex-direction:column;min-width:0}
+.layer .nm{font-weight:600;padding-block:1px}
+.layer .fields input:not(.nm){font-size:12px;color:var(--muted);padding-block:1px}
+.layer .del{padding:0;width:24px;height:24px;justify-content:center;color:var(--faint);border-color:transparent;background:transparent}
+.layer .del:hover{color:var(--ink);background:var(--panel)}
+.pick{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:8px;align-items:center}
+.pick input[type=color]{width:40px;height:32px;padding:0;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--panel);cursor:pointer}
+.pick input[type=text]{font-variant-numeric:tabular-nums;text-transform:uppercase;border-color:var(--line-strong);height:32px;background:var(--panel)}
+.swatches{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px}
+.sw{padding:0;height:auto;aspect-ratio:1;border-radius:4px;border:1px solid var(--line-strong);position:relative}
+.sw:hover{outline:2px solid var(--accent);outline-offset:1px}
+.sw .x{position:absolute;right:-5px;top:-5px;width:14px;height:14px;border-radius:50%;background:var(--ink);color:var(--panel);font:600 10px/14px var(--ui);text-align:center}
+.note{color:var(--faint);font-size:11.5px;margin:0;line-height:1.5}
 </style>
 
-<div class="wrap">
-  <header>
+<div class="app">
+  <header class="bar">
     <h1>Wall Colour Visualiser</h1>
-    <p class="sub">Repaint a photo of the real job. Tap a wall, pick a colour, save the picture for your quote.</p>
+    <p class="sub">Paint Trade HQ prototype</p>
     <div class="actions">
-      <label class="btn primary" for="file" style="background:var(--tape);color:var(--tape-ink);border-color:var(--tape)">Upload photo</label>
+      <label class="btn primary" for="file"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 11V3M5 6l3-3 3 3M3 13h10"/></svg>Upload photo</label>
       <input id="file" type="file" accept="image/*" hidden>
-      <button id="demoBtn" type="button">Sample room</button>
-      <button id="exportBtn" type="button">Save picture</button>
+      <button id="exportBtn" type="button"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v8M5 8l3 3 3-3M3 13h10"/></svg>Save picture</button>
     </div>
   </header>
 
-  <div class="bench">
-    <div style="min-width:0">
+  <div class="work">
+    <div class="left">
       <div class="tools" role="toolbar" aria-label="Painting tools">
         <div class="seg" role="group" aria-label="Tool">
-          <button id="tFill" type="button" aria-pressed="true">Tap to fill</button>
-          <button id="tBrush" type="button" aria-pressed="false">Brush</button>
-          <button id="tErase" type="button" aria-pressed="false">Eraser</button>
+          <button id="tFill" type="button" aria-pressed="true" title="Tap a surface, or drag across it"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l4 10 1.6-4.400L13 7z"/></svg>Select</button>
+          <button id="tTrim" type="button" aria-pressed="false" title="Drag along skirting, cornice, architraves or frames"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 10l12-5M2 13l12-5"/></svg>Trim line</button>
+          <button id="tBrush" type="button" aria-pressed="false" title="Paint by hand"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 3L7 9M7 9l-2 1c-1 1-.5 2.5-2.5 3.5 2.5.5 4.5 0 5.5-1.500z"/></svg>Brush</button>
+          <button id="tErase" type="button" aria-pressed="false" title="Rub out paint"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 13L2.5 9.500l7-7 4 4L7 13zM6 13h8M5.5 6.500l4 4"/></svg>Eraser</button>
         </div>
         <div class="slider" id="tolWrap"><label for="tol">Sensitivity</label><input id="tol" type="range" min="1" max="100" value="45"></div>
         <div class="slider" id="sizeWrap" hidden><label for="size">Brush size</label><input id="size" type="range" min="4" max="120" value="28"></div>
         <button id="guardBtn" type="button" aria-pressed="true" hidden title="Paint spreads only from where your stroke started and stops at edges">Stay inside edges</button>
-        <button id="aiBtn" type="button" aria-pressed="true" hidden title="Uses an AI model to find the wall you tap. Turn off to use the simpler edge fill.">Smart detect</button>
+        <button id="aiBtn" type="button" aria-pressed="true" hidden title="Uses an AI model to find the surface you tap. Turn off to use the simpler edge fill.">Smart detect</button>
         <div class="right">
-          <button id="undoBtn" type="button" disabled>Undo</button>
-          <button id="clearBtn" type="button">Clear surface</button>
+          <button id="undoBtn" type="button" disabled><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 3l-3 3 3 3M2.5 6H9a4 4 0 010 8H6"/></svg>Undo</button>
+          <button id="clearBtn" type="button">Clear</button>
           <button id="cmpBtn" type="button" aria-pressed="false">Show original</button>
         </div>
       </div>
       <div class="stage" id="stage">
-        <canvas id="cv" width="1200" height="800" aria-label="Photo being repainted"></canvas>
-        <span class="tag" id="tag" hidden>Sample room. Upload your own photo to start a job.</span>
+        <canvas id="cv" width="1200" height="800" aria-label="Photo being repainted" hidden></canvas>
+        <div class="empty" id="empty">
+          <svg viewBox="0 0 40 40" aria-hidden="true"><rect x="4" y="8" width="32" height="24" rx="2"/><path d="M4 27l9-8 7 6 5-4 11 8"/><circle cx="27" cy="15" r="2.5"/></svg>
+          <strong>Add a photo of the job</strong>
+          <p>Drop it here, paste it, or upload it. Tap a wall to paint it, then drag along skirting or cornice with Trim line.</p>
+          <label class="btn primary" for="file">Upload photo</label>
+        </div>
         <div class="ring" id="ring" hidden></div>
       </div>
-      <p class="status" id="status" role="status" aria-live="polite"></p>
-      <p class="hint">Tap a wall to paint it. For skirting, frames, doors and tricky walls, drag your finger across the surface instead of tapping: it selects more accurately. If it took too much, slide Sensitivity left; if it stopped short, slide it right. It re-fills from the same tap or drag. With Stay inside edges on, start a brush stroke on the wall and scrub right over the trim without painting it. You can also drop or paste a photo here.</p>
+      <div class="foot">
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+        <p class="tip" id="tip"></p>
+      </div>
     </div>
 
     <aside class="rail">
       <section>
-        <h2>Surfaces</h2>
+        <div class="head"><h2>Surfaces</h2><button id="addBtn" type="button">Add surface</button></div>
         <ul class="layers" id="layers"></ul>
-        <button id="addBtn" type="button">Add surface</button>
       </section>
       <section>
         <h2 id="pickTitle">Colour</h2>
@@ -149,14 +165,16 @@ input[type=range]{accent-color:var(--tape);width:100%;min-width:0}
           <button id="saveCol" type="button">Keep</button>
         </div>
         <div class="swatches" id="starter" aria-label="Starter colours"></div>
-        <p class="note">Starter colours are generic, not from any paint brand. Type the brand and colour name from the fan deck next to each surface so it prints on the saved picture.</p>
+        <p class="note">Starter colours are generic. Type the brand and colour name from the fan deck under each surface and it prints on the saved picture.</p>
       </section>
       <section id="mineSec" hidden>
         <h2>My colours</h2>
         <div class="swatches" id="mine"></div>
         <p class="note">Kept on this device only.</p>
       </section>
-      <p class="note">Screens can't show paint accurately. Treat this as a guide and confirm with a brush-out or sample pot before ordering.</p>
+      <section>
+        <p class="note">On-screen guide only. Confirm colours with a brush-out or sample pot before ordering.</p>
+      </section>
     </aside>
   </div>
 </div>
@@ -193,7 +211,7 @@ function setImage(drawable,w,h,sample){
     Y[i]=0.299*r+0.587*g+0.114*b; Cb[i]=128-0.169*r-0.331*g+0.5*b; Cr[i]=128+0.5*r-0.419*g-0.081*b;}
   sY=smooth(Y);sB=smooth(Cb);sR=smooth(Cr);edges();
   layers=[newLayer("Walls","#6F8F80"),newLayer("Trim","#F3F1EA")]; active=0; undo=[]; lastFill=null;
-  isSample=!!sample; $("tag").hidden=!isSample; showOrig=false; $("cmpBtn").setAttribute("aria-pressed","false");
+  isSample=false; $("empty").hidden=true; cv.hidden=false; showOrig=false; $("cmpBtn").setAttribute("aria-pressed","false");
   drawLayers(); syncPicker(); syncUndo(); schedule(); aiStart();
 }
 async function loadFile(file){
@@ -205,52 +223,6 @@ async function loadFile(file){
     setImage(bmp,bmp.width||bmp.naturalWidth,bmp.height||bmp.naturalHeight,false);
     say("Photo loaded. Tap a wall to paint it.");
   }catch(e){say("Couldn't open that photo. Try a JPG or PNG (iPhone HEIC photos may need converting).",true)}
-}
-
-/* ---------- sample room, drawn in code so no stock photo is needed ---------- */
-function sampleRoom(){
-  const c=document.createElement("canvas");c.width=1200;c.height=800;const g=c.getContext("2d");
-  const poly=(pts,fill)=>{g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.closePath();g.fillStyle=fill;g.fill()};
-  let gr=g.createLinearGradient(0,0,0,150);gr.addColorStop(0,"#f6f5f1");gr.addColorStop(1,"#e9e7e1");
-  poly([[0,0],[1200,0],[1200,150],[300,150]],gr);
-  gr=g.createLinearGradient(300,0,1200,0);gr.addColorStop(0,"#cfc6b6");gr.addColorStop(.55,"#e2dbcd");gr.addColorStop(1,"#d6cebf");
-  poly([[300,150],[1200,150],[1200,600],[300,600]],gr);
-  gr=g.createLinearGradient(0,0,300,0);gr.addColorStop(0,"#b3aa9a");gr.addColorStop(1,"#c2b9a9");
-  poly([[0,0],[300,150],[300,600],[0,800]],gr);
-  gr=g.createLinearGradient(0,600,0,800);gr.addColorStop(0,"#8d6a48");gr.addColorStop(1,"#a67c52");
-  poly([[0,800],[300,600],[1200,600],[1200,800]],gr);
-  g.strokeStyle="rgba(60,35,15,.25)";g.lineWidth=1.5;
-  for(let i=0;i<14;i++){const x=300+i*70;g.beginPath();g.moveTo(x,600);g.lineTo((x-600)*1.9+600,800);g.stroke()}
-  // window with daylight spilling on the wall
-  gr=g.createRadialGradient(930,330,60,930,330,420);gr.addColorStop(0,"rgba(255,250,235,.35)");gr.addColorStop(1,"rgba(255,250,235,0)");
-  g.fillStyle=gr;g.fillRect(300,150,900,450);
-  g.fillStyle="#fbfaf6";g.fillRect(810,215,250,250);
-  gr=g.createLinearGradient(0,227,0,453);gr.addColorStop(0,"#9cc3e6");gr.addColorStop(1,"#dbe9ee");
-  g.fillStyle=gr;g.fillRect(822,227,107,226);g.fillRect(941,227,107,226);
-  // skirting, cornice
-  g.fillStyle="#f7f6f2";g.fillRect(300,578,900,22);poly([[0,770],[300,578],[300,600],[0,800]],"#eceae4");
-  g.fillStyle="#f1efea";g.fillRect(300,150,900,10);
-  // framed print
-  g.fillStyle="#2b2b2b";g.fillRect(440,250,150,190);g.fillStyle="#efe9dc";g.fillRect(452,262,126,166);
-  g.fillStyle="#c9864f";g.beginPath();g.arc(515,330,34,0,7);g.fill();g.fillStyle="#44605a";g.fillRect(470,370,90,40);
-  // sofa and lamp
-  g.fillStyle="rgba(0,0,0,.18)";g.beginPath();g.ellipse(650,668,300,22,0,0,7);g.fill();
-  g.fillStyle="#3d4f58";g.beginPath();g.roundRect(400,470,500,120,22);g.fill();
-  g.fillStyle="#465b65";g.beginPath();g.roundRect(380,540,540,110,20);g.fill();
-  g.fillStyle="#d8a94a";g.beginPath();g.roundRect(450,505,90,70,12);g.fill();
-  g.fillStyle="#2a2a2a";g.fillRect(1100,360,6,300);g.beginPath();g.ellipse(1103,662,34,7,0,0,7);g.fill();
-  poly([[1068,300],[1138,300],[1150,372],[1056,372]],"#f2c96a");
-  // camera grain so the fill behaves like it does on a real photo
-  const im=g.getImageData(0,0,1200,800),d=im.data;let s=12345;
-  for(let p=0;p<d.length;p+=4){s=(s*1664525+1013904223)>>>0;const n=((s>>>24)/255-.5)*7;d[p]+=n;d[p+1]+=n;d[p+2]+=n}
-  g.putImageData(im,0,0);return c;
-}
-function loadSample(){
-  setImage(sampleRoom(),1200,800,true);
-  applyFill(700,300); active=0; applyFill(120,400);
-  active=1; applyFill(1000,589); active=0;
-  undo=[]; lastFill=null; drawLayers(); syncPicker(); syncUndo(); schedule();
-  say("Sample room loaded with the walls already filled. Try another colour.");
 }
 
 /* ---------- wall detection ----------
@@ -388,6 +360,74 @@ function endStroke(){
   strokeSet=null;
 }
 
+/* ---------- Trim line: skirting, cornice, architraves, frames ----------
+   Thin strips are too narrow for the AI model and all "edge" to the fill. Here the drag is the guide:
+   at each point along it we look sideways for where the strip's colour ends or a step in tone appears,
+   then even those two edge lines out along the run so the band comes out straight and clean. */
+function trimLine(path,R,erase){
+  // 1. evenly spaced, smoothed centre line
+  let raw=[path[0]];
+  for(let i=1;i<path.length;i++){const a=path[i-1],b=path[i],L=Math.hypot(b.x-a.x,b.y-a.y),n=Math.max(1,Math.round(L/1.5));
+    for(let k=1;k<=n;k++)raw.push({x:a.x+(b.x-a.x)*k/n,y:a.y+(b.y-a.y)*k/n})}
+  if(raw.length<6)return 0;
+  const n=raw.length,P=new Array(n),win=Math.min(8,(n-1)>>1);
+  for(let k=0;k<n;k++){let x=0,y=0,c=0;for(let j=Math.max(0,k-win);j<=Math.min(n-1,k+win);j++){x+=raw[j].x;y+=raw[j].y;c++}P[k]={x:x/c,y:y/c}}
+  const at=(x,y)=>{x=Math.round(x);y=Math.round(y);return x<0||y<0||x>=W||y>=H?-1:y*W+x};
+  // 2. at each point, read the colours along a line square to the drag and cut it at every step in tone;
+  //    the pieces between two cuts that are no wider than Max width are candidate strips
+  const med=a=>{a.sort((p,q)=>p-q);return a[a.length>>1]};
+  const maxW=Math.max(4,Math.round(2*R)),Lh=maxW+4,sv=+$("tol").value/100,thr=Math.pow(18-sv*10,2),T2=Math.pow(params().T,2);
+  const NX=new Float32Array(n),NY=new Float32Array(n),cands=new Array(n),idx=new Int32Array(2*Lh+1),df=new Float32Array(2*Lh+1);
+  for(let k=0;k<n;k++){
+    const a=P[Math.max(0,k-6)],b=P[Math.min(n-1,k+6)],L=Math.hypot(b.x-a.x,b.y-a.y)||1,nx=-(b.y-a.y)/L,ny=(b.x-a.x)/L;NX[k]=nx;NY[k]=ny;
+    for(let d=-Lh;d<=Lh;d++)idx[d+Lh]=at(P[k].x+d*nx,P[k].y+d*ny);
+    df.fill(0);
+    for(let d=-Lh+2;d<Lh;d++){const p=idx[d+1+Lh],q=idx[d-2+Lh];if(p<0||q<0){df[d+Lh]=1e9;continue}
+      const u=sY[p]-sY[q],v=sB[p]-sB[q],w=sR[p]-sR[q];df[d+Lh]=0.8*u*u+2.5*(v*v+w*w)}
+    const cuts=[];for(let d=-Lh+2;d<Lh;d++){const v=df[d+Lh];if(v>thr&&v>=df[d-1+Lh]&&v>df[d+1+Lh])cuts.push(d)}
+    const list=[];
+    for(let c=0;c+1<cuts.length;c++){const lo=cuts[c],hi=cuts[c+1]-1,w=hi-lo+1;if(w<2||w>maxW)continue;
+      const m=idx[Math.round((lo+hi)/2)+Lh];if(m<0)continue;
+      list.push({lo,hi,off:lo>0?lo:hi<0?-hi:0,y:sY[m],b:sB[m],r:sR[m]})}
+    cands[k]=list;
+  }
+  // 3. the strip's colour is the commonest of the nearest candidates; then keep, at each point, the
+  //    nearest candidate of that colour
+  const cy=[],cb=[],cr=[];
+  for(let k=0;k<n;k++){let best=null;for(const c of cands[k])if(c.off<=R&&(!best||c.off<best.off))best=c;if(best){cy.push(best.y);cb.push(best.b);cr.push(best.r)}}
+  if(cy.length<4)return 0;
+  const rY=med(cy),rB=med(cb),rR=med(cr),lo=new Float32Array(n),hi=new Float32Array(n),ok=new Uint8Array(n);
+  for(let k=0;k<n;k++){let best=null;
+    for(const c of cands[k]){const u=c.y-rY,v=c.b-rB,w=c.r-rR;if(0.3*u*u+2.5*(v*v+w*w)>T2||c.off>R*1.5)continue;if(!best||c.off<best.off)best=c}
+    if(best){lo[k]=best.lo;hi[k]=best.hi;ok[k]=1}}
+  // Low-contrast trim (white cornice under a white ceiling) often shows no clear cut on one side. Where no
+  // band was found, fall back to spreading sideways from the drag while the colour still matches.
+  let found=0;for(let k=0;k<n;k++)found+=ok[k];
+  if(found<n*0.6){
+    const py=[],pb=[],pr=[];for(const p of P){const i=at(p.x,p.y);if(i>=0){py.push(sY[i]);pb.push(sB[i]);pr.push(sR[i])}}
+    const fY=found>=n*0.2?rY:med(py),fB=found>=n*0.2?rB:med(pb),fR=found>=n*0.2?rR:med(pr);
+    const like=i=>{if(i<0)return false;const u=sY[i]-fY,v=sB[i]-fB,w=sR[i]-fR;return 0.3*u*u+2.5*(v*v+w*w)<=T2};
+    const stp=(i,j)=>{const u=sY[i]-sY[j],v=sB[i]-sB[j],w=sR[i]-sR[j];return 0.8*u*u+2.5*(v*v+w*w)>thr};
+    for(let k=0;k<n;k++){if(ok[k])continue;const nx=NX[k],ny=NY[k];let c=0;
+      if(!like(at(P[k].x,P[k].y))){c=null;for(let d=1;d<=R;d++){if(like(at(P[k].x+d*nx,P[k].y+d*ny))){c=d;break}if(like(at(P[k].x-d*nx,P[k].y-d*ny))){c=-d;break}}}
+      if(c===null)continue;
+      const run=sgn=>{let d=c;for(;;){const nd=d+sgn;if(Math.abs(nd-c)>maxW)break;const i=at(P[k].x+nd*nx,P[k].y+nd*ny);if(!like(i))break;
+        const j=at(P[k].x+(nd-3*sgn)*nx,P[k].y+(nd-3*sgn)*ny);if(Math.abs(nd-c)>=3&&j>=0&&stp(i,j)){d=nd-2*sgn;break}d=nd}return d};
+      const a=run(-1),b=run(1);if(b-a+1<=maxW){lo[k]=a;hi[k]=b;ok[k]=1}}
+  }
+  // 4. even the two edge lines out along the run
+  const smooth=src=>{const out=new Float32Array(n),w=14;for(let k=0;k<n;k++){const v=[];for(let j=Math.max(0,k-w);j<=Math.min(n-1,k+w);j++)if(ok[j])v.push(src[j]);out[k]=v.length?med(v):NaN}return out};
+  const LO=smooth(lo),HI=smooth(hi),L=layers[active];let painted=0;
+  // 5. fill the band
+  for(let k=0;k<n;k++){if(isNaN(LO[k])||HI[k]-LO[k]<1)continue;
+    for(let d=LO[k]-0.5;d<=HI[k]+0.5;d+=0.5){const i=at(P[k].x+d*NX[k],P[k].y+d*NY[k]);if(i<0)continue;
+      if(erase?L.mask[i]:!L.mask[i])painted++;putPix(i,L,erase);
+      if(i%W<W-1)putPix(i+1,L,erase)}}
+  if(!erase)closeHoles(L.mask,255,new Int32Array(N));
+  for(const o of layers)o.dirty=true;
+  return painted;
+}
+
 /* ---------- undo ---------- */
 function pushUndo(){undo.push(layers.map(l=>({id:l.id,mask:l.mask.slice()})));if(undo.length>UNDO_MAX)undo.shift();syncUndo()}
 function restore(snap){for(const s of snap){const l=layers.find(l=>l.id===s.id);if(l){l.mask.set(s.mask);l.dirty=true}}}
@@ -416,7 +456,9 @@ function refine(L){
   boxMean(a,w,h,r,tmp,Ip);boxMean(b,w,h,r,tmp,II);
   let c=0;
   for(let y=0;y<h;y++)for(let x=0,j=y*w,i=(y+y0)*W+x0;x<w;x++,j++,i++){
-    let q=(Ip[j]*I[j]+II[j]-0.12)/0.76;q=q<0?0:q>1?1:q;const v=q*255;s[i]=v;if(v>=1)c++}
+    let q=(Ip[j]*I[j]+II[j]-0.12)/0.76;q=q<0?0:q>1?1:q;
+    if(m[i]&&x>0&&x<w-1&&y>0&&y<h-1&&m[i-1]&&m[i+1]&&m[i-W]&&m[i+W])q=1;
+    const v=q*255;s[i]=v;if(v>=1)c++}
   L.count=c;
 }
 function soften(L){
@@ -539,9 +581,11 @@ async function smartMask(pts){
   return m;
 }
 function applyMask(m){
+  // a tap or drag never takes pixels another surface already owns, so paint the trim first and the
+  // wall fill will stop at it; the brush and Trim line can still paint over anything
   const L=layers[active];let added=0;
+  for(const o of layers)if(o!==L){const om=o.mask;for(let i=0;i<N;i++)if(om[i])m[i]=0}
   for(let i=0;i<N;i++) if(m[i]){ if(!L.mask[i])added++; L.mask[i]=255; }
-  for(const o of layers) if(o!==L){ for(let i=0;i<N;i++) if(m[i]&&o.mask[i]) o.mask[i]=0; o.dirty=true; }
   L.dirty=true; return added;
 }
 async function doFill(pts){
@@ -567,7 +611,7 @@ function ring(e){
 }
 cv.addEventListener("pointerdown",e=>{
   if(!src||showOrig)return; e.preventDefault(); const p=pos(e);
-  if(tool==="fill"){
+  if(tool==="fill"||tool==="trim"){
     if(filling)return; cv.setPointerCapture(e.pointerId); gesture=[p];
   }else{ cv.setPointerCapture(e.pointerId); pushUndo(); lastFill=null; drawing=true; lastPt=p; ref=meanAt(p.x,p.y); strokeSet=guard?new Uint8Array(N):null; strokeFirst=true; stamp(p,p); schedule(); }
 });
@@ -580,6 +624,12 @@ cv.addEventListener("pointermove",e=>{ring(e);
   if(!drawing)return; const p=pos(e); stamp(lastPt,p); lastPt=p; schedule()});
 function endGesture(){
   const g=gesture;gesture=null;if(!g||filling)return;
+  if(tool==="trim"){
+    if(g.length<3){say("Drag along the skirting, cornice or frame to paint it.");schedule();return}
+    pushUndo();lastFill=null;
+    const R=Math.max(3,(+$("size").value)*W/cv.getBoundingClientRect().width/2),got=trimLine(g,R,false);
+    if(!got){undo.pop();syncUndo()}
+    schedule();say(got?"Painted trim on "+layers[active].name+". Raise Sensitivity if it stopped short, or Max width if the strip is wider.":"Couldn't find a strip there. Drag along the middle of the trim.");return}
   // a tap is one point; a drag is up to six points spread evenly along the path
   let pts=g;if(g.length>6){pts=[];for(let k=0;k<6;k++)pts.push(g[Math.round(k*(g.length-1)/5)])}
   if(g.length===2)pts=[g[0]];
@@ -595,12 +645,14 @@ $("tol").addEventListener("input",()=>{
   refillLast();
 });
 $("undoBtn").onclick=()=>{const s=undo.pop();if(s){restore(s);lastFill=null;syncUndo();schedule();say("Undone.")}};
-$("clearBtn").onclick=()=>{const L=layers[active];if(!L.count)return;pushUndo();lastFill=null;L.mask.fill(0);L.dirty=true;schedule();say("Cleared "+L.name+". Undo brings it back.")};
+$("clearBtn").onclick=()=>{const L=layers[active];if(!L||!L.count)return;pushUndo();lastFill=null;L.mask.fill(0);L.dirty=true;schedule();say("Cleared "+L.name+". Undo brings it back.")};
 $("cmpBtn").onclick=()=>{showOrig=!showOrig;$("cmpBtn").setAttribute("aria-pressed",showOrig);$("cmpBtn").textContent=showOrig?"Show painted":"Show original";schedule()};
-function setTool(t){tool=t;[["tFill","fill"],["tBrush","brush"],["tErase","erase"]].forEach(([id,v])=>$(id).setAttribute("aria-pressed",v===t));
-  $("sizeWrap").hidden=$("guardBtn").hidden=t==="fill";$("ring").hidden=true}
+function setTool(t){tool=t;[["tFill","fill"],["tTrim","trim"],["tBrush","brush"],["tErase","erase"]].forEach(([id,v])=>$(id).setAttribute("aria-pressed",v===t));
+  $("tip").textContent={fill:"Tap a surface, or drag across it for a tighter selection.",trim:"Drag along skirting, cornice, architraves or frames.",brush:"Paint by hand. Stay inside edges keeps strokes off neighbouring surfaces.",erase:"Rub out paint by hand."}[t];
+  $("sizeWrap").hidden=t==="fill";$("guardBtn").hidden=t==="fill"||t==="trim";$("tolWrap").hidden=false;
+  document.querySelector("#sizeWrap label").textContent=t==="trim"?"Max width":"Brush size";$("ring").hidden=true}
 $("guardBtn").onclick=()=>{guard=!guard;$("guardBtn").setAttribute("aria-pressed",guard)};
-$("tFill").onclick=()=>setTool("fill");$("tBrush").onclick=()=>setTool("brush");$("tErase").onclick=()=>setTool("erase");
+$("tFill").onclick=()=>setTool("fill");$("tTrim").onclick=()=>setTool("trim");$("tBrush").onclick=()=>setTool("brush");$("tErase").onclick=()=>setTool("erase");
 
 /* ---------- surfaces ---------- */
 function drawLayers(){
@@ -651,13 +703,12 @@ function drawMine(){
   mine.forEach((m,i)=>el.append(swatch(m.hex,(m.name||"Unnamed")+" "+m.hex,()=>setColour(m.hex,m.name||""),()=>{mine.splice(i,1);keepMine();drawMine()})));
 }
 function keepMine(){try{localStorage.setItem("ptq.colours",JSON.stringify(mine))}catch(_){}}
-$("saveCol").onclick=()=>{const L=layers[active];if(mine.some(m=>m.hex===L.hex&&m.name===L.label)){say("That colour is already in My colours.");return}
+$("saveCol").onclick=()=>{const L=layers[active];if(!L)return;if(mine.some(m=>m.hex===L.hex&&m.name===L.label)){say("That colour is already in My colours.");return}
   mine.unshift({hex:L.hex,name:L.label});mine=mine.slice(0,40);keepMine();drawMine();say("Kept "+(L.label||L.hex)+" in My colours.")};
 drawMine();
 
 /* ---------- files ---------- */
 $("file").addEventListener("change",e=>{loadFile(e.target.files[0]);e.target.value=""});
-$("demoBtn").onclick=loadSample;
 const stage=$("stage");
 ["dragenter","dragover"].forEach(t=>stage.addEventListener(t,e=>{e.preventDefault();stage.classList.add("drop")}));
 ["dragleave","drop"].forEach(t=>stage.addEventListener(t,e=>{e.preventDefault();stage.classList.remove("drop")}));
@@ -695,7 +746,7 @@ $("exportBtn").onclick=async()=>{
   }
 };
 
-loadSample();
+layers=[newLayer("Walls","#6F8F80"),newLayer("Trim","#F3F1EA")];drawLayers();syncPicker();setTool("fill");
 })();
 </script>
 <!--/APP-->
