@@ -17,6 +17,22 @@ def rep(old: str, new: str, count: int = 1) -> None:
     src = src.replace(old, new, count)
 
 
+PERMS_HTML = """<div class="qs-sec" id="lzPerms" data-testid="lucy-perms"><h3>What Lucy can do</h3>
+        <p class="lz-hint">Lucy always shows you what she is about to do and waits for your OK. This sets what she is allowed to offer at all.</p>
+        __AREAS__
+        <div class="sw"><div class="t"><b>Send for me</b><span>Quotes, invoices, reminders and emails. You see each one before it goes.</span></div><label class="tog"><input type="checkbox" id="pSend" data-testid="lucy-perm-send"><span class="tr"></span></label></div>
+        <div class="sw"><div class="t"><b>Delete records</b><span>One at a time, and you type its number.</span></div><label class="tog"><input type="checkbox" id="pDelete" data-testid="lucy-perm-delete"><span class="tr"></span></label></div>
+        <div class="lz-sub">Email and files</div>
+        <div class="sw"><div class="t"><b>Email</b><span id="pMailWho" data-testid="lucy-perm-mail-who"></span></div><div class="lz-seg" data-perm="mail" data-testid="lucy-perm-mail"><button data-v="off">Off</button><button data-v="read">Read</button><button data-v="send">Read and send</button></div></div>
+        <div class="sw"><div class="t"><b>Files</b><span id="pFilesWho" data-testid="lucy-perm-files-who"></span></div><div class="lz-seg" data-perm="files" data-testid="lucy-perm-files"><button data-v="off">Off</button><button data-v="read">Read</button><button data-v="change">Read and change</button></div></div>
+      </div>
+      """
+AREAS = [("quotes", "Quotes", "Start, change and follow up quotes."), ("clients", "Clients and leads", "Add and update clients, leads, notes and calls."), ("jobs", "Jobs", "Jobs, expenses, hire and variations."),
+         ("invoices", "Invoices", "Raise and change invoices, record payments."), ("calendar", "Calendar and reminders", "Events, reminders and ideas."), ("crew", "Crew and HR", "Timesheet fixes, notes, contract wording."),
+         ("library", "Library and products", "Items, tasks, products and suppliers.")]
+PERMS_HTML = PERMS_HTML.replace("__AREAS__", "\n        ".join(
+    f'<div class="sw"><div class="t"><b>{n}</b><span>{d}</span></div><div class="lz-seg" data-perm="{k}" data-testid="lucy-perm-{k}"><button data-v="read">Read</button><button data-v="change">Read and change</button></div></div>' for k, n, d in AREAS))
+
 CSS = r"""
   /* ===== Lucy does the work — the action card ===== */
   .lz-card{ align-self:stretch; background:var(--surface); border:1px solid var(--border-strong); border-radius:14px; padding:12px 12px 11px; font-size:13px; line-height:1.45; }
@@ -70,6 +86,14 @@ CSS = r"""
   .lz-next{ display:flex; flex-wrap:wrap; gap:6px; margin-top:9px; }
   .lz-next button{ height:30px; padding:0 11px; border-radius:999px; border:1px solid var(--border-strong); background:var(--accent-bg); font:inherit; font-size:12.5px; font-weight:600; color:var(--accent-ink); cursor:pointer; white-space:normal; text-align:left; }
   .lz-card.report .lz-kick{ color:var(--accent); }
+  /* Lucy's setup › What Lucy can do */
+  .lz-hint{ font-size:12.5px; color:var(--text-secondary); margin:-4px 0 6px; line-height:1.5; }
+  .lz-seg{ display:inline-flex; border:1px solid var(--border-strong); border-radius:8px; overflow:hidden; flex:none; }
+  .lz-seg button{ height:30px; padding:0 10px; border:none; background:var(--surface); font:inherit; font-size:12.5px; font-weight:600; color:var(--text-secondary); cursor:pointer; white-space:nowrap; }
+  .lz-seg button + button{ border-left:1px solid var(--border-strong); }
+  .lz-seg button.on{ background:var(--accent-bg); color:var(--accent-ink); }
+  .lz-seg[aria-disabled="true"]{ opacity:.45; pointer-events:none; }
+  .lz-sub{ font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); margin:16px 0 2px; }
   /* a tester's reports */
   .lz-reports .lz-back{ border:none; background:none; font:inherit; font-size:12.5px; font-weight:600; color:var(--accent-ink); cursor:pointer; padding:0; margin-bottom:8px; }
   .lz-rep{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px 12px; margin-bottom:8px; font-size:13px; }
@@ -146,6 +170,25 @@ const FLOWS = {
   variation: () => ['Here it is as a variation on the job instead.', ['list_projects'],
     actCard('change', 'variation', { title: 'Draft a variation', rows: [['Job', '12 Ivanhoe Pde, Ivanhoe'], ['Title', 'Extra door — rear entry'], ['Price', '$320.00 + GST ($352.00 incl. GST)'], ['Status', 'Draft — not sent to the client']], doneText: 'Variation drafted on the Ivanhoe job.', link: 'Open the job' })],
 };
+/* What Lucy can do — set in Lucy's setup. The app enforces it on the server as well; here it decides what she offers. */
+const MAIL = (/[?&]mail=(\w+)/.exec(location.search) || [])[1] || 'gmail';
+const STORE = (/[?&]storage=(\w+)/.exec(location.search) || [])[1] || 'drive';
+const MAIL_WHO = { gmail: 'Your connected mailbox: Gmail · josh@sanopainting.example', microsoft: 'Your connected mailbox: Outlook · josh@sanopainting.example', imap: 'Your connected mailbox: your own mail server · josh@sanopainting.example', none: 'No mailbox connected — connect one in Settings › Communication' };
+const STORE_WHO = { drive: 'Your storage: Google Drive · the Paint Trade HQ folder', onedrive: 'Your storage: OneDrive · the Paint Trade HQ folder', builtin: 'Your storage: Paint Trade HQ’s own storage' };
+let P = { quotes: 'change', clients: 'change', jobs: 'change', invoices: 'change', calendar: 'change', crew: 'change', library: 'change', send: true, del: false, mail: MAIL === 'none' ? 'off' : 'send', files: 'change' };
+let PD = Object.assign({}, P);
+const lzAllowed = (k) => k === 'send' ? P.send : k === 'del' ? P.del : P[k] === 'change';
+const PERM_OF = { expense: 'jobs', quote: 'quotes', refuse: 'quotes', send: 'send', reminder: 'send', delete: 'del' };
+const PERM_OFF = { jobs: 'Changing jobs is turned off in my setup, so I can only read them.', quotes: 'Changing quotes is turned off in my setup, so I can only read them.', send: 'Sending is turned off in my setup. I can still draft the words for you to send yourself.', del: 'Deleting is turned off in my setup.' };
+function lzPaintPerms(){
+  document.querySelectorAll('#lzPerms .lz-seg').forEach(g => g.querySelectorAll('button').forEach(b => { const on = PD[g.dataset.perm] === b.dataset.v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }));
+  $('#pSend').checked = PD.send; $('#pDelete').checked = PD.del;
+  $('#pMailWho').textContent = MAIL_WHO[MAIL] || MAIL_WHO.gmail; $('#pFilesWho').textContent = STORE_WHO[STORE] || STORE_WHO.drive;
+  document.querySelector('#lzPerms [data-perm="mail"]').setAttribute('aria-disabled', String(MAIL === 'none'));
+}
+function lzFillPerms(){ PD = Object.assign({}, P); lzPaintPerms(); }
+function lzSavePerms(){ PD.send = $('#pSend').checked; PD.del = $('#pDelete').checked; P = Object.assign({}, PD); }
+document.addEventListener('click', e => { const b = e.target.closest('#lzPerms .lz-seg button'); if (!b) return; e.stopPropagation(); PD[b.closest('.lz-seg').dataset.perm] = b.dataset.v; lzPaintPerms(); });
 function lucyFlowOf(t){
   if (TESTER && /^about fb-/.test(t)) return 'about';
   if (TESTER && /(report a problem|found a (bug|problem)|went wrong|not working|doesn.t work|is broken)/.test(t)) return 'report';
@@ -168,6 +211,8 @@ function lucyDo(text){
   AI.msgs.push({ role: 'me', text }); AI.msgs.push({ role: 'typing' });
   $('#tcInput').value = ''; $('#tcInput').style.height = ''; setMood('think'); renderAssistant();
   setTimeout(() => {
+    const need = PERM_OF[flow];
+    if (need && !lzAllowed(need)) { lucyPush(PERM_OFF[need] + '\n<button class="lz-offer" data-lz="setup" data-testid="lucy-open-setup">Open Lucy’s setup</button>', []); return; }
     if (flow === 'refuse') { lucyPush('I can’t do that one. <b>EST-0019 is accepted, so it can’t be changed.</b> Price extra or changed work as a variation on the job «12 Ivanhoe Pde, Ivanhoe».\n<button class="lz-offer" data-offer="variation" data-testid="lucy-offer">Draft a variation instead</button>', ['list_pending_estimates']); return; }
     const m = /\$\s?(\d+(?:\.\d+)?)/.exec(text);
     const amt = m ? Number(m[1]) : (changing && pending.amt) || 180;
@@ -193,6 +238,7 @@ document.addEventListener('click', e => {
   const w = e.target.closest('#tcWide'); if (w) { e.stopPropagation(); const on = $('#tc').classList.toggle('wide'); w.setAttribute('aria-pressed', String(on)); w.setAttribute('aria-label', on ? 'Make Lucy narrower' : 'Make Lucy wider'); return; }
   const lz = e.target.closest('[data-lz]');
   if (lz) { e.stopPropagation(); const k = lz.dataset.lz; if (typeof tcMenuClose === 'function') tcMenuClose();
+    if (k === 'setup') { openPop(); return; }
     if (k === 'reports') { AI.showReports = true; AI.list = false; renderAssistant(); }
     if (k === 'back') { AI.showReports = false; renderAssistant(); }
     if (k === 'add') { AI.showReports = false; renderAssistant(); const ta = $('#tcInput'); ta.value = 'About ' + lz.dataset.rid + ': '; ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); ta.dispatchEvent(new Event('input', { bubbles: true })); }
@@ -231,6 +277,10 @@ src = _re.sub(r'<button data-tab="help" data-testid="tc-menu-help">.*?</button>'
 _m = _re.search(r'<button[^>]*data-testid="tc-more"', src)
 assert _m, "tc-more not found"
 src = src[:_m.start()] + '<button id="tcWide" class="lz-wide" data-testid="tc-wide" aria-pressed="false" aria-label="Make Lucy wider"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6"/></svg></button>' + src[_m.start():]
+# 3e. Lucy's setup opens with "What Lucy can do"; it is filled and saved with the rest of the setup
+rep('<div class="qs-sec"><h3>Voice</h3>', PERMS_HTML + '<div class="qs-sec"><h3>Voice</h3>')
+rep("function fillPop(){", "function fillPop(){ lzFillPerms();")
+rep("closePop(); say('Settings saved');", "lzSavePerms(); closePop(); say('Settings saved');")
 # 4. a request to do something goes to the flows first
 rep("text = (text || '').trim(); if (!text && !AI.attach) return;\n  const rep = pickReply(text);",
     "text = (text || '').trim(); if (!text && !AI.attach) return;\n  if (text && lucyDo(text)) return;\n  const rep = pickReply(text);")

@@ -77,6 +77,21 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     await last().locator('[data-testid="lucy-act-approve"]').click(); await p.waitForTimeout(1300);
     ok((await last().innerText()).includes('Sent to leanne.crowe@example.com'), 'sent only after "Send it"');
 
+    // ---- Lucy's setup decides what she may do: deleting is off until the admin turns it on
+    const nCards = await p.locator('[data-testid="lucy-act"]').count();
+    await say('Delete the empty draft EST-0040');
+    ok(await p.locator('[data-testid="lucy-act"]').count() === nCards && (await p.locator('[data-testid="ai-msg-assistant"]').last().innerText()).includes('Deleting is turned off in my setup.'), 'deleting is off by default: no card, she says so');
+    await p.click('[data-testid="lucy-open-setup"]'); await p.waitForTimeout(250);
+    ok(await p.locator('#pop').isVisible() && (await p.locator('#pop .qs-sec h3').first().innerText()).toUpperCase() === 'WHAT LUCY CAN DO', 'her button opens Lucy’s setup, which starts with "What Lucy can do"');
+    ok(await p.locator('#lzPerms .lz-seg[data-perm]').count() === 9 && await p.locator('#lzPerms .lz-seg button.on').count() === 9, 'seven areas plus Email and Files, each with one choice lit');
+    ok(await p.locator('[data-testid="lucy-perm-quotes"] button.on').innerText() === 'Read and change' && await p.locator('#pSend').isChecked() && !(await p.locator('#pDelete').isChecked()), 'defaults: areas read and change, Send on, Delete off');
+    ok((await p.locator('[data-testid="lucy-perm-mail-who"]').innerText()).includes('Gmail') && (await p.locator('[data-testid="lucy-perm-files-who"]').innerText()).includes('Google Drive'), 'Email and Files name what this business has connected');
+    const pop = await p.locator('#pop .qs-panel').boundingBox();
+    ok(pop.x >= 0 && pop.x + pop.width <= W + 1 && await p.evaluate(() => { const b = document.querySelector('#pop .qs-body'); return b.scrollWidth <= b.clientWidth + 1; }), 'the setup panel fits, nothing runs off sideways');
+    await p.screenshot({ path: `${SHOTS}/lucy-op-setup-${W}.png` });
+    await p.click('label.tog:has(#pDelete)'); await p.click('[data-testid="ai-setting-save"]'); await p.waitForTimeout(250);
+    ok(!(await p.locator('#pop').isVisible()), 'Save closes the setup');
+
     // ---- deleting asks for the number
     await say('Delete the empty draft EST-0040');
     ok(await last().getAttribute('data-kind') === 'delete' && await last().locator('[data-testid="lucy-act-warn"]').innerText() === 'This can’t be undone.' && await last().locator('[data-testid="lucy-act-approve"]').isDisabled(), 'the delete card is red, says it can’t be undone, and its button is off');
@@ -131,6 +146,35 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     ok(sw[0] <= sw[1] && sw[2] <= sw[3] + 1, 'no sideways scroll on the page or inside Lucy');
     ok(await inView(p.locator('#tc')), 'the panel is fully on screen');
     ok(errs.length === 0, `no console errors${errs.length ? ': ' + errs.join(' | ').slice(0, 200) : ''}`);
+
+    // ---- an area set to Read: she reads, she does not offer the change; Cancel in the setup saves nothing
+    await fresh();
+    await p.click('[data-testid="tc-more"]'); await p.waitForTimeout(150); await p.click('[data-testid="tc-menu-setup"]'); await p.waitForTimeout(250);
+    await p.click('[data-testid="lucy-perm-quotes"] button[data-v="read"]'); await p.click('label.tog:has(#pSend)');
+    ok(await p.locator('[data-testid="lucy-perm-quotes"] button.on').innerText() === 'Read', 'Quotes can be set to Read');
+    await p.click('[data-testid="ai-setting-cancel"]'); await p.waitForTimeout(200);
+    await say('Start a quote for Leanne Crowe, exterior repaint at 12 Ivanhoe Pde');
+    ok(await last().getAttribute('data-kind') === 'plan', 'Cancel saved nothing: she still plans a quote');
+    await last().locator('[data-testid="lucy-act-cancel"]').click();
+    await p.click('[data-testid="tc-more"]'); await p.waitForTimeout(150); await p.click('[data-testid="tc-menu-setup"]'); await p.waitForTimeout(250);
+    ok(await p.locator('[data-testid="lucy-perm-quotes"] button.on').innerText() === 'Read and change' && await p.locator('#pSend').isChecked(), 'and the setup opens as it was saved');
+    await p.click('[data-testid="lucy-perm-quotes"] button[data-v="read"]'); await p.click('label.tog:has(#pSend)'); await p.click('[data-testid="ai-setting-save"]'); await p.waitForTimeout(250);
+    const c0 = await p.locator('[data-testid="lucy-act"]').count();
+    await say('Start a quote for Leanne Crowe, exterior repaint at 12 Ivanhoe Pde');
+    ok(await p.locator('[data-testid="lucy-act"]').count() === c0 && (await p.locator('[data-testid="ai-msg-assistant"]').last().innerText()).includes('Changing quotes is turned off in my setup'), 'Quotes on Read: no plan card, she says it is turned off');
+    await say('Send EST-0046 to Leanne');
+    ok(await p.locator('[data-testid="lucy-act"]').count() === c0 && (await p.locator('[data-testid="ai-msg-assistant"]').last().innerText()).includes('Sending is turned off in my setup'), 'Send off: no send card, she offers to draft instead');
+    await say('Add a $180 skip bin expense to the South Wharf job');
+    ok(await last().getAttribute('data-kind') === 'change' && await last().getAttribute('data-state') === 'ask', 'Jobs is still on: the expense card comes');
+
+    // ---- email and files follow what the admin connected, whoever the provider is
+    await p.goto(U + '?mail=microsoft&storage=onedrive'); await p.waitForTimeout(400); await p.click('#tcBubble'); await p.waitForTimeout(300);
+    await p.click('[data-testid="tc-more"]'); await p.waitForTimeout(150); await p.click('[data-testid="tc-menu-setup"]'); await p.waitForTimeout(250);
+    ok((await p.locator('[data-testid="lucy-perm-mail-who"]').innerText()).includes('Outlook') && (await p.locator('[data-testid="lucy-perm-files-who"]').innerText()).includes('OneDrive'), 'a business on Outlook and OneDrive sees Outlook and OneDrive');
+    await p.goto(U + '?mail=none&storage=builtin'); await p.waitForTimeout(400); await p.click('#tcBubble'); await p.waitForTimeout(300);
+    await p.click('[data-testid="tc-more"]'); await p.waitForTimeout(150); await p.click('[data-testid="tc-menu-setup"]'); await p.waitForTimeout(250);
+    ok((await p.locator('[data-testid="lucy-perm-mail-who"]').innerText()).startsWith('No mailbox connected') && await p.getAttribute('[data-testid="lucy-perm-mail"]', 'aria-disabled') === 'true' && await p.locator('[data-testid="lucy-perm-mail"] button.on').innerText() === 'Off', 'no mailbox connected: the Email row says so and stays Off');
+    ok((await p.locator('[data-testid="lucy-perm-files-who"]').innerText()).includes('Paint Trade HQ’s own storage'), 'no cloud storage: Files uses the app’s own storage');
 
     // ---- someone who is not a tester
     await p.goto(U + '?tester=0'); await p.waitForTimeout(400); await p.click('#tcBubble'); await p.waitForTimeout(300);

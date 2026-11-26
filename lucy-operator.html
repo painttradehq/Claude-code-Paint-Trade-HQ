@@ -1090,6 +1090,14 @@
   .lz-next{ display:flex; flex-wrap:wrap; gap:6px; margin-top:9px; }
   .lz-next button{ height:30px; padding:0 11px; border-radius:999px; border:1px solid var(--border-strong); background:var(--accent-bg); font:inherit; font-size:12.5px; font-weight:600; color:var(--accent-ink); cursor:pointer; white-space:normal; text-align:left; }
   .lz-card.report .lz-kick{ color:var(--accent); }
+  /* Lucy's setup › What Lucy can do */
+  .lz-hint{ font-size:12.5px; color:var(--text-secondary); margin:-4px 0 6px; line-height:1.5; }
+  .lz-seg{ display:inline-flex; border:1px solid var(--border-strong); border-radius:8px; overflow:hidden; flex:none; }
+  .lz-seg button{ height:30px; padding:0 10px; border:none; background:var(--surface); font:inherit; font-size:12.5px; font-weight:600; color:var(--text-secondary); cursor:pointer; white-space:nowrap; }
+  .lz-seg button + button{ border-left:1px solid var(--border-strong); }
+  .lz-seg button.on{ background:var(--accent-bg); color:var(--accent-ink); }
+  .lz-seg[aria-disabled="true"]{ opacity:.45; pointer-events:none; }
+  .lz-sub{ font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); margin:16px 0 2px; }
   /* a tester's reports */
   .lz-reports .lz-back{ border:none; background:none; font:inherit; font-size:12.5px; font-weight:600; color:var(--accent-ink); cursor:pointer; padding:0; margin-bottom:8px; }
   .lz-rep{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px 12px; margin-bottom:8px; font-size:13px; }
@@ -1273,6 +1281,21 @@
   <div class="qs-panel" role="dialog" aria-label="AI setup">
     <div class="qs-head"><h2><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg> Lucy’s setup</h2><div class="s">One set of rules for everywhere Lucy writes — chat, drafts, summaries, the morning brief. Shared by every admin of this business; crew have no AI.</div><button class="qs-x" id="sClose" aria-label="Close" data-testid="ai-settings-close"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
     <div class="qs-body">
+      <div class="qs-sec" id="lzPerms" data-testid="lucy-perms"><h3>What Lucy can do</h3>
+        <p class="lz-hint">Lucy always shows you what she is about to do and waits for your OK. This sets what she is allowed to offer at all.</p>
+        <div class="sw"><div class="t"><b>Quotes</b><span>Start, change and follow up quotes.</span></div><div class="lz-seg" data-perm="quotes" data-testid="lucy-perm-quotes"><button data-v="read">Read</button><button data-v="change">Read and change</button></div></div>
+        <div class="sw"><div class="t"><b>Clients and leads</b><span>Add and update clients, leads, notes and calls.</span></div><div class="lz-seg" data-perm="clients" data-testid="lucy-perm-clients"><button data-v="read">Read</button><button data-v="change">Read and change</button></div></div>
+        <div class="sw"><div class="t"><b>Jobs</b><span>Jobs, expenses, hire and variations.</span></div><div class="lz-seg" data-perm="jobs" data-testid="lucy-perm-jobs"><button data-v="read">Read</button><button data-v="change">Read and change</button></div></div>
+        <div class="sw"><div class="t"><b>Invoices</b><span>Raise and change invoices, record payments.</span></div><div class="lz-seg" data-perm="invoices" data-testid="lucy-perm-invoices"><button data-v="read">Read</button><button data-v="change">Read and change</button></div></div>
+        <div class="sw"><div class="t"><b>Calendar and reminders</b><span>Events, reminders and ideas.</span></div><div class="lz-seg" data-perm="calendar" data-testid="lucy-perm-calendar"><button data-v="read">Read</button><button data-v="change">Read and change</button></div></div>
+        <div class="sw"><div class="t"><b>Crew and HR</b><span>Timesheet fixes, notes, contract wording.</span></div><div class="lz-seg" data-perm="crew" data-testid="lucy-perm-crew"><button data-v="read">Read</button><button data-v="change">Read and change</button></div></div>
+        <div class="sw"><div class="t"><b>Library and products</b><span>Items, tasks, products and suppliers.</span></div><div class="lz-seg" data-perm="library" data-testid="lucy-perm-library"><button data-v="read">Read</button><button data-v="change">Read and change</button></div></div>
+        <div class="sw"><div class="t"><b>Send for me</b><span>Quotes, invoices, reminders and emails. You see each one before it goes.</span></div><label class="tog"><input type="checkbox" id="pSend" data-testid="lucy-perm-send"><span class="tr"></span></label></div>
+        <div class="sw"><div class="t"><b>Delete records</b><span>One at a time, and you type its number.</span></div><label class="tog"><input type="checkbox" id="pDelete" data-testid="lucy-perm-delete"><span class="tr"></span></label></div>
+        <div class="lz-sub">Email and files</div>
+        <div class="sw"><div class="t"><b>Email</b><span id="pMailWho" data-testid="lucy-perm-mail-who"></span></div><div class="lz-seg" data-perm="mail" data-testid="lucy-perm-mail"><button data-v="off">Off</button><button data-v="read">Read</button><button data-v="send">Read and send</button></div></div>
+        <div class="sw"><div class="t"><b>Files</b><span id="pFilesWho" data-testid="lucy-perm-files-who"></span></div><div class="lz-seg" data-perm="files" data-testid="lucy-perm-files"><button data-v="off">Off</button><button data-v="read">Read</button><button data-v="change">Read and change</button></div></div>
+      </div>
       <div class="qs-sec"><h3>Voice</h3>
         <div class="fr"><label class="f">Tone<select id="sTone" data-testid="ai-tone"><option>Formal</option><option selected>Friendly</option><option>Cheeky</option><option>Custom</option></select><span class="hint">Messages setup keeps only the email sign-off; tone lives here.</span></label></div>
         <div class="fr" id="sCustomWrap" hidden><label class="f">Describe the voice<textarea id="sCustom" rows="2" data-testid="ai-tone-custom" placeholder="e.g. Short sentences, no exclamation marks, tradie-plain."></textarea></label></div>
@@ -1578,6 +1601,25 @@ const FLOWS = {
   variation: () => ['Here it is as a variation on the job instead.', ['list_projects'],
     actCard('change', 'variation', { title: 'Draft a variation', rows: [['Job', '12 Ivanhoe Pde, Ivanhoe'], ['Title', 'Extra door — rear entry'], ['Price', '$320.00 + GST ($352.00 incl. GST)'], ['Status', 'Draft — not sent to the client']], doneText: 'Variation drafted on the Ivanhoe job.', link: 'Open the job' })],
 };
+/* What Lucy can do — set in Lucy's setup. The app enforces it on the server as well; here it decides what she offers. */
+const MAIL = (/[?&]mail=(\w+)/.exec(location.search) || [])[1] || 'gmail';
+const STORE = (/[?&]storage=(\w+)/.exec(location.search) || [])[1] || 'drive';
+const MAIL_WHO = { gmail: 'Your connected mailbox: Gmail · josh@sanopainting.example', microsoft: 'Your connected mailbox: Outlook · josh@sanopainting.example', imap: 'Your connected mailbox: your own mail server · josh@sanopainting.example', none: 'No mailbox connected — connect one in Settings › Communication' };
+const STORE_WHO = { drive: 'Your storage: Google Drive · the Paint Trade HQ folder', onedrive: 'Your storage: OneDrive · the Paint Trade HQ folder', builtin: 'Your storage: Paint Trade HQ’s own storage' };
+let P = { quotes: 'change', clients: 'change', jobs: 'change', invoices: 'change', calendar: 'change', crew: 'change', library: 'change', send: true, del: false, mail: MAIL === 'none' ? 'off' : 'send', files: 'change' };
+let PD = Object.assign({}, P);
+const lzAllowed = (k) => k === 'send' ? P.send : k === 'del' ? P.del : P[k] === 'change';
+const PERM_OF = { expense: 'jobs', quote: 'quotes', refuse: 'quotes', send: 'send', reminder: 'send', delete: 'del' };
+const PERM_OFF = { jobs: 'Changing jobs is turned off in my setup, so I can only read them.', quotes: 'Changing quotes is turned off in my setup, so I can only read them.', send: 'Sending is turned off in my setup. I can still draft the words for you to send yourself.', del: 'Deleting is turned off in my setup.' };
+function lzPaintPerms(){
+  document.querySelectorAll('#lzPerms .lz-seg').forEach(g => g.querySelectorAll('button').forEach(b => { const on = PD[g.dataset.perm] === b.dataset.v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }));
+  $('#pSend').checked = PD.send; $('#pDelete').checked = PD.del;
+  $('#pMailWho').textContent = MAIL_WHO[MAIL] || MAIL_WHO.gmail; $('#pFilesWho').textContent = STORE_WHO[STORE] || STORE_WHO.drive;
+  document.querySelector('#lzPerms [data-perm="mail"]').setAttribute('aria-disabled', String(MAIL === 'none'));
+}
+function lzFillPerms(){ PD = Object.assign({}, P); lzPaintPerms(); }
+function lzSavePerms(){ PD.send = $('#pSend').checked; PD.del = $('#pDelete').checked; P = Object.assign({}, PD); }
+document.addEventListener('click', e => { const b = e.target.closest('#lzPerms .lz-seg button'); if (!b) return; e.stopPropagation(); PD[b.closest('.lz-seg').dataset.perm] = b.dataset.v; lzPaintPerms(); });
 function lucyFlowOf(t){
   if (TESTER && /^about fb-/.test(t)) return 'about';
   if (TESTER && /(report a problem|found a (bug|problem)|went wrong|not working|doesn.t work|is broken)/.test(t)) return 'report';
@@ -1600,6 +1642,8 @@ function lucyDo(text){
   AI.msgs.push({ role: 'me', text }); AI.msgs.push({ role: 'typing' });
   $('#tcInput').value = ''; $('#tcInput').style.height = ''; setMood('think'); renderAssistant();
   setTimeout(() => {
+    const need = PERM_OF[flow];
+    if (need && !lzAllowed(need)) { lucyPush(PERM_OFF[need] + '\n<button class="lz-offer" data-lz="setup" data-testid="lucy-open-setup">Open Lucy’s setup</button>', []); return; }
     if (flow === 'refuse') { lucyPush('I can’t do that one. <b>EST-0019 is accepted, so it can’t be changed.</b> Price extra or changed work as a variation on the job «12 Ivanhoe Pde, Ivanhoe».\n<button class="lz-offer" data-offer="variation" data-testid="lucy-offer">Draft a variation instead</button>', ['list_pending_estimates']); return; }
     const m = /\$\s?(\d+(?:\.\d+)?)/.exec(text);
     const amt = m ? Number(m[1]) : (changing && pending.amt) || 180;
@@ -1625,6 +1669,7 @@ document.addEventListener('click', e => {
   const w = e.target.closest('#tcWide'); if (w) { e.stopPropagation(); const on = $('#tc').classList.toggle('wide'); w.setAttribute('aria-pressed', String(on)); w.setAttribute('aria-label', on ? 'Make Lucy narrower' : 'Make Lucy wider'); return; }
   const lz = e.target.closest('[data-lz]');
   if (lz) { e.stopPropagation(); const k = lz.dataset.lz; if (typeof tcMenuClose === 'function') tcMenuClose();
+    if (k === 'setup') { openPop(); return; }
     if (k === 'reports') { AI.showReports = true; AI.list = false; renderAssistant(); }
     if (k === 'back') { AI.showReports = false; renderAssistant(); }
     if (k === 'add') { AI.showReports = false; renderAssistant(); const ta = $('#tcInput'); ta.value = 'About ' + lz.dataset.rid + ': '; ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); ta.dispatchEvent(new Event('input', { bubbles: true })); }
@@ -1725,7 +1770,7 @@ function renderLucyLists(){
   const ideas = AI.ideas.filter(i => i.open);
   $('#sIdeas').innerHTML = ideas.map(i => `<div class="item" data-testid="ai-idea-${i.id}"><div class="tx">${esc(i.text)}<span>${esc(i.by)} · ${ago(new Date(i.at).toISOString())}</span></div><button class="act" data-iarch="${i.id}" data-testid="ai-idea-archive-${i.id}">Archive</button></div>`).join('') || '<p class="muted" style="font-size:12.5px;margin:0 0 8px">No open ideas. Tell Lucy “I’ve got an idea…”</p>';
 }
-function fillPop(){ $('#sBriefRem').checked = AI.briefRem; $('#sBriefIdeas').checked = AI.briefIdeas; $('#sBriefMeet').checked = AI.briefMeet; $('#sBriefBday').checked = AI.briefBday; $('#sBriefCloser').checked = AI.briefCloser; renderLucyLists(); $('#sTone').value = S.tone; $('#sCustom').value = S.custom; $('#sCustomWrap').hidden = S.tone !== 'Custom'; $('#sBrief').checked = S.brief; $('#sHour').value = S.hour; $('#sMin').value = S.min; $('#sNotes').value = S.notes; $('#fChat').checked = S.chat; $('#fPolish').checked = S.polish; $('#fPrice').checked = S.price; $('#sBudget').value = S.budget; $('#sUseTxt').textContent = `12,400 / ${S.budget.toLocaleString()}`; $('#sUseBar').style.width = Math.min(100, Math.round(12400 / S.budget * 100)) + '%'; renderRules(); }
+function fillPop(){ lzFillPerms(); $('#sBriefRem').checked = AI.briefRem; $('#sBriefIdeas').checked = AI.briefIdeas; $('#sBriefMeet').checked = AI.briefMeet; $('#sBriefBday').checked = AI.briefBday; $('#sBriefCloser').checked = AI.briefCloser; renderLucyLists(); $('#sTone').value = S.tone; $('#sCustom').value = S.custom; $('#sCustomWrap').hidden = S.tone !== 'Custom'; $('#sBrief').checked = S.brief; $('#sHour').value = S.hour; $('#sMin').value = S.min; $('#sNotes').value = S.notes; $('#fChat').checked = S.chat; $('#fPolish').checked = S.polish; $('#fPrice').checked = S.price; $('#sBudget').value = S.budget; $('#sUseTxt').textContent = `12,400 / ${S.budget.toLocaleString()}`; $('#sUseBar').style.width = Math.min(100, Math.round(12400 / S.budget * 100)) + '%'; renderRules(); }
 function openPop(){ fillPop(); $('#pop').hidden = false; $('#tcGear').classList.add('on'); }
 function closePop(){ $('#pop').hidden = true; $('#tcGear').classList.remove('on'); }
 function savePop(){
@@ -1735,7 +1780,7 @@ function savePop(){
   $('#tcUsage').textContent = `12,400 / ${b.toLocaleString()} today`; $('#tcUsageBar').style.width = Math.min(100, Math.round(12400 / b * 100)) + '%';
   if (window.D && D.BUSINESS) { D.BUSINESS.ai_brief_on = S.brief; }
   if (typeof renderBrief === 'function') renderBrief();
-  closePop(); say('Settings saved');
+  lzSavePerms(); closePop(); say('Settings saved');
 }
 
 document.addEventListener('click', e => {

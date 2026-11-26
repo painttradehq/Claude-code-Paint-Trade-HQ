@@ -6,9 +6,11 @@
 - "We need to remove the testing section of it, because now it's two sections: one is the Lucy chat and the other is a chat for testers. Although we need to keep the ability for testers to be able to log the error if they come across any. So make Lucy in a way that serves the testers while the testing phase is ongoing."
 - "My other Claude account … also has connectors connected to my painting emails and storage, which is essential to run it effectively. We already have connectors in the app that users can connect their emails and storage; Lucy should be able to connect to these too and create, edit, delete and read what it's allowed to do."
 
+- (26 Nov) "With Lucy's ability permissions, we need to have that in the Lucy gear: what the user wants Lucy to be able to do. For the emails and storage it has to be what the admin set it to be, and not just Google."
+
 This promotes the parked item "Lucy does the work in the app, confirm first" (17 Nov) to a build. **Nothing is built and nothing has gone to Emergent.** Round K is with Emergent now; this starts after it is reported, one round at a time, on Josh's "send".
 
-**Prototype:** `lucy-operator.html` (built by `tools/make_lucy_operator.py` on top of the Round 73 box, `lucy-chat-notion.html`). **Checks:** `tools/test_lucy_operator.js` — 102 of 102 at 1440 × 900 and 1024 × 768. Add `?tester=0` to see it as someone who is not in the tester program.
+**Prototype:** `lucy-operator.html` (built by `tools/make_lucy_operator.py` on top of the Round 73 box, `lucy-chat-notion.html`). **Checks:** `tools/test_lucy_operator.js` — 134 of 134 at 1440 × 900 and 1024 × 768. Add `?tester=0` to see it as someone who is not in the tester program, and `?mail=microsoft&storage=onedrive` or `?mail=none&storage=builtin` to see Lucy's setup for a business on other providers.
 
 ## 1. What the prototype shows
 
@@ -27,6 +29,7 @@ This promotes the parked item "Lucy does the work in the app, confirm first" (17
 | The app's rules | Lucy goes through the same routes as the screens, so the same refusals come back in the app's own words (the example: an accepted quote can't be changed) and she offers the right way instead (a variation). |
 | Answers | An answer can carry a next step too ("What's owed?" → "Send a reminder for INV-0009"). |
 | One chat | The **Help** chat for testers is gone from the menu. See §4. |
+| Lucy's setup | Opens with **What Lucy can do** — the admin chooses her abilities. See §2a. When something is turned off she says so in one line with a button to open her setup; no card. |
 
 ## 2. What Lucy can do — the full list, and what I recommend stays out
 
@@ -52,9 +55,26 @@ Lucy uses **one set of tools, the same one the Claude connector uses** (`service
 - Start fresh, bulk deletes and data export; platform-owner tools; Lucy's own key and allowance
 - **more than one record per delete** — "delete all my drafts" becomes a list she walks through, one card each
 
+## 2a. Lucy's setup › What Lucy can do — the admin decides
+
+The first section of Lucy's setup (the gear), saved with the rest of it:
+
+| Row | Choices | Starts as |
+|---|---|---|
+| Quotes · Clients and leads · Jobs · Invoices · Calendar and reminders · Crew and HR · Library and products | **Read** · **Read and change** | Read and change |
+| Send for me (quotes, invoices, reminders, emails) | on / off | on |
+| Delete records | on / off | **off** |
+| Email — names the mailbox this business connected | Off · Read · Read and send | Read and send (Off, and not selectable, when no mailbox is connected) |
+| Files — names the storage this business uses | Off · Read · Read and change | Read and change |
+
+- The setting is the business's, like the rest of Lucy's setup. An admin's Lucy can do the **lesser** of this setting and what that admin may do in the app.
+- **It is enforced on the server**, not only in the panel: Lucy is given only the tools the setting allows, and a call outside it is refused.
+- "Read and change" never removes the card — every change still asks.
+- The starting values are a recommendation: everything on except Delete, because each action asks first. Josh's word decides.
+
 ## 3. Email and storage — Lucy uses what the business has connected
 
-No new connector: Lucy runs inside the app, and the app already holds each business's mailbox (Settings › Communication: Gmail, Microsoft, or IMAP/SMTP), storage (built-in, Google Drive, OneDrive) and calendars. She gets **actions** on top of them, each behind its card.
+No new connector: Lucy runs inside the app, and the app already holds each business's mailbox (Settings › Communication: Gmail, Microsoft, or IMAP/SMTP), storage (built-in, Google Drive, OneDrive) and calendars. **She works with whichever the admin set — not only Google.** Her email and file actions go through the app's own mail and storage layer (`routes/comms.py`, `services/file_storage.py`), which already switches on the business's choice, so the same action works on Gmail, Outlook or a mail server, and on Drive, OneDrive or the app's own storage. The setup row names the provider ("Your connected mailbox: Outlook · …", "Your storage: OneDrive · the Paint Trade HQ folder"). Each action is behind its card.
 
 | | What the connection allows today | What Lucy does with it | Not possible without asking the user for more permission |
 |---|---|---|---|
@@ -63,6 +83,7 @@ No new connector: Lucy runs inside the app, and the app already holds each busin
 | IMAP / SMTP | read, send | the same | — |
 | Google Drive | only the files the app created (`drive.file`) | create, read, move, rename, delete inside the **Paint Trade HQ** folder | see or search the rest of the Drive (a restricted permission Google must approve) |
 | OneDrive | Files.ReadWrite | the same, in the Paint Trade HQ folder | — (the permission is already broad; she is kept to the app's folder by rule) |
+| The app's own storage | everything the app stored | the same | — |
 
 So today's connections give Lucy **read and send** on email and **full control inside the app's own folder** on storage. Deleting emails or reaching the whole Drive, as Josh's Claude account can, means asking each user for wider permissions and, for Google, passing its review. That is a decision on its own (L5 below), not a blocker for the rest.
 
@@ -93,7 +114,7 @@ So today's connections give Lucy **read and send** on email and **full control i
 
 | Round | What | Prototype |
 |---|---|---|
-| **L1** | The bigger panel; the card (approve, change, cancel, done, moved on); Lucy gets the tools that exist today (creates and edits); the record; caching and the longer loop; **one chat — testers report to Lucy** | this one |
+| **L1** | The bigger panel; the card (approve, change, cancel, done, moved on); **Lucy's setup › What Lucy can do**; Lucy gets the tools that exist today (creates and edits); the record; caching and the longer loop; **one chat — testers report to Lucy** | this one |
 | **L2** | Sending: quote, invoice, reminder, variation, an email or reply from the connected mailbox; record a payment | the send card is in this one; the email reply needs its own look |
 | **L3** | Deleting and archiving; the edit tools still missing (invoice lines, timesheets, Library, products, crew documents) | the delete card is in this one |
 | **L4** | Files in the business's folder: find, read, save, move, delete | to draw |
@@ -109,3 +130,4 @@ Voice ("talk to Lucy") stays the exploratory item it was.
 4. Lucy is a right-hand panel by default (560 px), with a wider setting — the small box is gone.
 5. Tester reports are a list with the team's reply, not a second chat; they are logged without the AI.
 6. The order of the rounds in §7.
+7. Lucy's setup starts with everything on except Delete (§2a), and the areas are the seven listed there.
