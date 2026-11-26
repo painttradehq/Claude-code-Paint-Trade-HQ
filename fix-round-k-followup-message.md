@@ -1,14 +1,14 @@
-# Fix Round K follow-up — the variation's Review & Send as the quote's; finish the screen checks — NOT SENT; waits for Josh's "send"
+# Fix Round K follow-up — the variation's Review & Send as the quote's; finish the screen checks — SENT to Emergent 26 Nov on Josh's word ("send the variation and round k to Emergent, I will upload the files")
 
 Josh uploads `variation-review-send.html` (the prototype) with this message. Notes: `variation-review-send-notes.md`.
 
 ---
 
-## The message as it will be sent
+## The message as sent
 
 # Fix Round K follow-up — two things
 
-Josh is uploading **`variation-review-send.html`**. Save it as `memory/specs/projects/variation-review-send.html`. It is the reference for part 1.
+Josh is uploading **`variation-review-send.html`** (the prototype) and `fix-round-k-followup-message.md` (this message as a file). Save the prototype as `memory/specs/projects/variation-review-send.html`. It is the reference for part 1. If it is not in the chat when you read this, reply "waiting for the prototype" once and start part 2 meanwhile.
 
 ## 1. The variation's Review & Send is the quote's Review & Send
 
