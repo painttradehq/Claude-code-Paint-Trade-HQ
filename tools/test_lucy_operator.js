@@ -73,6 +73,8 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     await last().locator('[data-testid="lucy-next"] button').click(); await p.waitForTimeout(1000);
     ok(await last().getAttribute('data-kind') === 'send' && (await last().locator('[data-testid="lucy-act-mail"]').innerText()).includes('leanne.crowe@example.com') && (await last().innerText()).includes('Hi Leanne,') && (await last().innerText()).includes('Estimate-EST-0046.pdf'), 'the send card shows who, the subject, the words and the attachment');
     ok((await last().locator('[data-testid="lucy-act-approve"]').innerText()) === 'Send it', 'its button says "Send it"');
+    ok((await last().locator('[data-testid="lucy-act-sig"]').innerText()).includes('Josh Sano') && (await last().locator('[data-testid="lucy-act-sig"]').innerText()).toUpperCase().includes('FROM MESSAGES SETUP'), 'the send card shows the signature from Messages setup under the words');
+    ok((await last().locator('[data-testid="lucy-act-checks"]').innerText()).includes('Nothing red on the quote') && await last().locator('[data-testid="lucy-act-approve"]').isEnabled(), 'it shows the quote’s own checks; nothing red, so Send it is on');
     await p.screenshot({ path: `${SHOTS}/lucy-op-send-${W}.png` });
     await last().locator('[data-testid="lucy-act-approve"]').click(); await p.waitForTimeout(1300);
     ok((await last().innerText()).includes('Sent to leanne.crowe@example.com'), 'sent only after "Send it"');
@@ -140,6 +142,28 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     ok((await last().locator('[data-testid="lucy-act-title"]').innerText()) === 'Add to FB-247c7747', 'adding to a report is a card too');
     await last().locator('[data-testid="lucy-act-approve"]').click(); await p.waitForTimeout(1300);
     ok((await last().innerText()).includes('Added to FB-247c7747.'), 'added');
+
+    // ---- round 2: a quote with red checks is not sent; a variation; a payment
+    await say('Send EST-0041 to Mark');
+    ok(await last().getAttribute('data-kind') === 'send' && (await last().locator('[data-testid="lucy-act-checks"]').innerText()).toUpperCase().includes('2 THINGS TO FIX BEFORE IT CAN GO'), 'a quote with red checks: the card lists them');
+    ok((await last().locator('[data-testid="lucy-act-checks"]').innerText()).includes('isn’t measured') && await last().locator('[data-testid="lucy-act-approve"]').isDisabled(), 'Send it is off while a red check stands');
+    ok((await last().locator('[data-testid="lucy-act-fix"]').innerText()) === 'Open EST-0041', 'a button opens the quote to fix it');
+    await last().locator('[data-testid="lucy-act-approve"]').click({ force: true }); await p.waitForTimeout(400);
+    ok(await last().getAttribute('data-state') === 'ask', 'pressing the switched-off button sends nothing');
+    await p.screenshot({ path: `${SHOTS}/lucy-op-blocked-${W}.png` });
+    await say('Send the variation to Leanne');
+    ok(await last().getAttribute('data-kind') === 'send' && (await last().locator('[data-testid="lucy-act-title"]').innerText()) === 'Send a variation to Leanne Crowe' && (await last().innerText()).includes('carries the link to the approval page'), 'a variation has its own send card: no attachment, the approval link');
+    ok((await last().locator('[data-testid="lucy-act-checks"]').innerText()).includes('$320.00 + GST ($352.00 incl. GST)'), 'its checks show the price with GST');
+    await last().locator('[data-testid="lucy-act-approve"]').click(); await p.waitForTimeout(1300);
+    ok((await last().innerText()).includes('awaiting approval'), 'sent on "Send it"; the variation is awaiting approval');
+    await say('Record a payment on INV-0009');
+    ok(await last().getAttribute('data-kind') === 'change' && (await last().locator('[data-testid="lucy-act-title"]').innerText()) === 'Record a payment' && (await last().innerText()).includes('$233.99') && (await last().innerText()).includes('Paid in full'), 'recording a payment is a card: the invoice, the amount, the method, the date and what it leaves owing');
+    ok((await last().locator('[data-testid="lucy-act-approve"]').innerText()) === 'Approve', 'a payment is a change, not a send: the button says Approve');
+    await p.screenshot({ path: `${SHOTS}/lucy-op-payment-${W}.png` });
+    await say('Change that: $100');
+    ok((await last().innerText()).includes('$100.00') && (await last().innerText()).includes('$133.99 still owing'), 'a part payment shows what is still owing');
+    await last().locator('[data-testid="lucy-act-approve"]').click(); await p.waitForTimeout(1300);
+    ok((await last().innerText()).includes('Payment recorded on INV-0009.'), 'recorded only after Approve');
 
     // ---- layout
     const sw = await p.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth, document.querySelector('#tcBody').scrollWidth, document.querySelector('#tcBody').clientWidth]);

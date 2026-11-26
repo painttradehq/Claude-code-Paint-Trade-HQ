@@ -10,7 +10,7 @@
 
 This promotes the parked item "Lucy does the work in the app, confirm first" (17 Nov) to a build. **Round L1 went to Emergent on 26 Nov on Josh's word** (`lucy-l1-emergent-message.md`); L2–L5 follow one at a time, each on his "send". What L1 narrows from this spec is listed in §9.
 
-**Prototype:** `lucy-operator.html` (built by `tools/make_lucy_operator.py` on top of the Round 73 box, `lucy-chat-notion.html`). **Checks:** `tools/test_lucy_operator.js` — 134 of 134 at 1440 × 900 and 1024 × 768. Add `?tester=0` to see it as someone who is not in the tester program, and `?mail=microsoft&storage=onedrive` or `?mail=none&storage=builtin` to see Lucy's setup for a business on other providers.
+**Prototype:** `lucy-operator.html` (built by `tools/make_lucy_operator.py` on top of the Round 73 box, `lucy-chat-notion.html`). **Checks:** `tools/test_lucy_operator.js` — 160 of 160 at 1440 × 900 and 1024 × 768 (26 Nov: the round 2 cards added). Add `?tester=0` to see it as someone who is not in the tester program, and `?mail=microsoft&storage=onedrive` or `?mail=none&storage=builtin` to see Lucy's setup for a business on other providers.
 
 ## 1. What the prototype shows
 
@@ -155,4 +155,29 @@ Read from Emergent's chat. **The L1 code is in the preview only — not on GitHu
 - **Not as asked / open:** three commits, not one per part. What's new draft **#47** (two cards, not published) was worded by Emergent from the brief — to read before publishing. One observation from the testing agent, not fixed: Lucy's setup sometimes stayed open after Cancel → Discard (not reproduced by hand; the panel is shared by every gear). The message file was not saved in its pod, and the copy of this spec there is an **older one** (without §9).
 - **Not seen in what could be read:** the cache figures of a real turn, and whether a plan card shows its total before or after approval. Both are in `memory/reports/lucy-l1-report.md`, readable once it is on GitHub.
 - **Waiting on Josh:** he clicked Emergent's "Lucy L2" suggestion; Emergent stopped and asked four questions (build from the saved spec or wait for a message; what she may send; own card or last step of a plan; a "Send for me" switch). Recommended: **wait for the L2 message** — sending to clients is the riskiest round, the spec copy in the pod is old, and the message is written against the L1 code once it is saved to GitHub. Scope when it is written: quotes, invoices and payment reminders, variations, record a payment; always its own "Send it" card; the switch starts on; emails and replies from the mailbox wait for their own design.
+
+## 11. Round L1 — the code, read after Josh saved it to GitHub (26 Nov, `640c20d`)
+
+Read: `services/lucy_tools.py`, `services/lucy_actions.py`, the chat / approve / cancel routes in `ai_routes.py`, the loop in `services/ai_provider.py`, `components/lucy/LucyCard.tsx`, and Emergent's report. **It is built to the brief.**
+
+- A change never runs in the chat loop; the first one becomes the waiting card and a second in the same reply is refused back to her ("put several changes in one do_steps").
+- Approve moves waiting → running in one database step (a second click gets 409), checks it is the admin who asked, works out the permissions again, then runs the same handler the connector uses and writes the record (`via: "lucy"`).
+- The card the panel gets carries no ids and no arguments — only the title, the rows built from the record, and the result.
+- Crew get 403 on every Lucy route; a team admin's tools are cut by their own access; pay is stripped for an admin without it.
+- Caching works in the preview: about 13,000 tokens read from cache against 2 uncached on a turn. A plan's total is shown on the done card, read from the saved quote.
+
+**Three small things, written into the L2 message:** deleting a conversation leaves its cards' rows behind (with the held conversation inside); a finished card keeps that held conversation when it no longer needs it; a card whose run is interrupted would stay on "Working…" for ever. None changes what Lucy does today.
+
+## 12. Round L2 — prepared, not sent (26 Nov)
+
+`lucy-l2-emergent-message.md`. Lucy sends quotes, invoices, payment reminders and variations by email, and records a payment. Decisions in it, all Josh's to change:
+
+1. **The send card is the app's Review & Send in small.** The people, the opening words, the signature and the checks come from the same code as the window — moved into one shared place, not copied — so "send it" through Lucy is the same email as Send in the app.
+2. **Lucy never sends past a red check.** A quote with an unmeasured area or an unpriced line shows the red list and a button to open it; Send it is off.
+3. **Who it can go to:** the client's own addresses, or an address typed in the message that asked. Nothing she read somewhere else.
+4. **Email only.** Texts stay in the app's window.
+5. **Send for me** is one switch in her setup, starting on; a send also needs its area on Read and change.
+6. **A send is always its own card**, never a step of a plan. Recording a payment is an ordinary change.
+7. **Next-step buttons** arrive with this round: "Send it to Leanne" after a quote, an invoice or a variation; "Send a reminder for INV-0009" after "What's owed?".
+8. Emails and replies from the connected mailbox are **not** in this round — that screen needs its own design first.
 

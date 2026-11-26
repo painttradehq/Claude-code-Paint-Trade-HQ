@@ -1061,6 +1061,12 @@
   .lz-steps li span{ display:block; color:var(--text-secondary); font-size:12.5px; overflow-wrap:anywhere; }
   .lz-mail pre{ white-space:pre-wrap; font:inherit; font-size:12.5px; background:var(--surface-sunken); border-radius:8px; padding:8px 10px; margin:7px 0 6px; overflow-wrap:anywhere; }
   .lz-att{ font-size:12px; color:var(--text-secondary); }
+  .lz-sig{ white-space:pre-line; font-size:12px; color:var(--text-muted); margin:0 0 6px; line-height:1.45; }
+  .lz-sig span{ display:block; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; font-weight:800; margin-bottom:2px; }
+  .lz-checks{ margin-top:8px; padding:8px 10px; border-radius:8px; background:var(--success-bg); color:var(--success); font-size:12.5px; display:grid; gap:2px; }
+  .lz-checks b{ font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; }
+  .lz-checks.red{ background:var(--danger-bg); color:var(--danger); }
+  .lz-checks .lz-link{ justify-self:start; margin-top:6px; }
   .lz-warn{ margin-top:8px; padding:8px 10px; border-radius:8px; background:var(--danger-bg); color:var(--danger); font-size:12.5px; font-weight:600; }
   .lz-confirm{ margin-top:9px; }
   .lz-confirm label{ display:block; font-size:12px; color:var(--text-secondary); margin-bottom:4px; }
@@ -1567,16 +1573,17 @@ function actHtml(m){
   const st = m.state, n = (m.steps || []).length;
   const kick = st === 'ask' ? 'Lucy is about to' : st === 'running' ? 'Lucy is working' : st === 'done' ? 'Lucy did' : 'Not done';
   const steps = n ? `<ol class="lz-steps">${m.steps.map((s, i) => `<li class="${st === 'done' || (st === 'running' && i < m.at) ? 'ok' : st === 'running' && i === m.at ? 'now' : ''}" data-testid="lucy-act-step-${i + 1}"><i>${st === 'done' || (st === 'running' && i < m.at) ? '✓' : i + 1}</i><div><b>${esc(s[0])}</b><span>${esc(s[1])}</span></div></li>`).join('')}</ol>` : '';
-  const mail = m.mail ? `<div class="lz-mail" data-testid="lucy-act-mail"><div class="lz-row"><span>To</span><b>${esc(m.mail.to)}</b></div><div class="lz-row"><span>Subject</span><b>${esc(m.mail.subject)}</b></div><pre>${esc(m.mail.body)}</pre><div class="lz-att">Attached: ${esc(m.mail.att)}</div></div>` : '';
+  const mail = m.mail ? `<div class="lz-mail" data-testid="lucy-act-mail"><div class="lz-row"><span>To</span><b>${esc(m.mail.to)}</b></div><div class="lz-row"><span>Subject</span><b>${esc(m.mail.subject)}</b></div><pre>${esc(m.mail.body)}</pre>${m.mail.sig ? `<div class="lz-sig" data-testid="lucy-act-sig"><span>Signature · from Messages setup</span>${esc(m.mail.sig)}</div>` : ''}<div class="lz-att">${m.mail.att ? 'Attached: ' + esc(m.mail.att) : esc(m.mail.link || '')}</div></div>` : '';
+  const checks = m.checks && st === 'ask' ? `<div class="lz-checks ${m.blocked ? 'red' : ''}" data-testid="lucy-act-checks"><b>${m.blocked ? `${m.checks.length} thing${m.checks.length === 1 ? '' : 's'} to fix before it can go` : 'Checked'}</b>${m.checks.map(c => `<span>${esc(c)}</span>`).join('')}${m.blocked ? `<button class="lz-link" data-act="fix" data-testid="lucy-act-fix">${esc(m.fix)}</button>` : ''}</div>` : '';
   const rows = (m.rows || []).map(([k, v]) => `<div class="lz-row"><span>${esc(k)}</span><b>${v}</b></div>`).join('');
   const warn = m.warn && st === 'ask' ? `<div class="lz-warn" data-testid="lucy-act-warn">${esc(m.warn)}</div>` : '';
   const confirm = m.kind === 'delete' && st === 'ask' ? `<div class="lz-confirm"><label for="in-${m.id}">Type ${esc(m.confirm)} to delete it</label><input id="in-${m.id}" data-actin="${m.id}" data-testid="lucy-act-confirm-input" value="${esc(m.typed)}" autocomplete="off" spellcheck="false"></div>` : '';
   const okLabel = m.kind === 'plan' ? `Approve all ${n} steps` : m.kind === 'delete' ? `Delete ${esc(m.confirm)}` : ACT_OK[m.kind];
-  const foot = st === 'ask' ? `<div class="lz-btns"><button class="lz-btn ${m.kind === 'delete' ? 'red' : 'pri'}" data-act="ok" data-testid="lucy-act-approve" ${m.kind === 'delete' && m.typed.trim().toUpperCase() !== m.confirm ? 'disabled' : ''}>${okLabel}</button>${m.kind === 'delete' ? '' : '<button class="lz-btn" data-act="change" data-testid="lucy-act-change">Change something</button>'}<button class="lz-btn quiet" data-act="no" data-testid="lucy-act-cancel">Cancel</button></div>`
+  const foot = st === 'ask' ? `<div class="lz-btns"><button class="lz-btn ${m.kind === 'delete' ? 'red' : 'pri'}" data-act="ok" data-testid="lucy-act-approve" ${(m.kind === 'delete' && m.typed.trim().toUpperCase() !== m.confirm) || m.blocked ? 'disabled' : ''}>${okLabel}</button>${m.kind === 'delete' ? '' : '<button class="lz-btn" data-act="change" data-testid="lucy-act-change">Change something</button>'}<button class="lz-btn quiet" data-act="no" data-testid="lucy-act-cancel">Cancel</button></div>`
     : st === 'running' ? `<div class="lz-state run" data-testid="lucy-act-state">Working${n ? ` — step ${Math.min(m.at + 1, n)} of ${n}` : ''}…</div>`
     : st === 'done' ? `<div class="lz-state ok" data-testid="lucy-act-state">✓ ${esc(m.doneText)}</div><div class="lz-meta">Approved by ${ME} · ${m.when}</div>${m.link ? `<button class="lz-link" data-act="open" data-testid="lucy-act-link">${esc(m.link)}</button>` : ''}${nextHtml(m)}`
     : `<div class="lz-state off" data-testid="lucy-act-state">${esc(m.offText || 'Cancelled — nothing was changed.')}</div>`;
-  return `<div class="lz-card ${m.kind} ${st === 'done' ? 'done' : st === 'cancelled' ? 'off' : ''}" data-actid="${m.id}" data-kind="${m.kind}" data-state="${st}" data-testid="lucy-act"><div class="lz-kick">${ACT_ICON[m.kind]}<span data-testid="lucy-act-kick">${kick}</span></div><div class="lz-title" data-testid="lucy-act-title">${esc(m.title)}</div>${steps}${mail}${rows}${warn}${confirm}${foot}</div>`;
+  return `<div class="lz-card ${m.kind} ${st === 'done' ? 'done' : st === 'cancelled' ? 'off' : ''}" data-actid="${m.id}" data-kind="${m.kind}" data-state="${st}" data-testid="lucy-act"><div class="lz-kick">${ACT_ICON[m.kind]}<span data-testid="lucy-act-kick">${kick}</span></div><div class="lz-title" data-testid="lucy-act-title">${esc(m.title)}</div>${steps}${mail}${rows}${checks}${warn}${confirm}${foot}</div>`;
 }
 const fmtAud = (x) => '$' + Number(x).toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const FLOWS = {
@@ -1586,16 +1593,23 @@ const FLOWS = {
     actCard('plan', 'quote', { title: 'Start a quote for Leanne Crowe', steps: [['Start a draft quote', 'Residential exterior · 12 Ivanhoe Pde, Ivanhoe'], ['Add two zones', 'Front facade · Side and rear walls'], ['Add five lines from your Library', 'Weatherboards, fascia, eaves, two doors, prep — at your Library rates'], ['Set the payment plan', '50% deposit · 50% on completion (your default)']],
       rows: [['Total', '$8,460.00 + GST'], ['Status', 'Draft — nothing is sent']], doneText: 'EST-0046 is ready as a draft.', link: 'Open EST-0046', next: [['Send it to Leanne', 'Send EST-0046 to Leanne']] })],
   reminder: () => ['INV-0009 is 12 days late and Jane has opened the last reminder. This is what would go out.', ['money_owed', 'recent_messages'],
-    actCard('send', 'reminder', { title: 'Send a reminder for INV-0009', mail: { to: 'Jane Chen · jane.chen@example.com', subject: 'Reminder: invoice INV-0009', body: 'Hi Jane,\n\nA quick reminder that invoice INV-0009 for $233.99 was due on 13 November. The invoice and the bank transfer details are at the link below.', att: 'Invoice-INV-0009.pdf' },
+    actCard('send', 'reminder', { title: 'Send a reminder for INV-0009', mail: { to: 'Jane Chen · jane.chen@example.com', subject: 'Reminder: invoice INV-0009', body: 'Hi Jane,\n\nA quick reminder that invoice INV-0009 for $233.99 was due on 13 November. The invoice and the bank transfer details are at the link below.', sig: 'Josh Sano\nSano Painting & Decorating\n0400 000 000', att: 'Invoice-INV-0009.pdf' },
       doneText: 'Reminder sent to jane.chen@example.com.', link: 'Open INV-0009' })],
+  payment: (amt) => ['INV-0009 is for Jane Chen: $233.99, nothing paid yet.', ['money_owed'],
+    actCard('change', 'payment', { title: 'Record a payment', amt, rows: [['Invoice', 'INV-0009 · Jane Chen'], ['Amount', fmtAud(amt === 180 ? 233.99 : amt)], ['Method', 'Bank transfer'], ['Date', 'Today'], ['After this', (amt === 180 ? 233.99 : amt) >= 233.99 ? 'Paid in full' : fmtAud(233.99 - amt) + ' still owing']], doneText: (amt === 180 ? 233.99 : amt) >= 233.99 ? 'Payment recorded. INV-0009 is paid.' : 'Payment recorded on INV-0009.', link: 'Open INV-0009' })],
+  sendVariation: () => ['The variation on the Ivanhoe job is a draft with a price, and Leanne has an email. This is what would go out.', ['list_projects'],
+    actCard('send', 'sendVariation', { title: 'Send a variation to Leanne Crowe', mail: { to: 'Leanne Crowe · leanne.crowe@example.com', subject: 'Extra work for your approval — 12 Ivanhoe Pde', body: 'Hi Leanne,\n\nWhile working at 12 Ivanhoe Pde we found some extra work that isn’t in your quote: extra door — rear entry. The details and the price are at the link below — you can approve or decline it there.\n\nWe won’t start it until you approve.', sig: 'Josh Sano\nSano Painting & Decorating\n0400 000 000', link: 'No attachment — the email carries the link to the approval page' },
+      checks: ['Price set — $320.00 + GST ($352.00 incl. GST)', 'The client has an email'], doneText: 'Sent to leanne.crowe@example.com. The variation is now awaiting approval.', link: 'Open the job' })],
+  sendBlocked: () => ['EST-0041 isn’t ready to go. These are the same checks its Review & Send shows.', ['list_pending_estimates'],
+    actCard('send', 'sendBlocked', { title: 'Send EST-0041 to Mark Ellis', blocked: true, fix: 'Open EST-0041', checks: ['Side and rear walls isn’t measured', 'No job address'], mail: { to: 'Mark Ellis · mark.ellis@example.com', subject: 'Your painting quote EST-0041 from Sano Painting & Decorating', body: 'Hi Mark,\n\nThanks for the opportunity to quote. Your quote for residential exterior painting is attached and online at the link below — you can review, accept and sign there, or call me with any questions.\n\nThe quote is valid for 30 days.', sig: 'Josh Sano\nSano Painting & Decorating\n0400 000 000', att: 'Estimate-EST-0041.pdf' } })],
   report: (_amt, text) => { const what = text.replace(/^report a problem\s*:?\s*/i, '').trim(); const id = 'FB-' + Math.random().toString(16).slice(2, 10);
     return ['I’ve added the page you are on and your browser. Check it reads right.', [],
       actCard('report', 'report', { title: 'Log a problem for the Paint Trade HQ team', rep: { id, text: what }, rows: [['What happened', esc(what)], ['Page', 'Dashboard · /admin/dashboard'], ['Browser', 'Chrome · window ' + window.innerWidth + ' wide'], ['Screenshot', AI.attach ? 'Attached' : 'None — add one with + first if it helps']], doneText: 'Logged as ' + id + '. The team will see it.', link: 'My reports' })]; },
   about: (_amt, text) => { const m = /^about (fb-[0-9a-f]+)\s*:?\s*(.*)$/i.exec(text) || []; const id = (m[1] || '').toUpperCase().replace('FB-', 'FB-'); const rid = 'FB-' + (m[1] || '').slice(3);
     return ['', [], actCard('report', 'about', { title: 'Add to ' + rid, addTo: rid, addText: m[2] || '', rows: [['Report', rid], ['Adding', esc(m[2] || '')]], doneText: 'Added to ' + rid + '.', link: 'My reports' })]; },
   send: () => ['EST-0046 is a draft with no red checks, and Leanne has an email on file. This is what would go out.', ['list_pending_estimates', 'search_clients'],
-    actCard('send', 'send', { title: 'Send EST-0046 to Leanne Crowe', mail: { to: 'Leanne Crowe · leanne.crowe@example.com', subject: 'Your painting quote EST-0046', body: 'Hi Leanne,\n\nThanks for the opportunity to quote. Your quote for the exterior repaint at 12 Ivanhoe Pde is attached and online at the link below — you can review, accept and sign there.\n\nThe quote is valid for 30 days.', att: 'Estimate-EST-0046.pdf' },
-      doneText: 'Sent to leanne.crowe@example.com. EST-0046 is now Sent.', link: 'Open EST-0046' })],
+    actCard('send', 'send', { title: 'Send EST-0046 to Leanne Crowe', mail: { to: 'Leanne Crowe · leanne.crowe@example.com', subject: 'Your painting quote EST-0046', body: 'Hi Leanne,\n\nThanks for the opportunity to quote. Your quote for the exterior repaint at 12 Ivanhoe Pde is attached and online at the link below — you can review, accept and sign there.\n\nThe quote is valid for 30 days.', sig: 'Josh Sano\nSano Painting & Decorating\n0400 000 000', att: 'Estimate-EST-0046.pdf' },
+      checks: ['Nothing red on the quote', 'No photos attached (you can still send)'], doneText: 'Sent to leanne.crowe@example.com. EST-0046 is now Sent.', link: 'Open EST-0046' })],
   delete: () => ['EST-0040 is an empty draft made by Duplicate on 15 Nov. No job, invoice or client is linked to it.', ['list_pending_estimates'],
     actCard('delete', 'delete', { title: 'Delete a draft quote', confirm: 'EST-0040', rows: [['Quote', 'EST-0040 · draft · $0.00'], ['Client', 'None'], ['Linked', 'No job, no invoice']], warn: 'This can’t be undone.', doneText: 'EST-0040 was deleted.' })],
   variation: () => ['Here it is as a variation on the job instead.', ['list_projects'],
@@ -1609,8 +1623,8 @@ const STORE_WHO = { drive: 'Your storage: Google Drive · the Paint Trade HQ fol
 let P = { quotes: 'change', clients: 'change', jobs: 'change', invoices: 'change', calendar: 'change', crew: 'change', library: 'change', send: true, del: false, mail: MAIL === 'none' ? 'off' : 'send', files: 'change' };
 let PD = Object.assign({}, P);
 const lzAllowed = (k) => k === 'send' ? P.send : k === 'del' ? P.del : P[k] === 'change';
-const PERM_OF = { expense: 'jobs', quote: 'quotes', refuse: 'quotes', send: 'send', reminder: 'send', delete: 'del' };
-const PERM_OFF = { jobs: 'Changing jobs is turned off in my setup, so I can only read them.', quotes: 'Changing quotes is turned off in my setup, so I can only read them.', send: 'Sending is turned off in my setup. I can still draft the words for you to send yourself.', del: 'Deleting is turned off in my setup.' };
+const PERM_OF = { expense: 'jobs', quote: 'quotes', refuse: 'quotes', send: 'send', reminder: 'send', sendVariation: 'send', sendBlocked: 'send', payment: 'invoices', delete: 'del' };
+const PERM_OFF = { jobs: 'Changing jobs is turned off in my setup, so I can only read them.', quotes: 'Changing quotes is turned off in my setup, so I can only read them.', invoices: 'Changing invoices is turned off in my setup, so I can only read them.', send: 'Sending is turned off in my setup. I can still draft the words for you to send yourself.', del: 'Deleting is turned off in my setup.' };
 function lzPaintPerms(){
   document.querySelectorAll('#lzPerms .lz-seg').forEach(g => g.querySelectorAll('button').forEach(b => { const on = PD[g.dataset.perm] === b.dataset.v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }));
   $('#pSend').checked = PD.send; $('#pDelete').checked = PD.del;
@@ -1624,6 +1638,9 @@ function lucyFlowOf(t){
   if (TESTER && /^about fb-/.test(t)) return 'about';
   if (TESTER && /(report a problem|found a (bug|problem)|went wrong|not working|doesn.t work|is broken)/.test(t)) return 'report';
   if (/reminder/.test(t) && /inv-/.test(t)) return 'reminder';
+  if (/(record|log|add|mark).*(payment|paid)|inv-\d+.*\b(paid|payment)\b/.test(t)) return 'payment';
+  if (/(send|email).*variation/.test(t)) return 'sendVariation';
+  if (/(send|email).*est-0041/.test(t)) return 'sendBlocked';
   if (/(expense|skip bin)/.test(t)) return 'expense';
   if (/(send|email)/.test(t) && /(quote|est-)/.test(t)) return 'send';
   if (/(delete|remove)/.test(t)) return 'delete';
@@ -1681,9 +1698,10 @@ document.addEventListener('click', e => {
   const a = b.dataset.act;
   if (a === 'open') { if (m.link === 'My reports') { AI.showReports = true; renderAssistant(); } else say('In the app this opens ' + m.link.replace(/^Open /, '')); return; }
   if (m.state !== 'ask') return;
+  if (a === 'fix') { say('In the app this opens ' + m.fix.replace(/^Open /, '') + ' so you can fix it'); return; }
   if (a === 'no') { m.state = 'cancelled'; renderAssistant(); return; }
   if (a === 'change') { const ta = $('#tcInput'); ta.value = 'Change that: '; ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); ta.dispatchEvent(new Event('input', { bubbles: true })); return; }
-  if (a === 'ok') { if (m.kind === 'delete' && m.typed.trim().toUpperCase() !== m.confirm) return; lucyRun(m); }
+  if (a === 'ok') { if (m.blocked || (m.kind === 'delete' && m.typed.trim().toUpperCase() !== m.confirm)) return; lucyRun(m); }
 });
 if (!TESTER) { const mr = document.getElementById('tcMenuReports'); if (mr) mr.hidden = true; }
 
