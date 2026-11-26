@@ -1,4 +1,4 @@
-# Lucy L3 — fixing and removing (round 3 of 5) — NOT SENT (waits for Josh's "send")
+# Lucy L3 — fixing and removing (round 3 of 5) — SENT to Emergent 27 Nov on Josh's word ("and send")
 
 Josh, 27 Nov: "Let's go back to Lucy to finish it off." · "Remember Lucy should be able to do what you do as a connector — except as a connector you need a browser to operate, but because Lucy is native she has more capability."
 
@@ -8,7 +8,7 @@ Josh uploads the updated `lucy-operator.html` with it. Checks: `tools/test_lucy_
 
 ---
 
-## The message to send
+## The message as sent
 
 # Lucy L3 — fixing and removing (round 3 of 5)
 

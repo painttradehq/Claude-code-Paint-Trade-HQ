@@ -214,7 +214,7 @@ Read from Emergent's chat only. **Neither is on GitHub yet** (`main` is still `6
 
 | Item | Decision |
 |---|---|
-| Round 3 — fixing and removing | Go. `lucy-l3-emergent-message.md`, prepared, **not sent**. |
+| Round 3 — fixing and removing | Go. `lucy-l3-emergent-message.md` — **sent to Emergent 27 Nov** on Josh's word. |
 | Email from his own mailbox | Next after round 3; needs its design first. |
 | Round 4 — files | Yes, **kept to the app's own folder** — Josh, 27 Nov, later the same day: "maybe just restrict the storage access to its own files instead of the whole drive, seems simpler." So today's permissions are enough on every storage (Google Drive's `drive.file`, OneDrive kept to the Paint Trade HQ folder, the app's own storage): no wider permission, no reconnecting, no Google review. |
 | Round 5 — wider permissions | **Dropped.** The whole drive is not wanted, and deleting emails was never asked for. |
