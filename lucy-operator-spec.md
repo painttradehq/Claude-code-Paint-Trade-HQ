@@ -216,7 +216,8 @@ Read from Emergent's chat only. **Neither is on GitHub yet** (`main` is still `6
 |---|---|
 | Round 3 — fixing and removing | Go. `lucy-l3-emergent-message.md`, prepared, **not sent**. |
 | Email from his own mailbox | Next after round 3; needs its design first. |
-| Round 4 — files, with **round 5's wider reach**: "Lucy can see the whole drive of the chosen storage" | Yes. Consequence to put in front of him when it is designed: on Google Drive that means asking each user for a wider permission than today's (`drive.file` → the whole Drive), which is one Google classes as restricted — its review, and possibly a paid yearly security assessment, before any user outside testing can grant it. OneDrive's permission already covers the whole drive. Deleting emails was not asked for. |
+| Round 4 — files | Yes, **kept to the app's own folder** — Josh, 27 Nov, later the same day: "maybe just restrict the storage access to its own files instead of the whole drive, seems simpler." So today's permissions are enough on every storage (Google Drive's `drive.file`, OneDrive kept to the Paint Trade HQ folder, the app's own storage): no wider permission, no reconnecting, no Google review. |
+| Round 5 — wider permissions | **Dropped.** The whole drive is not wanted, and deleting emails was never asked for. |
 | Plain names on the chips | Yes — in round 3. |
 | Revise an accepted quote | "We have already established this one" — the rule is his description (back for correction, marked Revised, sent again, accepted again). Not parked: to design next, prototype first; it is an app-wide change that Lucy then follows. |
 | Talking to Lucy by voice | No, for now. |
