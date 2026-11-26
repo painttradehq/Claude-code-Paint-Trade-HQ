@@ -82,19 +82,47 @@
   .cv .no{ width:100%; background:none; border:none; padding:13px; margin-top:6px; color:#8b93a1; font-size:14px; font-weight:700; }
   .cv [disabled]{ cursor:default; opacity:1; }
   .cv .foot{ color:#5b6270; font-size:11px; text-align:center; margin-top:20px; }
-  /* ---- proposed: the client's approval page in the light look of the quote and the invoice (add ?page=today to see today's dark page) ---- */
-  .cv-page.light{ background:#fff; border:1px solid var(--border); }
-  .cv-page.light .cv{ background:#fff; border:none; color:var(--text); padding:4px 6px; max-width:520px; }
-  .cv-page.light .cv .biz{ font-family:var(--display); font-weight:600; font-size:22px; }
-  .cv-page.light .cv .kick{ color:var(--text-2); }
-  .cv-page.light .cv .body{ background:var(--sunken); }
-  .cv-page.light .cv .desc{ color:var(--text-2); }
-  .cv-page.light .cv .lines div{ color:var(--text); border-top:1px solid var(--border); padding-top:7px; }
-  .cv-page.light .cv .tf{ color:var(--text-2); }
-  .cv-page.light .cv input{ background:#fff; color:var(--text); border:1px solid var(--border-strong); }
-  .cv-page.light .cv .ok{ background:var(--success); }
-  .cv-page.light .cv .no{ color:var(--text-2); }
-  .cv-page.light .cv .foot{ color:var(--muted); }
+  /* ---- the client's approval page as a proper document (wider, plain, the quote's look). ?page=today shows today's dark card. ---- */
+  .client-view{ min-height:100vh; background:var(--sunken); padding:28px 16px 48px; }
+  .vdoc{ width:100%; max-width:860px; margin:0 auto; background:#fff; border:1px solid var(--border); border-radius:12px; box-shadow:0 2px 16px rgba(0,0,0,.06); padding:clamp(20px, 5%, 44px); color:var(--text); font-size:14px; line-height:1.5; }
+  .vdoc .vhead{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:14px 24px; padding-bottom:18px; border-bottom:1px solid var(--border-strong); }
+  .vdoc .vlogo{ display:block; max-width:160px; max-height:56px; margin-bottom:8px; }
+  .vdoc .vbiz{ font-family:var(--display); font-size:26px; font-weight:600; line-height:1.2; }
+  .vdoc .vbizsub{ font-size:12.5px; color:var(--text-2); margin-top:4px; line-height:18px; }
+  .vdoc .vmeta{ text-align:right; font-size:12.5px; color:var(--text-2); margin-left:auto; }
+  .vdoc .vlab{ font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; font-weight:700; color:var(--muted); }
+  .vdoc .vmeta .vdt{ font-family:var(--display); font-size:34px; line-height:38px; font-weight:600; color:var(--accent); letter-spacing:.01em; margin-bottom:4px; }
+  .vdoc .vmeta b{ font-family:var(--mono); font-weight:600; color:var(--text); }
+  .vdoc .vwho{ display:flex; flex-wrap:wrap; gap:16px 40px; padding:18px 0 4px; }
+  .vdoc .vwho > div{ flex:1 1 200px; font-size:13.5px; }
+  .vdoc .vwho .vlab{ margin-bottom:4px; }
+  .vdoc h2{ font-family:var(--display); font-size:22px; font-weight:600; margin:22px 0 6px; line-height:1.25; }
+  .vdoc .vdesc{ color:var(--text-2); white-space:pre-line; margin:0 0 16px; max-width:62ch; }
+  .vdoc table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  .vdoc th{ text-align:left; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:700; padding:8px 0; border-bottom:1px solid var(--border-strong); }
+  .vdoc td{ padding:10px 0; border-bottom:1px solid var(--border); vertical-align:top; }
+  .vdoc .num{ text-align:right; font-family:var(--mono); white-space:nowrap; padding-left:12px; }
+  .vdoc th.num{ font-family:var(--body); }
+  .vdoc .vtotals{ margin:14px 0 0 auto; width:min(100%, 320px); font-size:13.5px; }
+  .vdoc .vtotals div{ display:flex; justify-content:space-between; gap:16px; padding:5px 0; }
+  .vdoc .vtotals .num{ padding-left:0; }
+  .vdoc .vtotals .grand{ border-top:2px solid var(--text); margin-top:6px; padding-top:10px; font-size:17px; font-weight:700; }
+  .vdoc .vtotals .small{ color:var(--text-2); font-size:12.5px; }
+  .vdoc .vapprove{ margin-top:26px; background:var(--sunken); border-radius:12px; padding:18px 20px; }
+  .vdoc .vapprove h3{ font-size:15px; margin:0 0 2px; }
+  .vdoc .vapprove p{ margin:0 0 12px; font-size:13px; color:var(--text-2); }
+  .vdoc .vact{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .vdoc .vact input{ flex:1 1 240px; min-width:0; height:46px; padding:0 14px; border:1px solid var(--border-strong); border-radius:10px; font-family:var(--body); font-size:14.5px; background:#fff; color:var(--text); }
+  .vdoc .vact .ok{ flex:0 0 auto; height:46px; padding:0 22px; border:none; border-radius:10px; background:var(--success); color:#fff; font-size:15px; font-weight:700; cursor:pointer; }
+  .vdoc .vact .no{ flex:0 0 auto; height:46px; padding:0 10px; border:none; background:none; color:var(--text-2); font-size:13.5px; font-weight:600; cursor:pointer; text-decoration:underline; }
+  .vdoc .vact [disabled]{ cursor:default; }
+  .vdoc .vact .ok[data-live][disabled]{ opacity:.45; }
+  .vdoc .vsig{ margin-top:8px; font-size:12px; color:var(--muted); }
+  .vdoc .vdone{ display:flex; flex-direction:column; gap:2px; }
+  .vdoc .vdone b{ font-size:15px; font-weight:700; color:var(--success); }
+  .vdoc .vdone span{ font-size:13px; color:var(--text-2); }
+  .vdoc .vdone.declined b{ color:var(--text); }
+  .vdoc .vfoot{ margin-top:22px; padding-top:14px; border-top:1px solid var(--border); display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px 16px; font-size:12px; color:var(--muted); }
   .toast{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#2A2740; color:#fff; padding:10px 16px; border-radius:10px; font-size:13.5px; z-index:200; }
   .toast[hidden]{ display:none; }
 </style>
@@ -129,16 +157,12 @@ Sano Painting &amp; Decorating
         <button class="btn" id="rsSend" data-testid="rs-send"></button>
         <div class="total" data-testid="rs-total"><span id="rsTotal"></span> · <button class="lnk" id="rsEdit" data-testid="rs-edit">Edit the variation</button></div>
       </div>
-      <div class="rs-right" data-testid="rs-preview"><div class="cv-page" data-testid="cv-page"><div class="cv" data-testid="public-variation-card">
-        <div class="biz">Sano Painting &amp; Decorating</div><div class="kick">Additional work approval — 12 Ivanhoe Pde, Ivanhoe</div>
-        <div class="body"><div class="ti" id="cvTitle"></div><div class="desc" id="cvDesc"></div><div class="lines" id="cvLines"></div><div class="price" id="cvPrice" data-testid="variation-price"></div><div class="tf" id="cvTotal" data-testid="variation-total"></div><div class="tf" id="cvTf"></div></div>
-        <input placeholder="Type your full name to approve" disabled aria-label="Name (off in this preview)"><button class="ok" disabled data-testid="cv-approve">Approve this work ✓</button><button class="no" disabled data-testid="cv-decline">Decline</button>
-        <div class="foot">Sent via Paint Trade HQ</div>
-      </div></div></div>
+      <div class="rs-right" data-testid="rs-preview"><div id="docHost"></div></div>
     </div>
     <div class="sent" id="rsSent" data-testid="rs-sent" hidden><div class="box"><div class="h" id="rsSentH">Variation sent!</div><div class="p" id="rsSentP"></div><div class="l"><input class="inp" id="rsLink" data-testid="rs-link" readonly><button class="btn ghost" id="rsCopy" data-testid="rs-copy-link">Copy</button></div><div class="f"><button class="btn" id="rsDone" data-testid="rs-done">Done</button></div></div></div>
   </div>
 </div>
+<div class="client-view" id="clientView" hidden><div id="clientHost"></div></div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -157,6 +181,28 @@ const priceText = (v) => `${money(v.price)} + GST (${money(v.price * (1 + GST / 
 const CHIP = { draft: ['Draft', ''], sent: ['Sent · awaiting approval', 'info'], approved: ['Approved', 'success'] };
 const PENCIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/></svg>';
 let cur = null, ticked = new Set(), cc = [], toastT;
+const TODAY_LOOK = /[?&]page=today/.test(location.search); const LOGO = /[?&]logo=1/.test(location.search);
+/** The client's approval page. `preview` = inside Review & Send: nothing can be tapped. `done` = 'approved' | 'declined' after the client answers. */
+function docHtml(v, o = {}){
+  const off = o.preview ? 'disabled' : '';
+  if (TODAY_LOOK) return `<div class="cv-page" data-testid="cv-page"><div class="cv" data-testid="public-variation-card"><div class="biz">Sano Painting &amp; Decorating</div><div class="kick">Additional work approval — 12 Ivanhoe Pde, Ivanhoe</div>
+    <div class="body"><div class="ti">${esc(v.title)}</div>${v.desc ? `<div class="desc">${esc(v.desc)}</div>` : ''}<div class="lines">${v.lines.map(([n, q, a]) => `<div><span>${esc(n)} · ${esc(q)}</span><span>${money(a).replace('.00', '')}</span></div>`).join('')}</div><div class="price" data-testid="variation-price">${money(v.price)} + GST</div><div class="tf" data-testid="variation-total">${money(v.price * (1 + GST / 100))} including GST</div><div class="tf">Estimated timeframe: ${esc(v.tf)}</div></div>
+    <input placeholder="Type your full name to approve" ${off}><button class="ok" ${off} data-testid="variation-approve-btn">Approve this work ✓</button><button class="no" ${off} data-testid="variation-decline-btn">Decline</button><div class="foot">Sent via Paint Trade HQ</div></div></div>`;
+  const gst = v.price * GST / 100;
+  const logo = LOGO ? `<svg class="vlogo" data-testid="cv-logo" width="132" height="44" viewBox="0 0 132 44" role="img" aria-label="The business's logo"><rect width="44" height="44" rx="9" fill="#2F4A3A"/><path d="M13 30c6 2 14 1 14-5 0-7-13-3-13-10 0-5 8-6 13-3" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/><text x="54" y="20" font-family="Georgia, serif" font-size="15" font-weight="700" fill="#2F4A3A">SANO</text><text x="54" y="36" font-family="Georgia, serif" font-size="11" fill="#2F4A3A" letter-spacing="1.2">PAINTING</text></svg>` : '';
+  const act = o.done ? `<div class="vdone ${o.done}" data-testid="variation-done-box"><b>${o.done === 'approved' ? `✓ Approved by ${esc(o.name)} · 26 November 2026` : 'Declined · 26 November 2026'}</b><span>${o.done === 'approved' ? 'Thank you. Sano Painting &amp; Decorating has been notified.' : 'Sano Painting &amp; Decorating has been notified.'}</span></div>`
+    : `<h3>Approve this extra work</h3><p>It is extra to your quote EST-0019. Nothing starts until you approve it.</p><div class="vact"><input id="cvName" placeholder="Type your full name" aria-label="Your full name" ${off} data-testid="variation-signer-name"><button class="ok" ${o.preview ? 'disabled' : 'disabled data-live'} data-cv="approve" data-testid="variation-approve-btn">Approve this work</button><button class="no" ${off} data-cv="decline" data-testid="variation-decline-btn">Decline</button></div><div class="vsig">Your typed name acts as your signature.</div>`;
+  return `<div class="vdoc" data-testid="public-variation-card">
+    <div class="vhead"><div>${logo}<div class="vbiz" data-testid="cv-business">Sano Painting &amp; Decorating</div><div class="vbizsub" data-testid="cv-business-lines"><div>ABN 00 000 000 000</div><div>4 Marshall St, Ivanhoe VIC 3079</div><div>0400 000 000 · hello@sanopainting.example</div></div></div>
+      <div class="vmeta"><div class="vdt" data-testid="cv-doc-title">VARIATION</div><div>Quote # <b>EST-0019</b></div><div>Date <b>26 November 2026</b></div></div></div>
+    <div class="vwho"><div><div class="vlab">Prepared for</div><b>Leanne Crowe</b><br>12 Ivanhoe Pde, Ivanhoe VIC 3079</div><div data-testid="cv-job"><div class="vlab">Job</div><b>Residential exterior</b><br>12 Ivanhoe Pde, Ivanhoe VIC 3079</div></div>
+    <h2 data-testid="cv-title">${esc(v.title)}</h2>${v.desc ? `<p class="vdesc">${esc(v.desc)}</p>` : ''}
+    <table data-testid="variation-public-lines"><thead><tr><th>Description</th><th class="num">Qty</th><th class="num">Amount</th></tr></thead><tbody>${v.lines.map(([n, q, a]) => `<tr><td>${esc(n)}</td><td class="num">${esc(q)}</td><td class="num">${money(a)}</td></tr>`).join('')}</tbody></table>
+    <div class="vtotals" data-testid="cv-totals"><div><span>Extra work</span><span class="num" data-testid="variation-price">${money(v.price)}</span></div><div><span>GST (${GST}%)</span><span class="num">${money(gst)}</span></div><div class="grand"><span>Total to approve</span><span class="num" data-testid="variation-total">${money(v.price + gst)}</span></div><div class="small"><span>Estimated time</span><span>${esc(v.tf)}</span></div></div>
+    <div class="vapprove" data-testid="cv-approve-panel">${act}</div>
+    <div class="vfoot"><span>Questions? Call 0400 000 000 or email hello@sanopainting.example.</span><span>Sent with Paint Trade HQ</span></div>
+  </div>`;
+}
 const say = (t) => { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { el.hidden = true; }, 2200); };
 
 function renderRows(){
@@ -192,9 +238,7 @@ function openRs(id){
   $('#rsSms').checked = false; $('#rsSmsBox').hidden = true; $('#rsSmsText').value = `Hi Leanne, Sano Painting & Decorating needs your approval for extra work at 12 Ivanhoe Pde: ${cur.title} — ${priceText(cur)}. Tap to approve: https://painttradehq.example/variation/…`;
   $('#rsCc').hidden = true; $('#rsCc').value = ''; $('#rsErr').hidden = true;
   $('#rsTotal').innerHTML = `Variation: <b>${priceText(cur)}</b> · ${cur.lines.length} line${cur.lines.length === 1 ? '' : 's'} · ${esc(cur.tf)}`;
-  $('#cvTitle').textContent = cur.title; $('#cvDesc').textContent = cur.desc; $('#cvDesc').hidden = !cur.desc;
-  $('#cvLines').innerHTML = cur.lines.map(([n, q, a]) => `<div><span>${esc(n)} · ${esc(q)}</span><span>${money(a).replace('.00', '')}</span></div>`).join('');
-  $('#cvPrice').textContent = `${money(cur.price)} + GST`; $('#cvTotal').textContent = `${money(cur.price * (1 + GST / 100))} including GST`; $('#cvTf').textContent = `Estimated timeframe: ${cur.tf}`;
+  $('#docHost').innerHTML = docHtml(cur, { preview: true });
   paintCheck(); paintTo();
   $('#rsMain').hidden = false; $('#rsSent').hidden = true; $('#rsScrim').hidden = false;
 }
@@ -223,8 +267,15 @@ document.addEventListener('change', (e) => {
 });
 $('#rsCc').addEventListener('keydown', (e) => { if (e.key !== 'Enter') return; const v = e.target.value.trim().toLowerCase(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { $('#rsErr').textContent = 'That address doesn’t look right'; $('#rsErr').hidden = false; return; } $('#rsErr').hidden = true; if (!cc.includes(v)) cc.push(v); e.target.value = ''; e.target.hidden = true; paintTo(); });
 $('#rsScrim').addEventListener('mousedown', (e) => { if (e.target.id === 'rsScrim') closeRs(); });
-document.querySelector('.cv-page').classList.toggle('light', !/[?&]page=today/.test(location.search));
 renderRows();
+// ?view=client — the page on its own, as the client's link opens it (buttons work)
+if (/[?&]view=client/.test(location.search)) {
+  document.querySelector('.page').hidden = true; $('#clientView').hidden = false; const v = VARS[0]; let done = null, name = '';
+  const paint = () => { $('#clientHost').innerHTML = docHtml(v, { done, name }); };
+  paint();
+  document.addEventListener('input', (e) => { if (e.target.id !== 'cvName') return; const b = document.querySelector('[data-cv="approve"]'); if (b) b.disabled = !e.target.value.trim(); });
+  document.addEventListener('click', (e) => { const b = e.target.closest('[data-cv]'); if (!b || b.disabled) return; if (b.dataset.cv === 'approve') { name = ($('#cvName').value || '').trim(); if (!name) return; done = 'approved'; } else done = 'declined'; paint(); });
+}
 </script>
 </body>
 </html>

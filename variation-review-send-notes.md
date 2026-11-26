@@ -2,7 +2,7 @@
 
 **Josh, 26 Nov:** "I also asked Emergent to fix the variation work — I wanted to have a preview before send for the variation, but I think Emergent did it poorly. Please check, and if needed create a prototype of it. We should have the same preview and send as we have in the estimate builder."
 
-**Prototype:** `variation-review-send.html` — open it, press **Preview & send** on the draft row. **Checks:** `tools/test_variation_review_send.js`, 72 of 72 at 1440 × 900 and 1024 × 768. Add `?noemail=1` for a client with no email, `?page=today` for the client's page as it is today (dark).
+**Prototype:** `variation-review-send.html` — open it, press **Preview & send** on the draft row. **Checks:** `tools/test_variation_review_send.js`, 100 of 100 at 1440 × 900 and 1024 × 768, with the client's page also checked at phone width (390). Add `?view=client` for the client's page on its own with working buttons (`&logo=1` for a business with a logo), `?noemail=1` for a client with no email, `?page=today` for the client's page as it is today (small and dark).
 
 ## What Emergent built (its commit `9942d32`, 25 Nov — read from its report; the code is not on GitHub yet, so it was not seen)
 
@@ -37,11 +37,31 @@ So Josh's read is right: it is a look-alike, not the same preview and send.
 
 `POST /projects/{id}/variations/{vid}/send` takes a `to` list today but no cc, subject or message — the email is one fixed layout. To match the quote: accept `to`, `cc`, `subject` and `body`; the client's email is the admin's message and signature, then the approval card and button as now; the SMS text is the one typed in the window; the sent event records who it went to. No backfill; a variation already sent keeps what it was sent with.
 
-## The client's page: light, like the quote (Josh, 26 Nov: "why is the screen of what the client sees black?")
+## The client's page: a proper document, the quote's width (Josh, 26 Nov)
 
-It was black in the first prototype because that is the page the client gets today: `app/variation/[token].tsx` is a dark page (background `#0F1115`, a dark card, a bright green button) left from before the app's light look, and it was copied as it is. The quote and the invoice the same client receives are white documents, so the variation looks like it came from a different product.
+Two things Josh said about it the same day: "why is the screen of what the client sees black?" and then "what the client sees for the variation is a small frame and it looks cheap — make it better and wider, more professional and simple looking."
 
-The prototype now shows it **light**: white paper, the business name in the display font, the work on a soft panel, the lines ruled, the price large with the GST-inclusive figure under it, the app's green on Approve. Same content, same order, same buttons — only the colours and type. `?page=today` shows the dark page for comparison. This is a change to a page clients see, so it goes to Emergent only with Josh's word (it is item 1b of the follow-up message).
+**Today** (`app/variation/[token].tsx`): a dark page with one card 460 px wide, the lines as plain text, a bright green button. It predates the app's light look, so next to the white quote and invoice the same client receives it looks like a different product. `?page=today` shows it.
+
+**The prototype** (`?view=client`): a white document **860 px wide — the quote's width** — centred on the soft grey page, shrinking to fit a phone.
+
+| Part | What it shows |
+|---|---|
+| Header | The quote's header: the logo when the business has one, the business name in the display font, ABN, address, phone · email. On the right **VARIATION** where the quote says QUOTE, then the quote number and the date. |
+| Who | **Prepared for** (client and address) · **Job** (the job type, then the address — the invoice's Job box). |
+| The work | The title, the description, then the lines in a ruled table: Description · Qty · Amount. |
+| Totals | Extra work · GST (10%) · **Total to approve** · Estimated time. A variation with GST included or no GST shows the one total. |
+| Approve | One soft panel: "Approve this extra work — it is extra to your quote EST-0019. Nothing starts until you approve it." A name box, a green **Approve this work**, and Decline as plain text. "Your typed name acts as your signature." |
+| After | The panel becomes the record: "✓ Approved by Leanne Crowe · 26 November 2026 — Thank you. Sano Painting & Decorating has been notified." (or "Declined · date"). |
+| Footer | "Questions? Call … or email …" and "Sent with Paint Trade HQ". |
+
+**Unchanged:** what the client can do and when. Approve is off until a name is typed, Decline needs no name, an answered variation shows its answer — all as today, and the page keeps today's test ids (`public-variation-card`, `variation-public-lines`, `variation-price`, `variation-total`, `variation-signer-name`, `variation-approve-btn`, `variation-decline-btn`, `variation-done-box`). `variation-price` now holds the ex-GST figure alone and `variation-total` the figure to approve.
+
+**What the server adds for it** (`GET /public/variation/{token}` returns the business name only today): the business profile the quote's client document already gets (`build_business_profile` in `routes/estimate_send.py`: logo, ABN, address, phone, email); the client's address (`client_snapshot.address`); the quote's number and the job type and address the invoice's Job box uses (Round K, B-067); the date it was sent; and `responded_by`, so the answered page can name who approved. Nothing is stored that isn't stored today.
+
+The preview in Review & Send is this same component with the name box and buttons off (at full colour, so the admin sees what the client sees).
+
+**Status:** the follow-up sent to Emergent on 26 Nov carries the earlier, smaller version of this as item 1b ("colours and type only"). The wider document replaces it — `variation-client-page-addendum.md` is ready and goes only on Josh's "send".
 
 ## Not in this prototype
 

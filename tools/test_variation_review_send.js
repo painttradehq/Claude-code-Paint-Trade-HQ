@@ -51,9 +51,13 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
 
     // ---- the preview is the client's page, switched off
     const cv = p.locator('[data-testid="public-variation-card"]');
-    ok((await cv.innerText()).includes('Extra door — rear entry') && (await p.locator('[data-testid="variation-price"]').innerText()) === '$320.00 + GST' && (await p.locator('[data-testid="variation-total"]').innerText()) === '$352.00 including GST', 'the preview shows the client’s page: title, price + GST and the GST-inclusive figure');
-    ok(await p.locator('[data-testid="cv-approve"]').isDisabled() && await p.locator('[data-testid="cv-decline"]').isDisabled(), 'Approve and Decline are off in the preview');
-    const cvb = await cv.boundingBox(); ok(cvb.x >= R.x && cvb.x + cvb.width <= R.x + R.width + 1, 'the client’s page fits its pane');
+    ok((await p.locator('[data-testid="cv-title"]').innerText()) === 'Extra door — rear entry' && (await p.locator('[data-testid="cv-business"]').innerText()) === 'Sano Painting & Decorating', 'the preview is the client’s page: the business, then the work');
+    ok((await p.locator('[data-testid="cv-doc-title"]').innerText()) === 'VARIATION' && await p.locator('[data-testid="cv-business-lines"] > div').count() === 3 && (await p.locator('.vmeta').innerText()).includes('EST-0019'), 'the quote’s header: name, ABN, address, phone · email on the left; VARIATION, the quote number and the date on the right');
+    ok(await p.locator('[data-testid="variation-public-lines"] tbody tr').count() === 2 && (await p.locator('[data-testid="variation-public-lines"] thead').innerText()).toUpperCase().includes('DESCRIPTION'), 'the lines are a ruled table: Description · Qty · Amount');
+    ok((await p.locator('[data-testid="variation-price"]').innerText()) === '$320.00' && (await p.locator('[data-testid="cv-totals"]').innerText()).includes('GST (10%)') && (await p.locator('[data-testid="cv-totals"]').innerText()).includes('$32.00') && (await p.locator('[data-testid="variation-total"]').innerText()) === '$352.00', 'totals read Extra work $320.00 · GST (10%) $32.00 · Total to approve $352.00');
+    ok(await p.locator('[data-testid="variation-approve-btn"]').isDisabled() && await p.locator('[data-testid="variation-decline-btn"]').isDisabled() && await p.locator('[data-testid="variation-signer-name"]').isDisabled(), 'the name box, Approve and Decline are off in the preview');
+    ok(await p.evaluate(() => getComputedStyle(document.querySelector('[data-testid="variation-approve-btn"]')).opacity) === '1', 'in the preview Approve keeps its full colour, so the admin sees the page as the client does');
+    const cvb = await cv.boundingBox(); ok(cvb.x >= R.x && cvb.x + cvb.width <= R.x + R.width + 1 && cvb.width >= Math.min(860, R.width - 40), `the client’s page fills its pane (${Math.round(cvb.width)} px wide), not a small card`);
 
     // ---- SMS, AI draft
     await p.click('[data-testid="rs-sms-toggle"]');
@@ -82,15 +86,40 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     ok(sw[0] <= sw[1], 'no sideways scroll');
     ok(errs.length === 0, `no console errors${errs.length ? ': ' + errs.join(' | ').slice(0, 200) : ''}`);
 
-    // ---- the client's page: light like the quote (proposed); today's dark page with ?page=today
-    await p.click('[data-testid="variation-send-v3"]').catch(() => {}); await p.goto(U); await p.waitForTimeout(300); await p.click('[data-testid="variation-send-v1"]'); await p.waitForTimeout(200);
-    const look = async () => p.evaluate(() => { const g = (sel) => getComputedStyle(document.querySelector(sel)); return [g('[data-testid="cv-page"]').backgroundColor, g('[data-testid="public-variation-card"]').color, g('[data-testid="cv-approve"]').backgroundColor]; });
-    let lk = await look();
-    ok(lk[0] === 'rgb(255, 255, 255)' && lk[1] === 'rgb(30, 28, 26)' && lk[2] === 'rgb(28, 138, 75)', 'the client’s page is light: white paper, dark text, the app’s green on Approve');
-    await p.screenshot({ path: `${SHOTS}/var-rs-light-${W}.png` });
+    // ---- the client's page on its own, as the link opens it
+    await p.goto(U + '?view=client'); await p.waitForTimeout(300);
+    const doc = await p.locator('[data-testid="public-variation-card"]').boundingBox();
+    ok(doc.width === Math.min(860, W - 32) && Math.abs((doc.x + doc.width / 2) - W / 2) <= 1, `on its own the page is a document ${Math.round(doc.width)} px wide (the quote’s width), centred`);
+    const lk = await p.evaluate(() => { const g = (sel) => getComputedStyle(document.querySelector(sel)); return [g('[data-testid="public-variation-card"]').backgroundColor, g('[data-testid="public-variation-card"]').color, g('[data-testid="variation-approve-btn"]').backgroundColor]; });
+    ok(lk[0] === 'rgb(255, 255, 255)' && lk[1] === 'rgb(30, 28, 26)' && lk[2] === 'rgb(28, 138, 75)', 'white paper, dark text, the app’s green on Approve');
+    const order2 = await p.evaluate(() => ['cv-business', 'cv-title', 'variation-public-lines', 'cv-totals', 'cv-approve-panel'].map(t => document.querySelector(`[data-testid="${t}"]`).getBoundingClientRect().top));
+    ok(order2.every((y, i) => i === 0 || y > order2[i - 1]), 'top to bottom: who it is from · the work · the lines · the totals · approve');
+    ok(await p.locator('[data-testid="cv-logo"]').count() === 0, 'a business with no logo: the name leads');
+    ok((await p.locator('[data-testid="cv-job"]').innerText()).replace(/\s+/g, ' ') === 'JOB Residential exterior 12 Ivanhoe Pde, Ivanhoe VIC 3079', 'the Job block is the invoice’s: the job type, then the address');
+    await p.screenshot({ path: `${SHOTS}/var-client-${W}.png`, fullPage: true });
+    ok(await p.locator('[data-testid="variation-approve-btn"]').isDisabled() && (await p.locator('.vsig').innerText()) === 'Your typed name acts as your signature.', 'Approve is off until a name is typed, as today; the line under it says the name is the signature');
+    await p.fill('[data-testid="variation-signer-name"]', 'Leanne Crowe'); await p.waitForTimeout(60);
+    ok(await p.locator('[data-testid="variation-approve-btn"]').isEnabled(), 'a typed name turns Approve on');
+    await p.click('[data-testid="variation-approve-btn"]'); await p.waitForTimeout(100);
+    ok((await p.locator('[data-testid="variation-done-box"]').innerText()).includes('Approved by Leanne Crowe · 26 November 2026') && await p.locator('[data-testid="variation-approve-btn"]').count() === 0 && await p.locator('.vapprove h3').count() === 0, 'approved: "Approved by Leanne Crowe · 26 November 2026", and the name box and buttons are gone');
+    await p.screenshot({ path: `${SHOTS}/var-client-approved-${W}.png`, fullPage: true });
+    await p.goto(U + '?view=client'); await p.waitForTimeout(300); await p.click('[data-testid="variation-decline-btn"]'); await p.waitForTimeout(100);
+    ok((await p.locator('[data-testid="variation-done-box"]').innerText()).startsWith('Declined'), 'Decline needs no name and says the business has been notified');
+    await p.goto(U + '?view=client&logo=1'); await p.waitForTimeout(300);
+    const lg = await p.locator('[data-testid="cv-logo"]').boundingBox(); const nmb = await p.locator('[data-testid="cv-business"]').boundingBox();
+    ok(lg && lg.y + lg.height <= nmb.y && lg.width <= 160 && lg.height <= 56, 'a business with a logo: it sits above the name, at most 160 × 56 like the quote');
+    await p.screenshot({ path: `${SHOTS}/var-client-logo-${W}.png` });
+    if (W === 1440) {
+      const ph = await b.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
+      await ph.goto(U + '?view=client'); await ph.waitForTimeout(300);
+      const d = await ph.locator('[data-testid="public-variation-card"]').boundingBox(); const sw2 = await ph.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
+      const nm = await ph.locator('[data-testid="variation-signer-name"]').boundingBox(); const okb = await ph.locator('[data-testid="variation-approve-btn"]').boundingBox();
+      ok(sw2[0] <= sw2[1] && d.x >= 0 && d.x + d.width <= 390, 'on a phone (390 wide) the page fits, no sideways scroll');
+      ok(nm.width > 250 && okb.y >= nm.y + nm.height - 1, 'on a phone the name box is full width and Approve sits under it');
+      await ph.screenshot({ path: `${SHOTS}/var-client-390.png`, fullPage: true }); await ph.close();
+    }
     await p.goto(U + '?page=today'); await p.waitForTimeout(300); await p.click('[data-testid="variation-send-v1"]'); await p.waitForTimeout(200);
-    lk = await look();
-    ok(lk[0] === 'rgb(15, 17, 21)', '?page=today shows the dark page the client gets today');
+    ok(await p.evaluate(() => getComputedStyle(document.querySelector('[data-testid="cv-page"]')).backgroundColor) === 'rgb(15, 17, 21)', '?page=today shows the small dark card the client gets today');
 
     // ---- a client with no email
     await p.goto(U + '?noemail=1'); await p.waitForTimeout(300); await p.click('[data-testid="variation-send-v1"]'); await p.waitForTimeout(200);
