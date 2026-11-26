@@ -1579,9 +1579,9 @@ function actHtml(m){
   const checks = m.checks && st === 'ask' ? `<div class="lz-checks ${m.blocked ? 'red' : ''}" data-testid="lucy-act-checks"><b>${m.blocked ? `${m.checks.length} thing${m.checks.length === 1 ? '' : 's'} to fix before it can go` : 'Checked'}</b>${m.checks.map(c => `<span>${esc(c)}</span>`).join('')}${m.blocked ? `<button class="lz-link" data-act="fix" data-testid="lucy-act-fix">${esc(m.fix)}</button>` : ''}</div>` : '';
   const rows = (m.rows || []).map(([k, v]) => `<div class="lz-row"><span>${esc(k)}</span><b>${v}</b></div>`).join('');
   const warn = m.warn && st === 'ask' ? `<div class="lz-warn" data-testid="lucy-act-warn">${esc(m.warn)}</div>` : '';
-  const confirm = m.kind === 'delete' && st === 'ask' ? `<div class="lz-confirm"><label for="in-${m.id}">Type ${esc(m.confirm)} to delete it</label><input id="in-${m.id}" data-actin="${m.id}" data-testid="lucy-act-confirm-input" value="${esc(m.typed)}" autocomplete="off" spellcheck="false"></div>` : '';
-  const okLabel = m.kind === 'plan' ? `Approve all ${n} steps` : m.kind === 'delete' ? `Delete ${esc(m.confirm)}` : ACT_OK[m.kind];
-  const foot = st === 'ask' ? `<div class="lz-btns"><button class="lz-btn ${m.kind === 'delete' ? 'red' : 'pri'}" data-act="ok" data-testid="lucy-act-approve" ${(m.kind === 'delete' && m.typed.trim().toUpperCase() !== m.confirm) || m.blocked ? 'disabled' : ''}>${okLabel}</button>${m.kind === 'delete' ? '' : '<button class="lz-btn" data-act="change" data-testid="lucy-act-change">Change something</button>'}<button class="lz-btn quiet" data-act="no" data-testid="lucy-act-cancel">Cancel</button></div>`
+  const confirm = m.kind === 'delete' && !m.small && st === 'ask' ? `<div class="lz-confirm"><label for="in-${m.id}">Type ${esc(m.confirm)} to delete it</label><input id="in-${m.id}" data-actin="${m.id}" data-testid="lucy-act-confirm-input" value="${esc(m.typed)}" autocomplete="off" spellcheck="false"></div>` : '';
+  const okLabel = m.kind === 'plan' ? `Approve all ${n} steps` : m.kind === 'delete' ? (m.small ? 'Delete' : `Delete ${esc(m.confirm)}`) : ACT_OK[m.kind];
+  const foot = st === 'ask' ? `<div class="lz-btns"><button class="lz-btn ${m.kind === 'delete' ? 'red' : 'pri'}" data-act="ok" data-testid="lucy-act-approve" ${(m.kind === 'delete' && !m.small && m.typed.trim().toUpperCase() !== m.confirm) || m.blocked ? 'disabled' : ''}>${okLabel}</button>${m.kind === 'delete' ? '' : '<button class="lz-btn" data-act="change" data-testid="lucy-act-change">Change something</button>'}<button class="lz-btn quiet" data-act="no" data-testid="lucy-act-cancel">Cancel</button></div>`
     : st === 'running' ? `<div class="lz-state run" data-testid="lucy-act-state">Working${n ? ` — step ${Math.min(m.at + 1, n)} of ${n}` : ''}…</div>`
     : st === 'done' ? `<div class="lz-state ok" data-testid="lucy-act-state">✓ ${esc(m.doneText)}</div><div class="lz-meta">Approved by ${ME} · ${m.when}</div>${m.link ? `<button class="lz-link" data-act="open" data-testid="lucy-act-link">${esc(m.link)}</button>` : ''}${nextHtml(m)}`
     : `<div class="lz-state off" data-testid="lucy-act-state">${esc(m.offText || 'Cancelled — nothing was changed.')}</div>`;
@@ -1612,7 +1612,13 @@ const FLOWS = {
   send: () => ['EST-0046 is a draft with no red checks, and Leanne has an email on file. This is what would go out.', ['list_pending_estimates', 'search_clients'],
     actCard('send', 'send', { title: 'Send EST-0046 to Leanne Crowe', mail: { to: 'Leanne Crowe · leanne.crowe@example.com', subject: 'Your painting quote EST-0046', body: 'Hi Leanne,\n\nThanks for the opportunity to quote. Your quote for the exterior repaint at 12 Ivanhoe Pde is attached and online at the link below — you can review, accept and sign there.\n\nThe quote is valid for 30 days.', sig: 'Josh Sano\nSano Painting & Decorating\n0400 000 000', att: 'Estimate-EST-0046.pdf' },
       checks: ['Nothing red on the quote', 'No photos attached (you can still send)'], doneText: 'Sent to leanne.crowe@example.com. EST-0046 is now Sent.', link: 'Open EST-0046' })],
-  delete: () => ['EST-0040 is an empty draft made by Duplicate on 15 Nov. No job, invoice or client is linked to it.', ['list_pending_estimates'],
+  deleteExpense: () => ['That is the skip bin expense on the South Wharf job.', ['list_projects'],
+    actCard('delete', 'deleteExpense', { title: 'Remove an expense', small: true, rows: [['Job', '20 Convention Centre Place, South Wharf'], ['What', 'Skip bin hire'], ['Amount', '$180.00'], ['Category', 'Materials'], ['Date', 'Today']], warn: 'This can’t be undone.', doneText: 'Removed from the South Wharf job.', link: 'Open the job' })],
+  archive: () => ['EST-0040 is a draft with no job or invoice.', ['list_pending_estimates'],
+    actCard('change', 'archive', { title: 'Archive a quote', rows: [['Quote', 'EST-0040 · draft · $0.00'], ['After this', 'Out of your lists — it can be brought back from Archived']], doneText: 'EST-0040 is archived.', link: 'Open EST-0040', next: [['Delete it for good', 'Delete EST-0040']] })],
+  timesheet: () => ['Tom has one session on Tuesday, on the South Wharf job: 7:00 am – 5:00 pm.', ['who_is_signed_in_today'],
+    actCard('change', 'timesheet', { title: 'Fix a timesheet session', rows: [['Crew member', 'Tom Baker'], ['Day', 'Tuesday 24 November · South Wharf job'], ['Finish', '5:00 pm → 3:30 pm'], ['Reason', 'Left early']], doneText: 'Tom’s Tuesday session now ends at 3:30 pm.', link: 'Open Timesheets' })],
+  delete: () => ['EST-0040 is an archived empty draft made by Duplicate on 15 Nov. No job, invoice or client is linked to it.', ['list_pending_estimates'],
     actCard('delete', 'delete', { title: 'Delete a draft quote', confirm: 'EST-0040', rows: [['Quote', 'EST-0040 · draft · $0.00'], ['Client', 'None'], ['Linked', 'No job, no invoice']], warn: 'This can’t be undone.', doneText: 'EST-0040 was deleted.' })],
   variation: () => ['Here it is as a variation on the job instead.', ['list_projects'],
     actCard('change', 'variation', { title: 'Draft a variation', rows: [['Job', '12 Ivanhoe Pde, Ivanhoe'], ['Title', 'Extra door — rear entry'], ['Price', '$320.00 + GST ($352.00 incl. GST)'], ['Status', 'Draft — not sent to the client']], doneText: 'Variation drafted on the Ivanhoe job.', link: 'Open the job' })],
@@ -1625,8 +1631,8 @@ const STORE_WHO = { drive: 'Your storage: Google Drive · the Paint Trade HQ fol
 let P = { ask: /[?&]ask=1/.test(location.search), quotes: 'change', clients: 'change', jobs: 'change', invoices: 'change', calendar: 'change', crew: 'change', library: 'change', send: true, del: false, mail: MAIL === 'none' ? 'off' : 'send', files: 'change' };
 let PD = Object.assign({}, P);
 const lzAllowed = (k) => k === 'send' ? P.send : k === 'del' ? P.del : P[k] === 'change';
-const PERM_OF = { expense: 'jobs', quote: 'quotes', refuse: 'quotes', send: 'send', reminder: 'send', sendVariation: 'send', sendBlocked: 'send', payment: 'invoices', delete: 'del' };
-const PERM_OFF = { jobs: 'Changing jobs is turned off in my setup, so I can only read them.', quotes: 'Changing quotes is turned off in my setup, so I can only read them.', invoices: 'Changing invoices is turned off in my setup, so I can only read them.', send: 'Sending is turned off in my setup. I can still draft the words for you to send yourself.', del: 'Deleting is turned off in my setup.' };
+const PERM_OF = { expense: 'jobs', quote: 'quotes', refuse: 'quotes', send: 'send', reminder: 'send', sendVariation: 'send', sendBlocked: 'send', payment: 'invoices', delete: 'del', deleteExpense: 'del', archive: 'quotes', timesheet: 'crew' };
+const PERM_OFF = { jobs: 'Changing jobs is turned off in my setup, so I can only read them.', quotes: 'Changing quotes is turned off in my setup, so I can only read them.', invoices: 'Changing invoices is turned off in my setup, so I can only read them.', crew: 'Changing crew and HR is turned off in my setup, so I can only read them.', send: 'Sending is turned off in my setup. I can still draft the words for you to send yourself.', del: 'Deleting is turned off in my setup.' };
 function lzPaintPerms(){
   document.querySelectorAll('#lzPerms .lz-seg').forEach(g => g.querySelectorAll('button').forEach(b => { const on = PD[g.dataset.perm] === b.dataset.v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }));
   $('#pSend').checked = PD.send; $('#pDelete').checked = PD.del; $('#pAsk').checked = PD.ask;
@@ -1643,6 +1649,9 @@ function lucyFlowOf(t){
   if (/(record|log|add|mark).*(payment|paid)|inv-\d+.*\b(paid|payment)\b/.test(t)) return 'payment';
   if (/(send|email).*variation/.test(t)) return 'sendVariation';
   if (/(send|email).*est-0041/.test(t)) return 'sendBlocked';
+  if (/(remove|delete).*(expense|skip bin)/.test(t)) return 'deleteExpense';
+  if (/archive.*est-/.test(t)) return 'archive';
+  if (/(timesheet|session|clocked)/.test(t)) return 'timesheet';
   if (/(expense|skip bin)/.test(t)) return 'expense';
   if (/(send|email)/.test(t) && /(quote|est-)/.test(t)) return 'send';
   if (/(delete|remove)/.test(t)) return 'delete';
@@ -1652,6 +1661,8 @@ function lucyFlowOf(t){
 }
 const lzOpen = (label) => `\n<button class="lz-offer" data-openrec="${esc(label)}" data-testid="lucy-open">${esc(label)}</button>`;
 const DIRECT = {
+  archive: () => ['Done — <b>EST-0040</b> is archived. It is out of your lists and can be brought back from Archived.' + lzOpen('Open EST-0040'), ['list_pending_estimates'], [['Delete it for good', 'Delete EST-0040']]],
+  timesheet: () => ['Done — Tom’s Tuesday session on the South Wharf job now ends at <b>3:30 pm</b> (was 5:00 pm). The reason is kept on the timesheet: “left early”.' + lzOpen('Open Timesheets'), ['who_is_signed_in_today'], null],
   expense: (amt) => [`Done — I added <b>Skip bin hire, ${fmtAud(amt)}</b> to the South Wharf job as a Materials expense, dated today.` + lzOpen('Open the job'), ['list_projects'], null],
   quote: () => ['Done — <b>EST-0046</b> is ready as a draft for Leanne Crowe: two zones, five lines from your Library at your rates, 50% deposit · 50% on completion. Total <b>$8,460.00 + GST</b>. Nothing is sent.' + lzOpen('Open EST-0046'), ['search_clients', 'list_pending_estimates'], [['Send it to Leanne', 'Send EST-0046 to Leanne']]],
   variation: () => ['Done — I drafted the variation <b>Extra door — rear entry</b> on the Ivanhoe job: $320.00 + GST ($352.00 incl. GST). It is a draft, not sent to the client.' + lzOpen('Open the job'), ['list_projects'], [['Send it to Leanne', 'Send the variation to Leanne']]],
@@ -1715,7 +1726,7 @@ document.addEventListener('click', e => {
   if (a === 'fix') { say('In the app this opens ' + m.fix.replace(/^Open /, '') + ' so you can fix it'); return; }
   if (a === 'no') { m.state = 'cancelled'; renderAssistant(); return; }
   if (a === 'change') { const ta = $('#tcInput'); ta.value = 'Change that: '; ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); ta.dispatchEvent(new Event('input', { bubbles: true })); return; }
-  if (a === 'ok') { if (m.blocked || (m.kind === 'delete' && m.typed.trim().toUpperCase() !== m.confirm)) return; lucyRun(m); }
+  if (a === 'ok') { if (m.blocked || (m.kind === 'delete' && !m.small && m.typed.trim().toUpperCase() !== m.confirm)) return; lucyRun(m); }
 });
 if (!TESTER) { const mr = document.getElementById('tcMenuReports'); if (mr) mr.hidden = true; }
 

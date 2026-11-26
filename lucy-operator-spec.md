@@ -10,7 +10,7 @@
 
 This promotes the parked item "Lucy does the work in the app, confirm first" (17 Nov) to a build. **Round L1 went to Emergent on 26 Nov on Josh's word** (`lucy-l1-emergent-message.md`) and is built and saved to GitHub; **L2 went the same day** (`lucy-l2-emergent-message.md`); L3–L5 follow one at a time, each on his "send". What L1 narrows from this spec is listed in §9.
 
-**Prototype:** `lucy-operator.html` (built by `tools/make_lucy_operator.py` on top of the Round 73 box, `lucy-chat-notion.html`). **Checks:** `tools/test_lucy_operator.js` — 192 of 192 at 1440 × 900 and 1024 × 768 (26 Nov: the round 2 cards, then conversation first). The prototype opens conversation-first; `?ask=1` shows it with "Ask me before changes" on. Add `?tester=0` to see it as someone who is not in the tester program, and `?mail=microsoft&storage=onedrive` or `?mail=none&storage=builtin` to see Lucy's setup for a business on other providers.
+**Prototype:** `lucy-operator.html` (built by `tools/make_lucy_operator.py` on top of the Round 73 box, `lucy-chat-notion.html`). **Checks:** `tools/test_lucy_operator.js` — 214 of 214 at 1440 × 900 and 1024 × 768 (26 Nov: the round 2 cards, then conversation first; 27 Nov: round 3's removing and fixing). The prototype opens conversation-first; `?ask=1` shows it with "Ask me before changes" on. Add `?tester=0` to see it as someone who is not in the tester program, and `?mail=microsoft&storage=onedrive` or `?mail=none&storage=builtin` to see Lucy's setup for a business on other providers.
 
 ## 1. What the prototype shows
 
@@ -207,4 +207,19 @@ Read from Emergent's chat only. **Neither is on GitHub yet** (`main` is still `6
 - **Seen in its test output, not raised by it:** the small chips under her answer show raw names for the connector's tools ("get projects", "add job expense"); and in one run her answer added a remark about the late hour and a draft invoice after "Done" — her existing manner, not new.
 - What's new draft #47 now has three cards; still a draft. Two TS_ draft quotes from 21 Oct with no owner sit in the preview database; not from this round.
 - Its own suggestions (Accepted Quote Lock, Step 9 Retest, L3, Undo Last Change) wait for Josh's word like any other.
+
+## 15. Finishing Lucy — Josh's decisions (27 Nov)
+
+"Let's go back to Lucy to finish it off." And the principle for everything that is left: **"Lucy should be able to do what you do as a connector — except as a connector you need a browser to operate, but because Lucy is native she has more capability."** His other Claude account works through the connector plus a browser; Lucy is inside the app, so whatever an admin can do to a record on a screen she should be able to do, without one.
+
+| Item | Decision |
+|---|---|
+| Round 3 — fixing and removing | Go. `lucy-l3-emergent-message.md`, prepared, **not sent**. |
+| Email from his own mailbox | Next after round 3; needs its design first. |
+| Round 4 — files, with **round 5's wider reach**: "Lucy can see the whole drive of the chosen storage" | Yes. Consequence to put in front of him when it is designed: on Google Drive that means asking each user for a wider permission than today's (`drive.file` → the whole Drive), which is one Google classes as restricted — its review, and possibly a paid yearly security assessment, before any user outside testing can grant it. OneDrive's permission already covers the whole drive. Deleting emails was not asked for. |
+| Plain names on the chips | Yes — in round 3. |
+| Revise an accepted quote | "We have already established this one" — the rule is his description (back for correction, marked Revised, sent again, accepted again). Not parked: to design next, prototype first; it is an app-wide change that Lucy then follows. |
+| Talking to Lucy by voice | No, for now. |
+
+**Round 3 in one line:** every change a screen allows that she could not make yet (crew and hire on a job, duplicate and refresh a quote, edit and archive an invoice, archive a client, fix a timesheet, the Library and products) is done and told; every delete is a red card, one record at a time, behind a "Delete records" switch that starts off; archiving is not deleting. The keys to the account stay outside for good.
 

@@ -247,6 +247,34 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     await say('Add a $90 skip bin expense to the South Wharf job');
     ok(await last().getAttribute('data-kind') === 'change' && (await last().locator('[data-testid="lucy-act-title"]').innerText()) === 'Add an expense' && await last().getAttribute('data-state') === 'ask', 'with it on, the same request waits on a card');
     await last().locator('[data-testid="lucy-act-cancel"]').click();
+    // ==== round 3 — fixing and removing: a change is told, a delete always asks ====
+    await p.goto(U0); await p.waitForTimeout(400); await p.click('#tcBubble'); await p.waitForTimeout(300);
+    await say('Delete the skip bin expense on the South Wharf job');
+    ok(await cardsNow().count() === 0 && (await lastAi().innerText()).includes('Deleting is turned off in my setup'), 'Delete records is off as it starts: nothing is removed, she says so');
+    await lastAi().locator('[data-testid="lucy-open-setup"]').click(); await p.waitForTimeout(250);
+    await p.click('label.tog:has(#pDelete)'); await p.click('[data-testid="ai-setting-save"]'); await p.waitForTimeout(250);
+    await say('Delete the skip bin expense on the South Wharf job');
+    ok(await last().getAttribute('data-kind') === 'delete' && (await last().locator('[data-testid="lucy-act-title"]').innerText()) === 'Remove an expense' && (await last().innerText()).includes('$180.00'), 'with it on: a red card names the expense, the job and the amount');
+    ok(await last().locator('[data-testid="lucy-act-confirm-input"]').count() === 0 && (await last().locator('[data-testid="lucy-act-approve"]').innerText()) === 'Delete' && await last().locator('[data-testid="lucy-act-approve"]').isEnabled() && (await last().locator('[data-testid="lucy-act-warn"]').innerText()) === 'This can’t be undone.', 'a small thing needs no typing: one Delete button, and "This can’t be undone."');
+    ok(!(await last().innerText()).includes('Removed from'), 'nothing is removed before the button');
+    await p.screenshot({ path: `${SHOTS}/lucy-op-delete-small-${W}.png` });
+    await last().locator('[data-testid="lucy-act-approve"]').click(); await p.waitForTimeout(1300);
+    ok((await last().innerText()).includes('Removed from the South Wharf job.'), 'removed on Delete');
+    await say('Archive EST-0040');
+    ok(await cardsNow().count() === 1 && (await lastAi().innerText()).includes('EST-0040 is archived') && (await lastAi().innerText()).includes('can be brought back'), 'archiving can be undone, so it is simply done and told');
+    ok((await lastAi().locator('[data-testid="lucy-next"] button').innerText()) === 'Delete it for good', 'it offers the next step: Delete it for good');
+    await lastAi().locator('[data-testid="lucy-next"] button').click(); await p.waitForTimeout(1000);
+    ok(await last().getAttribute('data-kind') === 'delete' && await last().locator('[data-testid="lucy-act-confirm-input"]').count() === 1 && await last().locator('[data-testid="lucy-act-approve"]').isDisabled(), 'deleting a quote for good still needs its number typed');
+    await last().locator('[data-testid="lucy-act-cancel"]').click();
+    await say('Fix Tom’s timesheet for Tuesday to finish at 3:30, he left early');
+    ok(await cardsNow().count() === 2 && (await lastAi().innerText()).includes('now ends at 3:30 pm (was 5:00 pm)') && (await lastAi().innerText()).includes('left early'), 'a timesheet fix is done and told: the new time, the old one and the reason');
+    const sw4 = await p.evaluate(() => [document.querySelector('#tcBody').scrollWidth, document.querySelector('#tcBody').clientWidth]);
+    ok(sw4[0] <= sw4[1] + 1, 'nothing runs off sideways inside Lucy');
+    await p.click('[data-testid="tc-more"]'); await p.waitForTimeout(150); await p.click('[data-testid="tc-menu-setup"]'); await p.waitForTimeout(250);
+    await p.click('[data-testid="lucy-perm-crew"] button[data-v="read"]'); await p.click('[data-testid="ai-setting-save"]'); await p.waitForTimeout(250);
+    await say('Fix Tom’s timesheet for Tuesday to finish at 4:00, he left early');
+    ok((await lastAi().innerText()).includes('Changing crew and HR is turned off in my setup'), 'Crew and HR on Read: no timesheet is changed');
+
     // an area on Read still stops her, card or no card
     await p.goto(U0); await p.waitForTimeout(400); await p.click('#tcBubble'); await p.waitForTimeout(300);
     await p.click('[data-testid="tc-more"]'); await p.waitForTimeout(150); await p.click('[data-testid="tc-menu-setup"]'); await p.waitForTimeout(250);
