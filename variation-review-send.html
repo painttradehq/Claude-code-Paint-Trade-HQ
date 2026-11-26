@@ -82,6 +82,19 @@
   .cv .no{ width:100%; background:none; border:none; padding:13px; margin-top:6px; color:#8b93a1; font-size:14px; font-weight:700; }
   .cv [disabled]{ cursor:default; opacity:1; }
   .cv .foot{ color:#5b6270; font-size:11px; text-align:center; margin-top:20px; }
+  /* ---- proposed: the client's approval page in the light look of the quote and the invoice (add ?page=today to see today's dark page) ---- */
+  .cv-page.light{ background:#fff; border:1px solid var(--border); }
+  .cv-page.light .cv{ background:#fff; border:none; color:var(--text); padding:4px 6px; max-width:520px; }
+  .cv-page.light .cv .biz{ font-family:var(--display); font-weight:600; font-size:22px; }
+  .cv-page.light .cv .kick{ color:var(--text-2); }
+  .cv-page.light .cv .body{ background:var(--sunken); }
+  .cv-page.light .cv .desc{ color:var(--text-2); }
+  .cv-page.light .cv .lines div{ color:var(--text); border-top:1px solid var(--border); padding-top:7px; }
+  .cv-page.light .cv .tf{ color:var(--text-2); }
+  .cv-page.light .cv input{ background:#fff; color:var(--text); border:1px solid var(--border-strong); }
+  .cv-page.light .cv .ok{ background:var(--success); }
+  .cv-page.light .cv .no{ color:var(--text-2); }
+  .cv-page.light .cv .foot{ color:var(--muted); }
   .toast{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#2A2740; color:#fff; padding:10px 16px; border-radius:10px; font-size:13.5px; z-index:200; }
   .toast[hidden]{ display:none; }
 </style>
@@ -116,7 +129,7 @@ Sano Painting &amp; Decorating
         <button class="btn" id="rsSend" data-testid="rs-send"></button>
         <div class="total" data-testid="rs-total"><span id="rsTotal"></span> · <button class="lnk" id="rsEdit" data-testid="rs-edit">Edit the variation</button></div>
       </div>
-      <div class="rs-right" data-testid="rs-preview"><div class="cv-page"><div class="cv" data-testid="public-variation-card">
+      <div class="rs-right" data-testid="rs-preview"><div class="cv-page" data-testid="cv-page"><div class="cv" data-testid="public-variation-card">
         <div class="biz">Sano Painting &amp; Decorating</div><div class="kick">Additional work approval — 12 Ivanhoe Pde, Ivanhoe</div>
         <div class="body"><div class="ti" id="cvTitle"></div><div class="desc" id="cvDesc"></div><div class="lines" id="cvLines"></div><div class="price" id="cvPrice" data-testid="variation-price"></div><div class="tf" id="cvTotal" data-testid="variation-total"></div><div class="tf" id="cvTf"></div></div>
         <input placeholder="Type your full name to approve" disabled aria-label="Name (off in this preview)"><button class="ok" disabled data-testid="cv-approve">Approve this work ✓</button><button class="no" disabled data-testid="cv-decline">Decline</button>
@@ -210,6 +223,7 @@ document.addEventListener('change', (e) => {
 });
 $('#rsCc').addEventListener('keydown', (e) => { if (e.key !== 'Enter') return; const v = e.target.value.trim().toLowerCase(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { $('#rsErr').textContent = 'That address doesn’t look right'; $('#rsErr').hidden = false; return; } $('#rsErr').hidden = true; if (!cc.includes(v)) cc.push(v); e.target.value = ''; e.target.hidden = true; paintTo(); });
 $('#rsScrim').addEventListener('mousedown', (e) => { if (e.target.id === 'rsScrim') closeRs(); });
+document.querySelector('.cv-page').classList.toggle('light', !/[?&]page=today/.test(location.search));
 renderRows();
 </script>
 </body>

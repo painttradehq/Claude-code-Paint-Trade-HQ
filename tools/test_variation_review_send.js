@@ -82,6 +82,16 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     ok(sw[0] <= sw[1], 'no sideways scroll');
     ok(errs.length === 0, `no console errors${errs.length ? ': ' + errs.join(' | ').slice(0, 200) : ''}`);
 
+    // ---- the client's page: light like the quote (proposed); today's dark page with ?page=today
+    await p.click('[data-testid="variation-send-v3"]').catch(() => {}); await p.goto(U); await p.waitForTimeout(300); await p.click('[data-testid="variation-send-v1"]'); await p.waitForTimeout(200);
+    const look = async () => p.evaluate(() => { const g = (sel) => getComputedStyle(document.querySelector(sel)); return [g('[data-testid="cv-page"]').backgroundColor, g('[data-testid="public-variation-card"]').color, g('[data-testid="cv-approve"]').backgroundColor]; });
+    let lk = await look();
+    ok(lk[0] === 'rgb(255, 255, 255)' && lk[1] === 'rgb(30, 28, 26)' && lk[2] === 'rgb(28, 138, 75)', 'the client’s page is light: white paper, dark text, the app’s green on Approve');
+    await p.screenshot({ path: `${SHOTS}/var-rs-light-${W}.png` });
+    await p.goto(U + '?page=today'); await p.waitForTimeout(300); await p.click('[data-testid="variation-send-v1"]'); await p.waitForTimeout(200);
+    lk = await look();
+    ok(lk[0] === 'rgb(15, 17, 21)', '?page=today shows the dark page the client gets today');
+
     // ---- a client with no email
     await p.goto(U + '?noemail=1'); await p.waitForTimeout(300); await p.click('[data-testid="variation-send-v1"]'); await p.waitForTimeout(200);
     ok((await p.locator('[data-testid="rs-check-head"]').innerText()) === '1 thing to check before it goes' && await p.locator('[data-testid="rs-fix-1"]').isVisible() && await p.locator('[data-testid="rs-send"]').isDisabled(), 'no client email: a red check with Fix, and Send is off');
