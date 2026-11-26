@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Variation · Review &amp; Send</title>
+<style>
+  :root{ --accent:#4B3E86; --accent-bg:#F1EEFA; --accent-ink:#34295E; --success:#1C8A4B; --success-bg:#F1FAF4; --danger:#C6382E; --danger-bg:#FBEAEA; --info:#2563A8; --info-bg:#E8F0FA;
+    --surface:#fff; --sunken:#F4F2EE; --bg:#FAF9F6; --border:#E7E3DA; --border-strong:#D8D3C7; --text:#1E1C1A; --text-2:#6B675F; --muted:#9B968A;
+    --display:'Fraunces', Georgia, 'Times New Roman', serif; --body:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; --mono:'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace; }
+  *{ box-sizing:border-box; }
+  [hidden]{ display:none !important; }
+  body{ margin:0; font-family:var(--body); color:var(--text); background:var(--bg); font-size:14px; }
+  button{ font:inherit; }
+  /* ---- the job page behind (only the Variations card matters) ---- */
+  .page{ max-width:1180px; margin:0 auto; padding:26px 28px 80px; }
+  .crumb{ font-size:12.5px; color:var(--text-2); margin-bottom:8px; }
+  h1{ font-family:var(--display); font-size:26px; font-weight:600; margin:0 0 4px; }
+  .sub{ color:var(--text-2); font-size:13.5px; margin-bottom:22px; }
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 18px; max-width:760px; }
+  .chead{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .chead b{ font-size:15px; } .chead .n{ font-family:var(--mono); font-size:12px; color:var(--muted); }
+  .chead .sp{ flex:1; }
+  .csub{ font-size:12.5px; color:var(--text-2); margin-bottom:8px; }
+  .row{ display:flex; align-items:center; gap:10px; padding:11px 0; border-top:1px solid var(--border); flex-wrap:wrap; }
+  .row .t{ flex:1; min-width:180px; } .row .t b{ display:block; font-weight:600; } .row .t span{ font-size:12.5px; color:var(--text-2); }
+  .chip{ font-size:11.5px; font-weight:700; padding:2px 8px; border-radius:999px; background:var(--sunken); color:var(--text-2); white-space:nowrap; }
+  .chip.info{ background:var(--info-bg); color:var(--info); } .chip.success{ background:#E7F6ED; color:var(--success); }
+  .amt{ font-family:var(--mono); font-size:13px; font-weight:500; white-space:nowrap; }
+  .btn{ padding:9px 14px; border-radius:8px; font-size:13.5px; font-weight:600; cursor:pointer; border:1px solid transparent; background:var(--accent); color:#fff; }
+  .btn.ghost{ background:#fff; color:var(--text); border-color:var(--border); }
+  .btn.small{ padding:6px 10px; font-size:12.5px; }
+  .btn[disabled]{ opacity:.5; cursor:not-allowed; }
+  .icon{ border:none; background:none; cursor:pointer; color:var(--muted); padding:4px; display:inline-flex; }
+  .icon svg{ width:17px; height:17px; }
+  /* ---- Review & Send: the same window the estimate builder opens ---- */
+  .scrim{ position:fixed; inset:0; background:rgba(20,18,30,.55); z-index:100; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .scrim[hidden]{ display:none; }
+  .rs{ width:1400px; max-width:100%; height:calc(100vh - 40px); background:#fff; border-radius:16px; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.3); }
+  .rs-head{ display:flex; align-items:center; gap:12px; padding:16px 22px; border-bottom:1px solid var(--border); }
+  .rs-head .tt{ flex:1; } .rs-head .tt div:first-child{ font-family:var(--display); font-size:21px; } .rs-head .tt div:last-child{ font-size:13px; color:var(--text-2); }
+  .rs-head .x{ border:none; background:none; cursor:pointer; font-size:22px; line-height:1; color:var(--text-2); }
+  .rs-main{ flex:1; display:flex; min-height:0; }
+  .rs-left{ width:min(520px, 48%); flex-shrink:0; overflow-y:auto; padding:20px; border-right:1px solid var(--border); display:grid; gap:14px; align-content:start; }
+  .rs-right{ flex:1; overflow:auto; background:var(--sunken); padding:16px; min-width:0; }
+  .lab{ display:block; font-size:11px; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); font-weight:600; margin-bottom:5px; }
+  .inp{ width:100%; padding:9px 11px; border:1px solid var(--border); border-radius:8px; font-size:13.5px; font-family:var(--body); background:#fff; color:var(--text); outline:none; }
+  textarea.inp{ resize:vertical; }
+  .check{ border:1px solid var(--success); background:var(--success-bg); border-radius:12px; padding:12px 14px; }
+  .check.red{ border-color:var(--danger); background:var(--danger-bg); }
+  .check .h{ font-weight:600; font-size:14px; color:var(--success); } .check.red .h{ color:var(--danger); }
+  .check .c{ display:flex; align-items:center; gap:8px; font-size:13px; margin-top:6px; }
+  .check .c i{ width:8px; height:8px; border-radius:4px; background:var(--success); flex-shrink:0; } .check .c i.red{ background:var(--danger); }
+  .check .c span{ flex:1; }
+  .lnk{ border:none; background:none; color:var(--accent); font-weight:600; font-size:12.5px; cursor:pointer; padding:0; text-decoration:none; }
+  .to{ display:flex; flex-direction:column; gap:5px; }
+  .to label{ display:flex; gap:9px; align-items:center; padding:7px 10px; border-radius:8px; border:1px solid var(--border); background:#fff; cursor:pointer; font-size:13px; }
+  .to label.on{ border-color:var(--accent); background:var(--accent-bg); }
+  .to label.off{ opacity:.55; cursor:not-allowed; }
+  .to label b{ font-weight:600; } .to label .e{ color:var(--text-2); overflow-wrap:anywhere; } .to label .note{ margin-left:auto; font-size:11.5px; color:var(--muted); white-space:nowrap; }
+  .line{ display:flex; align-items:center; justify-content:space-between; }
+  .sig{ font-size:12px; color:var(--muted); line-height:1.5; white-space:pre-wrap; }
+  .tick{ display:flex; gap:8px; align-items:center; font-size:13.5px; }
+  .sms{ display:grid; gap:8px; margin-top:8px; } .sms .hint{ font-size:12px; color:var(--muted); }
+  .total{ font-size:12.5px; color:var(--text-2); } .total b{ color:var(--text); font-family:var(--mono); font-weight:500; }
+  .err{ color:var(--danger); font-size:13px; }
+  .sent{ flex:1; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .sent .box{ width:520px; max-width:100%; background:var(--sunken); border-radius:14px; padding:24px; display:grid; gap:12px; }
+  .sent .box .h{ font-family:var(--display); font-size:22px; } .sent .box .p{ font-size:13.5px; line-height:1.5; }
+  .sent .box .l{ display:flex; gap:8px; } .sent .box .l input{ flex:1; font-family:var(--mono); font-size:12px; }
+  .sent .box .f{ display:flex; justify-content:flex-end; }
+  /* ---- the client's approval page, as it is today (dark), shown in the preview ---- */
+  .cv-page{ background:#0F1115; border-radius:10px; padding:32px 20px; display:flex; justify-content:center; box-shadow:0 2px 16px rgba(0,0,0,.08); }
+  .cv{ width:100%; max-width:460px; background:#171A21; border-radius:18px; padding:26px; border:1px solid rgba(255,255,255,.08); color:#F8FAFC; }
+  .cv .biz{ font-size:20px; font-weight:800; } .cv .kick{ color:#8b93a1; font-size:13px; margin:3px 0 18px; }
+  .cv .body{ background:rgba(255,255,255,.04); border-radius:12px; padding:18px; margin-bottom:18px; }
+  .cv .ti{ font-size:17px; font-weight:800; } .cv .desc{ color:#c3c9d4; font-size:14px; line-height:20px; margin-top:8px; white-space:pre-line; }
+  .cv .lines{ margin-top:10px; display:grid; gap:6px; } .cv .lines div{ display:flex; justify-content:space-between; gap:10px; color:#c3c9d4; font-size:14px; }
+  .cv .price{ font-size:26px; font-weight:800; margin-top:12px; } .cv .tf{ color:#8b93a1; font-size:13px; margin-top:4px; }
+  .cv input{ width:100%; background:rgba(255,255,255,.06); border-radius:10px; padding:12px 14px; color:#F8FAFC; font-size:14px; margin-bottom:12px; border:1px solid rgba(255,255,255,.1); font-family:var(--body); }
+  .cv .ok{ width:100%; background:#22C55E; border:none; border-radius:12px; padding:15px; color:#fff; font-size:16px; font-weight:800; }
+  .cv .no{ width:100%; background:none; border:none; padding:13px; margin-top:6px; color:#8b93a1; font-size:14px; font-weight:700; }
+  .cv [disabled]{ cursor:default; opacity:1; }
+  .cv .foot{ color:#5b6270; font-size:11px; text-align:center; margin-top:20px; }
+  .toast{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#2A2740; color:#fff; padding:10px 16px; border-radius:10px; font-size:13.5px; z-index:200; }
+  .toast[hidden]{ display:none; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="crumb">Live Projects › 12 Ivanhoe Pde, Ivanhoe</div>
+  <h1>12 Ivanhoe Pde, Ivanhoe</h1>
+  <div class="sub">Leanne Crowe · In progress · EST-0019</div>
+  <div class="card" data-testid="project-variations-card">
+    <div class="chead"><b>Variations</b><span class="n" id="vCount"></span><span class="sp"></span><button class="btn small" id="newVar" data-testid="new-variation-btn">+ New variation</button></div>
+    <div class="csub">Extra work priced from the Library, sent to the client, approved before you lift a brush.</div>
+    <div id="vRows"></div>
+  </div>
+</div>
+
+<div class="scrim" id="rsScrim" hidden>
+  <div class="rs" role="dialog" aria-label="Review & Send" data-testid="review-and-send-modal">
+    <div class="rs-head"><div class="tt"><div id="rsTitle" data-testid="rs-title">Review &amp; Send</div><div data-testid="rs-sub">Compose the email on the left · the client sees the variation on the right</div></div><button class="x" id="rsClose" data-testid="rs-close" aria-label="Close">×</button></div>
+    <div class="rs-main" id="rsMain">
+      <div class="rs-left" data-testid="rs-left">
+        <div class="check" id="rsCheck" data-testid="rs-checklist"></div>
+        <div><span class="lab">To</span><div class="to" id="rsTo" data-testid="rs-to-list"></div><div style="margin-top:6px"><button class="lnk" id="rsCcAdd" data-testid="rs-cc-add">+ Add cc</button><input class="inp" id="rsCc" data-testid="rs-cc-input" placeholder="name@example.com" hidden style="margin-top:6px"></div></div>
+        <div><label class="lab" for="rsSubject">Subject</label><input class="inp" id="rsSubject" data-testid="rs-subject"></div>
+        <div><div class="line"><label class="lab" for="rsBody">Message</label><button class="btn ghost small" id="rsAi" data-testid="rs-ai-draft" style="margin-bottom:4px">✦ Draft with AI</button></div><textarea class="inp" id="rsBody" data-testid="rs-body" rows="8"></textarea></div>
+        <div data-testid="rs-signature-preview"><div class="line"><span class="lab">Signature · from Messages setup</span><a class="lnk" href="#" data-testid="rs-signature-edit" onclick="return false">Edit</a></div><div class="sig">Josh Sano
+Sano Painting &amp; Decorating
+0400 000 000</div></div>
+        <div><label class="tick"><input type="checkbox" id="rsSms" data-testid="rs-sms-toggle">Also send an SMS with the link</label>
+          <div class="sms" id="rsSmsBox" hidden><input class="inp" id="rsPhone" data-testid="rs-sms-phone" placeholder="+61 4xx xxx xxx" value="0412 555 010"><textarea class="inp" id="rsSmsText" data-testid="rs-sms-text" rows="3"></textarea><div class="hint">Uses the SMS number set up under CRM › Messages setup.</div></div></div>
+        <div class="err" id="rsErr" data-testid="rs-error" hidden></div>
+        <button class="btn" id="rsSend" data-testid="rs-send"></button>
+        <div class="total" data-testid="rs-total"><span id="rsTotal"></span> · <button class="lnk" id="rsEdit" data-testid="rs-edit">Edit the variation</button></div>
+      </div>
+      <div class="rs-right" data-testid="rs-preview"><div class="cv-page"><div class="cv" data-testid="public-variation-card">
+        <div class="biz">Sano Painting &amp; Decorating</div><div class="kick">Additional work approval — 12 Ivanhoe Pde, Ivanhoe</div>
+        <div class="body"><div class="ti" id="cvTitle"></div><div class="desc" id="cvDesc"></div><div class="lines" id="cvLines"></div><div class="price" id="cvPrice" data-testid="variation-price"></div><div class="tf" id="cvTotal" data-testid="variation-total"></div><div class="tf" id="cvTf"></div></div>
+        <input placeholder="Type your full name to approve" disabled aria-label="Name (off in this preview)"><button class="ok" disabled data-testid="cv-approve">Approve this work ✓</button><button class="no" disabled data-testid="cv-decline">Decline</button>
+        <div class="foot">Sent via Paint Trade HQ</div>
+      </div></div></div>
+    </div>
+    <div class="sent" id="rsSent" data-testid="rs-sent" hidden><div class="box"><div class="h" id="rsSentH">Variation sent!</div><div class="p" id="rsSentP"></div><div class="l"><input class="inp" id="rsLink" data-testid="rs-link" readonly><button class="btn ghost" id="rsCopy" data-testid="rs-copy-link">Copy</button></div><div class="f"><button class="btn" id="rsDone" data-testid="rs-done">Done</button></div></div></div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const money = (x) => '$' + Number(x).toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const NO_EMAIL = /[?&]noemail=1/.test(location.search);
+const PEOPLE = [{ id: 'primary', name: 'Leanne Crowe', email: NO_EMAIL ? '' : 'leanne.crowe@example.com', note: 'Client' }, { id: 'c1', name: 'Mark Crowe', email: 'mark.crowe@example.com', note: 'gets quotes' }];
+const VARS = [
+  { id: 'v1', title: 'Extra door — rear entry', desc: 'Prepare and paint the rear entry door and frame, both sides.\nTwo coats, colour to match the front door.', area: 'Whole job', tf: 'half a day', price: 320, lines: [['Door — both sides', '1 ea', 240], ['Door frame', '1 ea', 80]], status: 'draft' },
+  { id: 'v2', title: 'Repaint side gate', desc: 'Sand and repaint the timber side gate.', area: 'Side and rear walls', tf: '2 hours', price: 180, lines: [['Timber gate', '1 ea', 180]], status: 'sent', sent: '24 Nov' },
+  { id: 'v3', title: 'Second coat to eaves', desc: '', area: 'Front facade', tf: '1 day', price: 450, lines: [['Eaves', '30 m²', 450]], status: 'approved', by: 'Leanne Crowe', at: '20 Nov' },
+];
+const GST = 10;
+const priceText = (v) => `${money(v.price)} + GST (${money(v.price * (1 + GST / 100))} incl. GST)`;
+const CHIP = { draft: ['Draft', ''], sent: ['Sent · awaiting approval', 'info'], approved: ['Approved', 'success'] };
+const PENCIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/></svg>';
+let cur = null, ticked = new Set(), cc = [], toastT;
+const say = (t) => { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { el.hidden = true; }, 2200); };
+
+function renderRows(){
+  $('#vCount').textContent = VARS.length;
+  $('#vRows').innerHTML = VARS.map((v) => {
+    const sub = v.status === 'approved' ? `Approved by ${v.by} · ${v.at}` : `${v.area} · ${v.lines.length} line${v.lines.length === 1 ? '' : 's'} · ${v.tf}${v.status === 'sent' ? ` · sent ${v.sent}` : ''}`;
+    const acts = v.status === 'draft' ? `<button class="icon" data-edit="${v.id}" data-testid="variation-edit-${v.id}" aria-label="Edit variation ${esc(v.title)}">${PENCIL}</button><button class="btn ghost small" data-open="${v.id}" data-testid="variation-send-${v.id}">Preview &amp; send</button>`
+      : v.status === 'sent' ? `<button class="btn ghost small" data-open="${v.id}" data-testid="variation-send-${v.id}">Resend</button>` : '';
+    return `<div class="row" data-testid="variation-row-${v.id}" data-status="${v.status}"><div class="t"><b>${esc(v.title)}</b><span>${esc(sub)}</span></div><span class="chip ${CHIP[v.status][1]}">${CHIP[v.status][0]}</span><span class="amt">${money(v.price)} + GST</span>${acts}</div>`;
+  }).join('');
+}
+function people(){ return PEOPLE.filter((p) => ticked.has(p.id) && p.email).map((p) => p.email); }
+function paintTo(){
+  $('#rsTo').innerHTML = PEOPLE.map((p) => { const off = !p.email; const on = ticked.has(p.id) && !off; return `<label class="${on ? 'on' : ''} ${off ? 'off' : ''}" data-testid="${p.id === 'primary' ? 'rs-to-primary' : 'rs-to-' + p.id}"><input type="checkbox" data-tick="${p.id}" ${on ? 'checked' : ''} ${off ? 'disabled' : ''}><b>${esc(p.name)}</b><span class="e">${esc(p.email || 'no email — add one on the client')}</span><span class="note">${esc(p.note)}</span></label>`; }).join('')
+    + cc.map((e) => `<label class="on" data-testid="rs-cc-row"><input type="checkbox" checked data-cc="${esc(e)}"><b>cc</b><span class="e">${esc(e)}</span></label>`).join('');
+  const n = people().length; const resend = cur.status === 'sent';
+  $('#rsSend').textContent = `✈ ${resend ? 'Resend' : 'Send'} variation to ${n} ${n === 1 ? 'person' : 'people'}`;
+  $('#rsSend').disabled = n === 0;
+}
+function paintCheck(){
+  const noEmail = !PEOPLE[0].email;
+  const items = [[!(cur.price > 0), cur.price > 0 ? `Price set — ${priceText(cur)}` : 'No price yet'], [noEmail, noEmail ? 'No email for Leanne Crowe' : 'The client has an email'], [false, `${cur.lines.length} line${cur.lines.length === 1 ? '' : 's'} from the Library`]];
+  const reds = items.filter((i) => i[0]).length;
+  $('#rsCheck').className = 'check' + (reds ? ' red' : '');
+  $('#rsCheck').innerHTML = `<div class="h" data-testid="rs-check-head">${reds ? `${reds} thing${reds === 1 ? '' : 's'} to check before it goes` : 'Ready to send'}</div>` + items.map(([red, t], i) => `<div class="c" data-testid="rs-check-${i}"><i class="${red ? 'red' : ''}"></i><span>${esc(t)}</span>${red ? `<button class="lnk" data-fix="${i}" data-testid="rs-fix-${i}">Fix</button>` : ''}</div>`).join('');
+}
+function openRs(id){
+  cur = VARS.find((v) => v.id === id); const resend = cur.status === 'sent';
+  ticked = new Set(PEOPLE[0].email ? ['primary'] : []); cc = [];
+  $('#rsTitle').textContent = resend ? 'Resend variation' : 'Review & Send';
+  $('#rsSubject').value = `Extra work for your approval — 12 Ivanhoe Pde`;
+  $('#rsBody').value = `Hi Leanne,\n\nWhile working at 12 Ivanhoe Pde we found some extra work that isn’t in your quote: ${cur.title.toLowerCase()}. The details and the price are at the link below — you can approve or decline it there.\n\nWe won’t start it until you approve.`;
+  $('#rsSms').checked = false; $('#rsSmsBox').hidden = true; $('#rsSmsText').value = `Hi Leanne, Sano Painting & Decorating needs your approval for extra work at 12 Ivanhoe Pde: ${cur.title} — ${priceText(cur)}. Tap to approve: https://painttradehq.example/variation/…`;
+  $('#rsCc').hidden = true; $('#rsCc').value = ''; $('#rsErr').hidden = true;
+  $('#rsTotal').innerHTML = `Variation: <b>${priceText(cur)}</b> · ${cur.lines.length} line${cur.lines.length === 1 ? '' : 's'} · ${esc(cur.tf)}`;
+  $('#cvTitle').textContent = cur.title; $('#cvDesc').textContent = cur.desc; $('#cvDesc').hidden = !cur.desc;
+  $('#cvLines').innerHTML = cur.lines.map(([n, q, a]) => `<div><span>${esc(n)} · ${esc(q)}</span><span>${money(a).replace('.00', '')}</span></div>`).join('');
+  $('#cvPrice').textContent = `${money(cur.price)} + GST`; $('#cvTotal').textContent = `${money(cur.price * (1 + GST / 100))} including GST`; $('#cvTf').textContent = `Estimated timeframe: ${cur.tf}`;
+  paintCheck(); paintTo();
+  $('#rsMain').hidden = false; $('#rsSent').hidden = true; $('#rsScrim').hidden = false;
+}
+const closeRs = () => { $('#rsScrim').hidden = true; cur = null; };
+document.addEventListener('click', (e) => {
+  const o = e.target.closest('[data-open]'); if (o) { openRs(o.dataset.open); return; }
+  const ed = e.target.closest('[data-edit]'); if (ed) { say('In the app this opens the variation form, filled in. Its button reads “Save & preview” and opens this same window.'); return; }
+  if (e.target.closest('#newVar')) { say('In the app this opens the variation form. Its button reads “Save & preview” — it never sends by itself.'); return; }
+  if (e.target.closest('#rsClose')) { closeRs(); return; }
+  if (e.target.closest('#rsEdit') || e.target.closest('[data-fix]')) { const fix = e.target.closest('[data-fix]'); closeRs(); say(fix && fix.dataset.fix === '1' ? 'In the app this opens the client so you can add an email.' : 'In the app this opens the variation form, filled in.'); return; }
+  if (e.target.closest('#rsCcAdd')) { $('#rsCc').hidden = false; $('#rsCc').focus(); return; }
+  if (e.target.closest('#rsAi')) { const b = $('#rsAi'); b.disabled = true; b.textContent = 'Drafting…'; setTimeout(() => { $('#rsBody').value = `Hi Leanne,\n\nA quick one from site: the rear entry door wasn’t part of your quote, and it will look out of place beside the fresh paint. I’ve priced it for you at the link below.\n\nApprove it there and we’ll do it while we’re set up; decline and nothing changes.`; b.disabled = false; b.textContent = '✦ Draft with AI'; }, 600); return; }
+  if (e.target.closest('#rsSend')) {
+    const b = $('#rsSend'); if (b.disabled) return; const to = people(); b.disabled = true; b.textContent = 'Sending…';
+    setTimeout(() => { const resend = cur.status === 'sent'; cur.status = 'sent'; cur.sent = 'today'; renderRows();
+      $('#rsSentH').textContent = resend ? 'Variation sent again' : 'Variation sent!';
+      $('#rsSentP').textContent = `Emailed ${to.join(', ')}${cc.length ? ` · cc ${cc.join(', ')}` : ''}${$('#rsSms').checked && $('#rsPhone').value.trim() ? ` (and texted ${$('#rsPhone').value.trim()})` : ''}. They’ll receive a link to review and approve the extra work online.`;
+      $('#rsLink').value = 'https://painttradehq.example/variation/8f2c1d7e4a90'; $('#rsMain').hidden = true; $('#rsSent').hidden = false; }, 500); return; }
+  if (e.target.closest('#rsCopy')) { try { navigator.clipboard && navigator.clipboard.writeText($('#rsLink').value); } catch (x) {} $('#rsCopy').textContent = 'Copied'; setTimeout(() => { $('#rsCopy').textContent = 'Copy'; }, 1200); return; }
+  if (e.target.closest('#rsDone')) { closeRs(); return; }
+});
+document.addEventListener('change', (e) => {
+  const t = e.target.closest('[data-tick]'); if (t) { if (t.checked) ticked.add(t.dataset.tick); else ticked.delete(t.dataset.tick); paintTo(); return; }
+  const c = e.target.closest('[data-cc]'); if (c) { cc = cc.filter((x) => x !== c.dataset.cc); paintTo(); return; }
+  if (e.target.id === 'rsSms') { $('#rsSmsBox').hidden = !e.target.checked; }
+});
+$('#rsCc').addEventListener('keydown', (e) => { if (e.key !== 'Enter') return; const v = e.target.value.trim().toLowerCase(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { $('#rsErr').textContent = 'That address doesn’t look right'; $('#rsErr').hidden = false; return; } $('#rsErr').hidden = true; if (!cc.includes(v)) cc.push(v); e.target.value = ''; e.target.hidden = true; paintTo(); });
+$('#rsScrim').addEventListener('mousedown', (e) => { if (e.target.id === 'rsScrim') closeRs(); });
+renderRows();
+</script>
+</body>
+</html>

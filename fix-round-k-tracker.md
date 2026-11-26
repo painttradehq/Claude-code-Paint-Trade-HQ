@@ -78,3 +78,16 @@ The log says "as far as we know all the others are still open". For B-001 to B-0
 ## For the next Save to GitHub
 
 Emergent's pod is the only place newer than GitHub `main`. If anything was built there after 15 Nov and not saved, the patch may need a three-way merge on those files — the message tells Emergent to stop and name any file that conflicts.
+
+## Emergent's report (read 26 Nov, on Josh's "check")
+
+- **Applied cleanly:** `git apply --3way --index`, 56 files, no conflicts (its commit `2b8b794`). The 98 pure tests are green and the type check is clean. Its older tests were updated as asked (`ec55998`, `85c5216`, `7e31b25`). The suite's remaining reds are the pod's usual ones.
+- **On-screen checks — about half done, and only at 1440:**
+  - Passed: 11 (due date), 13 (resize, no crash), 16 (connector), 17 (no sideways scroll, 1440 and 1024).
+  - Part passed: 1 (variation GST — form and row; the client page, the invoice line and the GST-inclusive case not viewed), 2 (edit a draft — the sent row and the 409 not viewed), 3 (About us / terms — the empty case only), 5 (invoice layout — PDF only, the public page not viewed), 15 (contracts — the stacking only).
+  - **Not viewed at all:** 4 (terms format), 6 (zones and notes), 7 (un-accept), 8 (reopen), 9 (hourly item), 10 (session fix), 12 (greeting). The testing agent would not build the extra test data.
+  - Not run: 14 (Drive) — a test Drive can't be connected from the preview.
+- **One difference:** the connector returns what it couldn't place as `warnings` at the top of the result, not under `extra.warnings`. Harmless; the wording in the message was mine.
+- **One finding it left alone:** the invoice builder's own Job card (the admin's side) shows the address without the job type, while the PDF shows both.
+- What's new draft #46 made, not published. TS_ tenants torn down. **Not saved to GitHub** — `main` is still `0165cde`.
+- **After the round, at Josh's request, it built a variation "Preview & send" window (`9942d32`)** — see `variation-review-send-notes.md`: it is its own cut-down window, not the estimate builder's.
