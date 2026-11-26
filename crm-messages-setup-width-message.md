@@ -1,4 +1,4 @@
-# CRM › Messages setup — the page takes the CRM hub's width — NOT SENT (waits for Josh's "send")
+# CRM › Messages setup — the page takes the CRM hub's width — SENT to Emergent 27 Nov on Josh's word ("send it")
 
 Josh, 27 Nov, with a screenshot of `/admin/crm/setup`: "CRM gear framing is weird. Make it full width like other pages."
 
@@ -8,7 +8,7 @@ Josh, 27 Nov, with a screenshot of `/admin/crm/setup`: "CRM gear framing is weir
 
 ---
 
-## The message to send
+## The message as sent
 
 # CRM › Messages setup — the page takes the CRM hub's width
 
