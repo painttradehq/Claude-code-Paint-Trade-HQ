@@ -10,7 +10,7 @@
 
 This promotes the parked item "Lucy does the work in the app, confirm first" (17 Nov) to a build. **Round L1 went to Emergent on 26 Nov on Josh's word** (`lucy-l1-emergent-message.md`) and is built and saved to GitHub; **L2 went the same day** (`lucy-l2-emergent-message.md`); L3–L5 follow one at a time, each on his "send". What L1 narrows from this spec is listed in §9.
 
-**Prototype:** `lucy-operator.html` (built by `tools/make_lucy_operator.py` on top of the Round 73 box, `lucy-chat-notion.html`). **Checks:** `tools/test_lucy_operator.js` — 160 of 160 at 1440 × 900 and 1024 × 768 (26 Nov: the round 2 cards added). Add `?tester=0` to see it as someone who is not in the tester program, and `?mail=microsoft&storage=onedrive` or `?mail=none&storage=builtin` to see Lucy's setup for a business on other providers.
+**Prototype:** `lucy-operator.html` (built by `tools/make_lucy_operator.py` on top of the Round 73 box, `lucy-chat-notion.html`). **Checks:** `tools/test_lucy_operator.js` — 192 of 192 at 1440 × 900 and 1024 × 768 (26 Nov: the round 2 cards, then conversation first). The prototype opens conversation-first; `?ask=1` shows it with "Ask me before changes" on. Add `?tester=0` to see it as someone who is not in the tester program, and `?mail=microsoft&storage=onedrive` or `?mail=none&storage=builtin` to see Lucy's setup for a business on other providers.
 
 ## 1. What the prototype shows
 
@@ -180,4 +180,19 @@ Read: `services/lucy_tools.py`, `services/lucy_actions.py`, the chat / approve /
 6. **A send is always its own card**, never a step of a plan. Recording a payment is an ordinary change.
 7. **Next-step buttons** arrive with this round: "Send it to Leanne" after a quote, an invoice or a variation; "Send a reminder for INV-0009" after "What's owed?".
 8. Emails and replies from the connected mailbox are **not** in this round — that screen needs its own design first.
+
+## 13. Conversation first — Josh's change after using L1 (26 Nov)
+
+Josh: "Why is Lucy showing like framing while creating an estimate and all? I thought it was going to be communication only, like the Claude connector would do." Offered three ways, he chose: **conversation only for creating and changing; a card only for what can't be undone** — "as close as we can get it to how we do it here." This replaces choice 1 of §8 ("every change asks").
+
+- **As it starts:** Lucy makes the change and says what she did in a line or two, with a plain button to open the record. No card, no step list. A task of several steps is simply done, then told ("EST-0046 is ready as a draft … Nothing is sent.").
+- **Still a card, always:** sending anything to a client; recording a payment (it cannot be removed in the app and goes on to the accounting sync); deleting, when that round comes.
+- **One switch in her gear, "Ask me before changes"**, off as it starts. On brings back the card before every change, as L1 built it.
+- **Unsure → she asks.** Something missing, or two records that match: one short question first, never a guess.
+- **Testers:** "Report a problem: …" is logged straight away and she says its number; the small card stays only when Lucy herself guesses a message was a fault.
+- What she may change (the seven areas, a team admin's own access) is exactly as before.
+
+The trade, said plainly: without the card a mistake lands and is fixed afterwards, as with the Claude connector today. Until round 3 Lucy can add an expense but not change or remove one, so a wrong one is corrected on the job.
+
+`lucy-conversation-first-message.md` is written and **not sent** — it waits for Josh's "send".
 

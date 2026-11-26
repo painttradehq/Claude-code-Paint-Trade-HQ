@@ -18,7 +18,9 @@ def rep(old: str, new: str, count: int = 1) -> None:
 
 
 PERMS_HTML = """<div class="qs-sec" id="lzPerms" data-testid="lucy-perms"><h3>What Lucy can do</h3>
-        <p class="lz-hint">Lucy always shows you what she is about to do and waits for your OK. This sets what she is allowed to offer at all.</p>
+        <p class="lz-hint">Lucy makes the change and tells you what she did. Before anything is sent to a client she shows you the email and waits for your OK.</p>
+        <div class="sw"><div class="t"><b>Ask me before changes</b><span>On: she shows a card and waits for your OK before every change. Off: she makes the change and tells you. Sending always asks first.</span></div><label class="tog"><input type="checkbox" id="pAsk" data-testid="lucy-perm-ask"><span class="tr"></span></label></div>
+        <div class="lz-sub">What she may change</div>
         __AREAS__
         <div class="sw"><div class="t"><b>Send for me</b><span>Quotes, invoices, reminders and emails. You see each one before it goes.</span></div><label class="tog"><input type="checkbox" id="pSend" data-testid="lucy-perm-send"><span class="tr"></span></label></div>
         <div class="sw"><div class="t"><b>Delete records</b><span>One at a time, and you type its number.</span></div><label class="tog"><input type="checkbox" id="pDelete" data-testid="lucy-perm-delete"><span class="tr"></span></label></div>
@@ -189,19 +191,19 @@ const MAIL = (/[?&]mail=(\w+)/.exec(location.search) || [])[1] || 'gmail';
 const STORE = (/[?&]storage=(\w+)/.exec(location.search) || [])[1] || 'drive';
 const MAIL_WHO = { gmail: 'Your connected mailbox: Gmail · josh@sanopainting.example', microsoft: 'Your connected mailbox: Outlook · josh@sanopainting.example', imap: 'Your connected mailbox: your own mail server · josh@sanopainting.example', none: 'No mailbox connected — connect one in Settings › Communication' };
 const STORE_WHO = { drive: 'Your storage: Google Drive · the Paint Trade HQ folder', onedrive: 'Your storage: OneDrive · the Paint Trade HQ folder', builtin: 'Your storage: Paint Trade HQ’s own storage' };
-let P = { quotes: 'change', clients: 'change', jobs: 'change', invoices: 'change', calendar: 'change', crew: 'change', library: 'change', send: true, del: false, mail: MAIL === 'none' ? 'off' : 'send', files: 'change' };
+let P = { ask: /[?&]ask=1/.test(location.search), quotes: 'change', clients: 'change', jobs: 'change', invoices: 'change', calendar: 'change', crew: 'change', library: 'change', send: true, del: false, mail: MAIL === 'none' ? 'off' : 'send', files: 'change' };
 let PD = Object.assign({}, P);
 const lzAllowed = (k) => k === 'send' ? P.send : k === 'del' ? P.del : P[k] === 'change';
 const PERM_OF = { expense: 'jobs', quote: 'quotes', refuse: 'quotes', send: 'send', reminder: 'send', sendVariation: 'send', sendBlocked: 'send', payment: 'invoices', delete: 'del' };
 const PERM_OFF = { jobs: 'Changing jobs is turned off in my setup, so I can only read them.', quotes: 'Changing quotes is turned off in my setup, so I can only read them.', invoices: 'Changing invoices is turned off in my setup, so I can only read them.', send: 'Sending is turned off in my setup. I can still draft the words for you to send yourself.', del: 'Deleting is turned off in my setup.' };
 function lzPaintPerms(){
   document.querySelectorAll('#lzPerms .lz-seg').forEach(g => g.querySelectorAll('button').forEach(b => { const on = PD[g.dataset.perm] === b.dataset.v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }));
-  $('#pSend').checked = PD.send; $('#pDelete').checked = PD.del;
+  $('#pSend').checked = PD.send; $('#pDelete').checked = PD.del; $('#pAsk').checked = PD.ask;
   $('#pMailWho').textContent = MAIL_WHO[MAIL] || MAIL_WHO.gmail; $('#pFilesWho').textContent = STORE_WHO[STORE] || STORE_WHO.drive;
   document.querySelector('#lzPerms [data-perm="mail"]').setAttribute('aria-disabled', String(MAIL === 'none'));
 }
 function lzFillPerms(){ PD = Object.assign({}, P); lzPaintPerms(); }
-function lzSavePerms(){ PD.send = $('#pSend').checked; PD.del = $('#pDelete').checked; P = Object.assign({}, PD); }
+function lzSavePerms(){ PD.send = $('#pSend').checked; PD.del = $('#pDelete').checked; PD.ask = $('#pAsk').checked; P = Object.assign({}, PD); }
 document.addEventListener('click', e => { const b = e.target.closest('#lzPerms .lz-seg button'); if (!b) return; e.stopPropagation(); PD[b.closest('.lz-seg').dataset.perm] = b.dataset.v; lzPaintPerms(); });
 function lucyFlowOf(t){
   if (TESTER && /^about fb-/.test(t)) return 'about';
@@ -217,7 +219,17 @@ function lucyFlowOf(t){
   if (/(start|new|draft|create|make|build).*quote|quote for/.test(t)) return 'quote';
   return null;
 }
-function lucyPush(lead, srcs, card){ AI.msgs.pop(); if (lead) AI.msgs.push({ role: 'ai', html: lead, src: srcs || [] }); if (card) AI.msgs.push(card); setMood(card ? 'idle' : 'done'); renderAssistant(); if (!card) setTimeout(() => { if (MOOD === 'done') setMood('idle'); }, 1400); }
+const lzOpen = (label) => `\n<button class="lz-offer" data-openrec="${esc(label)}" data-testid="lucy-open">${esc(label)}</button>`;
+const DIRECT = {
+  expense: (amt) => [`Done — I added <b>Skip bin hire, ${fmtAud(amt)}</b> to the South Wharf job as a Materials expense, dated today.` + lzOpen('Open the job'), ['list_projects'], null],
+  quote: () => ['Done — <b>EST-0046</b> is ready as a draft for Leanne Crowe: two zones, five lines from your Library at your rates, 50% deposit · 50% on completion. Total <b>$8,460.00 + GST</b>. Nothing is sent.' + lzOpen('Open EST-0046'), ['search_clients', 'list_pending_estimates'], [['Send it to Leanne', 'Send EST-0046 to Leanne']]],
+  variation: () => ['Done — I drafted the variation <b>Extra door — rear entry</b> on the Ivanhoe job: $320.00 + GST ($352.00 incl. GST). It is a draft, not sent to the client.' + lzOpen('Open the job'), ['list_projects'], [['Send it to Leanne', 'Send the variation to Leanne']]],
+  report: (_amt, text) => { const what = text.replace(/^report a problem\s*:?\s*/i, '').trim(); const id = 'FB-' + Math.random().toString(16).slice(2, 10); REPORTS.unshift({ id, text: what, page: 'Dashboard', at: 'Today', status: 'Logged', reply: '' });
+    return [`Logged as <b>${id}</b>. I added the page you’re on (Dashboard) and your browser${AI.attach ? ', and your screenshot' : ''}. The team will see it.\n<button class="lz-offer" data-lz="reports" data-testid="lucy-open">My reports</button>`, [], null]; },
+  about: (_amt, text) => { const m = /^about (fb-[0-9a-f]+)\s*:?\s*(.*)$/i.exec(text) || []; const rid = 'FB-' + (m[1] || '').slice(3); const r = REPORTS.find(x => x.id === rid); if (r) r.text += ' — ' + (m[2] || '');
+    return [`Added to <b>${rid}</b>.\n<button class="lz-offer" data-lz="reports" data-testid="lucy-open">My reports</button>`, [], null]; },
+};
+function lucyPush(lead, srcs, card, next){ AI.msgs.pop(); if (lead) AI.msgs.push({ role: 'ai', html: lead, src: srcs || [], next: next || null }); if (card) AI.msgs.push(card); setMood(card ? 'idle' : 'done'); renderAssistant(); if (!card) setTimeout(() => { if (MOOD === 'done') setMood('idle'); }, 1400); }
 function lucyDo(text){
   const t = text.toLowerCase();
   const pending = AI.msgs.find(m => m.role === 'act' && m.state === 'ask');
@@ -234,6 +246,7 @@ function lucyDo(text){
     const m = /\$\s?(\d+(?:\.\d+)?)/.exec(text);
     const amt = m ? Number(m[1]) : (changing && pending.amt) || 180;
     if (flow === 'report' && !text.replace(/^report a problem\s*:?\s*/i, '').trim()) { lucyPush('What went wrong? Tell me what you did and what happened — I add the page and the browser myself.', []); return; }
+    if (!P.ask && DIRECT[flow]) { const [html, srcs, next] = DIRECT[flow](amt, text); lucyPush(html, srcs, null, next); return; }
     const [lead, srcs, card] = FLOWS[flow](amt, text);
     lucyPush(changing ? 'Changed. Here it is again.' : lead, changing ? [] : srcs, card);
   }, 700);
@@ -261,7 +274,8 @@ document.addEventListener('click', e => {
     if (k === 'add') { AI.showReports = false; renderAssistant(); const ta = $('#tcInput'); ta.value = 'About ' + lz.dataset.rid + ': '; ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); ta.dispatchEvent(new Event('input', { bubbles: true })); }
     return; }
   const o = e.target.closest('[data-offer]');
-  if (o) { e.stopPropagation(); AI.msgs.push({ role: 'typing' }); setMood('think'); renderAssistant(); setTimeout(() => { const [lead, srcs, card] = FLOWS[o.dataset.offer](); lucyPush(lead, srcs, card); }, 600); return; }
+  if (o) { e.stopPropagation(); AI.msgs.push({ role: 'typing' }); setMood('think'); renderAssistant(); setTimeout(() => { if (!P.ask && DIRECT[o.dataset.offer]) { const [html, srcs, next] = DIRECT[o.dataset.offer](180, ''); lucyPush(html, srcs, null, next); return; } const [lead, srcs, card] = FLOWS[o.dataset.offer](); lucyPush(lead, srcs, card); }, 600); return; }
+  const orec = e.target.closest('[data-openrec]'); if (orec) { e.stopPropagation(); say('In the app this opens ' + orec.dataset.openrec.replace(/^Open /, '')); return; }
   const b = e.target.closest('[data-act]'); if (!b) return; e.stopPropagation();
   const m = AI.msgs.find(x => x.id === b.closest('[data-actid]').dataset.actid); if (!m) return;
   const a = b.dataset.act;
@@ -305,7 +319,7 @@ rep("text = (text || '').trim(); if (!text && !AI.attach) return;\n  const rep =
 # 5. words
 rep("Hi ${ME}, what do you want to know?", "Hi ${ME}, what do you need?")
 rep("Ask in plain words. I read your clients, leads, calendar, quotes, invoices, jobs and crew — only this business — and I keep your reminders and ideas. I don’t send anything or book jobs; I tell you where to.",
-    "Ask in plain words, or tell me what to do. I read your clients, leads, calendar, quotes, invoices, jobs and crew — only this business — and I can do the work on them: start and change quotes, add to jobs, raise invoices, book the calendar, send and delete. I always show you what I’m about to do and wait for your OK.${TESTER ? ' While you’re testing: tell me when something goes wrong and I log it for the team, with the page you’re on.' : ''}")
+    "Ask in plain words, or tell me what to do. I read your clients, leads, calendar, quotes, invoices, jobs and crew — only this business — and I can do the work on them: start and change quotes, add to jobs, raise invoices, book the calendar, send and delete. I make the change and tell you what I did; before anything is sent or deleted I show you first and wait for your OK.${TESTER ? ' While you’re testing: tell me when something goes wrong and I log it for the team, with the page you’re on.' : ''}")
 rep("'Ask Lucy…'", "'Ask Lucy, or tell her what to do…'")
 # 6. two more verb rows that fill the box
 rep("const FILLERS = [['remind', 'Remind me…', 'type it in the box'], ['idea', 'I’ve got an idea', 'type it in the box']];",

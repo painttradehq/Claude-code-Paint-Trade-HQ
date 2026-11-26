@@ -2,7 +2,8 @@
 // Run: NODE_PATH=$(npm root -g) node tools/test_lucy_operator.js
 const { chromium } = require('playwright'); const path = require('path'); const fs = require('fs');
 const SHOTS = process.env.SHOTS || path.join(process.env.HOME || '/tmp', 'shots'); fs.mkdirSync(SHOTS, { recursive: true });
-const U = 'file://' + path.resolve('lucy-operator.html');
+const U0 = 'file://' + path.resolve('lucy-operator.html');  // as it opens: conversation first
+const U = U0 + '?ask=1';                                    // "Ask me before changes" on: a card before every change
 let pass = 0, fail = 0;
 const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail++; console.log('  FAIL', m); } };
 (async () => {
@@ -192,21 +193,66 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     ok(await last().getAttribute('data-kind') === 'change' && await last().getAttribute('data-state') === 'ask', 'Jobs is still on: the expense card comes');
 
     // ---- email and files follow what the admin connected, whoever the provider is
-    await p.goto(U + '?mail=microsoft&storage=onedrive'); await p.waitForTimeout(400); await p.click('#tcBubble'); await p.waitForTimeout(300);
+    await p.goto(U + '&mail=microsoft&storage=onedrive'); await p.waitForTimeout(400); await p.click('#tcBubble'); await p.waitForTimeout(300);
     await p.click('[data-testid="tc-more"]'); await p.waitForTimeout(150); await p.click('[data-testid="tc-menu-setup"]'); await p.waitForTimeout(250);
     ok((await p.locator('[data-testid="lucy-perm-mail-who"]').innerText()).includes('Outlook') && (await p.locator('[data-testid="lucy-perm-files-who"]').innerText()).includes('OneDrive'), 'a business on Outlook and OneDrive sees Outlook and OneDrive');
-    await p.goto(U + '?mail=none&storage=builtin'); await p.waitForTimeout(400); await p.click('#tcBubble'); await p.waitForTimeout(300);
+    await p.goto(U + '&mail=none&storage=builtin'); await p.waitForTimeout(400); await p.click('#tcBubble'); await p.waitForTimeout(300);
     await p.click('[data-testid="tc-more"]'); await p.waitForTimeout(150); await p.click('[data-testid="tc-menu-setup"]'); await p.waitForTimeout(250);
     ok((await p.locator('[data-testid="lucy-perm-mail-who"]').innerText()).startsWith('No mailbox connected') && await p.getAttribute('[data-testid="lucy-perm-mail"]', 'aria-disabled') === 'true' && await p.locator('[data-testid="lucy-perm-mail"] button.on').innerText() === 'Off', 'no mailbox connected: the Email row says so and stays Off');
     ok((await p.locator('[data-testid="lucy-perm-files-who"]').innerText()).includes('Paint Trade HQ’s own storage'), 'no cloud storage: Files uses the app’s own storage');
 
     // ---- someone who is not a tester
-    await p.goto(U + '?tester=0'); await p.waitForTimeout(400); await p.click('#tcBubble'); await p.waitForTimeout(300);
+    await p.goto(U + '&tester=0'); await p.waitForTimeout(400); await p.click('#tcBubble'); await p.waitForTimeout(300);
     ok(await p.locator('[data-fill="report"]').count() === 0 && await p.locator('[data-fill]').count() === 4, 'not a tester: no "Report a problem" row');
     await p.click('[data-testid="tc-more"]'); await p.waitForTimeout(150);
     ok(!(await p.locator('[data-testid="tc-menu-reports"]').isVisible()), 'not a tester: no "My reports" in the menu');
     await p.click('#tcBody'); await p.waitForTimeout(150); await say('Report a problem: something is broken');
     ok(await p.locator('[data-testid="lucy-act"]').count() === 0, 'not a tester: no report card');
+
+    // ==== as it opens — conversation first (Josh, 26 Nov): she makes the change and tells you; only what can't be undone asks ====
+    const lastAi = () => p.locator('[data-testid="ai-msg-assistant"]').last();
+    const cardsNow = () => p.locator('[data-testid="lucy-act"]');
+    await p.goto(U0); await p.waitForTimeout(400); await p.click('#tcBubble'); await p.waitForTimeout(300);
+    await say('Add a $180 skip bin expense to the South Wharf job');
+    ok(await cardsNow().count() === 0 && (await lastAi().innerText()).includes('Done — I added Skip bin hire, $180.00'), 'an expense is added straight away: no card, Lucy says what she did');
+    ok((await lastAi().locator('[data-testid="lucy-open"]').innerText()) === 'Open the job', 'her answer carries a button to open the record');
+    await p.screenshot({ path: `${SHOTS}/lucy-op-direct-${W}.png` });
+    await say('Start a quote for Leanne Crowe, exterior repaint at 12 Ivanhoe Pde');
+    ok(await cardsNow().count() === 0 && (await lastAi().innerText()).includes('EST-0046') && (await lastAi().innerText()).includes('$8,460.00 + GST') && (await lastAi().innerText()).includes('Nothing is sent'), 'a quote of several steps is built straight away: one answer with the number, the total and "Nothing is sent"');
+    ok((await lastAi().locator('[data-testid="lucy-next"] button').innerText()) === 'Send it to Leanne', 'it offers the next step: Send it to Leanne');
+    await lastAi().locator('[data-testid="lucy-next"] button').click(); await p.waitForTimeout(1000);
+    ok(await cardsNow().count() === 1 && await last().getAttribute('data-kind') === 'send' && (await last().locator('[data-testid="lucy-act-approve"]').innerText()) === 'Send it', 'sending still asks: the send card, with "Send it"');
+    ok(!(await last().innerText()).includes('Sent to'), 'nothing is sent before the button');
+    await last().locator('[data-testid="lucy-act-approve"]').click(); await p.waitForTimeout(1300);
+    ok((await last().innerText()).includes('Sent to leanne.crowe@example.com'), 'sent on "Send it"');
+    await say('Change the price on EST-0019 to $9,000'); await lastAi().locator('[data-testid="lucy-offer"]').click(); await p.waitForTimeout(1000);
+    ok(await cardsNow().count() === 1 && (await lastAi().innerText()).includes('I drafted the variation') && (await lastAi().innerText()).includes('$320.00 + GST ($352.00 incl. GST)') && (await lastAi().innerText()).includes('not sent to the client'), 'the variation offered instead is drafted straight away, as a draft');
+    await say('Record a payment on INV-0009');
+    ok(await cardsNow().count() === 2 && await last().getAttribute('data-kind') === 'change' && (await last().locator('[data-testid="lucy-act-title"]').innerText()) === 'Record a payment' && await last().getAttribute('data-state') === 'ask', 'a payment still asks: it can’t be taken back in the app');
+    await last().locator('[data-testid="lucy-act-cancel"]').click();
+    await say('Report a problem: the Variations card shows $0 after I approve one');
+    const logged = await lastAi().innerText(); const fbId = (/FB-[0-9a-f]{6,8}/.exec(logged) || [''])[0];
+    ok(await cardsNow().count() === 2 && logged.includes('Logged as FB-') && logged.includes('the page you’re on'), 'a tester’s report is logged straight away, with the page and the browser');
+    await lastAi().locator('[data-testid="lucy-open"]').click(); await p.waitForTimeout(250);
+    ok(await p.locator('[data-testid="lucy-reports"]').isVisible() && (await p.locator('.lz-rep').first().innerText()).includes(fbId), 'its button opens My reports with it first');
+    await p.click('[data-testid="lucy-reports-back"]'); await p.waitForTimeout(150);
+    const sw3 = await p.evaluate(() => [document.querySelector('#tcBody').scrollWidth, document.querySelector('#tcBody').clientWidth]);
+    ok(sw3[0] <= sw3[1] + 1, 'nothing runs off sideways inside Lucy');
+    // the switch: off as it opens; on brings the cards back
+    await p.click('[data-testid="tc-more"]'); await p.waitForTimeout(150); await p.click('[data-testid="tc-menu-setup"]'); await p.waitForTimeout(250);
+    ok(!(await p.locator('#pAsk').isChecked()) && (await p.locator('#lzPerms .sw').first().innerText()).includes('Ask me before changes'), 'her setup starts with "Ask me before changes", off');
+    ok(await p.evaluate(() => { const b = document.querySelector('#pop .qs-body'); return b.scrollWidth <= b.clientWidth + 1; }), 'the setup still fits with the new row');
+    await p.screenshot({ path: `${SHOTS}/lucy-op-ask-${W}.png` });
+    await p.click('label.tog:has(#pAsk)'); await p.click('[data-testid="ai-setting-save"]'); await p.waitForTimeout(250);
+    await say('Add a $90 skip bin expense to the South Wharf job');
+    ok(await last().getAttribute('data-kind') === 'change' && (await last().locator('[data-testid="lucy-act-title"]').innerText()) === 'Add an expense' && await last().getAttribute('data-state') === 'ask', 'with it on, the same request waits on a card');
+    await last().locator('[data-testid="lucy-act-cancel"]').click();
+    // an area on Read still stops her, card or no card
+    await p.goto(U0); await p.waitForTimeout(400); await p.click('#tcBubble'); await p.waitForTimeout(300);
+    await p.click('[data-testid="tc-more"]'); await p.waitForTimeout(150); await p.click('[data-testid="tc-menu-setup"]'); await p.waitForTimeout(250);
+    await p.click('[data-testid="lucy-perm-quotes"] button[data-v="read"]'); await p.click('[data-testid="ai-setting-save"]'); await p.waitForTimeout(250);
+    await say('Start a quote for Leanne Crowe');
+    ok(await cardsNow().count() === 0 && (await lastAi().innerText()).includes('Changing quotes is turned off in my setup') && !(await lastAi().innerText()).includes('EST-0046'), 'Quotes on Read: nothing is created; she says it is turned off');
     await p.close();
   }
   await b.close();
