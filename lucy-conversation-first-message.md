@@ -1,4 +1,4 @@
-# Lucy — conversation first (a change to L1; two points of L2) — NOT SENT (waits for Josh's "send")
+# Lucy — conversation first (a change to L1; two points of L2) — SENT to Emergent 26 Nov on Josh's word ("send it")
 
 Josh, 26 Nov, after seeing L1 in the preview: "Why is Lucy showing like framing while creating an estimate and all? I thought it was going to be communication only, like the Claude connector would do." Offered three ways, he chose: **conversation only for creating and changing; a card only for what can't be undone** — "as close as we can get it to how we do it here."
 
@@ -6,7 +6,7 @@ Josh uploads the updated `lucy-operator.html` with it (it opens conversation-fir
 
 ---
 
-## The message to send
+## The message as sent
 
 # Lucy — conversation first (a change to L1; two points of L2)
 

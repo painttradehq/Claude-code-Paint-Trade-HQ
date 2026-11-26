@@ -194,5 +194,5 @@ Josh: "Why is Lucy showing like framing while creating an estimate and all? I th
 
 The trade, said plainly: without the card a mistake lands and is fixed afterwards, as with the Claude connector today. Until round 3 Lucy can add an expense but not change or remove one, so a wrong one is corrected on the job.
 
-`lucy-conversation-first-message.md` is written and **not sent** — it waits for Josh's "send".
+`lucy-conversation-first-message.md` was **sent to Emergent on 26 Nov** on Josh's "send it", queued behind L2.
 
