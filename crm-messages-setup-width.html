@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRM · Messages setup — the page's width</title>
+<style>
+  :root{ --accent:#4B3E86; --accent-bg:#F1EEFA; --accent-ink:#34295E; --success:#1C8A4B; --success-bg:#E7F5EC; --danger:#C6382E; --danger-bg:#FBEAEA;
+    --surface:#fff; --sunken:#F4F2EE; --bg:#FAF9F6; --border:#E7E3DA; --border-strong:#D8D3C7; --text:#1E1C1A; --text-2:#6B675F; --muted:#9B968A;
+    --display:'Fraunces', Georgia, 'Times New Roman', serif; --body:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; --mono:'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace; }
+  *{ box-sizing:border-box; }
+  html, body{ height:100%; }
+  body{ margin:0; font-family:var(--body); color:var(--text); background:var(--bg); font-size:13.5px; }
+  .shell{ display:flex; height:100vh; }
+  /* the admin shell's side menu: the icon rail (as in Josh's screenshot) or open with ?nav=open */
+  .nav{ flex:0 0 68px; background:#fff; border-right:1px solid var(--border); display:flex; flex-direction:column; align-items:center; gap:14px; padding:18px 0; }
+  .nav i{ width:26px; height:26px; border-radius:7px; background:var(--sunken); display:block; }
+  .nav i.on{ background:var(--accent-bg); outline:1px solid #DCD5F0; }
+  .nav.open{ flex-basis:248px; align-items:stretch; padding:18px 14px; }
+  .nav.open i{ width:auto; height:30px; }
+  .content{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  /* the page: kit.tsx S.page — the frame the CRM hub and the client page use */
+  main{ font-family:var(--body); color:var(--text); padding:28px 32px 40px; max-width:1400px; width:100%; margin:0 auto; min-height:0; min-width:0; overflow-x:clip;
+        display:flex; flex-direction:column; gap:18px; flex:1; overflow-y:auto; }
+  main.today{ max-width:1100px; }   /* today: CommunicationSettings.tsx narrows it to 1100 */
+  .top{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .crumb{ font-size:12px; color:var(--muted); margin-bottom:6px; font-weight:500; } .crumb a{ color:var(--accent); font-weight:600; text-decoration:none; }
+  h1{ font-family:var(--display); font-size:30px; margin:0; line-height:1.15; letter-spacing:-.3px; font-weight:600; }
+  .sub{ color:var(--text-2); font-size:13.5px; margin-top:4px; }
+  .btn{ height:38px; padding:0 14px; border-radius:10px; border:1px solid var(--border); background:#fff; font:inherit; font-weight:600; color:var(--text); cursor:pointer; white-space:nowrap; }
+  .btn.pri{ background:var(--accent); border-color:var(--accent); color:#fff; } .btn.small{ height:32px; font-size:12.5px; } .btn.red{ color:var(--danger); background:var(--danger-bg); border-color:transparent; }
+  .jump{ position:sticky; top:0; z-index:5; background:var(--bg); padding:6px 0; display:flex; gap:4px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+  .jump button{ border:0; background:transparent; padding:6px 10px; border-radius:999px; cursor:pointer; font:inherit; font-size:13px; font-weight:500; color:var(--text-2); }
+  section{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:14px; }
+  section h2{ font-family:var(--display); font-size:19px; font-weight:600; margin:0; } section .sub{ margin-top:2px; font-size:13px; }
+  .grid3{ display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; }
+  .opt{ border:1px solid var(--border); border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:8px; }
+  .opt b{ font-size:14px; } .opt span{ font-size:12.5px; color:var(--text-2); flex:1; }
+  .note{ background:var(--sunken); border-radius:10px; padding:10px 14px; font-size:12.5px; color:var(--text-2); line-height:1.5; }
+  .label{ font-size:11px; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); font-weight:600; }
+  .pill{ font-size:10.5px; letter-spacing:.5px; text-transform:uppercase; font-weight:700; padding:2px 7px; border-radius:6px; background:var(--success-bg); color:var(--success); }
+  .pill.red{ background:var(--danger-bg); color:var(--danger); } .pill.acc{ background:var(--accent-bg); color:var(--accent); margin-left:6px; }
+  input, textarea{ width:100%; padding:9px 11px; border:1px solid var(--border); border-radius:8px; font:inherit; background:#fff; color:var(--text); }
+  .line{ display:flex; gap:8px; align-items:center; } .line input{ flex:1; }
+  .split{ border-top:1px solid var(--border); padding-top:14px; display:flex; flex-direction:column; gap:12px; }
+  table{ width:100%; border-collapse:collapse; table-layout:fixed; font-size:12.5px; background:#fff; border:1px solid var(--border); border-radius:10px; }
+  th{ text-align:left; padding:10px 12px; color:var(--text-2); font-size:12px; } td{ padding:10px 12px; border-top:1px solid var(--border); font-family:var(--mono); }
+  td.v{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } col.t{ width:80px; } col.n{ width:28%; } col.l{ width:90px; }
+  .row{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 0; border-top:1px solid var(--border); }
+  .row b{ display:block; font-weight:600; } .row span{ font-size:12.5px; color:var(--text-2); }
+  .tog{ width:36px; height:20px; border-radius:999px; background:var(--accent); flex:0 0 auto; position:relative; } .tog::after{ content:''; position:absolute; right:2px; top:2px; width:16px; height:16px; border-radius:50%; background:#fff; }
+  .tw{ display:grid; grid-template-columns:1fr 1fr 180px; gap:10px; }
+  .tpl{ display:grid; grid-template-columns:minmax(180px, 280px) minmax(0, 1fr); gap:16px; }
+  .tpl .list button{ display:block; width:100%; text-align:left; border:1px solid var(--border); border-radius:10px; background:#fff; padding:9px 11px; font:inherit; margin-bottom:4px; }
+  .two{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .fields{ display:flex; gap:10px; flex-wrap:wrap; } .fields > div{ flex:1; min-width:220px; }
+  .bubble{ position:fixed; right:24px; bottom:24px; width:52px; height:52px; border-radius:26px; background:var(--accent); box-shadow:0 8px 24px rgba(52,41,94,.3); }
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav class="nav" id="nav" data-testid="admin-nav"><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i></nav>
+  <div class="content" data-testid="content-area">
+    <main id="page" data-testid="comms-settings">
+      <div class="top" data-testid="comms-page-top">
+        <div><div class="crumb"><a href="#">CRM</a> › Messages setup</div><h1>Messages setup</h1><div class="sub">Your connected inbox, SMS number, automations, templates and AI assistant.</div></div>
+        <div style="display:flex; gap:8px" data-testid="comms-actions"><button class="btn">← Back to CRM</button><button class="btn">Open inbox</button><button class="btn pri" data-testid="comms-save">Save changes</button></div>
+      </div>
+      <div class="jump" data-testid="comms-jump"><button>Inbox · Sending domain</button><button>SMS</button><button>Automations</button><button>Templates</button><button>AI assistant</button><button>Links &amp; signature</button></div>
+
+      <section data-testid="comms-inbox">
+        <div><h2>Connected inbox</h2><div class="sub">Client email lands in the CRM Inbox and on each client's timeline. Only client mail is read.</div></div>
+        <div class="grid3">
+          <div class="opt"><b>Google Workspace / Gmail <span class="pill acc">Recommended</span></b><span>Recommended · OAuth, no password stored</span><button class="btn pri small">Connect</button></div>
+          <div class="opt"><b>Microsoft 365 / Outlook</b><span>OAuth via Microsoft Graph</span><button class="btn small" disabled>Not configured</button></div>
+          <div class="opt"><b>Any other mailbox</b><span>IMAP + SMTP with an app password</span><button class="btn small">Connect</button></div>
+        </div>
+        <div class="note"><b>What connecting does:</b> reads threads whose other party is one of your clients (or that this app started) into the CRM; other senders show as Unmatched with sender + subject only. Sends from your address. Disconnecting stops sync and deletes nothing.<br>Until then, mail goes out from the platform sender: <b>Paint Trade HQ &lt;no-reply@painttradehq.example&gt;</b>.</div>
+        <div class="split" data-testid="crm-setup-sending-domain">
+          <div style="display:flex; gap:8px; align-items:center"><b style="font-size:15px">Sending domain</b><span class="pill">Connected</span></div>
+          <div><div class="label">Delivery status</div><div style="font-size:12.5px; color:var(--text-2); margin-top:4px">Emails go out via Resend as “Paint Trade HQ &lt;no-reply@painttradehq.example&gt;”. Quotes, invoices, CRM templates and password-reset links are live.</div></div>
+          <div><div class="label">Send a test email</div><div class="line" style="margin-top:4px"><input value="josh@sanopainting.example" data-testid="int-email-test-to"><button class="btn pri small">Send test email</button></div></div>
+          <div style="display:flex; justify-content:space-between; align-items:center"><div><b style="font-size:15px">sanopainting.example</b><div style="font-size:12px; color:var(--text-2)">Added 3 Nov 2026 · us-east-1</div></div><span class="pill red">Failed</span></div>
+          <div style="display:flex; gap:8px"><button class="btn small">Recheck DNS</button><button class="btn small red">Remove domain</button></div>
+          <div class="note" style="padding:14px"><b style="color:var(--text)">Add these records at your DNS provider (Cloudflare, GoDaddy, Route 53, etc.)</b>
+            <table data-testid="dns-table" style="margin-top:10px"><colgroup><col class="t"><col class="n"><col><col class="l"></colgroup>
+              <tr><th>Type</th><th>Name / Host</th><th>Value</th><th>TTL</th></tr>
+              <tr><td>TXT</td><td>resend._domainkey</td><td class="v" data-testid="dns-long">p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC/yMhLZpqueTmlh+2gqlfMGuw6z7aq5VLPFHsXhLMZE/aWTMiYzYp2WnDRxpNp7Qe3Jqe03NosfCu8eUSJLCd0NY9iJBI67FEdiYWEGOlSEmcIMrkPDO+HFnWhEXAMPLEONLYNOTAREALKEYVALUE0123456789</td><td>Auto</td></tr>
+              <tr><td>MX</td><td>send</td><td class="v">feedback-smtp.us-east-1.amazonses.com</td><td>Auto</td></tr>
+              <tr><td>TXT</td><td>send</td><td class="v">v=spf1 include:amazonses.com ~all</td><td>Auto</td></tr>
+            </table></div>
+        </div>
+      </section>
+
+      <section data-testid="comms-sms">
+        <div><h2>SMS number</h2><div class="sub">Twilio number for texts, replies and STOP handling.</div></div>
+        <div class="row"><div><b>Two-way replies</b><span>Inbound texts land in the Inbox and on the client's timeline</span></div><div class="tog"></div></div>
+        <div class="row"><div><b>Quiet hours</b><span>Automated texts only — manual sends always go</span></div><input value="7am – 8pm" style="width:150px"></div>
+        <div class="split"><b style="font-size:15px">Twilio account</b>
+          <div class="tw" data-testid="twilio-grid"><div><div class="label">Account SID</div><input placeholder="AC…"></div><div><div class="label">Auth token</div><input placeholder="•••• hidden once saved"></div><div><div class="label">From number</div><input placeholder="+61…"></div></div></div>
+      </section>
+
+      <section data-testid="comms-automations">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start"><div><h2>Automations</h2><div class="sub">The only messages that go out without a person — and only the rules switched on.</div></div><button class="btn small">+ New rule</button></div>
+        <div class="row"><div><b>Quote follow-up</b><span>Quote sent · after 3 / 7 days · email</span></div><div class="tog"></div></div>
+        <div class="row"><div><b>Invoice reminder</b><span>Invoice due · overdue day 3 / 10 · email + SMS</span></div><div class="tog"></div></div>
+        <div class="row"><div><b>A client views their quote or invoice</b><span>Saved with the page's Save changes button</span></div><div class="tog"></div></div>
+      </section>
+
+      <section data-testid="comms-templates">
+        <div><h2>Templates</h2><div class="sub">Reusable emails and texts with merge tags. Never a real client's details.</div></div>
+        <div class="tpl" data-testid="tpl-grid"><div class="list"><button><b>Quote follow-up</b></button><button>Invoice reminder</button><button>Job starting soon</button><button class="btn small" style="width:auto">+ New template</button></div>
+          <div class="opt" data-testid="comms-tpl-editor"><div class="fields"><div><div class="label">Name</div><input value="Quote follow-up"></div><div><div class="label">Subject</div><input value="Following up on your quote {quote_number}"></div></div><textarea rows="6" data-testid="tpl-body">Hi {first_name},
+
+Just checking you received the quote for {job_address}. Happy to talk it through — call me any time.
+
+{signature}</textarea></div></div>
+      </section>
+
+      <section data-testid="comms-ai">
+        <div><h2>AI assistant</h2><div class="sub">Drafts and summaries; you always send.</div></div>
+        <div class="fields"><div><div class="label">Sign-off</div><input value="Cheers, Josh" data-testid="comms-ai-signoff"></div></div>
+        <div class="row"><div><b>Suggest replies in the Inbox</b><span>A ready draft appears on unread client threads</span></div><div class="tog"></div></div>
+        <div class="two" data-testid="ai-two"><div class="note"><b>What it reads</b><br>The client record, the thread being answered, their open quote and unpaid invoice, the active job (dates, crew lead), your business profile and sign-off.</div><div class="note"><b>What it never does</b><br>Send anything on its own. Invent a price, date or promise. Use another client's details.</div></div>
+      </section>
+
+      <section data-testid="comms-links">
+        <div><h2>Links &amp; signature</h2><div class="sub">Used by the {review_link}, {calendar_link} and {signature} merge tags.</div></div>
+        <div class="fields"><div><div class="label">Google review link</div><input placeholder="https://g.page/r/…/review"></div><div><div class="label">Booking link</div><input placeholder="https://…"></div></div>
+        <div><div class="label">Signature</div><textarea rows="3" data-testid="comms-signature">Josh Sano
+Sano Painting · 0400 000 000</textarea></div>
+      </section>
+    </main>
+  </div>
+</div>
+<div class="bubble" aria-hidden="true"></div>
+<script>
+  // ?today=1 — the page as it is today (narrowed to 1100). ?nav=open — the side menu open instead of the icon rail.
+  if (/[?&]today=1/.test(location.search)) document.getElementById('page').classList.add('today');
+  if (/[?&]nav=open/.test(location.search)) document.getElementById('nav').classList.add('open');
+</script>
+</body>
+</html>
