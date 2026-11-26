@@ -457,8 +457,14 @@ async function aiLoad(){
   ort.env.wasm.wasmPaths=base+"vendor/";ort.env.wasm.proxy=true;
   ort.env.wasm.numThreads=self.crossOriginIsolated?Math.min(4,navigator.hardwareConcurrency||1):1;
   const o={executionProviders:["wasm"],graphOptimizationLevel:"all"};
-  AI.enc=await ort.InferenceSession.create(base+"model/vision_encoder_quantized.onnx",o);
-  AI.dec=await ort.InferenceSession.create(base+"model/prompt_encoder_mask_decoder_quantized.onnx",o);
+  // model files are served either as .onnx, or (where a host only serves web file types) as base64 inside .json
+  const bytes=async name=>{
+    let r=await fetch(base+"model/"+name).catch(()=>null);
+    if(r&&r.ok)return new Uint8Array(await r.arrayBuffer());
+    r=await fetch(base+"model/"+name+".json");if(!r.ok)throw new Error("model file missing: "+name);
+    const b=atob((await r.json()).b64),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u};
+  AI.enc=await ort.InferenceSession.create(await bytes("vision_encoder_quantized.onnx"),o);
+  AI.dec=await ort.InferenceSession.create(await bytes("prompt_encoder_mask_decoder_quantized.onnx"),o);
 }
 async function aiEncode(){
   const k=1024/Math.max(W,H),nw=Math.round(W*k),nh=Math.round(H*k);
