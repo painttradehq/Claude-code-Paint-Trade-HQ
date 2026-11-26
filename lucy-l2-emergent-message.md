@@ -1,10 +1,10 @@
-# Lucy L2 — Lucy sends, and records a payment (round 2 of 5) — NOT SENT (waits for Josh's "send")
+# Lucy L2 — Lucy sends, and records a payment (round 2 of 5) — SENT to Emergent 26 Nov on Josh's word ("send it")
 
 Written 26 Nov against the L1 code as saved to GitHub (`640c20d`). Josh uploads with it: the updated `lucy-operator.html` (the send card now shows the signature and the checks; a blocked send; a variation send; a payment card), this file, and the current `lucy-operator-spec.md` (the copy in Emergent's pod is an older one).
 
 ---
 
-## The message to send
+## The message as sent
 
 # Lucy L2 — Lucy sends, and records a payment (round 2 of 5)
 

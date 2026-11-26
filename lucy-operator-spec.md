@@ -8,7 +8,7 @@
 
 - (26 Nov) "With Lucy's ability permissions, we need to have that in the Lucy gear: what the user wants Lucy to be able to do. For the emails and storage it has to be what the admin set it to be, and not just Google."
 
-This promotes the parked item "Lucy does the work in the app, confirm first" (17 Nov) to a build. **Round L1 went to Emergent on 26 Nov on Josh's word** (`lucy-l1-emergent-message.md`); L2–L5 follow one at a time, each on his "send". What L1 narrows from this spec is listed in §9.
+This promotes the parked item "Lucy does the work in the app, confirm first" (17 Nov) to a build. **Round L1 went to Emergent on 26 Nov on Josh's word** (`lucy-l1-emergent-message.md`) and is built and saved to GitHub; **L2 went the same day** (`lucy-l2-emergent-message.md`); L3–L5 follow one at a time, each on his "send". What L1 narrows from this spec is listed in §9.
 
 **Prototype:** `lucy-operator.html` (built by `tools/make_lucy_operator.py` on top of the Round 73 box, `lucy-chat-notion.html`). **Checks:** `tools/test_lucy_operator.js` — 160 of 160 at 1440 × 900 and 1024 × 768 (26 Nov: the round 2 cards added). Add `?tester=0` to see it as someone who is not in the tester program, and `?mail=microsoft&storage=onedrive` or `?mail=none&storage=builtin` to see Lucy's setup for a business on other providers.
 
@@ -168,7 +168,7 @@ Read: `services/lucy_tools.py`, `services/lucy_actions.py`, the chat / approve /
 
 **Three small things, written into the L2 message:** deleting a conversation leaves its cards' rows behind (with the held conversation inside); a finished card keeps that held conversation when it no longer needs it; a card whose run is interrupted would stay on "Working…" for ever. None changes what Lucy does today.
 
-## 12. Round L2 — prepared, not sent (26 Nov)
+## 12. Round L2 — sent to Emergent 26 Nov on Josh's "send it"
 
 `lucy-l2-emergent-message.md`. Lucy sends quotes, invoices, payment reminders and variations by email, and records a payment. Decisions in it, all Josh's to change:
 
