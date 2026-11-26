@@ -24,4 +24,6 @@ Josh: "CRM gear framing is weird. Make it full width like other pages." He is up
 5. The three Twilio fields, the template editor, the two AI notes and the signature box stay inside their cards.
 6. A screenshot of the page at each width in the report.
 
+**Also — one check to repeat, no code change.** Lucy L2's check 9 was not repeated by the testing agent: with "Ask me before changes" **on**, a send asked for inside a longer task ("start a quote for {TS_ client} and send it") gives a plan card with no send step, and the send comes as its own card afterwards; nothing is sent before **Send it** (dry run). Run it with the testing agent at 1440 and 1024 and add the result to `memory/reports/lucy-l2-report.md`.
+
 **Rules:** this one change only — nothing from your own suggestion list; one commit; TS_ rows only, torn down after; Josh's own tenant read-only; nothing under `app/employee/*`; no key, password or admin id in any reply. Add one line to What's new draft #47 (never publish): "Messages setup in the CRM now uses the full width of the page." Save to GitHub and Publish are Josh's clicks.
