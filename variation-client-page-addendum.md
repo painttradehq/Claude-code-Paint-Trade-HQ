@@ -1,4 +1,6 @@
-# Fix Round K follow-up — addendum to item 1b: the client's variation page — NOT SENT (waits for Josh's "send")
+# Fix Round K follow-up — addendum to item 1b: the client's variation page — NOT SENT, NO LONGER NEEDED
+
+**26 Nov:** Josh gave Emergent the updated prototype himself in the Emergent chat ("first do the variation design change and then the archive one"), and Emergent built the document-style page from it (its commit `1fdead8`) and hid archived invoices from a job's Linked records (`917ecb9`). This addendum was never sent and is kept only as the record of what the page should be. Emergent's own note: a GST-inclusive variation and a business with a logo were not viewed, and the preview's switched-off name box and Approve were not tested.
 
 Josh, 26 Nov: "What the client sees for the variation is a small frame and it looks cheap. Make it better and wider — more professional and simple looking."
 

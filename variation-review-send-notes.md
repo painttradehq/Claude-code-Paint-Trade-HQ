@@ -61,7 +61,7 @@ Two things Josh said about it the same day: "why is the screen of what the clien
 
 The preview in Review & Send is this same component with the name box and buttons off (at full colour, so the admin sees what the client sees).
 
-**Status:** the follow-up sent to Emergent on 26 Nov carries the earlier, smaller version of this as item 1b ("colours and type only"). The wider document replaces it — `variation-client-page-addendum.md` is ready and goes only on Josh's "send".
+**Status (26 Nov):** Josh uploaded this prototype to Emergent himself and asked for the design change; Emergent built it (its commit `1fdead8`). The addendum `variation-client-page-addendum.md` was never sent and is no longer needed. Not yet viewed by Emergent: a GST-inclusive variation, a business with a logo, and the switched-off name box and Approve in the preview.
 
 ## Not in this prototype
 

@@ -8,7 +8,7 @@
 
 - (26 Nov) "With Lucy's ability permissions, we need to have that in the Lucy gear: what the user wants Lucy to be able to do. For the emails and storage it has to be what the admin set it to be, and not just Google."
 
-This promotes the parked item "Lucy does the work in the app, confirm first" (17 Nov) to a build. **Nothing is built and nothing has gone to Emergent.** Round K is with Emergent now; this starts after it is reported, one round at a time, on Josh's "send".
+This promotes the parked item "Lucy does the work in the app, confirm first" (17 Nov) to a build. **Round L1 went to Emergent on 26 Nov on Josh's word** (`lucy-l1-emergent-message.md`); L2–L5 follow one at a time, each on his "send". What L1 narrows from this spec is listed in §9.
 
 **Prototype:** `lucy-operator.html` (built by `tools/make_lucy_operator.py` on top of the Round 73 box, `lucy-chat-notion.html`). **Checks:** `tools/test_lucy_operator.js` — 134 of 134 at 1440 × 900 and 1024 × 768. Add `?tester=0` to see it as someone who is not in the tester program, and `?mail=microsoft&storage=onedrive` or `?mail=none&storage=builtin` to see Lucy's setup for a business on other providers.
 
@@ -131,3 +131,17 @@ Voice ("talk to Lucy") stays the exploratory item it was.
 5. Tester reports are a list with the team's reply, not a second chat; they are logged without the AI.
 6. The order of the rounds in §7.
 7. Lucy's setup starts with everything on except Delete (§2a), and the areas are the seven listed there.
+
+## 9. What Round L1 builds, and what it leaves for later (26 Nov)
+
+Decided while reading Lucy's code for the message, so the round does only what is real today:
+
+1. **Her setup shows the seven area rows only.** "Send for me", "Delete records", Email and Files each arrive with the round that makes them do something (L2, L3, L2, L4). A switch that does nothing is not shown.
+2. **No send card, no delete card, no next-step buttons in L1.** Every natural next step is a send ("Send it to Leanne"), so the buttons come with L2. Asked to send or delete, she says where to do it in the app.
+3. **Reminders and ideas stay as they are today** — "Remind me…" and "I've got an idea" save at once with her one-line confirmation, no card. Everything else asks. They sit under "Calendar and reminders": with that row on Read she does not save them.
+4. **The card is written by the app, not by the AI** — from the action and its details, with names instead of ids. What the card shows is what runs.
+5. **Several steps = one plan** the app checks before showing, runs in order and stops at the first step the app refuses.
+6. **Only the admin who asked can approve their card.** A team admin's Lucy is limited to that admin's own access as well as the setup.
+7. **Tester statuses are the four that exist** — Logged, Replied, Fixed, Parked (the prototype's "Seen" does not exist in the app). Reports are numbered FB- plus the first eight characters, as the parking lot already does.
+8. **The daily allowance stays 300,000.** Caching is switched on and a cached read counts as a tenth, so the same allowance goes much further; it can still be raised in her setup.
+9. **Her "what I do" answer** keeps Josh's words plus one sentence: "I can also do the work for you — start and change quotes, add to jobs, raise invoices, book the calendar — and I always show you what I'm about to do and wait for your OK."
