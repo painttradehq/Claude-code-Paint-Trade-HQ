@@ -2,7 +2,7 @@
 
 Josh's ask (27 Nov): the time clock becomes a slide-in panel from the left edge (a thin line a fifth of the screen tall with a small arrow, Samsung edge-panel style); the weather sits top right next to the date; the Today tab becomes **Dashboard**; the Inbox tab becomes **Operations** (the Dashboard already carries the Inbox link); Operations holds **My hours**, **My equipment** (from Me) and **Training** (from Learn); on the job page the summary of the work is replaced by what "Open the full scope" showed, and that row now opens **the quote itself, as the owner sees it, without the prices**.
 
-Prototype: `c1-crew-shell.html` (this revision), checks in `tools/test_c1.js` at 390 × 844 then 360 × 800. Deep links: `?screen=app&tab=today` (the Dashboard), `&edge=1` (the panel open), `?screen=app&tab=ops`, `?screen=inbox`, `?screen=job&id=j1` (the scope inline), `?screen=quote&id=j1` (the quote; `&hours=1`, `&photos=0` as before), `?screen=quote&id=j2` (a bare quote).
+Prototype: `c1-crew-shell.html` (this revision, 224 KB), checks in `tools/test_c1.js` — **560 of 560** at 390 × 844 then 360 × 800 (280 each; the Round E Scope-screen checks retargeted to the job page, 26 new C7 checks per size). Screenshots `shots-f/c7-*.png`. Deep links: `?screen=app&tab=today` (the Dashboard), `&edge=1` (the panel open), `?screen=app&tab=ops`, `?screen=inbox`, `?screen=job&id=j1` (the scope inline), `?screen=quote&id=j1` (the quote; `&hours=1`, `&photos=0` as before), `?screen=quote&id=j2` (a bare quote).
 
 ## 1. What a crew member sees
 

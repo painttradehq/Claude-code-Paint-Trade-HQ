@@ -21,7 +21,7 @@ async function run(b, W, H, tag) {
   const edgeVisible = () => p.locator(T('crew-edge-panel')).isVisible();
   const openEdge = async () => { if (!(await edgeVisible())) { await p.click(T('crew-edge-handle')); await p.waitForTimeout(300); } };
   const closeEdge = async () => { if (await edgeVisible()) { await p.click(T('crew-edge-close')); await p.waitForTimeout(300); } };
-  const clockBtn = async () => { await openEdge(); await clockBtn(); };
+  const clockBtn = async () => { await openEdge(); await p.click(T('crew-today-clock-btn')); };
 
   // ---- sign in ----
   await p.goto(U); await p.waitForTimeout(400);
@@ -91,7 +91,7 @@ async function run(b, W, H, tag) {
   ok('after sign-out the card shows the sign-out time, the hours and the job' + full, /Signed out/.test(await txt('#clockStatus')) && (await txt('#clockLine')) === 'Last signed out 9:39 am today · 0 h 00 m · Wattle St repaint' && (await txt(T('crew-today-clock-btn'))) === 'Sign in');
   await p.screenshot({ path: OUT + `c3-today-after-out-${tag}.png` });
   await clockBtn(); await p.waitForTimeout(100); await p.locator(T('crew-clock-pick')).first().click(); await p.waitForTimeout(700);
-  await p.locator('#notifList ' + T('crew-notif-row')).first().click(); await p.waitForTimeout(150);
+  await closeEdge(); await p.locator('#notifList ' + T('crew-notif-row')).first().click(); await p.waitForTimeout(150);
   ok('tapping a notification marks it read and records its link' + full, (await txt('#notifHead')) === 'Unread · 2' && (await txt(T('crew-tab-dashboard-badge'))) === '2' && (await go()) === '/employee/contracts');
   ok('Daily report row leads to the reports list' + full, (await p.locator(T('crew-today-report')).getAttribute('data-go')) === '/employee/daily-report');
   ok('Today: content ends above the tab bar' + full, await p.evaluate(() => { const b = document.querySelector('#t-today .body'); b.scrollTop = b.scrollHeight; const last = b.lastElementChild.getBoundingClientRect().bottom; const tab = document.querySelector('.tabbar').getBoundingClientRect().top; return last <= tab; }));
@@ -112,7 +112,7 @@ async function run(b, W, H, tag) {
   ok('job screen opens as a stack screen: no tab bar, back to Jobs, name + address, Directions + Daily report' + full, await p.locator(T('crew-job')).isVisible() && !(await p.locator(T('crew-tabbar')).isVisible()) && (await txt('#jobTitle')) === 'Wattle St repaint' && (await txt('#jobAddr')) === 'Linh Nguyen · 14 Wattle St, Brunswick' && await p.locator(T('crew-job-directions')).isVisible() && await p.locator(T('crew-job-report-btn')).isVisible() && (await go()) === '/employee/project/j1');
   ok('job: no site-contact row on a job without one' + full, (await p.locator(T('crew-job-site-contact')).count()) === 0);
   ok('job: dates & crew, access note from the owner' + full, /Mon 6 Oct → Fri 17 Oct/.test(await txt(T('crew-job-crew'))) && /Mia, Tom/.test(await txt(T('crew-job-crew'))) && /From Josh:/.test(await txt(T('crew-job-notes'))) && /alarm code 4471/.test(await txt(T('crew-job-notes'))));
-  ok('job: the work = areas with lines and coats, added work marked, no prices anywhere' + full, (await p.locator(T('crew-job-work') + ' .area').count()) === 5 && (await p.locator(T('crew-job-added-work')).count()) === 1 && /Added work · approved 9 Oct/.test(await txt(T('crew-job-added-work'))) && /Skirting & architraves/.test(await txt(T('crew-job-work'))) && !/\$/.test(await txt('#jobBody')));
+  ok('job: the work = the quote\'s areas with their lines and coats (C7: inline), added work marked, no prices anywhere' + full, (await p.locator(T('crew-scope-area')).count()) === 4 && (await p.locator(T('crew-scope-line')).count()) === 8 && (await p.locator(T('crew-scope-added')).count()) === 1 && /approved 9 Oct/.test(await txt(T('crew-scope-added'))) && /Skirting & architraves/.test(await txt('#jobBody')) && !/\$/.test(await txt('#jobBody')));
   ok('job: paints & colours with swatches' + full, (await p.locator(T('crew-job-paints') + ' .swatch').count()) === 3 && /Natural White · walls/.test(await txt(T('crew-job-paints'))));
   ok('job: files the owner marked crew-visible' + full, (await p.locator(T('crew-job-file')).count()) === 2 && /Strata approval\.pdf/.test(await txt(T('crew-job-files'))));
   ok('job: photo grid with Add, my reports with Replied' + full, (await p.locator(T('crew-job-photos') + ' .ph').count()) === 6 && await p.locator(T('crew-job-photo-add')).isVisible() && /Replied/.test(await txt(T('crew-job-reports'))));
@@ -319,7 +319,7 @@ async function run(b, W, H, tag) {
   await p.goto(U + '?screen=report-new&jobs=0'); await p.waitForTimeout(300);
   ok('no jobs: the form opens on General with the Where-were-you field' + full, /General/.test(await txt(T('crew-report-job'))) && await p.locator(T('crew-report-site')).isVisible());
   await p.goto(U + '?screen=app&tab=today'); await p.waitForTimeout(300);
-  await p.locator('#notifList ' + T('crew-notif-row')).nth(2).click(); await p.waitForTimeout(150);
+  await closeEdge(); await p.locator('#notifList ' + T('crew-notif-row')).nth(2).click(); await p.waitForTimeout(150);
   ok('the feedback notification opens that report with the reply' + full, await p.locator(T('crew-report')).isVisible() && (await go()) === '/employee/daily-report/r1' && await p.locator(T('crew-report-reply')).isVisible());
 
   // ---- C6: Learn and gear ----

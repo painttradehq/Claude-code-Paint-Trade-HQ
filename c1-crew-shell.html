@@ -1537,7 +1537,9 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   $('#onClock').addEventListener('click', openEdge);
   const phoneEl = $('#phone');
   phoneEl.addEventListener('pointerdown', (e) => { const x = e.clientX - phoneEl.getBoundingClientRect().left; if (!edgeOpen && x <= 24 && !$('#edgeHandle').classList.contains('hide')) edgeDrag = { x: e.clientX, mode: 'open' }; else if (edgeOpen && edgeBox.contains(e.target)) edgeDrag = { x: e.clientX, mode: 'close' }; });
-  phoneEl.addEventListener('pointermove', (e) => { if (!edgeDrag) return; const dx = e.clientX - edgeDrag.x; if (edgeDrag.mode === 'open' && dx > 40) { openEdge(); edgeDrag = null; } else if (edgeDrag.mode === 'close' && dx < -40) { closeEdge(); edgeDrag = null; } });
+  let edgeSwiped = 0;   // a swipe is not a tap: the click that follows a drag is swallowed (as a touch screen does)
+  phoneEl.addEventListener('pointermove', (e) => { if (!edgeDrag) return; const dx = e.clientX - edgeDrag.x; if (edgeDrag.mode === 'open' && dx > 40) { openEdge(); edgeDrag = null; edgeSwiped = Date.now(); } else if (edgeDrag.mode === 'close' && dx < -40) { closeEdge(); edgeDrag = null; edgeSwiped = Date.now(); } });
+  phoneEl.addEventListener('click', (e) => { if (Date.now() - edgeSwiped < 400) { e.stopPropagation(); e.preventDefault(); } }, true);
   phoneEl.addEventListener('pointerup', () => { edgeDrag = null; }); phoneEl.addEventListener('pointercancel', () => { edgeDrag = null; });
   $('#readAll').addEventListener('click', (e) => { e.preventDefault(); state.notifs.forEach(n => n.read = true); renderNotifs(); });
   $('#signOut').addEventListener('click', showLogin);
@@ -2229,9 +2231,9 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
   else if (q.get('screen') === 'equip') { showApp('ops'); openEquip(); if (q.get('request') === '1') openReq(); }
   else if (q.get('screen') === 'item') { showApp('ops'); openItem(q.get('id') || 'e1'); if (q.get('problem') === '1') openProblem(q.get('id') || 'e1'); }
   else if (q.get('screen') === 'doc') { showApp('me'); openDoc(q.get('id') || 'd1'); if (q.get('sign') === '1') openSign(q.get('id') || 'd1'); }
-  if (q.get('edge') === '1' && !$('#edgeHandle').classList.contains('hide')) openEdge();
   else if (q.get('screen') === 'app') { showApp(q.get('tab') || 'today'); if (q.get('picker') === '1') openPicker(); }
   else showLogin();
+  if (q.get('edge') === '1' && !$('#edgeHandle').classList.contains('hide')) openEdge();   // C7 — the panel open over whatever the link showed
 })();
 </script>
 </body>
