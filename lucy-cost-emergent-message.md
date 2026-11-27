@@ -44,7 +44,7 @@ Three parts, in order. One commit per part. This spends real AI money on the run
    3. "What's on this week?"
    4. "Which quotes have gone quiet?"
    5. "Add a client — TS_ Dana Reid, 0400 000 001, ts_dana@example.com"
-   6. "Log a call with TS_ Dana Reid — she wants the fence done too"
+   6. "Log a call with TS_ Dana Reid — wants the fence done too"
    7. "Make a quote for TS_ Dana Reid: prep, two coats on walls, ceilings"
    8. "Send that quote" (same conversation as 7; approve the card)
    9. "Book the TS_ job for next Tuesday and put TS_ crew on it"
