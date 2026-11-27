@@ -1,4 +1,4 @@
-# Lucy — a long task ends in "Lucy could not answer just now" — NOT SENT. Waits for Josh's "send"
+# Lucy — a long task ends in "Lucy could not answer just now" — SENT to Emergent 27 Nov on Josh's word ("send it")
 
 Josh, 27 Nov, with a screenshot of Lucy's panel: "create test estimate of 10 items and accepted and create two invoices" → "Lucy could not answer just now." — "I keep getting error." The allowance line under it read 281,313 / 300,000.
 
@@ -14,7 +14,7 @@ Not confirmed from a log — this chat cannot see the server. The message asks E
 
 ---
 
-## The message
+## The message as sent
 
 # Lucy — a long task ends in "Lucy could not answer just now"
 
