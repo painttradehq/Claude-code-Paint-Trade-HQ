@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lucy — email and files · Paint Trade HQ</title>
+<style>
+  :root{ --accent:#4B3E86; --accent-bg:#F1EEFA; --accent-ink:#34295E; --success:#1C8A4B; --danger:#C6382E; --danger-bg:#FBEAEA; --warn:#8A5A00;
+    --surface:#fff; --sunken:#F4F2EE; --bg:#FAF9F6; --border:#E7E3DA; --border-strong:#D8D3C7; --text:#1E1C1A; --text-2:#6B675F; --muted:#9B968A;
+    --display:'Fraunces', Georgia, 'Times New Roman', serif; --body:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; --mono:'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace; }
+  *{ box-sizing:border-box; } html, body{ height:100%; }
+  body{ margin:0; font-family:var(--body); color:var(--text); background:var(--bg); font-size:13.5px; overflow:hidden; }
+  button{ font:inherit; color:inherit; cursor:pointer; } b{ font-weight:650; }
+  .shell{ display:flex; height:100%; }
+  .nav{ flex:0 0 68px; background:#fff; border-right:1px solid var(--border); display:flex; flex-direction:column; align-items:center; gap:14px; padding:18px 0; }
+  .nav i{ width:26px; height:26px; border-radius:7px; background:var(--sunken); display:block; } .nav i.on{ background:var(--accent-bg); outline:1px solid #DCD5F0; }
+  .content{ flex:1; min-width:0; position:relative; }
+  .dash{ padding:26px 30px; color:var(--muted); max-width:calc(100% - 600px); } .dash h1{ font-family:var(--display); font-size:30px; color:var(--text); margin:0 0 6px; font-weight:600; }
+  .dash .tries{ margin-top:22px; display:flex; flex-direction:column; gap:8px; align-items:flex-start; }
+  .dash .tries b{ font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+  .dash .tries button{ border:1px dashed var(--border-strong); background:#fff; border-radius:10px; padding:8px 12px; font-size:12.5px; color:var(--text-2); text-align:left; max-width:100%; }
+  @media (max-width:1180px){ .dash{ max-width:calc(100% - 512px); } }
+
+  /* Lucy's panel as rounds 1 to 3 and the chat-look round built it */
+  .lucy{ position:absolute; right:16px; top:16px; bottom:16px; width:560px; max-width:calc(100% - 32px); background:var(--bg); border-radius:20px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 18px 60px rgba(0,0,0,.28); z-index:50; }
+  @media (max-width:1180px){ .lucy{ width:480px; } }
+  .lhead{ flex:0 0 52px; display:flex; align-items:center; gap:10px; padding:0 10px 0 14px; background:linear-gradient(135deg, #34295E, #4B3E86); color:#fff; }
+  .lhead .face{ width:30px; height:30px; border-radius:50%; background:#F3E7D8; } .lhead b{ font-family:var(--display); font-size:17px; font-weight:600; flex:1; }
+  .lhead button{ height:30px; padding:0 10px; border-radius:8px; border:none; background:rgba(255,255,255,.14); color:#fff; font-size:12px; font-weight:600; }
+  .lbody{ flex:1; min-height:0; overflow-y:auto; overflow-x:hidden; padding:18px; display:flex; flex-direction:column; gap:10px; }
+  .lbody > *{ flex-shrink:0; }   /* a long conversation scrolls; it never squashes a card */
+  .hello{ margin:auto 0; text-align:center; padding:0 22px 30px; } .hello .big{ font-family:var(--display); font-size:30px; margin-bottom:10px; } .hello .ln{ font-size:15px; color:var(--text-2); }
+  .me{ align-self:flex-end; max-width:86%; background:var(--accent); color:#fff; border-radius:14px; border-bottom-right-radius:5px; padding:10px 12px; line-height:1.45; }
+  .ai{ align-self:flex-start; max-width:92%; background:#fff; border:1px solid var(--border); border-radius:14px; border-bottom-left-radius:5px; padding:11px 13px; line-height:1.5; min-width:0; overflow-wrap:anywhere; }
+  .ai ul{ margin:6px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:7px; }
+  .ai li{ padding-left:12px; border-left:3px solid var(--border); } .ai li.new{ border-left-color:var(--accent); }
+  .ai li small{ display:block; color:var(--text-2); font-size:12.5px; }
+  .ai .row{ display:flex; flex-wrap:wrap; gap:8px; margin-top:9px; }
+  .ob{ height:30px; padding:0 11px; border-radius:8px; border:1px solid var(--border-strong); background:#fff; font-size:12.5px; font-weight:650; color:var(--accent-ink); }
+  .src{ display:flex; flex-wrap:wrap; gap:6px; margin-top:9px; align-items:center; }
+  .src span{ font-size:11px; padding:2px 8px; border-radius:99px; background:var(--accent-bg); color:var(--accent-ink); font-weight:600; }
+  .draft{ margin-top:8px; border:1px dashed var(--border-strong); border-radius:10px; padding:10px 12px; white-space:pre-line; background:var(--bg); }
+
+  .act{ align-self:stretch; background:#fff; border:1px solid #DCD5F0; border-radius:14px; overflow:hidden; min-width:0; }
+  .act .kick{ font-size:10.5px; letter-spacing:.09em; text-transform:uppercase; font-weight:800; color:var(--accent); padding:11px 14px 0; }
+  .act.done .kick{ color:var(--success); } .act.off .kick{ color:var(--muted); }
+  .act h5{ font-family:var(--display); font-size:17px; font-weight:600; margin:2px 14px 8px; }
+  .inreply{ margin:0 14px 8px; padding:8px 10px; background:var(--sunken); border-radius:10px; font-size:12.5px; color:var(--text-2); line-height:1.45; }
+  .inreply b{ color:var(--text); display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .inreply span{ display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .mailbox{ margin:0 14px; border:1px solid var(--border); border-radius:10px; padding:10px 12px; }
+  .mailbox .hd{ display:grid; grid-template-columns:auto minmax(0,1fr); gap:4px 12px; }
+  .mailbox .hd span{ color:var(--text-2); font-size:12.5px; } .mailbox .hd b{ overflow-wrap:anywhere; }
+  .mailbox .bd{ border-top:1px solid var(--border); margin-top:9px; padding-top:9px; white-space:pre-line; line-height:1.5; }
+  .mailbox .sig{ white-space:pre-line; color:var(--text-2); font-size:12.5px; margin-top:10px; }
+  .files{ margin:8px 14px 0; display:flex; flex-direction:column; gap:5px; }
+  .files .f{ display:flex; align-items:center; gap:8px; border:1px solid var(--border); border-radius:9px; padding:6px 10px; font-size:12.5px; min-width:0; }
+  .files .f i{ flex:0 0 22px; height:22px; border-radius:6px; background:var(--accent-bg); color:var(--accent-ink); font-style:normal; font-size:9.5px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  .files .f b{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .files .f span{ color:var(--text-2); font-family:var(--mono); font-size:11.5px; white-space:nowrap; }
+  .files .tot{ color:var(--text-2); font-size:12px; padding-left:2px; }
+  .chks{ margin:10px 14px 0; display:flex; flex-direction:column; gap:5px; }
+  .chk{ display:flex; gap:8px; align-items:flex-start; font-size:13px; line-height:1.4; } .chk i{ flex:0 0 9px; height:9px; border-radius:50%; margin-top:5px; }
+  .chk.green i{ background:var(--success); } .chk.red i{ background:var(--danger); } .chk.red{ color:#8E241C; font-weight:600; }
+  .act .btns{ display:flex; flex-wrap:wrap; gap:8px; padding:12px 14px 14px; }
+  .act .go{ height:36px; padding:0 14px; border-radius:9px; border:none; background:var(--accent); color:#fff; font-weight:650; } .act .go:disabled{ opacity:.4; cursor:default; }
+  .act .alt{ height:36px; padding:0 12px; border-radius:9px; border:1px solid var(--border-strong); background:#fff; font-weight:600; }
+  .act .res{ padding:4px 14px 6px; font-weight:600; overflow-wrap:anywhere; }
+  .lfoot{ padding:10px 14px 14px; } .lfoot .box{ border:1px solid var(--border-strong); border-radius:14px; background:#fff; padding:12px 14px; color:var(--muted); }
+
+  /* her setup — the panel on the right that round 1 built; only the rows this round touches are live here */
+  .scrim{ position:absolute; inset:0; background:rgba(20,18,30,.38); z-index:60; }
+  .setup{ position:absolute; top:0; right:0; bottom:0; width:460px; max-width:100%; background:#fff; z-index:61; display:flex; flex-direction:column; box-shadow:-12px 0 40px rgba(0,0,0,.18); }
+  .setup header{ display:flex; align-items:center; padding:18px 20px 14px; border-bottom:1px solid var(--border); } .setup header h2{ font-family:var(--display); font-size:21px; font-weight:600; margin:0; flex:1; }
+  .setup header button{ width:32px; height:32px; border-radius:8px; border:1px solid var(--border); background:#fff; }
+  .setup .body{ flex:1; min-height:0; overflow-y:auto; padding:8px 20px 20px; }
+  .setup h6{ font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:18px 0 4px; font-weight:700; }
+  .sw{ display:flex; align-items:center; gap:14px; padding:11px 0; border-bottom:1px solid var(--border); }
+  .sw .t{ flex:1; min-width:0; } .sw .t b{ display:block; } .sw .t span{ display:block; color:var(--text-2); font-size:12.5px; line-height:1.45; margin-top:1px; }
+  .sw.dim{ opacity:.55; }
+  .tog{ flex:0 0 42px; height:24px; border-radius:99px; border:none; background:var(--border-strong); position:relative; padding:0; }
+  .tog::after{ content:''; position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff; transition:left .12s; }
+  .tog[aria-checked="true"]{ background:var(--accent); } .tog[aria-checked="true"]::after{ left:21px; }
+  .seg{ font-size:12px; color:var(--text-2); white-space:nowrap; }
+</style>
+</head>
+<body>
+<div class="shell"><aside class="nav"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></aside><div class="content" id="app"></div></div>
+
+<script>
+/* Lucy — email and files. Prototype: scripted, no AI behind it. The asks are the dashed buttons on the left.
+   ?mail=none (no mailbox connected) · ?inbox=off · ?files=off · ?send=off (her setup) · ?big=1 (attachments over 20 MB) · ?noemail=1 (the client has no email) */
+const Q = new URLSearchParams(location.search);
+const ME = 'Josh', BIZ = 'Sano Painting', BOX = 'josh@sanopainting.example', LE = 'leanne.crowe@example.com', JOB = '12 Ivanhoe Pde, Ivanhoe';
+const SIG = `Josh Sano\n${BIZ}\n0400 555 014`;
+const S = { msgs: [], setup: false, mail: Q.get('mail') === 'none' ? 'none' : 'gmail', can: { inbox: Q.get('inbox') !== 'off', files: Q.get('files') !== 'off', send: Q.get('send') !== 'off' }, read: false, ticked: ['Colour schedule.pdf'] };
+const BIG = Q.get('big') === '1', NOEMAIL = Q.get('noemail') === '1';
+const ASKS = [
+  ['inbox', 'Any new emails?'],
+  ['reply', 'Reply to Leanne — the 14th works, and yes the ceilings are included'],
+  ['files', 'What files are on the Ivanhoe job?'],
+  ['sendfiles', 'Send Leanne the colour schedule and the hallway before photo'],
+  ['tick', 'Attach the site plan to EST-0046 so it goes with the quote'],
+  ['text', 'Text Mark back that it\'s fine'],
+  ['unknown', 'What does the Tilehaus email say?'],
+];
+const chips = (...a) => `<div class="src" data-testid="ai-sources">${a.map(x => `<span>${x}</span>`).join('')}</div>`;
+const btns = (...a) => `<div class="row">${a.map(([l, act, id]) => `<button class="ob" data-testid="${id || 'lucy-open'}" data-act="${act || ''}">${l}</button>`).join('')}</div>`;
+const say = (html) => S.msgs.push({ role: 'ai', html });
+const OFF = { inbox: 'Reading your inbox is turned off in my setup.', files: 'Job files are turned off in my setup.', send: 'Sending is turned off in my setup. I can still draft the words for you to send yourself.' };
+const setupBtn = () => btns(['Open Lucy’s setup', 'setup', 'lucy-open-setup']);
+
+const REPLY = { kind: 'reply', title: 'Reply to Leanne Crowe', to: LE, subject: 'Re: Your painting quote EST-0046',
+  inreply: ['“Re: Your painting quote EST-0046” · Leanne Crowe, today 8:12 am', 'Hi Josh, thanks for the revised quote. Two quick things before I sign — could you start on Monday the 14th instead of the 7th? And can you confirm the ceilings in the living room are included in the price?'],
+  body: 'Hi Leanne,\n\nMonday the 14th works for us — we\'ll start then. And yes, the ceilings in the living and dining room are included: two coats of flat ceiling white, as listed on the quote.\n\nLet me know if there\'s anything else before you sign.', files: [] };
+const FILES_MAIL = { kind: 'new', title: 'Email Leanne Crowe', to: LE, subject: 'Colour schedule and photo — 12 Ivanhoe Pde',
+  body: 'Hi Leanne,\n\nHere is the colour schedule for 12 Ivanhoe Pde, and the photo of the hallway from before we started.',
+  files: BIG ? [['PDF', 'Colour schedule.pdf', 0.24], ['JPG', 'Hallway — before.jpg', 11.9], ['JPG', 'Hallway — before 2.jpg', 12.5]] : [['PDF', 'Colour schedule.pdf', 0.24], ['JPG', 'Hallway — before.jpg', 1.8]] };
+const mb = (n) => n < 1 ? `${Math.round(n * 1000)} KB` : `${n.toFixed(1)} MB`;
+
+function ask(k){
+  const text = ASKS.find(a => a[0] === k)[1]; S.msgs.push({ role: 'me', text });
+  const needInbox = ['inbox', 'reply', 'text', 'unknown'].includes(k), needFiles = ['files', 'sendfiles', 'tick'].includes(k);
+  if (needInbox && !S.can.inbox) return say(OFF.inbox + setupBtn());
+  if (needFiles && !S.can.files) return say(OFF.files + setupBtn());
+  if (k === 'inbox') {
+    if (S.mail === 'none') return say(`No mailbox is connected, so I only see what was sent from the app and the texts. Nothing new there today. Connect your mailbox and client emails will come into the Inbox.` + btns(['Open Messages setup', '', 'lucy-open']) + chips('Clients'));
+    return say(`I checked ${BOX} just now. Three new since yesterday:<ul data-testid="lucy-inbox">
+      <li class="new"><b>Leanne Crowe</b> · today 8:12 am<small>Re: Your painting quote EST-0046 — asks if you can start Monday the 14th instead of the 7th, and whether the living room ceilings are in the price.</small></li>
+      <li class="new"><b>Mark Davis</b> · text, today 7:40 am<small>“Running 10 min late for the walkthrough.”</small></li>
+      <li class="new"><b>bookings@tilehaus.example</b> · yesterday 4:55 pm<small>“Quote request — bathroom repaint”. Not linked to a client, so I can see who sent it and the subject, not the email.</small></li></ul>` + btns(['Open the Inbox', '', 'lucy-open']) + chips('Clients'));
+  }
+  if (k === 'reply' || k === 'sendfiles') {
+    const m = k === 'reply' ? REPLY : FILES_MAIL;
+    if (!S.can.send) return say(`${OFF.send}<div class="draft" data-testid="lucy-draft">${m.body}</div>` + btns(['Open the conversation', '', 'lucy-open'], ['Open Lucy’s setup', 'setup', 'lucy-open-setup']) + chips('Clients'));
+    say(k === 'reply' ? `Leanne asked two things this morning: a start on Monday the 14th, and whether the living room ceilings are included. Here is the reply — it goes when you say so.` + chips('Clients', 'Quotes')
+                      : `I found both on the job «${JOB}». Here is the email with them attached.` + chips('Jobs', 'Clients'));
+    return S.msgs.push({ role: 'act', mail: m, state: 'waiting' });
+  }
+  if (k === 'files') return say(`On «${JOB}» there are <b>3 files</b> and <b>14 photos</b>, saved in Google Drive › Paint Trade HQ › EST-0046 Ivanhoe.<ul data-testid="lucy-files">
+      <li><b>Colour schedule.pdf</b> · 240 KB · added 18 Nov<small>${S.ticked.includes('Colour schedule.pdf') ? 'Goes with the quote email.' : 'Not sent with the quote.'}</small></li>
+      <li><b>Site plan.pdf</b> · 310 KB · added 18 Nov<small>${S.ticked.includes('Site plan.pdf') ? 'Goes with the quote email.' : 'Not sent with the quote.'} The crew can see it.</small></li>
+      <li><b>EST-0046 accepted.pdf</b> · 180 KB · filed 21 Nov<small>The quote as Leanne signed it.</small></li>
+      <li><b>Photos</b> · Before 6 · Process 5 · After 3<small>Latest: “Hallway — after”, by Tom, Thu 26 Nov.</small></li></ul>` + btns(['Open the job', '', 'lucy-open']) + chips('Jobs'));
+  if (k === 'tick') { if (!S.ticked.includes('Site plan.pdf')) S.ticked.push('Site plan.pdf'); return say(`Done — <b>Site plan.pdf</b> now goes with EST-0046 when it is sent. That makes 2 files with the quote PDF, 0.7 MB of the 20 MB an email can carry. Nothing is sent.` + btns(['Open EST-0046', '', 'lucy-open']) + chips('Quotes')); }
+  if (k === 'text') return say(`I can't send texts yet — open the conversation and send it from there. Mark's last text: “Running 10 min late for the walkthrough.”` + btns(['Open the conversation', '', 'lucy-open']) + chips('Clients'));
+  if (k === 'unknown') return say(`That one isn't linked to a client, so the app keeps only who sent it and the subject: bookings@tilehaus.example, “Quote request — bathroom repaint”. Open the Inbox to link it to a client or make it a lead — then I can read what comes next.` + btns(['Open the Inbox', '', 'lucy-open']) + chips('Clients'));
+}
+
+function actHtml(m, i){
+  const x = m.mail; const total = x.files.reduce((a, f) => a + f[2], 0); const over = total > 20;
+  const reds = [...(NOEMAIL ? ['No email on file for Leanne Crowe'] : []), ...(over ? [`Too big for one email — ${x.files.length} files come to ${mb(total)}; the limit is 20 MB`] : [])];
+  if (m.state === 'done') return `<div class="act done" data-testid="lucy-act" data-kind="send" data-record="email" data-state="done"><div class="kick">Lucy did</div><div class="res">✓ Sent to ${x.to}.${x.kind === 'reply' ? ' The conversation is marked read.' : ''}</div><div class="btns" style="padding-top:4px"><button class="alt" data-testid="lucy-open">Open the conversation</button></div></div>`;
+  if (m.state === 'cancelled') return `<div class="act off" data-testid="lucy-act" data-kind="send" data-record="email" data-state="cancelled"><div class="kick">Cancelled</div><div class="res" style="color:var(--text-2);font-weight:500">Nothing was sent.</div></div>`;
+  return `<div class="act" data-testid="lucy-act" data-kind="send" data-record="email" data-state="waiting"><div class="kick">Lucy is about to</div><h5 data-testid="lucy-act-title">${x.title}</h5>
+    ${x.inreply ? `<div class="inreply" data-testid="lucy-act-inreply"><b>In reply to ${x.inreply[0]}</b><span>${x.inreply[1]}</span></div>` : ''}
+    <div class="mailbox" data-testid="lucy-act-mail"><div class="hd"><span>To</span><b data-testid="lucy-act-to">${NOEMAIL ? 'No address on the client' : x.to}</b><span>Subject</span><b data-testid="lucy-act-subject">${x.subject}</b></div>
+      <div class="bd" data-testid="lucy-act-body">${x.body}</div><div class="sig" data-testid="lucy-act-sig">${SIG}</div></div>
+    ${x.files.length ? `<div class="files" data-testid="lucy-act-files">${x.files.map(f => `<div class="f"><i>${f[0]}</i><b>${f[1]}</b><span>${mb(f[2])}</span></div>`).join('')}<div class="tot" data-testid="lucy-act-files-total">${x.files.length} attached · ${mb(total)} of the 20 MB an email can carry</div></div>` : ''}
+    <div class="chks" data-testid="lucy-act-checks">${reds.length ? reds.map(r => `<div class="chk red"><i></i><span>${r}</span></div>`).join('') : `<div class="chk green"><i></i><span>Going to Leanne's own address</span></div>`}</div>
+    <div class="btns"><button class="go" data-testid="lucy-act-approve" data-act="send" data-i="${i}" ${reds.length ? 'disabled' : ''}>Send it</button><button class="alt" data-testid="lucy-act-change">Change something</button><button class="alt" data-testid="lucy-act-cancel" data-act="cancel" data-i="${i}">Cancel</button>
+      ${NOEMAIL ? '<button class="alt" data-testid="lucy-act-fix">Open Leanne Crowe</button>' : ''}</div></div>`;
+}
+function setupHtml(){
+  const row = (id, title, sub, key, dim) => `<div class="sw ${dim ? 'dim' : ''}"><div class="t"><b>${title}</b><span data-testid="${id}-sub">${sub}</span></div>${key ? `<button class="tog" role="switch" aria-checked="${S.can[key]}" data-testid="${id}" data-act="tog" data-key="${key}" aria-label="${title}"></button>` : '<span class="seg">Read and change</span>'}</div>`;
+  return `<div class="scrim" data-act="setup-close"></div><aside class="setup" data-testid="lucy-setup" role="dialog" aria-label="Lucy's setup"><header><h2>What Lucy can do</h2><button data-act="setup-close" data-testid="lucy-setup-x" aria-label="Close">✕</button></header><div class="body">
+    <h6>What she may change</h6>${row('lucy-perm-quotes', 'Quotes', 'and five more areas, as today', null, true)}
+    <h6>Your inbox and files</h6>
+    ${row('lucy-perm-mail', 'Read my inbox', S.mail === 'none' ? 'No mailbox connected yet — connect one in CRM › Messages setup. Until then she sees the texts and what the app sent.' : `Gmail · ${BOX}. Client emails and texts in the app's Inbox. Mail from people who aren't your clients shows as sender and subject only.`, 'inbox')}
+    ${row('lucy-perm-files', 'Job files', 'Google Drive · the Paint Trade HQ folder. She finds a job\'s files and photos and attaches them to a quote or an email.', 'files')}
+    <h6>Sending and deleting</h6>
+    ${row('lucy-perm-send', 'Send for me', 'Quotes, invoices, reminders, variations and emails to clients. You see each one before it goes.', 'send')}
+    ${row('lucy-perm-delete', 'Delete records', 'One at a time. You see what goes before it goes. (as today)', null, true).replace('<span class="seg">Read and change</span>', '<span class="seg">Off</span>')}
+  </div></aside>`;
+}
+function render(){
+  const body = S.msgs.length ? S.msgs.map((m, i) => m.role === 'me' ? `<div class="me" data-testid="ai-msg-user">${m.text}</div>` : m.role === 'act' ? actHtml(m, i) : `<div class="ai" data-testid="ai-msg-assistant">${m.html}</div>`).join('')
+    : `<div class="hello" data-testid="ai-welcome"><div class="big">Hi ${ME}.</div><div class="ln">Ask me anything, or tell me what needs doing.</div></div>`;
+  document.getElementById('app').innerHTML = `<div class="dash"><h1>Dashboard</h1>The page behind Lucy. This prototype is scripted — press one to ask it:
+      <div class="tries" data-testid="tries"><b>Ask Lucy</b>${ASKS.map(([k, t]) => `<button data-testid="try-${k}" data-act="ask" data-k="${k}">“${t}”</button>`).join('')}</div></div>
+    <div class="lucy" data-testid="tc-panel"><div class="lhead"><span class="face"></span><b>Lucy</b><button data-testid="ai-settings" data-act="setup">Lucy’s setup</button><button data-act="new" data-testid="ai-new-chat-btn">New chat</button></div>
+      <div class="lbody" data-testid="tc-body">${body}</div><div class="lfoot"><div class="box">Message Lucy…</div></div></div>${S.setup ? setupHtml() : ''}`;
+  const lb = document.querySelector('.lbody'); lb.scrollTop = lb.scrollHeight;
+}
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-act]'); if (!a || !a.dataset.act) return; const act = a.dataset.act; const i = Number(a.dataset.i);
+  if (act === 'ask') ask(a.dataset.k);
+  else if (act === 'send') { if (a.disabled) return; S.msgs[i].state = 'done'; if (S.msgs[i].mail.kind === 'reply') say(`Sent. The job «${JOB}» still starts Mon 7 Dec — do you want me to move it to Mon 14 Dec?`); }
+  else if (act === 'cancel') S.msgs[i].state = 'cancelled';
+  else if (act === 'setup') S.setup = true;
+  else if (act === 'setup-close') S.setup = false;
+  else if (act === 'tog') S.can[a.dataset.key] = !S.can[a.dataset.key];
+  else if (act === 'new') S.msgs = [];
+  render();
+});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && S.setup) { S.setup = false; render(); } });
+render();
+</script>
+</body>
+</html>
