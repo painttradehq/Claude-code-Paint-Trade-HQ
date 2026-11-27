@@ -318,3 +318,18 @@ Its own suggestions (mailbox round, files round, a review of the failing tests, 
 - **Follow-through:** a reply that agrees to a new date for a job's start or a calendar event carries it (`then`); the finished card then shows one button, worded by the server from the record. One press says it to Lucy and her usual rules apply.
 - **Today briefing:** in place of "3 unread replies in the inbox", up to three rows naming who is waiting (longest first, a day-old one in the warning colour, each with Reply), then "n more", and a separate count for mail from people who aren't clients. Second in the list, after overdue invoices.
 - The answer's bullet becomes "Emails and texts — read your inbox and write the reply".
+
+## 22. Lucy L5 — Emergent's report (checked 27 Nov on Josh's "check")
+
+Complete: texts, the follow-through button, the inbox in the Today briefing. Every test ran on seed-made test accounts on the dry-run server and was removed after; Josh's account, mailbox, number and storage were not touched and no email or text left. **Saved to GitHub** (`a71a8f3`) — every Lucy round, Revise and the chat's look are now there.
+
+- **Tested:** 28 new in-process checks; 209 with the earlier Lucy and connector files. The testing agent passed all eight on-screen checks at 1440, then hit its time limit before reading its 1024 result — Emergent read that log itself: all eight pass. One older Lucy check (`fix_timesheet_session`) failed once and passed on five reruns.
+- **A fault fixed on the way:** when Lucy moved a calendar event by its date alone, the event did not move though she said it had (`update_event` wants `start_date`). Fixed for every event she or the connector moves.
+- **The dashboard's read budget:** the briefing adds one read (client names) only when a client conversation is waiting. The budget test was already failing before the round — 17 reads against 12 — and still is. Not fixed.
+- **"A day or more old"** is by calendar day in the business's time zone.
+- **Correction to what Josh was told when the round was sent:** opening a conversation in the Inbox does **not** mark it read. A row leaves the briefing when the conversation is answered or Mark read is pressed.
+- The 15 older failing tests are untouched. What's new draft #47 has nine cards, still a draft.
+
+**Read in the saved code** (`services/lucy_mail.py`, `services/attachments.email_files`): the client and the conversation are looked up inside the business; a conversation with another client's message in it is refused; a text goes only to the client's own numbers or one typed; every file is checked to be that client's own, inside the business, before its bytes are read; the follow-through is kept only when the job or event is that client's, and its button's words are built by the server.
+
+Its suggestions (dashboard speed, the older tests, read-on-open, reply drafts in the briefing) wait for Josh's word.
