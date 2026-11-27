@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revise an accepted quote — Paint Trade HQ</title>
+<style>
+  :root{ --accent:#4B3E86; --accent-bg:#F1EEFA; --accent-ink:#34295E; --success:#1C8A4B; --success-bg:#E7F5EC; --danger:#C6382E; --danger-bg:#FBEAEA; --warn:#8A5A00; --warn-bg:#FFF4E0; --warn-line:#F0C070;
+    --surface:#fff; --sunken:#F4F2EE; --bg:#FAF9F6; --border:#E7E3DA; --border-strong:#D8D3C7; --text:#1E1C1A; --text-2:#6B675F; --muted:#9B968A;
+    --display:'Fraunces', Georgia, 'Times New Roman', serif; --body:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; --mono:'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace; }
+  *{ box-sizing:border-box; }
+  html, body{ height:100%; }
+  body{ margin:0; font-family:var(--body); color:var(--text); background:var(--bg); font-size:13.5px; overflow:hidden; }
+  button{ font:inherit; color:inherit; cursor:pointer; }
+  b{ font-weight:650; }
+
+  /* the prototype's own strip — not part of the app */
+  .proto-bar{ height:38px; display:flex; align-items:center; gap:6px; padding:0 12px; background:#1E1C1A; color:#CFCAC0; font-size:12px; white-space:nowrap; overflow:hidden; }
+  .proto-bar b{ color:#fff; margin-right:6px; }
+  .proto-bar button{ height:26px; padding:0 10px; border-radius:7px; border:1px solid #4A463F; background:transparent; color:#E9E5DC; font-size:12px; font-weight:600; }
+  .proto-bar button.on{ background:#fff; color:#1E1C1A; border-color:#fff; }
+  .proto-bar .st{ margin-left:auto; color:#9B968A; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+  #app{ height:calc(100vh - 38px); position:relative; }
+
+  /* the admin shell */
+  .shell{ display:flex; height:100%; }
+  .nav{ flex:0 0 68px; background:#fff; border-right:1px solid var(--border); display:flex; flex-direction:column; align-items:center; gap:14px; padding:18px 0; }
+  .nav i{ width:26px; height:26px; border-radius:7px; background:var(--sunken); display:block; }
+  .nav i.on{ background:var(--accent-bg); outline:1px solid #DCD5F0; }
+  .content{ flex:1; min-width:0; display:flex; flex-direction:column; position:relative; }
+  .scroll{ flex:1; min-height:0; overflow-y:auto; overflow-x:hidden; }
+
+  /* the quote builder's top bar (Builder.tsx) */
+  .topbar{ flex:0 0 56px; display:flex; align-items:center; gap:8px; padding:0 16px; background:#fff; border-bottom:1px solid var(--border); }
+  .tb{ height:34px; padding:0 12px; border-radius:9px; border:1px solid var(--border); background:#fff; font-weight:600; font-size:13px; white-space:nowrap; }
+  .tb.sm{ padding:0 9px; }
+  .tb.primary{ background:var(--accent); border-color:var(--accent); color:#fff; padding:0 14px; }
+  .num{ font-family:var(--mono); font-weight:700; font-size:14px; white-space:nowrap; }
+  .tag{ display:inline-flex; align-items:center; padding:2px 9px; border-radius:99px; font-size:11.5px; font-weight:650; white-space:nowrap; }
+  .tag.accent{ background:var(--accent-bg); color:var(--accent-ink); } .tag.muted{ background:var(--sunken); color:var(--text-2); } .tag.outline{ border:1px solid var(--border-strong); color:var(--text-2); }
+  .tag.rev{ background:var(--warn-bg); color:var(--warn); border:1px solid var(--warn-line); font-size:11px; }
+  .tag.rev.quiet{ background:var(--sunken); color:var(--text-2); border-color:var(--border); }
+  .grow{ flex:1; min-width:0; }
+  .saved{ font-size:12px; color:var(--muted); white-space:nowrap; }
+  .seg{ display:inline-flex; background:var(--sunken); border-radius:8px; padding:3px; }
+  .seg button{ height:28px; padding:0 10px; border:none; background:transparent; border-radius:6px; font-size:12.5px; font-weight:600; white-space:nowrap; }
+  .seg button.on{ background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.12); }
+  .rel{ position:relative; }
+  .menu{ position:absolute; right:0; top:40px; width:236px; background:#fff; border:1px solid var(--border-strong); border-radius:12px; padding:6px; z-index:30; box-shadow:0 12px 32px rgba(0,0,0,.16); }
+  .menu button{ display:block; width:100%; text-align:left; height:34px; padding:0 10px; border:none; background:none; border-radius:8px; font-size:13.5px; font-weight:500; }
+  .menu button:hover{ background:var(--sunken); } .menu button.danger{ color:var(--danger); }
+  .menu button.mark{ font-weight:650; color:var(--accent-ink); }
+  @media (max-width:1100px){ .saved span, .seg button span{ display:none; } }
+
+  /* the paper */
+  .wrap{ display:flex; justify-content:center; padding:22px 20px 110px; }
+  .paper{ flex:1; min-width:0; max-width:1040px; background:#fff; border-radius:14px; border-left:6px solid var(--accent); padding:34px 40px 40px; box-shadow:0 2px 24px rgba(0,0,0,.06); }
+  .paper h1{ font-family:var(--display); font-size:32px; font-weight:600; margin:0; letter-spacing:-.3px; }
+  .paper .sub{ color:var(--text-2); margin-top:2px; }
+  .cards{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:18px; }
+  .card{ border:1px solid var(--border); border-radius:12px; padding:12px 14px; min-width:0; }
+  .card .k{ font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:4px; }
+  .card div{ overflow:hidden; text-overflow:ellipsis; } .card .s{ color:var(--text-2); font-size:12.5px; }
+  .area{ margin-top:22px; }
+  .area h3{ font-family:var(--display); font-size:19px; font-weight:600; margin:0 0 8px; display:flex; align-items:baseline; gap:10px; }
+  .area h3 span{ font-family:var(--mono); font-size:12.5px; color:var(--text-2); font-weight:500; }
+  .line{ display:grid; grid-template-columns:minmax(0,1fr) 150px 110px 110px; gap:10px; align-items:center; padding:8px 0; border-top:1px solid var(--border); }
+  .line .nm{ font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .line .ds{ color:var(--text-2); font-size:12px; }
+  .line .q{ display:flex; align-items:center; gap:6px; justify-content:flex-end; color:var(--text-2); font-size:12.5px; }
+  .line input{ width:74px; height:32px; border:1px solid var(--border); border-radius:8px; padding:0 8px; font-family:var(--mono); font-size:13px; text-align:right; background:#fff; color:var(--text); }
+  .line input:focus{ outline:2px solid #CFC7EA; border-color:var(--accent); }
+  .line .r{ display:flex; align-items:center; gap:4px; justify-content:flex-end; color:var(--text-2); }
+  .line .t{ font-family:var(--mono); font-weight:600; text-align:right; }
+  .totals{ margin:22px 0 0 auto; width:340px; max-width:100%; border:1px solid var(--border); border-radius:12px; padding:14px 16px; }
+  .totals div{ display:flex; justify-content:space-between; padding:3px 0; color:var(--text-2); }
+  .totals div span:last-child{ font-family:var(--mono); color:var(--text); }
+  .totals .big{ border-top:1px solid var(--border); margin-top:6px; padding-top:9px; font-weight:700; color:var(--text); font-size:15px; }
+  .totals .dep{ font-size:12px; }
+
+  /* right-hand panel — every panel opens on the right */
+  .scrim{ position:absolute; inset:0; background:rgba(20,18,30,.38); z-index:40; }
+  .rpanel{ position:absolute; top:0; right:0; bottom:0; width:440px; max-width:100%; background:#fff; z-index:41; display:flex; flex-direction:column; box-shadow:-12px 0 40px rgba(0,0,0,.18); }
+  .rpanel header{ display:flex; align-items:center; gap:10px; padding:18px 20px 14px; border-bottom:1px solid var(--border); }
+  .rpanel header h2{ font-family:var(--display); font-size:21px; font-weight:600; margin:0; flex:1; }
+  .rpanel header button{ width:32px; height:32px; border-radius:8px; border:1px solid var(--border); background:#fff; font-size:15px; }
+  .rpanel .body{ flex:1; min-height:0; overflow-y:auto; padding:18px 20px; }
+  .rpanel .lead{ font-size:14px; line-height:1.5; margin:0 0 16px; }
+  .what{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .what li{ display:flex; gap:12px; padding:12px 14px; border:1px solid var(--border); border-radius:12px; line-height:1.5; }
+  .what li i{ flex:0 0 26px; height:26px; border-radius:8px; background:var(--accent-bg); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-style:normal; font-weight:700; font-size:12.5px; }
+  .rpanel .quiet{ color:var(--text-2); font-size:12.5px; margin:14px 2px 0; line-height:1.5; }
+  .rpanel footer{ display:flex; gap:10px; padding:14px 20px; border-top:1px solid var(--border); }
+  .btn{ height:40px; padding:0 16px; border-radius:10px; border:1px solid var(--border-strong); background:#fff; font-weight:650; white-space:nowrap; }
+  .btn.primary{ background:var(--accent); border-color:var(--accent); color:#fff; flex:1; }
+  .stop{ border:1px solid #F0C9C5; background:var(--danger-bg); border-radius:12px; padding:14px; line-height:1.5; }
+  .stop b{ color:#8E241C; }
+  .can{ margin:14px 0 0; padding:0 0 0 18px; line-height:1.6; }
+
+  .toast{ position:absolute; left:50%; bottom:26px; transform:translateX(-50%); max-width:min(680px, calc(100% - 40px)); background:#1E1C1A; color:#fff; padding:11px 16px; border-radius:11px; font-size:13px; line-height:1.45; z-index:80; box-shadow:0 10px 30px rgba(0,0,0,.25); }
+
+  /* Review & Send — the window the builder already has, cut down to what this round touches */
+  .modal{ position:absolute; inset:0; background:rgba(20,18,30,.55); z-index:60; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .rs{ width:1040px; max-width:100%; max-height:100%; background:#fff; border-radius:16px; display:flex; flex-direction:column; overflow:hidden; }
+  .rs header{ display:flex; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); }
+  .rs header h2{ font-family:var(--display); font-size:21px; font-weight:600; margin:0; flex:1; }
+  .rs .cols{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,.9fr); min-height:0; flex:1; overflow:hidden; }
+  .rs .left{ padding:16px 20px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; min-width:0; }
+  .rs .right{ background:var(--sunken); padding:16px; overflow-y:auto; min-width:0; }
+  .lbl{ font-size:11px; letter-spacing:.07em; text-transform:uppercase; font-weight:700; color:var(--muted); margin-bottom:4px; }
+  .checks{ display:flex; flex-direction:column; gap:6px; }
+  .chk{ display:flex; gap:8px; align-items:flex-start; font-size:13px; line-height:1.4; }
+  .chk i{ flex:0 0 9px; height:9px; border-radius:50%; margin-top:5px; }
+  .chk.green i{ background:var(--success); } .chk.amber i{ background:#D9952B; } .chk.red i{ background:var(--danger); }
+  .in{ width:100%; border:1px solid var(--border); border-radius:10px; padding:9px 11px; font:inherit; color:var(--text); background:#fff; }
+  textarea.in{ min-height:150px; resize:vertical; line-height:1.5; }
+  .to{ display:flex; align-items:center; gap:8px; border:1px solid var(--border); border-radius:10px; padding:8px 11px; }
+  .to i{ width:16px; height:16px; border-radius:4px; background:var(--accent); color:#fff; font-style:normal; font-size:11px; display:flex; align-items:center; justify-content:center; }
+  .sig{ white-space:pre-line; color:var(--text-2); font-size:12.5px; border-left:3px solid var(--border); padding-left:10px; }
+  .rs footer{ display:flex; justify-content:flex-end; gap:10px; padding:14px 20px; border-top:1px solid var(--border); }
+  .sent{ padding:40px 24px; text-align:center; }
+  .sent h3{ font-family:var(--display); font-size:24px; margin:0 0 6px; font-weight:600; }
+
+  /* the client's document (ClientDoc.tsx) — also the preview in Review & Send */
+  .doc{ background:#fff; border-radius:12px; padding:26px 28px; box-shadow:0 2px 18px rgba(0,0,0,.06); }
+  .doc .head{ display:flex; justify-content:space-between; gap:16px; align-items:flex-start; }
+  .doc .biz{ font-family:var(--display); font-size:20px; font-weight:600; } .doc .biz small{ display:block; font-family:var(--body); font-size:12px; color:var(--text-2); font-weight:400; margin-top:2px; }
+  .doc .title{ font-family:var(--display); color:var(--accent); font-size:40px; line-height:40px; text-align:right; white-space:nowrap; }
+  .doc .title.rev{ font-size:30px; }
+  .doc .meta{ text-align:right; font-size:12.5px; color:var(--text-2); margin-top:6px; } .doc .meta b{ color:var(--text); font-family:var(--mono); font-weight:600; }
+  .doc .for{ margin-top:18px; line-height:1.5; }
+  .doc table{ width:100%; border-collapse:collapse; margin-top:16px; }
+  .doc th{ text-align:left; font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); padding:6px 0; border-bottom:1px solid var(--border-strong); }
+  .doc td{ padding:8px 0; border-bottom:1px solid var(--border); vertical-align:top; }
+  .doc td.n, .doc th.n{ text-align:right; font-family:var(--mono); white-space:nowrap; padding-left:10px; }
+  .doc .sum{ margin:14px 0 0 auto; width:280px; max-width:100%; }
+  .doc .sum div{ display:flex; justify-content:space-between; padding:3px 0; } .doc .sum span:last-child{ font-family:var(--mono); }
+  .doc .sum .big{ border-top:1px solid var(--border-strong); margin-top:5px; padding-top:8px; font-weight:700; font-size:15px; }
+
+  /* the client's own page (app/quote/[token].tsx) */
+  .cpage{ height:100%; overflow-y:auto; background:var(--sunken); padding:18px 16px 110px; }
+  .cinner{ max-width:900px; margin:0 auto; }
+  .strip{ padding:10px 16px; border-radius:10px; font-size:13.5px; font-weight:600; margin-bottom:12px; line-height:1.45; }
+  .strip.ok{ background:#E8F5EA; color:#1F6B33; }
+  .strip.note{ background:#fff; color:var(--text); border:1px solid var(--border-strong); border-left:4px solid var(--accent); font-weight:500; }
+  .hold{ background:#fff; border-radius:14px; padding:44px 28px; text-align:center; box-shadow:0 2px 18px rgba(0,0,0,.06); margin-top:40px; }
+  .hold h2{ font-family:var(--display); font-size:26px; font-weight:600; margin:0 0 8px; }
+  .hold p{ color:var(--text-2); line-height:1.55; margin:0 auto; max-width:440px; font-size:14px; }
+  .cbar{ position:absolute; left:0; right:0; bottom:0; background:var(--accent-ink); color:#fff; padding:12px 16px; z-index:20; }
+  .cbar .in2{ max-width:900px; margin:0 auto; display:flex; align-items:center; gap:14px; }
+  .cbar .k{ font-size:10.5px; letter-spacing:.09em; text-transform:uppercase; opacity:.7; }
+  .cbar .v{ font-family:var(--mono); font-size:26px; font-weight:700; line-height:1.15; }
+  .cbar button{ margin-left:auto; height:44px; padding:0 22px; border-radius:11px; border:none; background:#fff; color:var(--accent-ink); font-weight:700; font-size:14.5px; white-space:nowrap; }
+  .sign{ position:absolute; inset:0; background:rgba(20,18,30,.55); z-index:70; display:flex; align-items:flex-end; justify-content:center; }
+  .sign .sheet{ width:520px; max-width:100%; background:#fff; border-radius:18px 18px 0 0; padding:20px; display:flex; flex-direction:column; gap:12px; }
+  .sign h3{ font-family:var(--display); font-size:21px; font-weight:600; margin:0; }
+  .sign label{ display:flex; gap:9px; align-items:flex-start; line-height:1.45; }
+  .sign .pad{ height:84px; border:1px dashed var(--border-strong); border-radius:10px; display:flex; align-items:center; justify-content:center; font-family:'Brush Script MT', 'Segoe Script', cursive; font-size:30px; color:var(--accent-ink); }
+
+  /* the job page (app/admin/project/[id].tsx) */
+  .page{ padding:26px 30px 60px; max-width:1240px; margin:0 auto; }
+  .page h1{ font-family:var(--display); font-size:30px; font-weight:600; margin:0; letter-spacing:-.3px; }
+  .page .psub{ color:var(--text-2); margin-top:6px; } .page .psub b{ font-family:var(--mono); font-weight:500; color:var(--text); }
+  .grid2{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; margin-top:20px; }
+  .pc{ background:#fff; border:1px solid var(--border); border-radius:14px; padding:16px 18px; min-width:0; }
+  .pc h4{ font-family:var(--display); font-size:17px; font-weight:600; margin:0 0 10px; }
+  .money div{ display:flex; justify-content:space-between; padding:6px 0; border-top:1px solid var(--border); } .money div span:last-child{ font-family:var(--mono); font-weight:600; }
+  .lr{ display:flex; align-items:center; gap:10px; padding:9px 4px; border-top:1px solid var(--border); background:none; border-left:none; border-right:none; border-bottom:none; width:100%; text-align:left; border-radius:0; }
+  .lr:hover{ background:var(--accent-bg); }
+  .lr i{ flex:0 0 26px; height:26px; border-radius:8px; background:var(--accent-bg); display:block; }
+  .lr .m{ flex:1; min-width:0; } .lr .m b{ display:block; } .lr .m span{ display:block; color:var(--text-2); font-size:12.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lr .m span.wait{ color:var(--warn); font-weight:600; }
+
+  /* Lucy — her panel and cards as rounds 1 to 3 built them */
+  .dash{ padding:26px 30px; color:var(--muted); } .dash h1{ font-family:var(--display); font-size:30px; color:var(--text); margin:0 0 6px; font-weight:600; }
+  .lucy{ position:absolute; right:16px; top:16px; bottom:16px; width:560px; max-width:calc(100% - 32px); background:var(--bg); border-radius:20px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 18px 60px rgba(0,0,0,.28); z-index:50; }
+  @media (max-width:1180px){ .lucy{ width:480px; } }
+  .lhead{ flex:0 0 52px; display:flex; align-items:center; gap:10px; padding:0 14px; background:linear-gradient(135deg, #34295E, #4B3E86); color:#fff; }
+  .lhead .face{ width:30px; height:30px; border-radius:50%; background:#F3E7D8; } .lhead b{ font-family:var(--display); font-size:17px; font-weight:600; flex:1; }
+  .lbody{ flex:1; min-height:0; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:10px; }
+  .hello{ margin:auto 0; text-align:center; padding:0 22px 30px; } .hello .big{ font-family:var(--display); font-size:30px; margin-bottom:10px; } .hello .ln{ font-size:15px; color:var(--text-2); }
+  .hello .try{ margin-top:22px; display:flex; flex-direction:column; gap:8px; align-items:center; }
+  .hello .try button{ border:1px dashed var(--border-strong); background:#fff; border-radius:10px; padding:8px 12px; font-size:12.5px; color:var(--text-2); max-width:100%; }
+  .me{ align-self:flex-end; max-width:86%; background:var(--accent); color:#fff; border-radius:14px; border-bottom-right-radius:5px; padding:10px 12px; line-height:1.45; }
+  .ai{ align-self:flex-start; max-width:92%; background:#fff; border:1px solid var(--border); border-radius:14px; border-bottom-left-radius:5px; padding:11px 13px; line-height:1.5; }
+  .ai .row{ display:flex; flex-wrap:wrap; gap:8px; margin-top:9px; }
+  .ai .ob{ height:30px; padding:0 11px; border-radius:8px; border:1px solid var(--border-strong); background:#fff; font-size:12.5px; font-weight:650; color:var(--accent-ink); }
+  .act{ align-self:stretch; background:#fff; border:1px solid #DCD5F0; border-radius:14px; overflow:hidden; }
+  .act .kick{ font-size:10.5px; letter-spacing:.09em; text-transform:uppercase; font-weight:800; color:var(--accent); padding:11px 14px 0; }
+  .act.done .kick{ color:var(--success); } .act.off .kick{ color:var(--muted); }
+  .act h5{ font-family:var(--display); font-size:17px; font-weight:600; margin:2px 14px 8px; }
+  .act .rows{ margin:0 14px; border-top:1px solid var(--border); }
+  .act .rows div{ display:flex; gap:12px; padding:7px 0; border-bottom:1px solid var(--border); }
+  .act .rows div span:first-child{ flex:0 0 104px; color:var(--text-2); } .act .rows div span:last-child{ flex:1; min-width:0; font-weight:550; }
+  .act .warn{ margin:10px 14px 0; font-size:12.5px; color:var(--warn); font-weight:600; }
+  .act .mail{ margin:8px 14px 0; border:1px solid var(--border); border-radius:10px; padding:10px 12px; white-space:pre-line; line-height:1.5; font-size:13px; }
+  .act .chks{ margin:10px 14px 0; display:flex; flex-direction:column; gap:5px; }
+  .act .btns{ display:flex; flex-wrap:wrap; gap:8px; padding:12px 14px 14px; }
+  .act .btns .go{ height:36px; padding:0 14px; border-radius:9px; border:none; background:var(--accent); color:#fff; font-weight:650; }
+  .act .btns .alt{ height:36px; padding:0 12px; border-radius:9px; border:1px solid var(--border-strong); background:#fff; font-weight:600; }
+  .act .res{ padding:4px 14px 12px; font-weight:600; }
+  .lfoot{ padding:10px 14px 14px; } .lfoot .box{ border:1px solid var(--border-strong); border-radius:14px; background:#fff; padding:12px 14px; color:var(--muted); }
+
+  /* a phone */
+  @media (max-width:640px){
+    .proto-bar .st{ display:none; } .proto-bar b{ display:none; } .proto-bar{ gap:4px; padding:0 8px; } .proto-bar button{ padding:0 7px; font-size:11.5px; } #protoReset{ margin-left:auto; }
+    .doc{ padding:18px 16px; } .doc .head{ flex-direction:column; } .doc .title, .doc .meta{ text-align:left; } .doc .title{ font-size:30px; line-height:32px; } .doc .title.rev{ font-size:26px; }
+    .cbar .v{ font-size:21px; } .cbar button{ padding:0 16px; }
+    .hold{ padding:34px 20px; margin-top:20px; }
+  }
+</style>
+</head>
+<body>
+<div class="proto-bar" data-testid="proto-bar"><b>Prototype</b>
+  <button data-screen="builder">The quote</button><button data-screen="client">Client's page</button><button data-screen="job">The job</button><button data-screen="lucy">Lucy</button>
+  <span class="st" id="protoState"></span><button id="protoReset" data-testid="proto-reset">Start again</button>
+</div>
+<div id="app"></div>
+
+<script>
+/* Revise an accepted quote — prototype. One story, four places: the quote, the client's page, the job, Lucy.
+   ?screen=builder|client|job|lucy   ?step=revised|sent|accepted2 (jump ahead)   ?inv=sent (deposit invoice already sent → refused)   ?inv=none   ?job=0 */
+const Q = new URLSearchParams(location.search);
+const NUM = 'EST-0046', CLIENT = 'Leanne Crowe', FIRST = 'Leanne', EMAIL = 'leanne.crowe@example.com', BIZ = 'Sano Painting', JOB = '12 Ivanhoe Pde, Ivanhoe', TODAY = '27 Nov', ACC1 = '21 Nov', INV = 'INV-0052', INV2 = 'INV-0053';
+const money = (n) => '$' + n.toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fresh = () => ({
+  screen: Q.get('screen') || 'builder',
+  status: 'accepted',          // accepted | draft | sent
+  revising: false,              // true from Revise until the client accepts again
+  revision: 1, revisedAt: null, sentAgain: null, acceptedAt: ACC1,
+  inv: Q.get('inv') || 'draft', // the deposit invoice: draft (unsent) | sent | none | archived
+  job: Q.get('job') !== '0',
+  jobRevenue: null,             // the job's quoted revenue — the accepted figure until the next acceptance
+  lines: [
+    { id: 'l1', area: 'Living & dining', name: 'Walls — 2 coats', ds: 'Low sheen, colour as chosen', qty: 86, unit: 'm²', rate: 22 },
+    { id: 'l2', area: 'Living & dining', name: 'Ceiling — 2 coats', ds: 'Flat ceiling white', qty: 38, unit: 'm²', rate: 19 },
+    { id: 'l3', area: 'Hallway', name: 'Walls — 2 coats', ds: 'Low sheen, colour as chosen', qty: 31, unit: 'm²', rate: 22 },
+    { id: 'l4', area: 'Hallway', name: 'Doors & frames', ds: 'Enamel, two coats', qty: 6, unit: 'each', rate: 145 },
+    { id: 'l5', area: 'Site & setup', name: 'Protect floors & furniture', ds: 'Drop sheets, masking', qty: 1, unit: 'job', rate: 380 },
+  ],
+  menu: false, panel: false, review: null, toast: '', sign: false, sigName: '',
+  lucy: [],
+});
+let S = fresh();
+const tot = (s = S) => { const sub = s.lines.reduce((a, l) => a + l.qty * l.rate, 0); const gst = Math.round(sub * 10) / 100; const total = Math.round((sub + gst) * 100) / 100; return { sub, gst, total, dep: Math.round(total * 30) / 100 }; };
+S.jobRevenue = tot().total;
+const ACCEPTED_TOTAL = tot().total;   // what Leanne signed on 21 Nov
+
+/* ---------------------------------------------------------------- what the server does */
+const blockReason = () => S.inv === 'sent' ? `${NUM} has invoice ${INV} raised against it, so it can't be revised. Price the change as a variation on the job, or cancel or credit the invoice first.` : null;
+const lockedSentence = () => `${NUM} is accepted, so it can't be changed as it stands. To correct a mistake use Revise this quote — ${FIRST} will need to accept it again. Extra or changed work goes on the job${S.job ? ` «${JOB}»` : ''} as a variation.`;
+function doRevise(){                    // POST /estimates/{id}/revise
+  if (S.status !== 'accepted' || blockReason()) return false;
+  S.status = 'draft'; S.revising = true; S.revision += 1; S.revisedAt = TODAY; S.sentAgain = null;
+  if (S.inv === 'draft') S.inv = 'archived';
+  return true;
+}
+function doSend(){                      // POST /estimates/{id}/send
+  if (S.status === 'accepted') return 'resent';          // an accepted quote stays accepted: the copy is sent again, nothing else changes
+  S.status = 'sent'; S.sentAgain = TODAY; return 'sent';
+}
+function doAccept(){                    // the client signs again
+  S.status = 'accepted'; S.revising = false; S.acceptedAt = TODAY; S.jobRevenue = tot().total; S.inv = 'draft2';
+}
+const jump = Q.get('step');
+if (jump) { doRevise(); S.lines[1].qty = 42; if (jump === 'sent' || jump === 'accepted2') doSend(); if (jump === 'accepted2') doAccept(); }
+
+/* ---------------------------------------------------------------- pieces */
+const revisedTag = () => S.revision > 1 ? (S.sentAgain ? `<span class="tag rev quiet" data-testid="revised-tag">Revision ${S.revision} · sent ${S.sentAgain}</span>` : `<span class="tag rev" data-testid="revised-tag">Revised ${S.revisedAt} · not sent again yet</span>`) : '';
+const statusWord = () => ({ accepted: 'Accepted', draft: 'Draft', sent: 'Sent' })[S.status];
+const areas = () => [...new Set(S.lines.map(l => l.area))];
+const quoteWords = () => S.revising
+  ? { subject: `Your revised painting quote ${NUM} from ${BIZ}`, body: `Hi ${FIRST},\n\nI've corrected your quote for interior painting at 12 Ivanhoe Pde — the revised quote is attached and online at the link below. It replaces the one you accepted on ${ACC1}, so please review it and accept it again there, or call me with any questions.` }
+  : { subject: `Your painting quote ${NUM} from ${BIZ}`, body: `Hi ${FIRST},\n\nThanks for the opportunity to quote. Your quote for interior painting at 12 Ivanhoe Pde is attached and online at the link below — you can review, accept and sign there, or call me with any questions.\n\nThe quote is valid for 30 days.` };
+const SIG = `Josh Sano\n${BIZ}\n0400 555 014`;
+const checks = () => [
+  ...(S.revising ? [{ tone: 'amber', id: 'check-reaccept', text: `${FIRST} accepted the earlier quote on ${ACC1} — this asks for it to be accepted again` }] : []),
+  { tone: 'green', text: 'Prices include GST 10%' }, { tone: 'green', text: 'Deposit 30% · 1 progress payment(s) · terms from Settings' },
+];
+const chkHtml = (c) => `<div class="chk ${c.tone}" ${c.id ? `data-testid="${c.id}"` : ''}><i></i><span>${c.text}</span></div>`;
+
+function docHtml(){
+  const t = tot(); const rev = S.revision > 1;
+  return `<div class="doc" data-testid="client-doc">
+    <div class="head"><div class="biz">${BIZ}<small>ABN 12 345 678 901 · 0400 555 014</small></div>
+      <div><div class="title ${rev ? 'rev' : ''}" data-testid="doc-title">${rev ? 'REVISED QUOTE' : 'QUOTE'}</div><div class="meta">Quote # <b>${NUM}</b>${rev ? `<br>Revised <b data-testid="doc-revised">${S.revisedAt}</b>` : ''}</div></div></div>
+    <div class="for"><b>${CLIENT}</b><br>Interior painting · ${JOB}</div>
+    <table><tr><th>Work</th><th class="n">Qty</th><th class="n">Amount</th></tr>
+      ${S.lines.map(l => `<tr><td><b>${l.name}</b><br><span style="color:var(--text-2);font-size:12.5px">${l.area} · ${l.ds}</span></td><td class="n">${l.qty} ${l.unit}</td><td class="n">${money(l.qty * l.rate)}</td></tr>`).join('')}
+    </table>
+    <div class="sum"><div><span>Subtotal</span><span>${money(t.sub)}</span></div><div><span>GST 10%</span><span>${money(t.gst)}</span></div><div class="big"><span>Total incl. GST</span><span data-testid="doc-total">${money(t.total)}</span></div></div>
+  </div>`;
+}
+
+/* ---------------------------------------------------------------- the quote (builder) */
+function builder(){
+  const t = tot(); const acc = S.status === 'accepted';
+  const items = [['Download PDF'], ['Duplicate estimate'], ['Save as template'],
+    ...(S.status === 'draft' ? [['Refresh rates from Library']] : []),
+    ...(acc ? [['Revise this quote', 'more-revise', 'mark']] : []),
+    ['Convert to invoice'], ['Convert to live project'], ['Put on hold'], ['Archive', '', 'danger']];
+  const blocked = blockReason();
+  return `<div class="shell"><aside class="nav"><i></i><i class="on"></i><i></i><i></i><i></i><i></i></aside><div class="content">
+    <div class="topbar" data-testid="topbar">
+      <button class="tb sm" data-testid="back-btn">←</button>
+      <span class="num" data-testid="est-number">${NUM}</span>
+      <span class="tag ${S.status === 'draft' ? 'muted' : 'accent'}" data-testid="status-pill">${statusWord()}</span>${revisedTag()}
+      <span class="tag outline" data-testid="type-chip">Interior</span>
+      <span class="grow"></span><span class="saved" data-testid="save-indicator">● <span>Saved</span></span>
+      <div class="seg"><button class="on">✎<span> Builder</span></button><button>◉<span> Client view</span></button></div>
+      <button class="tb sm">📷</button><button class="tb sm">☰</button>
+      <div class="rel"><button class="tb sm" data-testid="more-btn" data-act="menu">⋯</button>${S.menu ? `<div class="menu" data-testid="more-menu">${items.map(([l, id, c]) => `<button class="${c || ''}" ${id ? `data-testid="${id}" data-act="revise-open"` : 'data-act="menu-other"'}>${l}</button>`).join('')}</div>` : ''}</div>
+      <button class="tb primary" data-testid="send-btn" data-act="review">✈ ${S.status === 'draft' ? 'Review & send' : 'Resend'}</button>
+    </div>
+    <div class="scroll"><div class="wrap"><div class="paper" data-testid="paper">
+      <h1>${CLIENT}</h1><div class="sub">Interior · ${JOB}</div>
+      <div class="cards"><div class="card"><div class="k">Client</div><div><b>${CLIENT}</b></div><div class="s">${EMAIL}</div></div>
+        <div class="card"><div class="k">Job address</div><div><b>12 Ivanhoe Pde</b></div><div class="s">Ivanhoe VIC 3079</div></div>
+        <div class="card"><div class="k">Start date</div><div><b>Mon 7 Dec</b></div><div class="s">About 4 days</div></div></div>
+      ${areas().map(a => { const ls = S.lines.filter(l => l.area === a); return `<div class="area"><h3>${a}<span>${money(ls.reduce((x, l) => x + l.qty * l.rate, 0))}</span></h3>
+        ${ls.map(l => `<div class="line" data-testid="line-${l.id}"><div><div class="nm">${l.name}</div><div class="ds">${l.ds}</div></div>
+          <div class="q"><input value="${l.qty}" inputmode="decimal" data-qty="${l.id}" data-testid="qty-${l.id}" aria-label="${l.name} quantity"> ${l.unit}</div>
+          <div class="r">$<input value="${l.rate}" inputmode="decimal" data-rate="${l.id}" data-testid="rate-${l.id}" aria-label="${l.name} rate"></div>
+          <div class="t" data-testid="total-${l.id}">${money(l.qty * l.rate)}</div></div>`).join('')}</div>`; }).join('')}
+      <div class="totals" data-testid="quote-totals"><div><span>Subtotal</span><span>${money(t.sub)}</span></div><div><span>GST 10%</span><span>${money(t.gst)}</span></div>
+        <div class="big"><span>Total incl. GST</span><span data-testid="quote-total">${money(t.total)}</span></div><div class="dep"><span>Deposit 30%</span><span>${money(t.dep)}</span></div></div>
+    </div></div></div>
+    ${S.panel ? `<div class="scrim" data-act="panel-close"></div><aside class="rpanel" data-testid="revise-panel" role="dialog" aria-label="Revise ${NUM}">
+      <header><h2>Revise ${NUM}</h2><button data-act="panel-close" data-testid="revise-x" aria-label="Close">✕</button></header>
+      ${blocked ? `<div class="body" data-testid="revise-blocked"><div class="stop"><b>${NUM} can't be revised.</b><br>Invoice <b>${INV}</b> (${money(tot().dep)} deposit) was sent to ${FIRST} on 22 Nov. Once money has been asked for on a quote, it stays as accepted.</div>
+          <div class="lbl" style="margin-top:18px">What you can do</div><ul class="can"><li>Price the change as a <b>variation</b> on the job «${JOB}».</li><li>Or cancel or credit ${INV} first, then revise the quote.</li></ul></div>
+        <footer><button class="btn primary" data-testid="revise-open-job" data-act="go-job">Open the job</button><button class="btn" data-act="panel-close" data-testid="revise-cancel">Close</button></footer>`
+      : `<div class="body"><p class="lead" data-testid="revise-lead"><b>${CLIENT}</b> accepted this quote on ${ACC1}. Revising takes it back so you can correct it.</p>
+          <ul class="what" data-testid="revise-what">
+            <li><i>1</i><span>The quote goes back to <b>Draft</b>, marked <b>Revised</b>, and can be edited again.</span></li>
+            <li><i>2</i><span>${FIRST}'s acceptance is withdrawn. ${FIRST} accepts the corrected quote again once you send it.</span></li>
+            ${S.job ? `<li data-testid="revise-job"><i>3</i><span>The job <b>${JOB}</b> stays as it is — crew, dates, expenses. It takes the new price when ${FIRST} accepts again.</span></li>` : ''}
+            ${S.inv === 'draft' ? `<li data-testid="revise-inv"><i>${S.job ? 4 : 3}</i><span>The unsent deposit invoice <b>${INV}</b> is archived. A new one is raised when ${FIRST} accepts again.</span></li>` : ''}
+          </ul><p class="quiet">Nothing is sent to ${FIRST} until you press Review &amp; send.</p></div>
+        <footer><button class="btn primary" data-testid="revise-go" data-act="revise-go">Revise quote</button><button class="btn" data-act="panel-close" data-testid="revise-cancel">Cancel</button></footer>`}
+    </aside>` : ''}
+    ${S.review ? reviewHtml() : ''}
+    ${S.toast ? `<div class="toast" data-testid="toast" role="status">${S.toast}</div>` : ''}
+  </div></div>`;
+}
+function reviewHtml(){
+  const w = quoteWords(); const again = S.status !== 'draft';
+  if (S.review === 'done') return `<div class="modal"><div class="rs" data-testid="review-window" style="width:520px"><div class="sent" data-testid="review-sent"><h3>${S.status === 'accepted' ? 'Sent again' : 'Quote sent'}</h3>
+      <p style="color:var(--text-2);line-height:1.55">${S.status === 'accepted' ? `${FIRST} has the accepted quote again. ${NUM} is still Accepted.` : `${NUM} went to ${EMAIL}. It is ${S.revising ? `waiting for ${FIRST} to accept it again` : 'now Sent'}.`}</p>
+      <button class="btn primary" style="flex:none;margin-top:10px" data-testid="review-done" data-act="review-close">Done</button></div></div></div>`;
+  return `<div class="modal"><div class="rs" data-testid="review-window"><header><h2>Review &amp; Send</h2><button class="tb sm" data-act="review-close" aria-label="Close">✕</button></header>
+    <div class="cols"><div class="left">
+      <div><div class="lbl">Checks</div><div class="checks" data-testid="review-checks">${checks().map(chkHtml).join('')}</div></div>
+      <div><div class="lbl">To</div><div class="to"><i>✓</i><span><b>${CLIENT}</b> · ${EMAIL}</span></div></div>
+      <div><div class="lbl">Subject</div><input class="in" data-testid="review-subject" value="${w.subject}"></div>
+      <div><div class="lbl">Message</div><textarea class="in" data-testid="review-body">${w.body}</textarea></div>
+      <div class="sig">${SIG}</div>
+    </div><div class="right">${docHtml()}</div></div>
+    <footer><button class="btn" data-act="review-close">Cancel</button><button class="btn primary" style="flex:none" data-testid="review-send" data-act="review-send">${again ? 'Resend' : 'Send'} quote to 1 person</button></footer></div></div>`;
+}
+
+/* ---------------------------------------------------------------- the client's page */
+function client(){
+  const t = tot(); const updating = S.revising && S.status === 'draft';
+  if (updating) return `<div class="cpage" data-testid="client-page"><div class="cinner"><div class="hold" data-testid="client-updating"><h2>This quote is being updated</h2>
+      <p>${BIZ} is correcting quote ${NUM} and will send you the new version shortly. There is nothing you need to do yet.</p></div></div></div>`;
+  const acc = S.status === 'accepted';
+  return `<div class="cpage" data-testid="client-page"><div class="cinner">
+      ${acc ? `<div class="strip ok" data-testid="accepted-banner">Accepted by ${CLIENT} on ${S.acceptedAt}. Thank you!</div>` : ''}
+      ${S.revising && !acc ? `<div class="strip note" data-testid="client-reaccept-note">This quote was updated on ${S.revisedAt}. It replaces the one you accepted on ${ACC1} — please review it and accept it again.</div>` : ''}
+      ${docHtml()}</div>
+    <div class="cbar" data-testid="client-bar"><div class="in2"><div><div class="k">${acc ? 'Accepted' : 'Your total incl. GST'}</div><div class="v" data-testid="bar-total">${money(t.total)}</div></div>
+      ${acc ? '' : `<button data-testid="accept-btn" data-act="sign-open">Accept quote</button>`}</div></div>
+    ${S.sign ? `<div class="sign"><div class="sheet" data-testid="sign-sheet"><h3>Accept quote ${NUM}</h3>
+      <div><div class="lbl">Your name</div><input class="in" data-testid="sign-name" value="${S.sigName}" placeholder="Type your full name"></div>
+      <div class="pad" data-testid="sign-pad">${S.sigName || '&nbsp;'}</div>
+      <label><input type="checkbox" data-testid="sign-terms"> <span>I accept this quote of <b>${money(t.total)}</b> and its terms.</span></label>
+      <div style="display:flex;gap:10px"><button class="btn primary" data-testid="sign-go" data-act="sign-go">Accept and sign</button><button class="btn" data-act="sign-close">Cancel</button></div></div></div>` : ''}
+  </div>`;
+}
+
+/* ---------------------------------------------------------------- the job */
+function job(){
+  const acc = S.status === 'accepted';
+  const sub = acc ? `Accepted ${S.acceptedAt} · ${money(S.jobRevenue)}${S.revision > 1 ? ` · revision ${S.revision}` : ''}` : S.status === 'draft' ? 'Being revised · not sent again yet' : `Revised · sent ${S.sentAgain}, waiting for ${FIRST} to accept`;
+  const dep = S.inv === 'draft' ? [INV, `Deposit · ${money(Math.round(ACCEPTED_TOTAL * 30) / 100)} · draft, not sent`] : S.inv === 'sent' ? [INV, `Deposit · ${money(Math.round(ACCEPTED_TOTAL * 30) / 100)} · unpaid`] : S.inv === 'draft2' ? [INV2, `Deposit · ${money(tot().dep)} · draft, not sent`] : null;
+  return `<div class="shell"><aside class="nav"><i></i><i></i><i class="on"></i><i></i><i></i><i></i></aside><div class="content"><div class="scroll"><div class="page" data-testid="job-page">
+    <h1>${JOB}</h1><div class="psub">Interior · <b>${NUM}</b> · Scheduled, starts Mon 7 Dec</div>
+    <div class="grid2">
+      <div class="pc" data-testid="job-money"><h4>Job money</h4><div class="money">
+        <div><span>Quoted revenue</span><span data-testid="job-revenue">${money(S.jobRevenue)}</span></div><div><span>Invoiced so far</span><span>$0.00</span></div><div><span>Cost to date</span><span>$0.00</span></div></div></div>
+      <div class="pc" data-testid="project-links-card"><h4>Linked records</h4>
+        <button class="lr" data-testid="project-link-estimate" data-act="go-builder"><i></i><span class="m"><b>${NUM}</b><span class="${acc ? '' : 'wait'}" data-testid="project-link-estimate-sub">${sub}</span></span></button>
+        ${dep ? `<button class="lr" data-testid="project-link-invoice"><i></i><span class="m"><b>${dep[0]}</b><span>${dep[1]}</span></span></button>`
+              : `<button class="lr" data-testid="project-link-new-invoice" data-act="new-invoice"><i></i><span class="m"><b>No invoice yet</b><span>Create one from this estimate</span></span></button>`}
+        <button class="lr"><i></i><span class="m"><b>${CLIENT}</b><span>Customer record · CRM timeline</span></span></button>
+      </div>
+    </div></div></div>${S.toast ? `<div class="toast" data-testid="toast" role="status">${S.toast}</div>` : ''}</div></div>`;
+}
+
+/* ---------------------------------------------------------------- Lucy */
+const ASK = `The ceiling in the living room on ${NUM} should be 42 m², not 38 — fix it`;
+function actHtml(m, i){
+  if (m.kind === 'revise') {
+    if (m.state === 'done') return `<div class="act done" data-testid="lucy-act" data-kind="revise" data-state="done"><div class="kick">Lucy did</div><div class="res">✓ ${NUM} is back in Draft, marked Revised.</div><div class="btns" style="padding-top:0"><button class="alt" data-testid="lucy-open" data-act="go-builder">Open ${NUM}</button></div></div>`;
+    if (m.state === 'cancelled') return `<div class="act off" data-testid="lucy-act" data-kind="revise" data-state="cancelled"><div class="kick">Cancelled</div><div class="res" style="color:var(--text-2);font-weight:500">Nothing changed. ${NUM} is still Accepted.</div></div>`;
+    return `<div class="act" data-testid="lucy-act" data-kind="revise" data-state="waiting"><div class="kick">Lucy is about to</div><h5>Revise quote ${NUM}</h5>
+      <div class="rows" data-testid="lucy-act-rows"><div><span>Quote</span><span>${NUM} · ${CLIENT}</span></div><div><span>Accepted</span><span>${ACC1} by ${CLIENT}</span></div><div><span>Total</span><span>${money(ACCEPTED_TOTAL)}</span></div>
+        ${S.job ? `<div><span>The job</span><span>${JOB} — stays as it is</span></div>` : ''}${S.inv === 'draft' ? `<div><span>Deposit draft</span><span>${INV} — archived</span></div>` : ''}</div>
+      <div class="warn" data-testid="lucy-act-warn">The acceptance is withdrawn. ${FIRST} will need to accept the quote again.</div>
+      <div class="btns"><button class="go" data-testid="lucy-act-approve" data-act="lucy-revise" data-i="${i}">Revise it</button><button class="alt" data-testid="lucy-act-change">Change something</button><button class="alt" data-testid="lucy-act-cancel" data-act="lucy-cancel" data-i="${i}">Cancel</button></div></div>`;
+  }
+  const w = quoteWords();
+  if (m.state === 'done') return `<div class="act done" data-testid="lucy-act" data-kind="send" data-state="done"><div class="kick">Lucy did</div><div class="res">✓ Sent to ${EMAIL}. ${NUM} is now Sent — waiting for ${FIRST} to accept it again.</div></div>`;
+  return `<div class="act" data-testid="lucy-act" data-kind="send" data-state="waiting"><div class="kick">Lucy is about to</div><h5>Send quote ${NUM}</h5>
+    <div class="rows"><div><span>To</span><span>${CLIENT} · ${EMAIL}</span></div><div><span>Subject</span><span data-testid="lucy-act-subject">${w.subject}</span></div><div><span>Attached</span><span>${NUM}.pdf</span></div></div>
+    <div class="mail" data-testid="lucy-act-mail">${w.body}\n\n${SIG}</div>
+    <div class="chks" data-testid="lucy-act-checks">${checks().map(chkHtml).join('')}</div>
+    <div class="btns"><button class="go" data-testid="lucy-act-approve" data-act="lucy-send" data-i="${i}">Send it</button><button class="alt">Change something</button><button class="alt" data-act="lucy-cancel" data-i="${i}">Cancel</button></div></div>`;
+}
+function lucy(){
+  const msgs = S.lucy.map((m, i) => m.role === 'me' ? `<div class="me" data-testid="ai-msg-user">${m.text}</div>` : m.role === 'act' ? actHtml(m, i)
+    : `<div class="ai" data-testid="ai-msg-assistant">${m.text}${m.btns ? `<div class="row">${m.btns.map(([l, a, id]) => `<button class="ob" data-testid="${id}" data-act="${a}">${l}</button>`).join('')}</div>` : ''}</div>`).join('');
+  return `<div class="shell"><aside class="nav"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></aside><div class="content"><div class="dash"><h1>Dashboard</h1>The page behind Lucy.</div>
+    <div class="lucy" data-testid="tc-panel"><div class="lhead"><span class="face"></span><b>Lucy</b><span style="opacity:.8">⋯ &nbsp;✕</span></div>
+      <div class="lbody" data-testid="tc-body">${S.lucy.length ? msgs : `<div class="hello" data-testid="ai-welcome"><div class="big">Hi Josh.</div><div class="ln">Ask me anything, or tell me what needs doing.</div>
+        <div class="try"><button data-testid="lucy-try" data-act="lucy-ask">Try: “${ASK}”</button></div></div>`}</div>
+      <div class="lfoot"><div class="box">Message Lucy…</div></div></div></div></div>`;
+}
+function lucyAsk(){
+  S.lucy.push({ role: 'me', text: ASK });
+  if (S.status !== 'accepted') { lucyFix(); return; }
+  const b = blockReason();
+  if (b) { S.lucy.push({ role: 'ai', text: `${b}<br><br>The extra ceiling can go on the job as a variation instead — 4 m² at $19.00 is $76.00 plus GST. Want me to draft it?`, btns: [['Draft the variation', 'lucy-var', 'lucy-next']] }); return; }
+  S.lucy.push({ role: 'ai', text: `${NUM} is accepted — ${FIRST} signed it on ${ACC1} — so I can't change it as it stands. I can revise it: it goes back to Draft and ${FIRST} accepts the corrected quote again.` });
+  S.lucy.push({ role: 'act', kind: 'revise', state: 'waiting' });
+}
+function lucyFix(){
+  const before = tot().total; S.lines[1].qty = 42; const after = tot().total;
+  S.lucy.push({ role: 'ai', text: `Done — the ceiling in Living &amp; dining is now 42 m² (was 38). The total went from ${money(before)} to ${money(after)}. Nothing is sent.`, btns: [[`Open ${NUM}`, 'go-builder', 'lucy-open'], [`Send it to ${FIRST}`, 'lucy-send-card', 'lucy-next']] });
+}
+
+/* ---------------------------------------------------------------- render + events */
+const SCREENS = { builder, client, job, lucy };
+function render(){
+  document.getElementById('app').innerHTML = SCREENS[S.screen]();
+  document.querySelectorAll('.proto-bar [data-screen]').forEach(b => b.classList.toggle('on', b.dataset.screen === S.screen));
+  document.getElementById('protoState').textContent = `${NUM} is ${statusWord()}${S.revision > 1 ? ` · revision ${S.revision}` : ''}${S.revising ? ` · ${FIRST} has not accepted again yet` : ''}`;
+  const lb = document.querySelector('.lbody'); if (lb) lb.scrollTop = lb.scrollHeight;
+}
+let toastT = null;
+const say = (m) => { S.toast = m; clearTimeout(toastT); toastT = setTimeout(() => { S.toast = ''; render(); }, 7000); };
+document.addEventListener('click', (e) => {
+  const sc = e.target.closest('[data-screen]'); if (sc) { S.screen = sc.dataset.screen; S.menu = false; S.panel = false; S.review = null; S.sign = false; S.toast = ''; render(); return; }
+  if (e.target.closest('#protoReset')) { const keep = S.screen; S = fresh(); S.jobRevenue = tot().total; S.screen = keep; render(); return; }
+  const a = e.target.closest('[data-act]'); const act = a && a.dataset.act;
+  if (!act) { if (S.menu) { S.menu = false; render(); } return; }
+  const i = a.dataset.i ? Number(a.dataset.i) : -1;
+  if (act === 'menu') S.menu = !S.menu;
+  else if (act === 'menu-other') S.menu = false;
+  else if (act === 'revise-open') { S.menu = false; S.panel = true; S.toast = ''; }
+  else if (act === 'panel-close') S.panel = false;
+  else if (act === 'revise-go') { if (doRevise()) { S.panel = false; say(`${NUM} is back in Draft — marked Revised`); } }
+  else if (act === 'go-job') { S.panel = false; S.screen = 'job'; }
+  else if (act === 'go-builder') { S.screen = 'builder'; S.toast = ''; }
+  else if (act === 'review') { S.review = 'open'; S.menu = false; }
+  else if (act === 'review-close') S.review = null;
+  else if (act === 'review-send') { doSend(); S.review = 'done'; }
+  else if (act === 'sign-open') { S.sign = true; S.sigName = ''; }
+  else if (act === 'sign-close') S.sign = false;
+  else if (act === 'sign-go') { const nm = document.querySelector('[data-testid="sign-name"]').value.trim(); const ok = document.querySelector('[data-testid="sign-terms"]').checked; if (!nm || !ok) return; S.sign = false; doAccept(); }
+  else if (act === 'new-invoice') { if (S.revising) say(`${NUM} is being revised — invoice it once ${FIRST} has accepted it again.`); }
+  else if (act === 'lucy-ask') lucyAsk();
+  else if (act === 'lucy-revise') { if (doRevise()) { S.lucy[i].state = 'done'; lucyFix(); } }
+  else if (act === 'lucy-cancel') { S.lucy[i].state = 'cancelled'; if (S.lucy[i].kind === 'send') S.lucy.splice(i, 1); }
+  else if (act === 'lucy-send-card') { if (!S.lucy.some(m => m.kind === 'send')) S.lucy.push({ role: 'act', kind: 'send', state: 'waiting' }); }
+  else if (act === 'lucy-send') { doSend(); S.lucy[i].state = 'done'; }
+  else if (act === 'lucy-var') S.lucy.push({ role: 'ai', text: `Drafted on the job «${JOB}»: “Extra ceiling area — living room”, $76.00 + GST. Nothing is sent.` });
+  render();
+});
+// a quantity or a rate typed on the quote: saved on a draft or a sent quote, refused on an accepted one (the value snaps back)
+document.addEventListener('change', (e) => {
+  const el = e.target; const id = el.dataset.qty || el.dataset.rate; if (!id) return;
+  const l = S.lines.find(x => x.id === id); const v = parseFloat(el.value);
+  if (S.status === 'accepted') { say(lockedSentence()); render(); return; }
+  if (!isNaN(v) && v >= 0) { if (el.dataset.qty) l.qty = v; else l.rate = v; if (S.status === 'sent' && S.sentAgain) { S.revision += 1; S.revisedAt = TODAY; S.sentAgain = null; } }
+  render();
+});
+document.addEventListener('input', (e) => { if (e.target.matches('[data-testid="sign-name"]')) { S.sigName = e.target.value; document.querySelector('[data-testid="sign-pad"]').textContent = S.sigName || ' '; } });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (S.review) S.review = null; else if (S.panel) S.panel = false; else if (S.menu) S.menu = false; else return; render(); } });
+render();
+</script>
+</body>
+</html>
