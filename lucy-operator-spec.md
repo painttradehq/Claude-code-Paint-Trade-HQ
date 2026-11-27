@@ -262,3 +262,20 @@ Built and tested in the preview. **Not on GitHub** — `main` is still round 1 (
 Its own suggestions (mailbox round, files round, a review of the failing tests, an "Undo that" button) wait for Josh's word.
 
 **The chat's look — where it stands (27 Nov):** Josh uploaded the latest `lucy-operator.html` to Emergent himself at 02:27 UTC with the word "here". Emergent downloaded it, listed the differences, changed nothing and asked for a written brief. The brief is `lucy-chat-look-emergent-message.md` — written, **not sent**; it goes on Josh's "send". It tells Emergent the scripted small talk is prototype only and is not to be built. Read in the saved code while writing it: the app's "My reports" menu row is an ordinary button, so the click the prototype swallowed is not a fault in the app; it stays in the checks.
+
+## 18. The chat's look sent; rounds 2 and 3 read in the saved code (27 Nov)
+
+**Sent.** Josh: "send the brief." `lucy-chat-look-emergent-message.md` went to Emergent as written; it was accepted and queued.
+
+**Saved.** Josh pressed Save to GitHub: `main` is now `51354c7` — 42 commits since round 1, covering round 2, conversation first, the Messages setup width, and round 3.
+
+**Read in that code, against what was asked:**
+
+- **A send** is checked twice — when the card is built and again when Send it is pressed: only the client's own addresses or one the user typed. The email goes exactly as the card showed it.
+- **A delete** is never in the connector's list. The typed number or DELETE is checked by the server, not only by the button (a wrong word is refused). A second press is refused. Her setup and the admin's own access are checked again at the moment of approving.
+- **With "Ask me before changes" off** a change runs inside the conversation through the same path an approved card uses; sends, a recorded payment and every delete still wait on their card.
+- **Delete records** is off unless it was turned on (`ai.can.delete`).
+- **Messages setup width** is the one line asked for.
+- **Beyond round 3's message:** `get_projects` and `get_estimates` take an `id` and then return that record's own lines. Reads only, scoped to the business.
+
+**One small thing to tidy in a later round — not urgent:** the delete card for a timesheet session, and for a quote follow-up, looks the record up by its id alone when it builds the card, without first checking it belongs to this business. The delete itself goes through the screen's own route, which does check, so nothing of another business can be removed; and Lucy only ever receives ids from her own business's records. It is the card's read that should carry the same check as every other card.

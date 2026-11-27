@@ -1,16 +1,16 @@
-# Lucy — the chat is a plain conversation (look only) — NOT SENT. Waits for Josh's "send"
+# Lucy — the chat is a plain conversation (look only) — SENT to Emergent 27 Nov on Josh's word ("send the brief")
 
 Josh, 27 Nov, with a screenshot of the empty chat: "Let's improve the look and feel of the chat. Remove the Lucy face from inside the chat, and also remove the ability titles so it's just a conversational chat. However having a short sentence in there is good — you come up with one."
 
 **Where it stands:** Josh uploaded the latest `lucy-operator.html` to Emergent himself (27 Nov 02:27 UTC, with the one word "here"). Emergent downloaded it, listed what differs from the saved prototype, changed nothing, and asked: "Do you want me to build these into the app as they stand, or is there a written brief to go with it?" This is that brief.
 
-Written against the app's code as saved to GitHub (`640c20d`, round 1) — `components/lucy/LucyChat.tsx` and `components/tester/HelperPanel.tsx`. Rounds 2 and 3 and conversation first are not on GitHub yet; nothing in this message depends on them.
+Written against `components/lucy/LucyChat.tsx` and `components/tester/HelperPanel.tsx`. Josh pressed Save to GitHub before it went (`51354c7`, round 3): the empty chat, the faces, the placeholder and the menu are the same there as in round 1, so the brief matches the code Emergent is working on.
 
 Prototype checks: `tools/test_lucy_operator.js`, 230 of 230 at 1440 × 900 and 1024 × 768.
 
 ---
 
-## The message
+## The message as sent
 
 # Lucy — the chat is a plain conversation (look only)
 
