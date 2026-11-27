@@ -333,3 +333,14 @@ Complete: texts, the follow-through button, the inbox in the Today briefing. Eve
 **Read in the saved code** (`services/lucy_mail.py`, `services/attachments.email_files`): the client and the conversation are looked up inside the business; a conversation with another client's message in it is refused; a text goes only to the client's own numbers or one typed; every file is checked to be that client's own, inside the business, before its bytes are read; the follow-through is kept only when the job or event is that client's, and its button's words are built by the server.
 
 Its suggestions (dashboard speed, the older tests, read-on-open, reply drafts in the briefing) wait for Josh's word.
+
+## 23. Inbox — read on open and reply drafts — sent (27 Nov)
+
+Josh: "check and do these: Read On Open, Reply Drafts" (two more of Emergent's suggestions). Emergent was free — nothing new since its L5 report. One round, no prototype. `inbox-read-on-open-reply-drafts-message.md`.
+
+**Read in the code first, and it changed the design:** the Inbox already drafts a reply. Opening a client's conversation with an unread message makes a "Suggested reply · from this thread and the client's records" with Use this reply — drafted by the AI on every open, kept nowhere, shown only while the message is unread. And the only Mark read button sits inside that box. So read-on-open by itself would have switched the suggested reply off.
+
+- **Read on open:** opening a conversation in the Inbox marks it read (any conversation). Lucy reading one still marks nothing. The Mark read button goes.
+- **The suggested reply** follows "the client spoke last" instead of "unread", is drafted once per message and kept (fewer AI calls than today), and not for a message older than 14 days.
+- **Reply drafts** is that same suggested reply, not a second drafting system: Reply on a briefing row opens the conversation with the draft already in the reply box.
+- **Not built, by choice:** a draft written for every waiting client each morning — it would spend AI on drafts nobody opens.
