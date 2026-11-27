@@ -362,3 +362,22 @@ Josh: "check and do these: Read On Open, Reply Drafts" (two more of Emergent's s
 **Josh wrote to Emergent himself (27 Nov 21:22 UTC):** "Live Progress: Display Lucy's ongoing task progress instead of static dots (show me a preview on this one or explain this further before implementing it)." Emergent was running on it at the time of this check; no reply yet.
 
 Its other suggestions (deposit clarity, dashboard speed, the older tests) wait for Josh's word.
+
+## 26. What Lucy costs — the code read and the round written (28 Nov, not sent)
+
+Josh, after the token explanation: "This is certainly unaffordable… we need to investigate why this is happening and find a solution here."
+
+**Read in the code (`a71a8f3`):**
+
+- Every AI feature runs on `claude-opus-5` (`AI_MODEL` default) with `thinking: adaptive` and no effort set — the default, high — including the one-line jobs (briefing, suggested reply, summaries).
+- An admin with everything on gets 96 tools (37,934 characters) plus about 8,000 characters of instructions: about 14,000 tokens on every call (estimate; round 1 measured about 13,000 with fewer tools).
+- Caching is set up correctly (frozen instructions, sorted tools, the date in the message), on the default 5-minute life: the 14,000 cost a tenth when the last call was under 5 minutes ago and 1.25× when it was not. A painter who asks one thing and goes back to work pays the 1.25× nearly every time.
+- One leak: the last-resort call after 10 rounds drops the tool list, which re-bills the whole prompt.
+
+**Prices (Anthropic's price page, 27 Nov 2026, US$ per million — input / cache write / cache read / output):** Opus 5 5.00 / 6.25 / 0.50 / 25.00 · Opus 5.5 4.00 / 5.00 / 0.20 / 20.00 · Sonnet 5.5 2.00 / 2.50 / 0.10 / 10.00 · Haiku 5.5 0.10 / 0.125 / 0.01 / 0.50.
+
+**By arithmetic (estimates until measured):** one simple question with one lookup is about US$0.13 cold and US$0.05 warm today; about US$0.05 / US$0.02 on Sonnet 5.5; under half a cent on Haiku 5.5. Josh's heaviest test day (281,313 of the 300,000 allowance) was about US$2. A day at the full allowance is about US$2–3, so the worst case is about US$60–90 a month for a business that hits the cap every day — the US$45–225 said earlier was too wide at the top.
+
+**The round — `lucy-cost-emergent-message.md`, waits for "send":** (1) measure a fixed set of twelve everyday tasks plus the four one-shot features on a TS_ test account — calls, tokens, cold and warm dollars, pass/fail; (2) cut the waste — tools loaded on demand (tool search, the five most-used kept loaded), the last-resort call keeps its tools — kept only if every task still passes and the cost falls; (3) price the same set on Opus 5.5, Sonnet 5.5 (default and low effort) and Haiku 5.5, switching nothing. Josh picks from the table. No prototype — nothing he looks at changes.
+
+**Not in the round, noted:** the cache life (5 minutes or 1 hour) needs real gaps between messages from real customers — none to read without Josh's account; the other path he raised — his own Claude account through the connector — already works and costs the app nothing.
