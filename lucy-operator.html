@@ -1117,6 +1117,15 @@
   .lz-rep .reply{ margin-top:7px; padding:7px 9px; border-radius:8px; background:var(--surface-sunken); font-size:12.5px; }
   .lz-rep .reply b{ display:block; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); font-weight:800; margin-bottom:2px; }
   .lz-rep button{ margin-top:8px; height:28px; padding:0 10px; border-radius:8px; border:1px solid var(--border-strong); background:var(--surface); font:inherit; font-size:12px; font-weight:600; color:var(--accent-ink); cursor:pointer; }
+
+  /* a plain conversation: one line in the middle of an empty chat, no face beside her messages */
+  .welcome.lz-hello{ text-align:center; margin:auto 0; padding:0 22px 56px; }
+  .welcome.lz-hello .big{ font-size:30px; line-height:1.15; margin-bottom:10px; letter-spacing:-.2px; }
+  .lz-line{ font-size:15px; line-height:1.5; color:var(--text-secondary); }
+  .welcome.lz-hello p.on{ text-align:left; margin:20px 0 0; font-size:13.5px; color:var(--text-secondary); }
+  .welcome.lz-hello .what{ display:block; margin:0 auto; }
+  .airow .msg.ai{ max-width:92%; }
+  .typing{ padding:8px 4px; }
 </style>
 </head>
 <body>
@@ -1273,6 +1282,7 @@
   <div class="tc-menu" id="tcMenu" hidden data-testid="tc-menu">
     <button data-menu="new" data-testid="tc-menu-new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New chat</button>
     <button data-menu="hist" data-testid="tc-menu-history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>Past chats</button>
+    <button data-lz="report" id="tcMenuReport" data-testid="tc-menu-report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5M12 16.5h.01"/><path d="M10.3 3.9 2.6 17.2A2 2 0 0 0 4.3 20h15.4a2 2 0 0 0 1.7-2.8L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>Report a problem</button>
     <button data-lz="reports" id="tcMenuReports" data-testid="tc-menu-reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>My reports<span id="tcHelpN2" hidden></span></button>
     <hr>
     <button data-menu="what" data-testid="tc-menu-what"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>What Lucy can do</button>
@@ -1712,6 +1722,7 @@ document.addEventListener('click', e => {
   if (lz) { e.stopPropagation(); const k = lz.dataset.lz; if (typeof tcMenuClose === 'function') tcMenuClose();
     if (k === 'setup') { openPop(); return; }
     if (k === 'reports') { AI.showReports = true; AI.list = false; renderAssistant(); }
+    if (k === 'report') { AI.showReports = false; AI.list = false; renderAssistant(); const ta = $('#tcInput'); ta.value = 'Report a problem: '; ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); ta.dispatchEvent(new Event('input', { bubbles: true })); }
     if (k === 'back') { AI.showReports = false; renderAssistant(); }
     if (k === 'add') { AI.showReports = false; renderAssistant(); const ta = $('#tcInput'); ta.value = 'About ' + lz.dataset.rid + ': '; ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); ta.dispatchEvent(new Event('input', { bubbles: true })); }
     return; }
@@ -1728,12 +1739,12 @@ document.addEventListener('click', e => {
   if (a === 'change') { const ta = $('#tcInput'); ta.value = 'Change that: '; ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); ta.dispatchEvent(new Event('input', { bubbles: true })); return; }
   if (a === 'ok') { if (m.blocked || (m.kind === 'delete' && !m.small && m.typed.trim().toUpperCase() !== m.confirm)) return; lucyRun(m); }
 });
-if (!TESTER) { const mr = document.getElementById('tcMenuReports'); if (mr) mr.hidden = true; }
+if (!TESTER) { ['tcMenuReports', 'tcMenuReport'].forEach(id => { const mr = document.getElementById(id); if (mr) mr.hidden = true; }); }
 
 function renderAssistant(){
   const b = $('#tcBody');
   if (AI.showReports){ b.innerHTML = reportsHtml(); $('#tcFoot').hidden = true; $('#tcCtx').hidden = true; $('#tcAttach').hidden = true; return; }
-  $('#tcCam').hidden = false; $('#tcFile').hidden = false; $('#tcInput').placeholder = 'Ask Lucy, or tell her what to do…'; $('#tcInput').disabled = false;
+  $('#tcCam').hidden = false; $('#tcFile').hidden = false; $('#tcInput').placeholder = 'Message Lucy…'; $('#tcInput').disabled = false;
   $('#tcCtxTxt').textContent = USAGE_HIGH ? 'Today’s allowance is nearly used up' : 'Claude · your key'; $('#tcUsage').hidden = false; $('#tcUsageBar').parentElement.hidden = false; $('#tcCtx').classList.toggle('show', USAGE_HIGH); if (USAGE_HIGH){ $('#tcUsage').textContent = '262,000 / 300,000 today'; $('#tcUsageBar').style.width = '87%'; }
   if (AI.list){
     b.innerHTML = `<div class="lbl">Chats with Lucy · this business · ${AI.hist.length}</div>` + (AI.hist.map(h => `<div class="conv" data-hid="${h.id}" data-testid="ai-conv-${h.id}"><div class="k">${svg('sparkle')}</div><div class="t"><b>${esc(h.title)}</b><span>${esc(h.by)} · ${h.n} messages · ${ago(new Date(h.at).toISOString())}</span></div><button class="x" data-hdel="${h.id}" data-testid="ai-conv-delete-${h.id}" aria-label="Delete">${svg('trash')}</button></div>`).join('') || '<div class="sysline">No conversations yet</div>');
@@ -1741,12 +1752,12 @@ function renderAssistant(){
   }
   $('#tcFoot').hidden = false; $('#tcCtx').hidden = false; $('#tcAttach').hidden = !AI.attach;
   if (!AI.msgs.length){
-    b.innerHTML = `<div class="welcome" data-testid="ai-welcome"><div class="wav">${faceHtml('welcome')}</div><div class="big">Hi ${ME}, what do you need?</div><p id="tcWhat" class="${WHAT ? 'on' : ''}">Ask in plain words, or tell me what to do. I read your clients, leads, calendar, quotes, invoices, jobs and crew — only this business — and I can do the work on them: start and change quotes, add to jobs, raise invoices, book the calendar, send and delete. I make the change and tell you what I did; before anything is sent or deleted I show you first and wait for your OK.${TESTER ? ' While you’re testing: tell me when something goes wrong and I log it for the team, with the page you’re on.' : ''}</p><div class="picks">${STARTERS.map(([k, l]) => `<button data-starter="${k}" data-testid="ai-starter-${k}">${ROWICON[k]}${l}</button>`).join('')}${FILLERS.map(([k, l, h]) => `<button data-fill="${k}" data-testid="ai-starter-${k}">${ROWICON[k]}${l}<small>${h}</small></button>`).join('')}</div><button class="what" id="tcWhatBtn" data-testid="ai-what">${WHAT ? 'Hide' : 'What can Lucy do?'}</button></div>`;
+    b.innerHTML = `<div class="welcome lz-hello" data-testid="ai-welcome"><div class="big">Hi ${ME}.</div><div class="lz-line" data-testid="ai-line">Ask me anything, or tell me what needs doing.</div><p id="tcWhat" class="${WHAT ? 'on' : ''}">Ask in plain words, or tell me what to do. I read your clients, leads, calendar, quotes, invoices, jobs and crew — only this business — and I can do the work on them: start and change quotes, add to jobs, raise invoices, book the calendar, send and delete. I make the change and tell you what I did; before anything is sent or deleted I show you first and wait for your OK.${TESTER ? ' While you’re testing: tell me when something goes wrong and I log it for the team, with the page you’re on.' : ''}</p>${WHAT ? '<button class="what" id="tcWhatBtn" data-testid="ai-what">Hide</button>' : ''}</div>`;
     syncSend(); return;
   }
-  b.innerHTML = AI.msgs.map(m => m.role === 'act' ? actHtml(m) : m.role === 'typing' ? `<div class="typing" data-testid="ai-typing"><span class="sav">${faceHtml('msg', 'think')}</span><span class="dots"><i></i><i></i><i></i></span></div>`
+  b.innerHTML = AI.msgs.map(m => m.role === 'act' ? actHtml(m) : m.role === 'typing' ? `<div class="typing" data-testid="ai-typing"><span class="dots"><i></i><i></i><i></i></span></div>`
     : m.role === 'me' ? `<div class="msg me" data-testid="ai-msg-user">${m.img ? '📷 Photo attached\n' : ''}${esc(m.text)}</div>`
-    : `<div class="airow"><span class="sav">${faceHtml('msg', 'idle')}</span><div class="msg ai" data-testid="ai-msg-assistant">${m.html}<div class="src" data-testid="ai-sources">${m.src.map(s => `<code>${DOC}${srcLabel(s)}</code>`).join('')}<button class="copy" data-copy data-testid="ai-copy">Copy</button></div>${nextHtml(m)}</div></div>`).join('');
+    : `<div class="airow"><div class="msg ai" data-testid="ai-msg-assistant">${m.html}<div class="src" data-testid="ai-sources">${m.src.map(s => `<code>${DOC}${srcLabel(s)}</code>`).join('')}<button class="copy" data-copy data-testid="ai-copy">Copy</button></div>${nextHtml(m)}</div></div>`).join('');
   b.scrollTop = b.scrollHeight; syncSend();
 }
 function helpBubble(m){ const who = m.who === 'me' ? '' : `<span class="who">${m.who === 'owner' ? 'Josh' : 'Helper'}</span>`; return `<div class="msg ${m.who}" data-testid="tc-msg-${m.who}">${who}${esc(m.text)}${m.shot ? '<span class="shot"></span>' : ''}<span class="when">${fmtWhen(m.at)}</span></div>`; }
@@ -1877,6 +1888,7 @@ document.addEventListener('click', e => {
   if (!t.closest('#tcMenu')) tcMenuClose();
   const mi = t.closest('#tcMenu [data-menu], #tcMenu [data-tab]');
   if (mi) { e.stopPropagation(); tcMenuClose(); const k = mi.dataset.menu || mi.dataset.tab; if (k === 'new') { tab = 'assistant'; AI.msgs = []; AI.list = false; AI.attach = false; render(); tcHelpMode(); $('#tcInput').focus(); } else if (k === 'hist') { tab = 'assistant'; AI.list = !AI.list; render(); tcHelpMode(); } else if (k === 'gear') { $('#tcGear').click(); } else if (k === 'help') { tab = 'help'; HELP.list = false; render(); tcHelpMode(); } else if (k === 'what') { WHAT = true; tab = 'assistant'; AI.list = false; render(); tcHelpMode(); } return; }
+  if (t.closest('#tcMenu [data-lz]')) return;
   if (t.closest('#tcMenu')) { e.stopPropagation(); return; }
   if (t.closest('#tcBack')) { tab = 'assistant'; render(); tcHelpMode(); return; }
   if (t.closest('#tcWhatBtn')) { WHAT = !WHAT; render(); return; }

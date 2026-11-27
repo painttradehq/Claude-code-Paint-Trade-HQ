@@ -343,5 +343,38 @@ rep("<title>", "<title>Lucy does the work · ", 1) if "<title>" in src else None
 # 7. plain names on the source chips for the lookups the new flows use
 rep("const SRC_LABEL = { ", "const SRC_LABEL = { search_clients: 'Clients', list_projects: 'Jobs', ")
 
+# 8. Josh, 27 Nov — a plain conversation: no face and no list of abilities inside the chat; one short line instead
+import re as _re
+rep("""<div class="welcome" data-testid="ai-welcome"><div class="wav">${faceHtml('welcome')}</div><div class="big">Hi ${ME}, what do you need?</div>""",
+    """<div class="welcome lz-hello" data-testid="ai-welcome"><div class="big">Hi ${ME}.</div><div class="lz-line" data-testid="ai-line">Ask me anything, or tell me what needs doing.</div>""")
+_n = len(src)
+src = _re.sub(r'<div class="picks">\$\{STARTERS\.map.*?</div><button class="what" id="tcWhatBtn" data-testid="ai-what">\$\{WHAT \? \'Hide\' : \'What can Lucy do\?\'\}</button>',
+              lambda m: """${WHAT ? '<button class="what" id="tcWhatBtn" data-testid="ai-what">Hide</button>' : ''}""", src, count=1, flags=_re.S)
+assert len(src) != _n, "welcome rows not found"
+rep("""<div class="typing" data-testid="ai-typing"><span class="sav">${faceHtml('msg', 'think')}</span>""", """<div class="typing" data-testid="ai-typing">""")
+rep("""<div class="airow"><span class="sav">${faceHtml('msg', 'idle')}</span>""", """<div class="airow">""")
+src = src.replace("Ask Lucy, or tell her what to do…", "Message Lucy…")
+# the ⋯ menu swallowed clicks on its Lucy items (My reports never opened from the menu) — let them through
+rep("""  if (t.closest('#tcMenu')) { e.stopPropagation(); return; }""", """  if (t.closest('#tcMenu [data-lz]')) return;
+  if (t.closest('#tcMenu')) { e.stopPropagation(); return; }""")
+rep("""<button data-lz="reports" id="tcMenuReports" data-testid="tc-menu-reports">""",
+    """<button data-lz="report" id="tcMenuReport" data-testid="tc-menu-report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5M12 16.5h.01"/><path d="M10.3 3.9 2.6 17.2A2 2 0 0 0 4.3 20h15.4a2 2 0 0 0 1.7-2.8L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>Report a problem</button>
+    <button data-lz="reports" id="tcMenuReports" data-testid="tc-menu-reports">""")
+rep("""    if (k === 'reports') { AI.showReports = true; AI.list = false; renderAssistant(); }""",
+    """    if (k === 'reports') { AI.showReports = true; AI.list = false; renderAssistant(); }
+    if (k === 'report') { AI.showReports = false; AI.list = false; renderAssistant(); const ta = $('#tcInput'); ta.value = 'Report a problem: '; ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); ta.dispatchEvent(new Event('input', { bubbles: true })); }""")
+rep("""if (!TESTER) { const mr = document.getElementById('tcMenuReports'); if (mr) mr.hidden = true; }""",
+    """if (!TESTER) { ['tcMenuReports', 'tcMenuReport'].forEach(id => { const mr = document.getElementById(id); if (mr) mr.hidden = true; }); }""")
+rep("</style>", """
+  /* a plain conversation: one line in the middle of an empty chat, no face beside her messages */
+  .welcome.lz-hello{ text-align:center; margin:auto 0; padding:0 22px 56px; }
+  .welcome.lz-hello .big{ font-size:30px; line-height:1.15; margin-bottom:10px; letter-spacing:-.2px; }
+  .lz-line{ font-size:15px; line-height:1.5; color:var(--text-secondary); }
+  .welcome.lz-hello p.on{ text-align:left; margin:20px 0 0; font-size:13.5px; color:var(--text-secondary); }
+  .welcome.lz-hello .what{ display:block; margin:0 auto; }
+  .airow .msg.ai{ max-width:92%; }
+  .typing{ padding:8px 4px; }
+</style>""", 1)
+
 (ROOT / "lucy-operator.html").write_text(src)
 print("wrote lucy-operator.html", len(src))

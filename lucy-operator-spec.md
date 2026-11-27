@@ -10,7 +10,7 @@
 
 This promotes the parked item "Lucy does the work in the app, confirm first" (17 Nov) to a build. **Round L1 went to Emergent on 26 Nov on Josh's word** (`lucy-l1-emergent-message.md`) and is built and saved to GitHub; **L2 went the same day** (`lucy-l2-emergent-message.md`); L3–L5 follow one at a time, each on his "send". What L1 narrows from this spec is listed in §9.
 
-**Prototype:** `lucy-operator.html` (built by `tools/make_lucy_operator.py` on top of the Round 73 box, `lucy-chat-notion.html`). **Checks:** `tools/test_lucy_operator.js` — 214 of 214 at 1440 × 900 and 1024 × 768 (26 Nov: the round 2 cards, then conversation first; 27 Nov: round 3's removing and fixing). The prototype opens conversation-first; `?ask=1` shows it with "Ask me before changes" on. Add `?tester=0` to see it as someone who is not in the tester program, and `?mail=microsoft&storage=onedrive` or `?mail=none&storage=builtin` to see Lucy's setup for a business on other providers.
+**Prototype:** `lucy-operator.html` (built by `tools/make_lucy_operator.py` on top of the Round 73 box, `lucy-chat-notion.html`). **Checks:** `tools/test_lucy_operator.js` — 224 of 224 at 1440 × 900 and 1024 × 768 (26 Nov: the round 2 cards, then conversation first; 27 Nov: round 3's removing and fixing, then the plain chat). The prototype opens conversation-first; `?ask=1` shows it with "Ask me before changes" on. Add `?tester=0` to see it as someone who is not in the tester program, and `?mail=microsoft&storage=onedrive` or `?mail=none&storage=builtin` to see Lucy's setup for a business on other providers.
 
 ## 1. What the prototype shows
 
@@ -223,4 +223,20 @@ Read from Emergent's chat only. **Neither is on GitHub yet** (`main` is still `6
 | Talking to Lucy by voice | No, for now. |
 
 **Round 3 in one line:** every change a screen allows that she could not make yet (crew and hire on a job, duplicate and refresh a quote, edit and archive an invoice, archive a client, fix a timesheet, the Library and products) is done and told; every delete is a red card, one record at a time, behind a "Delete records" switch that starts off; archiving is not deleting. The keys to the account stay outside for good.
+
+## 16. The chat's look: a plain conversation (27 Nov) — prototype only, nothing sent
+
+Josh, with a screenshot of the empty chat: "Let's improve the look and feel of the chat. Remove the Lucy face from inside the chat, and also remove the ability titles so it's just a conversational chat. However having a short sentence in there is good — you come up with one." Then: "Hold on, Emergent is still working. For now do the prototype for the chat box and I'll get back to you."
+
+In `lucy-operator.html` now:
+
+- **An empty chat is one line in the middle:** "Hi Josh." and under it "Ask me anything, or tell me what needs doing." No face above it, no rows (the four questions, Start a quote, Add to a job, Remind me, I've got an idea, Report a problem are gone), no "What can Lucy do?" link.
+- **No face beside her messages** and none on the three dots while she works. The face in her header and on the round button that opens her stay — they are how you find her.
+- **The typing box says "Message Lucy…"** so it does not repeat the line above.
+- **Nothing is lost, it moves to the ⋯ menu:** "What Lucy can do" was already there; **"Report a problem"** is added for testers (it fills the box, as the row did) beside "My reports".
+- Her answers are a little wider now that no face sits beside them.
+
+Other lines considered for the empty chat: "What do you need?" · "What are we working on?" — Josh's to pick.
+
+Found while testing: in the prototype the ⋯ menu swallowed clicks on "My reports" (it only ever opened from a report's own button). Fixed in the prototype; **to check in the app** when this goes to Emergent.
 

@@ -27,15 +27,26 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     await p.click('[data-testid="tc-wide"]'); await p.waitForTimeout(150);
     ok((await p.locator('#tc').boundingBox()).width === box.width, 'and narrows her again');
 
-    // ---- welcome
-    ok((await p.locator('[data-testid="ai-welcome"] .big').innerText()) === 'Hi Josh, what do you need?', 'greeting asks what you need');
-    ok(await p.locator('[data-starter]').count() === 4 && await p.locator('[data-fill]').count() === 5, 'rows: four questions, Start a quote, Add to a job, Remind me, I’ve got an idea, Report a problem');
-    ok(await inView(p.locator('#tcInput')) && await inView(p.locator('[data-fill="report"]')), 'every row and the typing box are on screen');
-    ok((await p.getAttribute('#tcInput', 'placeholder')) === 'Ask Lucy, or tell her what to do…', 'placeholder says she takes tasks');
+    // ---- an empty chat is a plain conversation: one line, no face, no list of abilities (Josh, 27 Nov)
+    ok((await p.locator('[data-testid="ai-welcome"] .big').innerText()) === 'Hi Josh.' && (await p.locator('[data-testid="ai-line"]').innerText()) === 'Ask me anything, or tell me what needs doing.', 'an empty chat says "Hi Josh." and one short line');
+    ok(await p.locator('[data-starter]').count() === 0 && await p.locator('[data-fill]').count() === 0 && await p.locator('[data-testid="ai-what"]').count() === 0, 'no rows of abilities and no "What can Lucy do?" link inside the chat');
+    ok(await p.locator('#tcBody [data-face]').count() === 0 && await p.locator('[data-testid="lucy-face-head"]').count() === 1, 'no Lucy face inside the chat; the one in her header stays');
+    const wl = await p.locator('[data-testid="ai-welcome"]').boundingBox(); const bd = await p.locator('#tcBody').boundingBox();
+    ok(Math.abs((wl.x + wl.width / 2) - (bd.x + bd.width / 2)) <= 2 && wl.y > bd.y + 80 && wl.y + wl.height < bd.y + bd.height - 40, 'the line sits in the middle of the empty chat');
+    ok(await inView(p.locator('#tcInput')) && (await p.getAttribute('#tcInput', 'placeholder')) === 'Message Lucy…', 'the typing box is on screen and says "Message Lucy…"');
     await p.screenshot({ path: `${SHOTS}/lucy-op-welcome-${W}.png` });
-    await p.click('[data-fill="quote"]'); await p.waitForTimeout(100);
-    ok((await p.inputValue('#tcInput')) === 'Start a quote for ', '"Start a quote for…" fills the box without sending');
+    await p.click('[data-testid="tc-more"]'); await p.waitForTimeout(150);
+    ok(await p.locator('[data-testid="tc-menu-what"]').isVisible() && await p.locator('[data-testid="tc-menu-report"]').isVisible(), '"What Lucy can do" and, for a tester, "Report a problem" live in the ⋯ menu');
+    await p.click('[data-testid="tc-menu-report"]'); await p.waitForTimeout(150);
+    ok((await p.inputValue('#tcInput')) === 'Report a problem: ', 'the menu\'s "Report a problem" fills the box without sending');
     await p.fill('#tcInput', '');
+    await p.click('[data-testid="tc-more"]'); await p.waitForTimeout(150); await p.click('[data-testid="tc-menu-reports"]'); await p.waitForTimeout(200);
+    ok(await p.locator('[data-testid="lucy-reports"]').isVisible() && await p.locator('#tcMenu').isHidden(), '"My reports" in the menu opens the list and closes the menu');
+    await p.click('[data-testid="lucy-reports-back"]'); await p.waitForTimeout(150);
+    await p.click('[data-testid="tc-more"]'); await p.waitForTimeout(150); await p.click('[data-testid="tc-menu-what"]'); await p.waitForTimeout(150);
+    ok((await p.locator('#tcWhat').innerText()).includes('I read your clients') && await p.locator('[data-testid="ai-what"]').innerText() === 'Hide', '"What Lucy can do" from the menu shows her answer under the line, with Hide');
+    await p.click('[data-testid="ai-what"]'); await p.waitForTimeout(100);
+    ok(await p.locator('[data-testid="ai-what"]').count() === 0, 'Hide puts the empty chat back to one line');
 
     // ---- one change: nothing happens before Approve
     await say('Add a $180 skip bin expense to the South Wharf job');
@@ -203,9 +214,8 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
 
     // ---- someone who is not a tester
     await p.goto(U + '&tester=0'); await p.waitForTimeout(400); await p.click('#tcBubble'); await p.waitForTimeout(300);
-    ok(await p.locator('[data-fill="report"]').count() === 0 && await p.locator('[data-fill]').count() === 4, 'not a tester: no "Report a problem" row');
     await p.click('[data-testid="tc-more"]'); await p.waitForTimeout(150);
-    ok(!(await p.locator('[data-testid="tc-menu-reports"]').isVisible()), 'not a tester: no "My reports" in the menu');
+    ok(!(await p.locator('[data-testid="tc-menu-reports"]').isVisible()) && !(await p.locator('[data-testid="tc-menu-report"]').isVisible()), 'not a tester: no "Report a problem" and no "My reports" in the menu');
     await p.click('#tcBody'); await p.waitForTimeout(150); await say('Report a problem: something is broken');
     ok(await p.locator('[data-testid="lucy-act"]').count() === 0, 'not a tester: no report card');
 
@@ -216,6 +226,7 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     await say('Add a $180 skip bin expense to the South Wharf job');
     ok(await cardsNow().count() === 0 && (await lastAi().innerText()).includes('Done — I added Skip bin hire, $180.00'), 'an expense is added straight away: no card, Lucy says what she did');
     ok((await lastAi().locator('[data-testid="lucy-open"]').innerText()) === 'Open the job', 'her answer carries a button to open the record');
+    ok(await p.locator('#tcBody [data-face]').count() === 0, 'no face beside her messages either');
     await p.screenshot({ path: `${SHOTS}/lucy-op-direct-${W}.png` });
     await say('Start a quote for Leanne Crowe, exterior repaint at 12 Ivanhoe Pde');
     ok(await cardsNow().count() === 0 && (await lastAi().innerText()).includes('EST-0046') && (await lastAi().innerText()).includes('$8,460.00 + GST') && (await lastAi().innerText()).includes('Nothing is sent'), 'a quote of several steps is built straight away: one answer with the number, the total and "Nothing is sent"');
