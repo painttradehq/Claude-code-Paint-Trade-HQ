@@ -242,3 +242,23 @@ Found while testing: in the prototype the ⋯ menu swallowed clicks on "My repor
 
 **Later the same day:** Josh typed "hey" in the prototype and got the "On site today" answer, and asked whether the conversation is restricted. It is not — the prototype has no AI behind it, only scripted lines, and anything it did not recognise fell back to that one answer. Now a greeting gets a greeting ("Hey Josh. What do you need?") and anything it has no script for says so plainly and offers what can be tried. In the app Lucy is Claude with the business's tools and answers whatever is typed.
 
+
+## 17. Round 3 — Emergent's report (checked 27 Nov on Josh's "check")
+
+Built and tested in the preview. **Not on GitHub** — `main` is still round 1 (`640c20d`, 26 Nov), so rounds 2 and 3, conversation first and the Messages setup width are unread here.
+
+- **Changes she can now make**, in conversation (or on the L1 card with "Ask me before changes" on): a job's crew, hire and paint; a timesheet session added or fixed, a reason required; Library items, tasks and products; duplicate, refresh or archive a quote; edit or archive an invoice; archive or restore a client. 20 new tools in the connector registry (74 tools, 53 of them changes), so the Claude connector has them too.
+- **Deleting** is off until Delete records is turned on in her setup. Then one record per red card: a quote or invoice needs its number typed; a job, client, lead, supplier or Library record needs DELETE typed. The app's own refusals come back in its words.
+- **Chips** read Jobs, Quotes, Clients, Invoices, Calendar, Crew, Library. What's new draft #47 has five cards and is still a draft (Lucy does the work · Report a problem to Lucy · Lucy can send for you · Messages setup is full width · Lucy can fix and tidy up).
+
+**Tested:** the twelve on-screen checks at 1440 and 1024, in Emergent's run and the testing agent's (the longest delete card at 1024 only); 28 faked-model tests; 208 Lucy and connector regression tests.
+
+**Not seen on screen yet:** the delete cards for an invoice, a lead, a supplier, a calendar event, a reminder, a Library record, and archiving a product.
+
+**Beyond the message:** reading one job or one quote now returns its own lines with their ids (expenses, hire, variations, paint; follow-ups on a quote). Without it she could not name the one expense to delete. It is a read, and needed for the round to work.
+
+**Flagged by Emergent, not from this round:** 15 backend tests fail, the same 15 on the commit before round 3; not investigated. The whole suite cannot run in one go in its pod.
+
+Its own suggestions (mailbox round, files round, a review of the failing tests, an "Undo that" button) wait for Josh's word.
+
+**The chat's look — where it stands (27 Nov):** Josh uploaded the latest `lucy-operator.html` to Emergent himself at 02:27 UTC with the word "here". Emergent downloaded it, listed the differences, changed nothing and asked for a written brief. The brief is `lucy-chat-look-emergent-message.md` — written, **not sent**; it goes on Josh's "send". It tells Emergent the scripted small talk is prototype only and is not to be built. Read in the saved code while writing it: the app's "My reports" menu row is an ordinary button, so the click the prototype swallowed is not a fault in the app; it stays in the checks.
