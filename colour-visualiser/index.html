@@ -364,7 +364,7 @@ function endStroke(){
    Thin strips are too narrow for the AI model and all "edge" to the fill. Here the drag is the guide:
    at each point along it we look sideways for where the strip's colour ends or a step in tone appears,
    then even those two edge lines out along the run so the band comes out straight and clean. */
-function trimLine(path,R,erase){
+function trimLine(path,R,erase,strict){
   // 1. evenly spaced, smoothed centre line
   let raw=[path[0]];
   for(let i=1;i<path.length;i++){const a=path[i-1],b=path[i],L=Math.hypot(b.x-a.x,b.y-a.y),n=Math.max(1,Math.round(L/1.5));
@@ -403,7 +403,8 @@ function trimLine(path,R,erase){
   // Low-contrast trim (white cornice under a white ceiling) often shows no clear cut on one side. Where no
   // band was found, fall back to spreading sideways from the drag while the colour still matches.
   let found=0;for(let k=0;k<n;k++)found+=ok[k];
-  if(found<n*0.6){
+  if(strict===true&&found<n*0.5)return 0;      // strict: only paint where a clear band was found
+  if(strict!==true&&found<n*0.6){
     const py=[],pb=[],pr=[];for(const p of P){const i=at(p.x,p.y);if(i>=0){py.push(sY[i]);pb.push(sB[i]);pr.push(sR[i])}}
     const fY=found>=n*0.2?rY:med(py),fB=found>=n*0.2?rB:med(pb),fR=found>=n*0.2?rR:med(pr);
     const like=i=>{if(i<0)return false;const u=sY[i]-fY,v=sB[i]-fB,w=sR[i]-fR;return 0.3*u*u+2.5*(v*v+w*w)<=T2};
@@ -418,6 +419,10 @@ function trimLine(path,R,erase){
   // 4. even the two edge lines out along the run
   const smooth=src=>{const out=new Float32Array(n),w=14;for(let k=0;k<n;k++){const v=[];for(let j=Math.max(0,k-w);j<=Math.min(n-1,k+w);j++)if(ok[j])v.push(src[j]);out[k]=v.length?med(v):NaN}return out};
   const LO=smooth(lo),HI=smooth(hi),L=layers[active];let painted=0;
+  if(strict==="checked"){   // only accept a result that looks like a strip: mostly found, narrow, and even in width
+    const ws=[];for(let k=0;k<n;k++)if(!isNaN(LO[k]))ws.push(HI[k]-LO[k]+1);
+    if(ws.length<n*0.6)return 0;ws.sort((p,q)=>p-q);
+    const m=ws[ws.length>>1],p9=ws[Math.floor(ws.length*0.9)];if(m>maxW*0.6||p9>2.2*m+2)return 0}
   // 5. fill the band
   for(let k=0;k<n;k++){if(isNaN(LO[k])||HI[k]-LO[k]<1)continue;
     for(let d=LO[k]-0.5;d<=HI[k]+0.5;d+=0.5){const i=at(P[k].x+d*NX[k],P[k].y+d*NY[k]);if(i<0)continue;
@@ -426,6 +431,78 @@ function trimLine(path,R,erase){
   if(!erase)closeHoles(L.mask,255,new Int32Array(N));
   for(const o of layers)o.dirty=true;
   return painted;
+}
+
+/* ---------- Trim line, straight runs ----------
+   Trim is straight, so read it as whole lines. Fit a line to the drag, then for every nearby offset and
+   small tilt, average the colour step across that candidate line along its full length. A real edge, even
+   a faint one (white cornice under a white ceiling), adds up along the run while grain cancels out.
+   The strip is the band between the two edge lines either side of the drag; each edge keeps its own tilt,
+   so a strip that tapers with perspective still gets two straight, clean sides. */
+function trimStraight(path,R){
+  const n=path.length;if(n<3)return null;
+  let mx=0,my=0;for(const p of path){mx+=p.x;my+=p.y}mx/=n;my/=n;
+  let sxx=0,sxy=0,syy=0;for(const p of path){const dx=p.x-mx,dy=p.y-my;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}
+  const ang=0.5*Math.atan2(2*sxy,sxx-syy),tx=Math.cos(ang),ty=Math.sin(ang),nx=-ty,ny=tx;
+  let s0=1e9,s1=-1e9,dev=0;for(const p of path){const sp=(p.x-mx)*tx+(p.y-my)*ty,dp=Math.abs((p.x-mx)*nx+(p.y-my)*ny);if(sp<s0)s0=sp;if(sp>s1)s1=sp;if(dp>dev)dev=dp}
+  const len=s1-s0;if(len<24||dev>Math.max(R*1.5,len*0.12))return null;       // too short, or not a straight drag
+  const maxW=Math.max(4,Math.round(2*R)),Lh=maxW+6,nd=2*Lh+1,TH=17,dth=0.6*Math.PI/180,ns=Math.max(12,Math.round(len/2));
+  const at=(x,y)=>{x=Math.round(x);y=Math.round(y);return x<0||y<0||x>=W||y>=H?-1:y*W+x};
+  const E=new Float32Array(nd),TB=new Float32Array(nd);
+  for(let ti=-TH;ti<=TH;ti++){
+    const a=ang+ti*dth,ux=Math.cos(a),uy=Math.sin(a),vx=-uy,vy=ux;
+    for(let di=0;di<nd;di++){const d=di-Lh,ox=mx+d*nx,oy=my+d*ny;let sum=0,cnt=0;
+      for(let k=0;k<=ns;k++){const sp=s0+len*k/ns,px=ox+sp*ux,py=oy+sp*uy,p=at(px+2*vx,py+2*vy),q=at(px-2*vx,py-2*vy);if(p<0||q<0)continue;
+        const u=sY[p]-sY[q],v=sB[p]-sB[q],w=sR[p]-sR[q],m=Math.sqrt(0.8*u*u+2.5*(v*v+w*w));sum+=m>40?40:m;cnt++}
+      if(cnt<ns*0.7)continue;const e=sum/cnt;if(e>E[di]){E[di]=e;TB[di]=a}}
+  }
+  // edge lines = offsets where the averaged step peaks clearly above the background level
+  const sorted=Array.from(E).sort((p,q)=>p-q),base=sorted[nd>>1],top=sorted[nd-1],sv=+$("tol").value/100;
+  if(top<base*1.6+1)return null;
+  const cut=base+(top-base)*(0.42-0.32*sv),peaks=[];
+  for(let di=2;di<nd-2;di++){const e=E[di];if(e>=cut&&e>=E[di-1]&&e>E[di+1]&&e>=E[di-2]&&e>=E[di+2])peaks.push(di-Lh)}
+  if(peaks.length<2)return null;
+  // the strip: the pair of neighbouring edge lines around the drag, or failing that the nearest pair no wider than Max width
+  // Any two edge lines can bound the strip, not only neighbours: a skirting board has a strong edge at the
+  // wall and at the floor, with weaker moulding lines between. Prefer the pair whose weaker side is strongest.
+  let best=null;
+  for(let i=0;i<peaks.length;i++)for(let j=i+1;j<peaks.length;j++){const a=peaks[i],b=peaks[j],w=b-a;if(w<2||w>maxW)continue;
+    const off=a>0?a:b<0?-b:0;if(off>R*1.5)continue;
+    const sc=Math.min(E[a+Lh],E[b+Lh])*(1-0.5*off/(R*1.5));if(!best||sc>best.sc)best={a,b,w,off,sc}}
+  if(!best)return null;
+  const aA=TB[best.a+Lh],aB=TB[best.b+Lh],L=layers[active];
+  // colour down the middle of the strip, to skip anything standing in front of it (furniture, a plant)
+  const mid=(best.a+best.b)/2,aM=(aA+aB)/2,cy=[],cb=[],cr=[],N2=Math.round(len/0.5);
+  for(let k=0;k<=N2;k+=4){const sp=s0+len*k/N2,i=at(mx+mid*nx+sp*Math.cos(aM),my+mid*ny+sp*Math.sin(aM));if(i>=0){cy.push(sY[i]);cb.push(sB[i]);cr.push(sR[i])}}
+  const med=a=>{a.sort((p,q)=>p-q);return a[a.length>>1]};if(cy.length<4)return null;
+  const rY=med(cy),rB=med(cb),rR=med(cr),T2=Math.pow(params().T*1.6,2),pix=[];let kept=0;
+  for(let k=0;k<=N2;k++){const sp=s0+len*k/N2;
+    const ax=mx+best.a*nx+sp*Math.cos(aA),ay=my+best.a*ny+sp*Math.sin(aA),bx=mx+best.b*nx+sp*Math.cos(aB),by=my+best.b*ny+sp*Math.sin(aB);
+    const c=at((ax+bx)/2,(ay+by)/2);if(c>=0){const u=sY[c]-rY,v=sB[c]-rB,w=sR[c]-rR;if(0.3*u*u+2.5*(v*v+w*w)>T2)continue}
+    kept++;const wd=Math.hypot(bx-ax,by-ay),m=Math.max(1,Math.ceil(wd/0.5));
+    for(let j=0;j<=m;j++){const i=at(ax+(bx-ax)*j/m,ay+(by-ay)*j/m);if(i>=0)pix.push(i)}}
+  return pix.length?{pix,cover:kept/(N2+1)}:null;
+}
+
+// Wide-angle phone lenses bend straight lines, and a drag can turn a corner, so a long run is read as a
+// chain of shorter straight pieces. Any piece with no clear pair of edge lines falls back to trimLine.
+function trimRun(path,R){
+  const L=layers[active],paint=pix=>{let c=0;for(const i of pix){if(!L.mask[i])c++;putPix(i,L,false)}return c};
+  const done=got=>{if(got){closeHoles(L.mask,255,new Int32Array(N));for(const o of layers)o.dirty=true}return got};
+  // one straight line for the whole run, if it fits nearly all of it: the longest line reads faint edges best
+  const whole=trimStraight(path,R);
+  if(whole&&whole.cover>=0.85)return done(paint(whole.pix));
+  const cum=[0];for(let i=1;i<path.length;i++)cum.push(cum[i-1]+Math.hypot(path[i].x-path[i-1].x,path[i].y-path[i-1].y));
+  const total=cum[cum.length-1],piece=Math.max(120,W/6),k=Math.max(1,Math.round(total/piece)),ptAt=d=>{
+    d=Math.max(0,Math.min(total,d));let i=1;while(i<cum.length-1&&cum[i]<d)i++;const t=(d-cum[i-1])/Math.max(1e-6,cum[i]-cum[i-1]);
+    return{x:path[i-1].x+(path[i].x-path[i-1].x)*t,y:path[i-1].y+(path[i].y-path[i-1].y)*t}};
+  let got=0;
+  if(k>1)for(let j=0;j<k;j++){const a=total*j/k-(j?8:0),b=total*(j+1)/k+(j<k-1?8:0),sub=[];
+    for(let q=0;q<=10;q++)sub.push(ptAt(a+(b-a)*q/10));
+    const st=trimStraight(sub,R);if(st&&st.cover>=0.35)got+=paint(st.pix)}
+  if(got)return done(got);
+  if(whole&&whole.cover>=0.5)return done(paint(whole.pix));
+  return trimLine(path,R,false,true);     // curved or irregular trim: follow the drag point by point, only where a clear band shows
 }
 
 /* ---------- undo ---------- */
@@ -627,7 +704,7 @@ function endGesture(){
   if(tool==="trim"){
     if(g.length<3){say("Drag along the skirting, cornice or frame to paint it.");schedule();return}
     pushUndo();lastFill=null;
-    const R=Math.max(3,(+$("size").value)*W/cv.getBoundingClientRect().width/2),got=trimLine(g,R,false);
+    const R=Math.max(3,(+$("size").value)*W/cv.getBoundingClientRect().width/2),got=trimRun(g,R);
     if(!got){undo.pop();syncUndo()}
     schedule();say(got?"Painted trim on "+layers[active].name+". Raise Sensitivity if it stopped short, or Max width if the strip is wider.":"Couldn't find a strip there. Drag along the middle of the trim.");return}
   // a tap is one point; a drag is up to six points spread evenly along the path

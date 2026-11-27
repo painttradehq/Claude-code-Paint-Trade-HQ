@@ -79,8 +79,16 @@ trim white (comes out grey and patchy).
 
 - **Select:** tap a surface, or drag across it for a tighter selection. A new selection never takes
   pixels another surface already owns, so paint trim first and the wall stops at it.
-- **Trim line:** drag along skirting, cornice, architraves or frames. It looks sideways from the drag
-  for the nearest narrow band between two edges and fills a straight strip. Max width limits the band.
+- **Trim line:** drag along skirting, cornice, architraves or frames. It fits a straight line to the
+  drag, then for each nearby offset and small tilt averages the colour step across that line along its
+  whole length, so faint but consistent edges stand out from grain. The strip is the band between the
+  pair of edge lines whose weaker side is strongest; each side keeps its own tilt, so tapering strips
+  stay straight-edged. Long or lens-curved runs are read as a chain of shorter pieces. Where no clear
+  band shows it paints nothing. Max width limits the band; Sensitivity sets how faint an edge counts.
+
+  On the five job photos (`tests/job_test.js`, one drag per run): hallway skirting full length and
+  crisp; living room timber skirting and ornate cornice full length; brick pier caps two of three.
+  Not found: the hallway's white cornice under a white ceiling, and a thin roof fascia.
 - **Brush / Eraser:** by hand, optionally staying inside edges.
 
 Not tested: phones, and the published artifact's sandbox.
