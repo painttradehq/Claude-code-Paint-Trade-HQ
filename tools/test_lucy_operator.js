@@ -40,6 +40,14 @@ const ok = (c, m) => { if (c) { pass++; console.log('  ok  ', m); } else { fail+
     await p.click('[data-testid="tc-menu-report"]'); await p.waitForTimeout(150);
     ok((await p.inputValue('#tcInput')) === 'Report a problem: ', 'the menu\'s "Report a problem" fills the box without sending');
     await p.fill('#tcInput', '');
+    // the prototype is scripted: a greeting gets a greeting, and what it has no script for says so instead of answering something else
+    await say('hey');
+    ok((await p.locator('[data-testid="ai-msg-assistant"]').last().innerText()).startsWith('Hey Josh. What do you need?'), '"hey" gets "Hey Josh. What do you need?"');
+    await say('what colour should I paint a south-facing bedroom?');
+    ok((await p.locator('[data-testid="ai-msg-assistant"]').last().innerText()).includes('This is the prototype') && await p.locator('[data-testid="ai-msg-assistant"]').last().locator('[data-say]').count() === 4, 'something it has no script for: it says it is the prototype and offers what can be tried');
+    await say('Who’s on site today?');
+    ok((await p.locator('[data-testid="ai-msg-assistant"]').last().innerText()).includes('On site today'), 'the on-site answer comes only when asked');
+    await p.click('[data-testid="tc-more"]'); await p.waitForTimeout(150); await p.click('[data-testid="tc-menu-new"]'); await p.waitForTimeout(200);
     await p.click('[data-testid="tc-more"]'); await p.waitForTimeout(150); await p.click('[data-testid="tc-menu-reports"]'); await p.waitForTimeout(200);
     ok(await p.locator('[data-testid="lucy-reports"]').isVisible() && await p.locator('#tcMenu').isHidden(), '"My reports" in the menu opens the list and closes the menu');
     await p.click('[data-testid="lucy-reports-back"]'); await p.waitForTimeout(150);

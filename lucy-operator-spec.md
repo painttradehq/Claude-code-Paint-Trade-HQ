@@ -10,7 +10,7 @@
 
 This promotes the parked item "Lucy does the work in the app, confirm first" (17 Nov) to a build. **Round L1 went to Emergent on 26 Nov on Josh's word** (`lucy-l1-emergent-message.md`) and is built and saved to GitHub; **L2 went the same day** (`lucy-l2-emergent-message.md`); L3–L5 follow one at a time, each on his "send". What L1 narrows from this spec is listed in §9.
 
-**Prototype:** `lucy-operator.html` (built by `tools/make_lucy_operator.py` on top of the Round 73 box, `lucy-chat-notion.html`). **Checks:** `tools/test_lucy_operator.js` — 224 of 224 at 1440 × 900 and 1024 × 768 (26 Nov: the round 2 cards, then conversation first; 27 Nov: round 3's removing and fixing, then the plain chat). The prototype opens conversation-first; `?ask=1` shows it with "Ask me before changes" on. Add `?tester=0` to see it as someone who is not in the tester program, and `?mail=microsoft&storage=onedrive` or `?mail=none&storage=builtin` to see Lucy's setup for a business on other providers.
+**Prototype:** `lucy-operator.html` (built by `tools/make_lucy_operator.py` on top of the Round 73 box, `lucy-chat-notion.html`). **Checks:** `tools/test_lucy_operator.js` — 230 of 230 at 1440 × 900 and 1024 × 768 (26 Nov: the round 2 cards, then conversation first; 27 Nov: round 3's removing and fixing, then the plain chat). The prototype opens conversation-first; `?ask=1` shows it with "Ask me before changes" on. Add `?tester=0` to see it as someone who is not in the tester program, and `?mail=microsoft&storage=onedrive` or `?mail=none&storage=builtin` to see Lucy's setup for a business on other providers.
 
 ## 1. What the prototype shows
 
@@ -239,4 +239,6 @@ In `lucy-operator.html` now:
 Other lines considered for the empty chat: "What do you need?" · "What are we working on?" — Josh's to pick.
 
 Found while testing: in the prototype the ⋯ menu swallowed clicks on "My reports" (it only ever opened from a report's own button). Fixed in the prototype; **to check in the app** when this goes to Emergent.
+
+**Later the same day:** Josh typed "hey" in the prototype and got the "On site today" answer, and asked whether the conversation is restricted. It is not — the prototype has no AI behind it, only scripted lines, and anything it did not recognise fell back to that one answer. Now a greeting gets a greeting ("Hey Josh. What do you need?") and anything it has no script for says so plainly and offers what can be tried. In the app Lucy is Claude with the business's tools and answers whatever is typed.
 

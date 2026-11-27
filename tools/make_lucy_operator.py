@@ -376,5 +376,17 @@ rep("</style>", """
   .typing{ padding:8px 4px; }
 </style>""", 1)
 
+# 9. the prototype has no AI behind it: small talk gets a natural line, and anything it has no script for says so plainly
+#    (it used to fall back to the "On site today" answer whatever was typed — Josh typed "hey" and got that)
+rep("""const pickReply = (t) => { const s = (t || '').toLowerCase(); if (AI.attach) return REPLIES.photo;""",
+    """const pickReply = (t) => { const s = (t || '').toLowerCase().trim(); if (AI.attach) return REPLIES.photo;
+  if (/^(hey|hi|hello|hiya|yo|g'?day|morning|good (morning|afternoon|evening))\\b[\\s!.,]*(lucy)?[\\s!.,]*$/.test(s)) return [`Hey ${ME}. What do you need?`, []];
+  if (/^how are you|^how'?s it going|^you there/.test(s)) return [`All good, ${ME}. What are we doing?`, []];
+  if (/^(thanks|thank you|cheers|ta|great|perfect|nice one)\\b/.test(s)) return ['No worries.', []];""")
+rep("""if (/quiet|quote/.test(s)) return REPLIES.quiet; return REPLIES.site; };""",
+    """if (/quiet|quote/.test(s)) return REPLIES.quiet; if (/on site|signed in|who.?s (on|in)|\\bcrew\\b|roster/.test(s)) return REPLIES.site; return REPLIES.proto; };""")
+rep("""const REPLIES = {""", """const REPLIES = {
+  proto: ["<i>This is the prototype — there is no AI behind it, only a handful of scripted lines, so it can’t answer that one.</i> In the app Lucy is the real thing: she answers whatever you type and does the work.\\nHere you can try:\\n<button class=\\"lz-offer\\" data-say=\\"What’s owed?\\">What’s owed?</button> <button class=\\"lz-offer\\" data-say=\\"Start a quote for Leanne Crowe\\">Start a quote for Leanne Crowe</button> <button class=\\"lz-offer\\" data-say=\\"Add a $180 skip bin expense to the South Wharf job\\">Add an expense to a job</button> <button class=\\"lz-offer\\" data-say=\\"Send EST-0046 to Leanne\\">Send a quote</button>", []],""")
+
 (ROOT / "lucy-operator.html").write_text(src)
 print("wrote lucy-operator.html", len(src))
