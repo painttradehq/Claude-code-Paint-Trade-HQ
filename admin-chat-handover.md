@@ -14,6 +14,7 @@ Josh Sano (the owner; app login `painting@joshsano.com.au`, service and Drive ac
 4. Simple and practical. No notices or banners, no duplication, no guess work in specs ("keep as built" or the exact value). Every panel opens on the right.
 5. AI = Claude only, through the app's own key. No AI and no Lucy for crew. Help hub content is Adam's.
 6. Isolation per business; TS_ test rows only, torn down; the owner's real tenant read-only in rounds (sanctioned one-off writes only by Josh's own click, e.g. the Storage card). No backfill.
+   - **Josh, 27 Nov: "If running tests later please don't do it on my account. If you need to run a test make another account."** So his own account is never used for a test — not signed in to, not read, not written, and never his mailbox, text number or storage. Tests run only on test accounts made for the run (the TS_ accounts) and removed after; whatever a check needs that they lack is made on a test account, never borrowed from his. Every message to Emergent carries this.
 7. Do not change anything beyond what was asked. **This chat never touches `app/employee/*`; the crew chat never touches admin files.**
 8. Never paste or echo secrets (Anthropic, Resend, Google, Places, Stripe, webhook secrets, GitHub tokens, `MONGO_URL`). Josh must never paste a key into the chat; if one lands, it is rolled.
 9. Every round message carries a What's new **Draft** (never published; publishing is Josh's call). Round messages end with "Round N done", a report file under `memory/reports/`, no code review, no next-action items.

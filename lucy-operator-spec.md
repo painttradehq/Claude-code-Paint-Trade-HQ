@@ -305,3 +305,16 @@ Its own suggestions (mailbox round, files round, a review of the failing tests, 
 - **Left out on purpose:** sending through the mailbox itself (threads under the client's email, shows in Sent) — needs live mailboxes to test; texts; Cc; acting on unknown senders (link, lead, ignore); opening a file or looking at a saved photo; saving a photo from the chat onto a job.
 
 **Lucy's rounds are then done as planned.** Still open: voice (parked); the 15 older failing tests (only on Josh's word).
+
+## 21. L4 and the new answer built; Lucy L5 sent (27 Nov)
+
+**L4 (email and files) and the "what I can do" answer — Emergent's report (checked 27 Nov on Josh's "check"):** both complete. L4: parts 1 to 6 built; 33 new in-process checks pass; all 12 on-screen checks pass at 1440 and 1024 in its runs and the testing agent's. Differences it reports from the message: the connector now has 24 reads and 54 writes; with no mailbox the button after "Any new emails?" is Open Messages setup; **Approve sends what the server built for the card, not what the browser posts** (safer than the message asked). The answer: one copy on the server, drawn with bold and bullets in both places; at 480 px the Jobs bullet wraps to a second line (the message asked for one line at 560 only). It removed three leftover fake test mailbox rows; no real mailbox or storage was contacted. What's new draft #47 has eight cards, still a draft. The 15 older failing tests are untouched. **GitHub** is at `3a13b48` — the chat's look and Revise are saved; L4 and the answer are in the preview only.
+
+**Josh, 27 Nov, a standing rule:** "If running tests later please don't do it on my account. If you need to run a test make another account." Recorded in `admin-chat-handover.md` §2 and carried at the top of every message from now.
+
+**Lucy L5 — sent on Josh's "check and do these"** (three of Emergent's suggestions, one round, no prototype — nothing in it is a new layout). `lucy-l5-texts-followthrough-digest-message.md`.
+
+- **Texts:** `send_text`, always a card — the text being answered, the mobile, the text, a character count. Through the composer's own route. Refused before any card when no number is connected, the plan has no texting, there is no mobile, or the client opted out.
+- **Follow-through:** a reply that agrees to a new date for a job's start or a calendar event carries it (`then`); the finished card then shows one button, worded by the server from the record. One press says it to Lucy and her usual rules apply.
+- **Today briefing:** in place of "3 unread replies in the inbox", up to three rows naming who is waiting (longest first, a day-old one in the warning colour, each with Reply), then "n more", and a separate count for mail from people who aren't clients. Second in the list, after overdue invoices.
+- The answer's bullet becomes "Emails and texts — read your inbox and write the reply".
