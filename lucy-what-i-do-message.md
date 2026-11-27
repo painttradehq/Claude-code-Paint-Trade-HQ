@@ -1,20 +1,22 @@
-# Lucy — her "what I can do" answer, updated and easier to read — NOT SENT. Waits for Josh's "send", and for round L4 to be reported
+# Lucy — her "what I can do" answer, updated and easier to read — SENT to Emergent 27 Nov on Josh's word ("send this"), with his own wording of two lines
 
 Josh, 27 Nov, pasting her fixed answer: "This is an old default message to answer what can you do. Update it and make it a more readable format."
 
 No prototype: it is words in a place that already exists. Read in the code (`51354c7`): the answer lives twice — the fixed answer in `ADMIN_SYSTEM_PROMPT` (`backend/ai_routes.py`) and `WHAT` in `frontend/components/lucy/LucyChat.tsx` — and every round has edited both. Her bubbles already draw bold, bullets and line breaks (`Md`); the two places `WHAT` is shown draw it as plain text.
 
-Its Emails and Files lines are true only once round L4 is built, so this goes after L4.
+Its Emails and Files lines are true only once round L4 is built. L4 was at its last step (the testing agent) when this went, so the message opens by telling Emergent to do it after L4 is finished and reported.
+
+Josh's wording, 27 Nov: Quotes — "Create, send, or revise an accepted one"; Jobs — "Track expenses, variations, crew, product and materials". Sent with those two first words in lower case, to match the other seven lines.
 
 ---
 
-## The message
+## The message as sent
 
 # Lucy — her "what I can do" answer, updated and easier to read
 
 Josh: "This is an old default message to answer what can you do. Update it and make it a more readable format."
 
-Words only — what she can do does not change. One commit.
+**Do this after Lucy L4 is finished and reported — not in the middle of it.** Words only — what she can do does not change. One commit.
 
 ## The new answer
 
@@ -27,8 +29,8 @@ I’m your AI assistant in Paint Trade HQ. I’m here to smooth things out for y
 Clients, leads, quotes, invoices, jobs, crew and the calendar — who’s on site, what’s owed, which quotes have gone quiet.
 
 **Tell me what needs doing**
-- **Quotes** — start, change, send, or revise an accepted one
-- **Jobs** — expenses, variations, crew, hire and paint
+- **Quotes** — create, send, or revise an accepted one
+- **Jobs** — track expenses, variations, crew, product and materials
 - **Invoices** — raise, send, remind, record payments
 - **Clients and leads** — add, update, log calls and notes
 - **Calendar** — book jobs and visits, set reminders
