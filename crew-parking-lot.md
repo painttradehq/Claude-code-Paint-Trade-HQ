@@ -170,3 +170,5 @@ Closed by the 1–7 Nov rounds: crew sessions recorded/revoked (reset signs out 
 - `StackHdr` (`app/employee/training/index.tsx`) gains `titleTestID`; `crew-feedback-title` and `crew-events-title` rendered.
 - `components/crew/VideoPlayer.tsx` web iframe: `origin` back to `window.location.origin` (native keeps `APP_WEB_URL`).
 - Inbox: unread rows sort above read ones, so a read "Reply from …" can sit under older unread event rows (C6b silence 8) — look at it in the Inbox/invite pass.
+- Invites (C8 notes, 28 Nov): replace the temporary password in the owner-added email with a set-your-password link, which would retire the "Enter the temporary password from your email" step — parked, keep the password for C8.
+- Crew notice text still lists "emergency contact" under What is collected; it is optional on the profile now and gone from the wizard — reword when the notice next changes (version bump; admin side owns the legal pages).

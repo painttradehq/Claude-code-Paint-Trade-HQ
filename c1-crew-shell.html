@@ -516,6 +516,38 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
 .pthanks .big{font-family:var(--font-display);font-size:16px;font-weight:700}
 .pthanks .sub{color:#6B6479;font-size:12.5px;margin-top:4px;overflow-wrap:anywhere}
 .qfoot{font-size:12.5px;color:var(--text-muted);text-align:center;margin:14px 0 4px;line-height:1.45}
+
+/* ---- C8: invites and the first sign-in — the PIN pad, the invite emails, the alerts card ---- */
+.pinwrap{display:flex;flex-direction:column;align-items:center;gap:12px;position:relative}
+.pinrow{display:flex;gap:14px}
+.pinbox{width:56px;height:64px;border-radius:14px;border:1.5px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--text-primary)}
+.pinbox.on{border-color:var(--accent)}
+.pinbox.bad{border-color:var(--danger)}
+.pinhidden{position:absolute;opacity:0;height:1px;width:1px;left:0;top:0}
+.pinerr{color:var(--danger);font-weight:600;font-size:13.5px;text-align:center}
+.pinskip{display:block;margin:28px auto 0;min-height:44px;color:var(--accent);font-weight:600;font-size:14.5px;padding:10px 16px}
+.pin-top{padding:26px 20px 10px;text-align:center}
+.pin-title{font-family:var(--font-display);font-size:26px;font-weight:600;letter-spacing:-.01em;margin:14px 0 8px}
+.pin-sub{font-size:14.5px;color:var(--text-secondary);line-height:1.45;max-width:320px;margin:0 auto 24px}
+.alerts{padding:16px 18px;margin-bottom:14px}
+.alerts-h{display:flex;align-items:center;gap:10px}
+.alerts-t{font-family:var(--font-display);font-size:18px;font-weight:600;flex:1}
+.alerts-s{font-size:14px;line-height:1.45;color:var(--text-secondary);margin:6px 0 12px}
+.mail{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:16px}
+.mail-from{display:flex;gap:10px;align-items:center}
+.mail-av{width:36px;height:36px;border-radius:18px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.mail-name{font-weight:600;font-size:14.5px}
+.mail-name span{color:var(--text-muted);font-weight:500}
+.mail-to{font-size:12.5px;color:var(--text-muted)}
+.mail-subject{font-family:var(--font-display);font-size:20px;font-weight:600;margin:14px 0 8px;line-height:1.2}
+.mail-body{font-size:15px;line-height:1.5}
+.mail-body p{margin:8px 0}
+.mail-body ol{padding-left:20px;margin:8px 0}
+.mail-body li{margin:5px 0}
+.mail-body .btn{margin:14px 0}
+.mail-body .small{font-size:13.5px;color:var(--text-secondary)}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.02em}
+.mail-foot{font-size:12.5px;color:var(--text-muted);border-top:1px solid var(--border);margin-top:14px;padding-top:10px;line-height:1.45}
 </style>
 </head>
 <body>
@@ -554,13 +586,20 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
 
   <!-- ================= SIGN IN ================= -->
   <section id="s-login" data-testid="crew-login">
-    <div class="login-top">
+    <div class="login-top" id="loginTop">
       <div class="mark" aria-hidden="true">
         <svg viewBox="8 2 56 62"><g transform="skewX(-9) translate(7 0)"><g fill="#C9C2E8" stroke="#C9C2E8" stroke-width=".4" stroke-linejoin="round"><use href="#pmark" transform="translate(-6 -6)"/><use href="#pmark" transform="translate(-5.4 -5.4)"/><use href="#pmark" transform="translate(-4.8 -4.8)"/><use href="#pmark" transform="translate(-4.2 -4.2)"/><use href="#pmark" transform="translate(-3.6 -3.6)"/><use href="#pmark" transform="translate(-3 -3)"/><use href="#pmark" transform="translate(-2.4 -2.4)"/><use href="#pmark" transform="translate(-1.8 -1.8)"/><use href="#pmark" transform="translate(-1.2 -1.2)"/><use href="#pmark" transform="translate(-.6 -.6)"/></g><use href="#pmark" fill="#FFFFFF"/></g></svg>
       </div>
       <div class="login-name" data-testid="crew-login-name">Paint Trade HQ</div>
       <div class="login-sub">Crew</div>
       <div class="login-hello">Sign in to clock on, see your jobs and send your report.</div>
+    </div>
+    <div class="login-top hide" id="pinLogin" data-testid="crew-pin-login">
+      <div class="mark" aria-hidden="true"></div>
+      <div class="login-name" data-testid="crew-pin-hello">Hi Mia</div>
+      <div class="login-hello">Enter your PIN to clock on.</div>
+      <div id="pinLoginPad" style="margin-top:22px"></div>
+      <button type="button" class="pinskip" id="pinUsePassword" data-testid="crew-pin-use-password">Use my password instead</button>
     </div>
     <form class="form" id="loginForm" novalidate>
       <div class="field">
@@ -654,6 +693,11 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
         <button class="onclock hide" id="onClock" data-testid="crew-dash-onclock"></button>
       </div>
       <div class="body">
+        <div class="card alerts" id="alertsCard" data-testid="crew-alerts-card">
+          <div class="alerts-h"><span class="ico"><svg><use href="#i-inbox"/></svg></span><div class="alerts-t" data-testid="crew-alerts-title">Get buzzed for new jobs</div><button class="edge-x" id="alertsX" data-testid="crew-alerts-dismiss" aria-label="Not now">×</button></div>
+          <div class="alerts-s">Jobs, start-time changes, messages and reminders reach your phone even when the app is closed.</div>
+          <button class="btn btn-primary btn-sm" id="alertsOn" data-testid="crew-alerts-on">Turn on alerts</button>
+        </div>
         <div class="sect">Today's job</div>
         <div id="todayJob"></div>
 
@@ -845,6 +889,25 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
     <div id="onbHead"></div>
     <div class="form-body" id="onbBody"></div>
     <div class="sendbar" id="onbBar"></div>
+  </section>
+
+  <!-- ================= C8: SET A PIN (after a password sign-in on a phone without one; live: /employee/set-pin) ================= -->
+  <section id="s-pin" class="hide" data-testid="crew-set-pin" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="form-body" style="padding-top:0">
+      <div class="pin-top"><div class="mark" aria-hidden="true" id="pinMark" style="margin:0 auto"></div><div class="pin-title" id="pinTitle" data-testid="set-pin-title">Set a 4-digit PIN</div><div class="pin-sub">Next time on this phone you sign in with the PIN instead of your password. Five wrong tries switch it off; signing out forgets it.</div></div>
+      <div id="pinBody"></div>
+      <button type="button" class="pinskip" id="pinSkip" data-testid="set-pin-skip">Not now</button>
+    </div>
+  </section>
+
+  <!-- ================= C8: WHAT THE CREW MEMBER RECEIVES (the two invite emails, shown as mail) ================= -->
+  <section id="s-mail" class="hide" data-testid="crew-mail" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="mailBack" data-testid="crew-mail-back"><svg><use href="#i-back"/></svg>Sign in</button></div>
+      <div class="job-title">What the crew member receives</div>
+      <div class="meta" id="mailMeta" data-testid="crew-mail-meta"></div>
+    </div>
+    <div class="form-body" id="mailBody" data-testid="crew-mail-body" style="padding-top:4px"></div>
   </section>
 
   <!-- ================= C5: PROFILE (stack) ================= -->
@@ -1074,6 +1137,8 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
   if (q.get('weather') === '0') jobs.forEach(j => { delete j.weather; });   // Open-Meteo gave nothing (no pin, or the call failed)
   const state = {
     signedIn: q.get('state') === 'in',
+    pinDevice: q.get('pindevice') === '1', pinOff: false,   // C8 — this phone has a PIN (live: a device row from POST /employees/me/pin)
+    alertsOn: q.get('alerts') === '0',                        // C8 — the alerts card is gone once alerts are on (or when the deep link hides it)
     job: q.get('job') || (jobs.find(x => x.status === 'now') || {}).id || 'general', // the job of the open session
     since: '7:04 am', elapsed: '2 h 35 m',
     offsite: q.get('offsite') === '1',   // the open session was flagged by the backend geofence
@@ -1471,11 +1536,12 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
     $('#s-login').classList.add('hide'); $('#s-job').classList.add('hide'); $('#s-hours').classList.add('hide'); $('#s-app').classList.remove('hide');
     renderClock(); renderTodayJob(); renderNotifs(); renderJobs(); showTab(tab || 'today');
     $('#edgeHandle').classList.remove('hide');
+    $('#alertsCard').classList.toggle('hide', state.alertsOn);
   }
   function showLogin(){ hideC5();
     $('#s-app').classList.add('hide'); $('#s-job').classList.add('hide'); $('#s-hours').classList.add('hide'); $('#s-login').classList.remove('hide');
     $('#edgeHandle').classList.add('hide'); closeEdge();
-    $('#password').value = '';
+    $('#password').value = ''; renderLoginMode();
   }
 
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab)));
@@ -1561,11 +1627,12 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
     const err = $('#loginError');
     if (!email || !pw) { $('#loginErrorText').textContent = 'Enter your email and password.'; err.classList.remove('hide'); return; }
     if (/restricted/i.test(email)) { $('#loginErrorText').textContent = RESTRICTED; err.classList.remove('hide'); return; }
-    err.classList.add('hide'); showApp('today');
+    err.classList.add('hide'); if (state.pinDevice) showApp('today'); else openPin('set', 'app');   // C8 — a password sign-in on a phone without a PIN sets one first (live: /employee/set-pin)
   });
 
   // ---- deep links for review / tests ----
   if (q.get('error') === 'restricted') { $('#loginErrorText').textContent = RESTRICTED; $('#loginError').classList.remove('hide'); }
+  if (q.get('error') === 'pending') { $('#loginErrorText').textContent = "Your account is waiting for Josh to approve it. We'll text you when you're in."; $('#loginError').classList.remove('hide'); }   // C8 proposal — the approval gate
 
   // ================= C5: documents — onboarding, profile, my documents =================
   const DOC_CAT = [
@@ -1590,7 +1657,7 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
     return { cls: 'ok', txt: `On file · expires ${dMY(d.exp)}` };
   };
   const BIZ = 'Sano Painting';
-  const prof = { name: 'Mia Nguyen', dob: '12/04/1998', phone: '0412 345 678', email: 'mia@example.com', emergency: 'Tom Nguyen 0411 222 333', address: '', suburb: '', photo: false, tried: false, saved: false,
+  const prof = { name: 'Mia Nguyen', dob: '12/04/1998', phone: '0412 345 678', email: 'mia@example.com', emergency: 'Tom Nguyen 0411 222 333', address: '14 Wattle St', suburb: 'Brunswick VIC 3056', photo: false, tried: false, saved: false,
     docs: q.get('docs') === '0' ? {} : { driving_licence: { on: true, exp: '2027-03-01' }, white_card: { on: true, exp: '2026-10-28' }, first_aid: { on: true, exp: '2026-09-30' }, working_height: { on: true, exp: '' } } };
   const contracts = q.get('contracts') === '0' ? [] : [
     { id: 'd1', name: 'Employment agreement', status: 'sent', sent: '2026-10-13', content: 'EMPLOYMENT AGREEMENT\n\nBetween Sano Painting Pty Ltd (the employer) and Mia Nguyen (the employee).\n\n1. Position: Painter, starting [START DATE].\n2. Hours: 38 a week, Monday to Friday, at the sites the employer allocates.\n3. Pay: as set out in the attached schedule, paid weekly.\n4. Safety: the employee follows the site safety plan and wears the PPE issued.\n5. Notice: two weeks by either side.\n\nSigned: [DATE SIGNED]' },
@@ -1598,16 +1665,71 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
     { id: 'd3', name: 'Safety agreement', status: 'ended', sent: '2026-05-01', signed: '2026-05-02', countersigned: '2026-05-02', ended: '2026-09-30', content: 'SAFETY AGREEMENT\n\nReplaced by the site safety plan of 30 Sep 2026.' },
   ];
   const cStatus = (c) => c.status === 'sent' ? { cls: 'wait', txt: 'Awaiting signature' } : c.status === 'signed' ? { cls: 'live', txt: 'Signed' } : { cls: 'ended', txt: 'Ended' };
-  function hideC5(){ ['#s-onb', '#s-profile', '#s-docs', '#s-doc', '#s-reset', '#s-notice', '#s-terms', '#s-quote', '#s-feedback', '#s-events', '#s-training', '#s-video', '#s-coaching', '#s-going', '#s-rating', '#s-equip', '#s-item'].forEach(x => $(x).classList.add('hide')); }
+  function hideC5(){ ['#s-onb', '#s-profile', '#s-docs', '#s-doc', '#s-reset', '#s-notice', '#s-terms', '#s-quote', '#s-pin', '#s-mail', '#s-feedback', '#s-events', '#s-training', '#s-video', '#s-coaching', '#s-going', '#s-rating', '#s-equip', '#s-item'].forEach(x => $(x).classList.add('hide')); }
   function stackOpen(id){ $('#s-app').classList.add('hide'); $('#s-login').classList.add('hide'); hideC5(); $(id).classList.remove('hide'); const b = $(id + ' .form-body'); if (b) b.scrollTop = 0; }
   const MARK = $('#s-login .mark').innerHTML;
+  $('#pinLogin .mark').innerHTML = MARK; $('#pinMark').innerHTML = MARK;
+
+  // ---- C8: the 4-digit PIN — set after a password sign-in on a phone without one (POST /employees/me/pin), sign in with it next time (POST /employees/pin-login); the live strings ----
+  const WEAK = new Set(['0000', '1111', '2222', '3333', '4444', '5555', '6666', '7777', '8888', '9999', '1234', '4321', '2580', '0852']);   // the server's list of easy PINs
+  const PIN_OK = '2468'; let pinFails = 0;
+  const pin = { first: null, err: '', next: 'app', val: '' };
+  const lp = { err: '', val: '' };
+  const padHtml = (prefix, val, err) => `<div class="pinwrap" data-testid="${prefix}-pad"><div class="pinrow">${[0, 1, 2, 3].map(i => `<div class="pinbox ${val.length === i ? 'on' : ''} ${err ? 'bad' : ''}" data-testid="${prefix}-box-${i}">${val[i] ? '●' : ''}</div>`).join('')}</div><input class="pinhidden" data-testid="${prefix}-input" data-pin="${prefix}" inputmode="numeric" maxlength="4" value="${esc(val)}" aria-label="4-digit PIN">${err ? `<div class="pinerr" data-testid="${prefix}-error" role="alert">${esc(err)}</div>` : ''}</div>`;
+  function renderPin(){ $('#pinTitle').textContent = pin.first ? 'Type it once more' : 'Set a 4-digit PIN'; $('#pinBody').innerHTML = padHtml('set-pin', pin.val, pin.err); const i = $('#pinBody input'); if (i) i.focus(); }
+  function openPin(mode, next){ Object.assign(pin, { first: null, err: '', next: next || 'app', val: '' }); stackOpen('#s-pin'); renderPin(); document.body.dataset.lastGo = '/employee/set-pin'; }
+  function pinDone(){ $('#s-pin').classList.add('hide'); showApp('today'); }
+  $('#pinSkip').addEventListener('click', pinDone);
+  function setPinComplete(v){
+    if (!pin.first) { if (WEAK.has(v)) { pin.err = 'That PIN is too easy to guess — pick another'; pin.val = ''; renderPin(); return; } pin.first = v; pin.err = ''; pin.val = ''; renderPin(); return; }
+    if (v !== pin.first) { pin.err = "Those didn't match — start again"; pin.first = null; pin.val = ''; renderPin(); return; }
+    state.pinDevice = true; document.body.dataset.lastGo = 'POST /employees/me/pin'; pinDone();
+  }
+  function renderLoginMode(){
+    const pinMode = state.pinDevice && !state.pinOff;
+    $('#pinLogin').classList.toggle('hide', !pinMode); $('#loginForm').classList.toggle('hide', pinMode); $('#loginTop').classList.toggle('hide', pinMode);
+    document.querySelectorAll('#s-login .login-foot, #s-login .login-links').forEach(x => x.classList.toggle('hide', pinMode));
+    if (pinMode) { $('#pinLoginPad').innerHTML = padHtml('crew-pin', lp.val, lp.err); const i = $('#pinLoginPad input'); if (i) i.focus(); }
+  }
+  function loginPinComplete(v){
+    if (v === PIN_OK) { pinFails = 0; lp.err = ''; lp.val = ''; document.body.dataset.lastGo = 'POST /employees/pin-login'; showApp('today'); return; }
+    pinFails += 1; lp.val = '';
+    if (pinFails >= 5) { state.pinDevice = false; pinFails = 0; lp.err = ''; renderLoginMode(); $('#loginErrorText').textContent = 'PIN switched off after too many wrong tries. Sign in with your password to set a new one.'; $('#loginError').classList.remove('hide'); return; }
+    const left = 5 - pinFails; lp.err = `Wrong PIN · ${left} tr${left === 1 ? 'y' : 'ies'} left`; renderLoginMode();
+  }
+  document.body.addEventListener('input', (e) => {
+    const i = e.target.closest('[data-pin]'); if (!i) return; const v = i.value.replace(/\D/g, '').slice(0, 4);
+    if (i.dataset.pin === 'set-pin') { pin.val = v; if (v.length === 4) setPinComplete(v); else renderPin(); }
+    else { lp.val = v; if (v.length === 4) loginPinComplete(v); else renderLoginMode(); }
+  });
+  $('#pinUsePassword').addEventListener('click', () => { state.pinOff = true; renderLoginMode(); });
+
+  // ---- C8: the invite emails, as mail on the phone (the owner-added one exists today as a plain email; the join one is a proposal) ----
+  let mailKind = 'added';
+  function openMail(kind){ mailKind = kind; stackOpen('#s-mail'); renderMail(); document.body.dataset.lastGo = 'mail:' + kind; }
+  function renderMail(){
+    const owner = 'Josh', added = mailKind === 'added';
+    $('#mailMeta').textContent = added ? 'The email when the owner adds you to the crew' : 'The email or text with the join link';
+    const subject = added ? `Your ${BIZ} login on Paint Trade HQ` : `Join ${BIZ} on Paint Trade HQ`;
+    const body = added
+      ? `<p>Hi Mia,</p><p>${owner} has added you to ${esc(BIZ)}'s crew app.</p><ol><li>Open the crew app.</li><li>Sign in with <b>mia@example.com</b> and this temporary password: <b class="mono">brush-lane-42</b>. It works until you set your own.</li><li>Check your details, set your password and add your licence and white card — about five minutes.</li></ol><button class="btn btn-primary" data-testid="crew-mail-cta" data-mail="login">Open the crew app</button>`
+      : `<p>Hi Mia,</p><p>${owner} has invited you to join the ${esc(BIZ)} crew on Paint Trade HQ.</p><button class="btn btn-primary" data-testid="crew-mail-cta" data-mail="join">Join ${esc(BIZ)}</button><p class="small">It takes about five minutes: your details, a photo, your driving licence and white card. The link is for ${esc(BIZ)}'s crew — please don't forward it.</p>`;
+    $('#mailBody').innerHTML = `<div class="mail" data-testid="crew-mail-card"><div class="mail-from"><span class="mail-av">${esc(BIZ[0])}</span><div><div class="mail-name">${esc(BIZ)} <span>via Paint Trade HQ</span></div><div class="mail-to">to mia@example.com</div></div></div><div class="mail-subject" data-testid="crew-mail-subject">${esc(subject)}</div><div class="mail-body">${body}</div><div class="mail-foot">Sent by Paint Trade HQ for ${esc(BIZ)}. Reply to this email to reach ${owner}.</div></div>
+      <div class="hint" style="margin:12px 4px 0" data-testid="crew-mail-note">${added ? 'Live today: a plain, unbranded email with the same login link and the temporary password.' : 'Proposal: today the join link exists only as a QR code and a link the owner copies.'}</div>`;
+  }
+  $('#mailBack').addEventListener('click', showLogin);
+  $('#mailBody').addEventListener('click', (e) => { const b = e.target.closest('[data-mail]'); if (!b) return; if (b.dataset.mail === 'login') { showLogin(); $('#email').value = 'mia@example.com'; document.body.dataset.lastGo = '/employee/login?email=mia%40example.com'; } else { openOnb(0); document.body.dataset.lastGo = '/employee/onboarding?admin=…&code=…'; } });
+
+  // ---- C8: the alerts card on the Dashboard (live since 2 Nov — Web Push) ----
+  $('#alertsX').addEventListener('click', () => { state.alertsOn = true; $('#alertsCard').classList.add('hide'); document.body.dataset.lastGo = 'alerts:dismissed'; });   // live: the × remembers the dismissal on the phone
+  $('#alertsOn').addEventListener('click', () => { const b = $('#alertsOn'); b.textContent = 'Turning on…'; b.disabled = true; document.body.dataset.lastGo = 'POST /employee/push/subscribe'; setTimeout(() => { state.alertsOn = true; $('#alertsCard').classList.add('hide'); }, 500); });
 
   // ---- onboarding (register mode: QR invite; finish mode: crew added by the owner with a temporary password) ----
   const WELCOME = { headline: q.get('headline') === '0' ? '' : 'Welcome to the crew', culture: q.get('culture') === '1', note: q.get('note') === '0' ? '' : 'Welcome aboard. We paint for people who trust us with their homes, so we do it properly and we look after each other. Any question, ask me or Dan.', title: 'The Painting Family Mentality', intro: 'At Sano Painting, we believe that great work comes from great relationships. We\'re not just a crew - we\'re a family that supports each other on and off the job.',
     sections: [ { title: 'Team building events', lines: ['Monthly team dinners', 'Quarterly BBQs', 'Social gatherings at local pubs', 'Team celebrations for milestones'] },
       { title: 'Communication', lines: ['If there\'s ever a personality clash or issue, we encourage open communication. Talk it through respectfully, and if needed, bring it to Josh. We handle conflicts professionally and fairly.'] },
       { title: 'Client interactions', lines: ['Always be polite and professional with clients. If there\'s a concern, let them know you\'ll pass it on to Josh.', '"Thanks for the feedback, I\'ll make sure Josh knows."', '"Let\'s take a moment and I\'ll call Josh to discuss this."'] } ] };
-  const onb = { step: 0, name: '', dob: '', phone: '', email: '', emergency: '', password: '', tempPw: '', photo: false, docs: {}, agree: false, tried: false, watched: false, open: {},
+  const onb = { step: 0, name: '', dob: '', phone: '', email: '', address: '', suburb: '', password: '', tempPw: '', gate: q.get('gate') === '1', auto: q.get('autosignin') === '1', photo: false, docs: {}, agree: false, tried: false, watched: false, open: {},
     finish: q.get('finish') === '1',
     biz: q.get('biz') === '0' ? null : { business_name: BIZ, owner_name: 'Josh Sano', video: q.get('video') === '0' ? null : 'dQw4w9WgXcQ', welcome: WELCOME }, invalid: q.get('invalid') === '1' };
   const hasCulture = () => !!(onb.biz && onb.biz.welcome && onb.biz.welcome.culture);   // the team page: not in Round 79; kept as an option (&culture=1)
@@ -1624,7 +1746,8 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
       if (age === null) e.dob = 'Enter your date of birth as DD/MM/YYYY.'; else if (age < 0 || age > 100) e.dob = 'Check your date of birth.'; else if (age < 15) e.dob = 'You need to be 15 or older to join a crew.';
       if (!/^(\+?61|0)[2-478]?\d{8,9}$/.test(onb.phone.replace(/\s/g, ''))) e.phone = 'Enter an Australian mobile number.';
       if (!onb.finish && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(onb.email.trim())) e.email = 'Enter your email address.';
-      if (!onb.emergency.trim()) e.emergency = 'Who should your employer call in an emergency?';
+      if (!onb.address.trim()) e.address = 'Enter your street address.';
+      if (!onb.suburb.trim()) e.suburb = 'Enter your suburb, state and postcode.';
       if (onb.finish && !onb.tempPw) e.tempPw = 'Enter the temporary password from your email.';
       if (onb.password.length < 8) e.password = 'At least 8 characters.';
     }
@@ -1650,7 +1773,7 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
       const video = biz && biz.video ? `<div class="sect">${esc(ownerFirst)} has a message for you</div><button class="card vid" data-testid="crew-onb-video" data-onb="video"><div class="vid-thumb"><span class="play"><svg><use href="#i-play"/></svg></span></div><div class="vid-cap">${onb.watched ? 'Playing…' : 'Welcome from ' + esc(ownerFirst)}</div></button>` : '';   // the owner's uploaded video, streamed from the app (Round 79), played in place
       body = `<div class="onb-top"><div class="mark" aria-hidden="true">${MARK}</div><div class="onb-kicker">Paint Trade HQ Crew</div><div class="onb-title" data-testid="crew-onb-title">${onb.finish ? 'Finish setting up' : (biz ? 'Join ' + esc(biz.business_name) : 'Join the team')}</div><div class="onb-sub">${onb.finish ? esc(biz ? biz.business_name : 'Your employer') + ' added you. Check your details, set your password and add your documents.' : ((biz ? esc(biz.owner_name) + ' has invited you.' : 'Your employer has invited you.') + ' It takes about five minutes.')}</div></div>${note}${video}
         <div class="sect">You'll need</div>
-        <div class="card need"><div><span class="ico"><svg><use href="#i-file"/></svg></span>Your driving licence or photo ID</div><div><span class="ico"><svg><use href="#i-check"/></svg></span>Your white card</div><div><span class="ico"><svg><use href="#i-phone"/></svg></span>An emergency contact's name and number</div></div>`;
+        <div class="card need"><div><span class="ico"><svg><use href="#i-file"/></svg></span>Your driving licence or photo ID</div><div><span class="ico"><svg><use href="#i-check"/></svg></span>Your white card</div><div><span class="ico"><svg><use href="#i-pin"/></svg></span>Your home address</div></div>`;
       bar = `<button class="btn btn-primary" data-testid="crew-onb-start" data-onb="next">Let's go</button>${onb.finish ? '' : `<div class="login-foot" style="margin-top:10px">Already on the team? <a href="#" class="login-foot-link" data-testid="crew-onb-signin" data-onb="signin">Sign in</a></div>`}`;
     } else if (n === 1) {
       const pw = onb.finish
@@ -1662,7 +1785,8 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
         <div class="fld"><label for="onbDob">Date of birth</label><input id="onbDob" data-testid="crew-onb-dob" data-f="dob" class="tin ${bad('dob')}" value="${esc(onb.dob)}" placeholder="DD/MM/YYYY" inputmode="numeric" maxlength="10">${err('dob')}${isMinor() ? `<div class="minor" data-testid="crew-onb-minor">Under 18? Your employer needs your parent or guardian's consent. Check with them before you go on.</div>` : ''}</div>
         <div class="fld"><label for="onbPhone">Mobile number</label><input id="onbPhone" data-testid="crew-onb-phone" data-f="phone" class="tin ${bad('phone')}" value="${esc(onb.phone)}" inputmode="tel" autocomplete="tel">${err('phone')}</div>
         <div class="fld"><label for="onbEmail">Email</label><input id="onbEmail" data-testid="crew-onb-email" data-f="email" class="tin ${onb.finish ? 'ro' : ''} ${bad('email')}" value="${esc(onb.email)}" inputmode="email" autocomplete="email" autocapitalize="none" ${onb.finish ? 'readonly' : ''}><div class="hint">${onb.finish ? 'Ask your employer to change your email.' : "You'll sign in with this."}</div>${err('email')}</div>
-        <div class="fld"><label for="onbEm">Emergency contact</label><input id="onbEm" data-testid="crew-onb-emergency" data-f="emergency" class="tin ${bad('emergency')}" value="${esc(onb.emergency)}" placeholder="Name and phone number">${err('emergency')}</div>
+        <div class="fld"><label for="onbAddr">Street address</label><input id="onbAddr" data-testid="crew-onb-address" data-f="address" class="tin ${bad('address')}" value="${esc(onb.address)}" placeholder="12 Example St" autocomplete="street-address">${err('address')}</div>
+        <div class="fld"><label for="onbSub">Suburb, state and postcode</label><input id="onbSub" data-testid="crew-onb-suburb" data-f="suburb" class="tin ${bad('suburb')}" value="${esc(onb.suburb)}" placeholder="Richmond VIC 3121">${err('suburb')}</div>
         ${pw}`;
       bar = `<button class="btn btn-primary" data-testid="crew-onb-next" data-onb="next">Continue</button>`;
     } else if (n === 2) {
@@ -1679,21 +1803,22 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
     } else if (n === 5) {
       const bn = biz ? esc(biz.business_name) : 'your employer';
       body = `<div class="sect">Before you ${onb.finish ? 'start' : 'join'}</div><div class="card facts"><div><span class="ico"><svg><use href="#i-people"/></svg></span><span><b>${bn} sees your details</b>Your name, contact details, documents, hours and reports go to ${bn}. Paint Trade HQ stores them for that business.</span></div><div><span class="ico"><svg><use href="#i-pin"/></svg></span><span><b>Location at sign-in and sign-out only</b>Your location is recorded when you sign in or out of a job, never in between.</span></div><div><span class="ico"><svg><use href="#i-file"/></svg></span><span><b>Your documents stay private</b>Your licences and signed documents are never shared by link. Only ${bn} and you can open them.</span></div><div><span class="ico"><svg><use href="#i-send"/></svg></span><span><b>Emails, texts and records</b>${bn} may email or text you about work: sign-in details, documents to sign, password codes. Your hours and sign-ins are kept on record.</span></div><div class="facts-more"><a href="#" data-testid="crew-onb-notice" data-legal="/crew-notice">Read the full crew notice</a></div></div>
-        <button class="agree ${onb.agree ? 'on' : ''} ${e.agree ? 'bad' : ''}" data-testid="crew-onb-agree" data-onb="agree" role="checkbox" aria-checked="${onb.agree}"><span class="box">${onb.agree ? '✓' : ''}</span><span class="at">I've read and agree to the <a href="#" data-testid="crew-onb-terms" data-legal="/terms">Terms of Service</a> and the <a href="#" data-testid="crew-onb-privacy" data-legal="/privacy">Privacy Policy</a>.</span></button><div class="fld">${err('agree')}</div>${onb.dup ? `<div class="card" style="padding:14px 16px;margin-top:12px;border-color:var(--danger)" data-testid="crew-onb-dup"><div style="font-size:15px;font-weight:600;color:var(--danger)">That email is already on ${biz ? esc(biz.business_name) : 'the team'}.</div><div class="hint" style="margin:4px 0 10px">If ${biz ? esc(biz.owner_name.split(' ')[0]) : 'your employer'} added you, sign in with the password from your email and finish setting up there.</div><button class="btn btn-outline btn-sm" style="width:auto;padding:0 18px;display:inline-flex" data-testid="crew-onb-dup-signin" data-onb="signin">Sign in</button></div>` : ''}`;
+        <button class="agree ${onb.agree ? 'on' : ''} ${e.agree ? 'bad' : ''}" data-testid="crew-onb-agree" data-onb="agree" role="checkbox" aria-checked="${onb.agree}"><span class="box">${onb.agree ? '✓' : ''}</span><span class="at">I've read and agree to the <a href="#" data-testid="crew-onb-terms" data-legal="/crew-notice">Crew notice</a>.</span></button><div class="fld">${err('agree')}</div>${onb.dup ? `<div class="card" style="padding:14px 16px;margin-top:12px;border-color:var(--danger)" data-testid="crew-onb-dup"><div style="font-size:15px;font-weight:600;color:var(--danger)">That email is already on ${biz ? esc(biz.business_name) : 'the team'}.</div><div class="hint" style="margin:4px 0 10px">If ${biz ? esc(biz.owner_name.split(' ')[0]) : 'your employer'} added you, sign in with the password from your email and finish setting up there.</div><button class="btn btn-outline btn-sm" style="width:auto;padding:0 18px;display:inline-flex" data-testid="crew-onb-dup-signin" data-onb="signin">Sign in</button></div>` : ''}`;
       bar = `<button class="btn btn-primary" data-testid="crew-onb-join" data-onb="next">${onb.finish ? "I'm done" : 'Join the team'}</button>`;
     } else {
-      body = onb.finish
-        ? `<div class="onb-top"><span class="ico ok" style="width:64px;height:64px;border-radius:32px;margin:10px auto 14px"><svg style="width:30px;height:30px"><use href="#i-check"/></svg></span><div class="onb-title" data-testid="crew-onb-done">You're all set, ${esc(first)}.</div><div class="onb-sub">From now on sign in with <b>${esc(onb.email)}</b> and your new password.</div></div>`
-        : `<div class="onb-top"><span class="ico ok" style="width:64px;height:64px;border-radius:32px;margin:10px auto 14px"><svg style="width:30px;height:30px"><use href="#i-check"/></svg></span><div class="onb-title" data-testid="crew-onb-done">You're on the team, ${esc(first)}.</div><div class="onb-sub">Sign in with <b>${esc(onb.email)}</b> and the password you just created.</div></div>`;
-      bar = onb.finish ? `<button class="btn btn-primary" data-testid="crew-onb-today" data-onb="today">Go to Today</button>` : `<button class="btn btn-primary" data-testid="crew-onb-signin" data-onb="signin">Sign in</button>`;
+      const okIco = `<span class="ico ok" style="width:64px;height:64px;border-radius:32px;margin:10px auto 14px"><svg style="width:30px;height:30px"><use href="#i-check"/></svg></span>`;
+      if (onb.finish) { body = `<div class="onb-top">${okIco}<div class="onb-title" data-testid="crew-onb-done">You're all set, ${esc(first)}.</div><div class="onb-sub">From now on sign in with <b>${esc(onb.email)}</b> and your new password.</div></div>`; bar = `<button class="btn btn-primary" data-testid="crew-onb-today" data-onb="today">Go to Today</button>`; }
+      else if (onb.gate) { body = `<div class="onb-top">${okIco}<div class="onb-title" data-testid="crew-onb-pending">Thanks, ${esc(first)}.</div><div class="onb-sub">${esc(ownerFirst)} needs to approve you before you can sign in. We'll text <b>${esc(onb.phone || 'your mobile')}</b> when you're in — usually the same day.</div></div>`; bar = `<button class="btn btn-outline" data-testid="crew-onb-signin" data-onb="signin">Done</button>`; }   // C8 proposal — the approval gate
+      else if (onb.auto) { body = `<div class="onb-top">${okIco}<div class="onb-title" data-testid="crew-onb-done">You're on the team, ${esc(first)}.</div><div class="onb-sub">You're signed in on this phone. Set a PIN so you can clock on with four digits.</div></div>`; bar = `<button class="btn btn-primary" data-testid="crew-onb-setpin" data-onb="setpin">Set a PIN</button>`; }   // C8 proposal — signed in by the join itself
+      else { body = `<div class="onb-top">${okIco}<div class="onb-title" data-testid="crew-onb-done">You're on the team, ${esc(first)}.</div><div class="onb-sub">Sign in with <b>${esc(onb.email)}</b> and the password you just created.</div></div>`; bar = `<button class="btn btn-primary" data-testid="crew-onb-signin" data-onb="signin">Sign in</button>`; }
     }
     $('#onbBody').innerHTML = body; $('#onbBar').innerHTML = bar;
     document.body.dataset.lastGo = '/employee/onboarding' + (onb.finish ? '?finish=1' : '') + (n ? '#step' + n : '');
   }
   function openOnb(step){
-    if (onb.finish) Object.assign(onb, { name: prof.name, dob: prof.dob, phone: prof.phone, email: prof.email, emergency: prof.emergency });
-    if (step > 0 && !onb.finish) Object.assign(onb, { name: 'Mia Nguyen', dob: q.get('minor') === '1' ? '12/04/2010' : '12/04/1998', phone: '0412 345 678', email: 'mia@example.com', emergency: 'Tom Nguyen 0411 222 333', password: 'painter2026' });
-    if (step > 1 && onb.finish) Object.assign(onb, { tempPw: 'temp-1234', password: 'painter2026' });
+    if (onb.finish) Object.assign(onb, { name: prof.name, dob: prof.dob, phone: prof.phone, email: prof.email, address: prof.address, suburb: prof.suburb });
+    if (step > 0 && !onb.finish) Object.assign(onb, { name: 'Mia Nguyen', dob: q.get('minor') === '1' ? '12/04/2010' : '12/04/1998', phone: '0412 345 678', email: 'mia@example.com', address: '14 Wattle St', suburb: 'Brunswick VIC 3056', password: 'painter2026' });
+    if (step > 1 && onb.finish) Object.assign(onb, { tempPw: 'temp-1234', password: 'painter2026', address: onb.address || '14 Wattle St', suburb: onb.suburb || 'Brunswick VIC 3056' });
     if (step >= 4) onb.docs = { driving_licence: { on: true, exp: '01/03/2027' }, white_card: { on: true, exp: '28/10/2026' } };
     if (q.get('agree') === '1') onb.agree = true;
     onb.step = Math.min(Math.max(step, 0), 6); if (onb.step === 4 && !hasCulture()) onb.step = 5; onb.tried = false;
@@ -2173,7 +2298,8 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
       else if (a === 'agree') { onb.agree = !onb.agree; renderOnb(); } else if (a === 'showpw') { onb.showPw = !onb.showPw; renderOnb(); }
       else if (a === 'video') { onb.watched = true; renderOnb(); document.body.dataset.lastGo = 'play:welcome'; }
       else if (a === 'toggle') { onb.open[o.dataset.i] = !onb.open[o.dataset.i]; renderOnb(); }
-      else if (a === 'today') { showApp('today'); }
+      else if (a === 'today') { if (state.pinDevice) showApp('today'); else openPin('set', 'app'); }   // C8 — a phone without a PIN sets one first
+      else if (a === 'setpin') { openPin('set', 'app'); }
       return; }
     const dr = t.closest('[data-doc]'); if (dr) { openDocSheet('onb', dr.dataset.doc); return; }
     const pr = t.closest('[data-pdoc]'); if (pr) { openDocSheet('profile', pr.dataset.pdoc); return; }
@@ -2223,6 +2349,8 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
   else if (q.get('screen') === 'terms-update') { openTermsUpdate(); }
   else if (q.get('screen') === 'scope') { showApp('jobs'); openJob(q.get('id') || 'j1'); }   // C7 — the scope is the job page now
   else if (q.get('screen') === 'quote') { showApp('jobs'); openQuote(q.get('id') || 'j1'); }
+  else if (q.get('screen') === 'setpin') { openPin('set', 'app'); }
+  else if (q.get('screen') === 'invite-mail') { openMail(q.get('kind') || 'added'); }
   else if (q.get('screen') === 'inbox') { showApp('inbox'); }
   else if (q.get('screen') === 'feedback') { showApp('inbox'); openFeedback(); }
   else if (q.get('screen') === 'events') { showApp('me'); openEvents(); }

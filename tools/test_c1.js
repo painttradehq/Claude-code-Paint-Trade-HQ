@@ -40,6 +40,17 @@ async function run(b, W, H, tag) {
   ok('login: red-flagged account keeps the existing 403 wording' + full, (await txt(T('employee-login-error'))) === 'Account access temporarily restricted. Please contact admin.');
   await p.screenshot({ path: OUT + `c1-login-error-${tag}.png` });
   await p.fill(T('employee-login-email'), 'mia@example.com'); await p.click(T('employee-login-submit')); await p.waitForTimeout(300);
+  // ---- C8: a password sign-in on a phone without a PIN sets one first ----
+  ok('after the password sign-in: Set a 4-digit PIN — four boxes, the one line, Not now (44 px); no tab bar' + full, await p.locator(T('crew-set-pin')).isVisible() && (await txt(T('set-pin-title'))) === 'Set a 4-digit PIN' && (await p.locator('.pinbox').count()) === 4 && (await box(T('set-pin-skip'))).height >= 44 && !(await p.locator(T('crew-tabbar')).isVisible()) && (await go()) === '/employee/set-pin');
+  await p.screenshot({ path: OUT + `c8-set-pin-${tag}.png` });
+  await p.fill(T('set-pin-input'), '1234'); await p.waitForTimeout(100);
+  ok('an easy PIN is refused with the server\'s line' + full, (await txt(T('set-pin-error'))) === 'That PIN is too easy to guess — pick another' && (await txt(T('set-pin-title'))) === 'Set a 4-digit PIN');
+  await p.fill(T('set-pin-input'), '2468'); await p.waitForTimeout(100);
+  ok('four digits → "Type it once more"' + full, (await txt(T('set-pin-title'))) === 'Type it once more' && (await p.locator(T('set-pin-error')).count()) === 0);
+  await p.fill(T('set-pin-input'), '2460'); await p.waitForTimeout(100);
+  ok('a mismatch starts again with the line' + full, (await txt(T('set-pin-error'))) === "Those didn't match — start again" && (await txt(T('set-pin-title'))) === 'Set a 4-digit PIN');
+  await p.fill(T('set-pin-input'), '2468'); await p.waitForTimeout(100); await p.fill(T('set-pin-input'), '2468'); await p.waitForTimeout(200);
+  ok('the same PIN twice saves it and lands on the Dashboard' + full, (await go()) === 'POST /employees/me/pin' && await p.locator(T('crew-pane-dashboard')).isVisible());
 
   // ---- Today ----
   ok('sign in lands on Today with the tab bar' + full, await p.locator(T('crew-pane-dashboard')).isVisible() && await p.locator(T('crew-tabbar')).isVisible() && (await p.locator(T('crew-tab-dashboard')).getAttribute('class')).includes('on'));
@@ -545,6 +556,52 @@ async function run(b, W, H, tag) {
   await p.goto(U + '?screen=terms-update'); await p.waitForTimeout(300); await p.click(T('crew-terms-signout')); await p.waitForTimeout(150);
   ok('Sign out from the gate → the sign-in screen' + full, await p.locator(T('crew-login')).isVisible());
 
+  // ---- C8: invites and the first sign-in ----
+  await p.goto(U + '?pindevice=1'); await p.waitForTimeout(300);
+  ok('a phone with a PIN opens on the PIN pad: Hi Mia, the line, four boxes, "Use my password instead"; no email field' + full, await p.locator(T('crew-pin-login')).isVisible() && (await txt(T('crew-pin-hello'))) === 'Hi Mia' && /Enter your PIN to clock on\./.test(await txt(T('crew-pin-login'))) && (await p.locator(T('crew-pin-login') + ' .pinbox').count()) === 4 && !(await p.locator(T('employee-login-email')).isVisible()) && (await box(T('crew-pin-use-password'))).height >= 44);
+  await p.screenshot({ path: OUT + `c8-pin-login-${tag}.png` });
+  await p.fill(T('crew-pin-input'), '1111'); await p.waitForTimeout(100);
+  ok('a wrong PIN: "Wrong PIN · 4 tries left" (the server\'s count), boxes cleared' + full, (await txt(T('crew-pin-error'))) === 'Wrong PIN · 4 tries left' && (await p.locator(T('crew-pin-login') + ' .pinbox.bad').count()) === 4);
+  await p.click(T('crew-pin-use-password')); await p.waitForTimeout(100);
+  ok('"Use my password instead" shows the password form' + full, await p.locator(T('employee-login-email')).isVisible() && !(await p.locator(T('crew-pin-login')).isVisible()));
+  await p.goto(U + '?pindevice=1'); await p.waitForTimeout(300); await p.fill(T('crew-pin-input'), '2468'); await p.waitForTimeout(300);
+  ok('the right PIN signs in straight to the Dashboard' + full, (await go()) === 'POST /employees/pin-login' && await p.locator(T('crew-pane-dashboard')).isVisible());
+  await p.goto(U + '?pindevice=1'); await p.waitForTimeout(300);
+  for (const w of ['1111', '2222', '3333', '4444', '5555']) { await p.fill(T('crew-pin-input'), w); await p.waitForTimeout(80); }
+  ok('five wrong tries switch the PIN off: the password form with the server\'s line' + full, await p.locator(T('employee-login-email')).isVisible() && /PIN switched off after too many wrong tries\. Sign in with your password to set a new one\./.test(await txt(T('employee-login-error'))));
+  await p.goto(U + '?error=pending'); await p.waitForTimeout(200);
+  ok('proposal — approval gate: a sign-in before approval shows the waiting line' + full, /waiting for Josh to approve it/.test(await txt(T('employee-login-error'))));
+  // the alerts card (live since 2 Nov; the prototype catches up)
+  await p.goto(U + '?screen=app&tab=today'); await p.waitForTimeout(300);
+  ok('Dashboard: the alerts card above Today\'s job — title, one line, Turn on alerts (44 px)' + full, await p.locator(T('crew-alerts-card')).isVisible() && (await txt(T('crew-alerts-title'))) === 'Get buzzed for new jobs' && (await box(T('crew-alerts-on'))).height >= 44 && (await box(T('crew-alerts-card'))).y < (await box(T('crew-today-jobcard'))).y);
+  ok('…the × (44 px) is the live card\'s Not now' + full, (await box(T('crew-alerts-dismiss'))).height >= 40);
+  await p.click(T('crew-alerts-on')); await p.waitForTimeout(700);
+  ok('Turn on alerts: "Turning on…", then the card is gone' + full, !(await p.locator(T('crew-alerts-card')).isVisible()) && (await go()) === 'POST /employee/push/subscribe');
+  await p.goto(U + '?screen=app&tab=today&alerts=0'); await p.waitForTimeout(300);
+  ok('…alerts already on → no card' + full, !(await p.locator(T('crew-alerts-card')).isVisible()));
+  // the invite emails
+  await p.goto(U + '?screen=invite-mail&kind=added'); await p.waitForTimeout(300);
+  ok('the owner-added email: from the business via Paint Trade HQ, the subject, three steps, the temporary password, Open the crew app' + full, await p.locator(T('crew-mail')).isVisible() && (await txt(T('crew-mail-subject'))) === 'Your Sano Painting login on Paint Trade HQ' && /via Paint Trade HQ/.test(await txt(T('crew-mail-card'))) && (await p.locator(T('crew-mail-card') + ' li').count()) === 3 && /brush-lane-42/.test(await txt(T('crew-mail-card'))) && (await txt(T('crew-mail-cta'))) === 'Open the crew app' && (await box(T('crew-mail-cta'))).height >= 44 && await noHScroll());
+  await p.screenshot({ path: OUT + `c8-mail-added-${tag}.png` });
+  await p.click(T('crew-mail-cta')); await p.waitForTimeout(150);
+  ok('…Open the crew app lands on the sign-in with the email filled' + full, await p.locator(T('crew-login')).isVisible() && (await p.locator(T('employee-login-email')).inputValue()) === 'mia@example.com' && (await go()) === '/employee/login?email=mia%40example.com');
+  await p.goto(U + '?screen=invite-mail&kind=join'); await p.waitForTimeout(300);
+  ok('the join email (proposal): the subject, Join Sano Painting, the five-minute line, the don\'t-forward line' + full, (await txt(T('crew-mail-subject'))) === 'Join Sano Painting on Paint Trade HQ' && (await txt(T('crew-mail-cta'))) === 'Join Sano Painting' && /about five minutes/.test(await txt(T('crew-mail-card'))) && /don't forward it/.test(await txt(T('crew-mail-card'))));
+  await p.screenshot({ path: OUT + `c8-mail-join-${tag}.png` });
+  await p.click(T('crew-mail-cta')); await p.waitForTimeout(150);
+  ok('…Join opens the onboarding welcome for the business' + full, await p.locator(T('crew-onb')).isVisible() && (await txt(T('crew-onb-title'))) === 'Join Sano Painting');
+  // the two proposals on the done screen
+  await p.goto(U + '?screen=onboarding&step=5&agree=1&autosignin=1'); await p.waitForTimeout(300); await p.click(T('crew-onb-join')); await p.waitForTimeout(150);
+  ok('proposal — signed in by the join: the done screen offers Set a PIN instead of Sign in' + full, /You're on the team, Mia\./.test(await txt(T('crew-onb-done'))) && (await txt(T('crew-onb-setpin'))) === 'Set a PIN' && (await p.locator(T('crew-onb-signin')).count()) === 0);
+  await p.screenshot({ path: OUT + `c8-onb-done-auto-${tag}.png` });
+  await p.click(T('crew-onb-setpin')); await p.waitForTimeout(150); await p.fill(T('set-pin-input'), '2468'); await p.waitForTimeout(100); await p.fill(T('set-pin-input'), '2468'); await p.waitForTimeout(200);
+  ok('…Set a PIN → the pad → the Dashboard, no password typed' + full, await p.locator(T('crew-pane-dashboard')).isVisible());
+  await p.goto(U + '?screen=onboarding&step=5&agree=1&gate=1'); await p.waitForTimeout(300); await p.click(T('crew-onb-join')); await p.waitForTimeout(150);
+  ok('proposal — approval gate: "Thanks, Mia." with the owner\'s name and the mobile number; Done' + full, /Thanks, Mia\./.test(await txt(T('crew-onb-pending'))) && /Josh needs to approve you/.test(await txt('#onbBody')) && /0412 345 678/.test(await txt('#onbBody')) && (await txt(T('crew-onb-signin'))) === 'Done');
+  await p.screenshot({ path: OUT + `c8-onb-pending-${tag}.png` });
+  await p.goto(U + '?screen=onboarding'); await p.waitForTimeout(300);
+  ok('onboarding 0: the "You\'ll need" list has no emergency contact (not asked since 2 Nov)' + full, !/emergency contact/i.test(await txt('#onbBody')) && /Your home address/.test(await txt('#onbBody')));
+
   // ---- C5: onboarding, profile, my documents ----
   await p.goto(U + '?screen=onboarding'); await p.waitForTimeout(300);
   ok('onboarding 0: invite from the business, Let\'s go, Sign in link' + full, (await txt(T('crew-onb-title'))) === 'Join Sano Painting' && /Josh Sano has invited you/.test(await txt('#onbBody')) && await p.locator(T('crew-onb-start')).isVisible() && await p.locator(T('crew-onb-signin')).isVisible());
@@ -555,15 +612,15 @@ async function run(b, W, H, tag) {
   ok('onboarding 0: the owner\'s uploaded video plays in place' + full, (await go()) === 'play:welcome' && /Playing…/.test(await txt(T('crew-onb-video'))));
   await p.screenshot({ path: OUT + `c5-onb-0-${tag}.png` });
   await p.click(T('crew-onb-start')); await p.waitForTimeout(150);
-  ok('onboarding 1: About you with six fields and Step 1 of 4' + full, (await txt(T('crew-onb-step'))) === 'Step 1 of 4' && await p.locator(T('crew-onb-name')).isVisible() && await p.locator(T('crew-onb-password')).isVisible());
+  ok('onboarding 1: About you with seven fields (street address and suburb, no emergency contact) and Step 1 of 4' + full, await p.locator(T('crew-onb-address')).isVisible() && await p.locator(T('crew-onb-suburb')).isVisible() && (await p.locator(T('crew-onb-emergency')).count()) === 0 && (await txt(T('crew-onb-step'))) === 'Step 1 of 4' && await p.locator(T('crew-onb-name')).isVisible() && await p.locator(T('crew-onb-password')).isVisible());
   await p.click(T('crew-onb-next')); await p.waitForTimeout(150);
-  ok('onboarding 1: empty Continue shows inline errors, stays on step 1' + full, (await p.locator(T('crew-onb-err')).count()) >= 6 && (await txt(T('crew-onb-step'))) === 'Step 1 of 4');
+  ok('onboarding 1: empty Continue shows inline errors, stays on step 1' + full, (await p.locator(T('crew-onb-err')).count()) >= 7 && /Enter your street address\./.test(await txt('#onbBody')) && (await txt(T('crew-onb-step'))) === 'Step 1 of 4');
   await p.fill(T('crew-onb-name'), 'Mia Nguyen'); await p.fill(T('crew-onb-dob'), '12042012'); await p.click(T('crew-onb-next')); await p.waitForTimeout(150);
   ok('onboarding 1: a 14-year-old is refused with the 15+ line' + full, /You need to be 15 or older to join a crew\./.test(await txt('#onbBody')) && (await txt(T('crew-onb-step'))) === 'Step 1 of 4');
   await p.fill(T('crew-onb-dob'), '12042010'); await p.waitForTimeout(150);
   ok('onboarding 1: 15–17 shows the guardian-consent line' + full, await p.locator(T('crew-onb-minor')).isVisible() && /parent or guardian/.test(await txt(T('crew-onb-minor'))));
   await p.screenshot({ path: OUT + `c5-onb-1-${tag}.png` });
-  await p.fill(T('crew-onb-phone'), '0412 345 678'); await p.fill(T('crew-onb-email'), 'mia@example.com'); await p.fill(T('crew-onb-emergency'), 'Tom Nguyen 0411 222 333'); await p.fill(T('crew-onb-password'), 'painter2026');
+  await p.fill(T('crew-onb-phone'), '0412 345 678'); await p.fill(T('crew-onb-email'), 'mia@example.com'); await p.fill(T('crew-onb-address'), '14 Wattle St'); await p.fill(T('crew-onb-suburb'), 'Brunswick VIC 3056'); await p.fill(T('crew-onb-password'), 'painter2026');
   await p.click(T('crew-onb-next')); await p.waitForTimeout(150);
   ok('onboarding 2: photo step with Add a photo and Skip for now' + full, (await txt(T('crew-onb-step'))) === 'Step 2 of 4' && await p.locator(T('crew-onb-photo-add')).isVisible() && (await txt(T('crew-onb-next'))) === 'Skip for now');
   await p.click(T('crew-onb-photo-add')); await p.waitForTimeout(150);
@@ -583,7 +640,7 @@ async function run(b, W, H, tag) {
   ok('onboarding 3: the row shows Added with the expiry' + full, /Added · expires 01\/03\/2027/.test(await txt(T('crew-onb-doc-driving_licence'))));
   await p.click(T('crew-onb-doc-white_card')); await p.click(T('crew-doc-sheet-file')); await p.fill(T('crew-doc-sheet-expiry'), '28102026'); await p.click(T('crew-doc-sheet-done')); await p.waitForTimeout(150);
   await p.click(T('crew-onb-next')); await p.waitForTimeout(150);
-  ok('onboarding 4: the four facts (emails, texts and records last), the crew-notice link and the agreement with both links (no team step: Round 79 has a headline, a note and a video)' + full, (await txt(T('crew-onb-step'))) === 'Step 4 of 4' && (await p.locator('#onbBody .facts > div:not(.facts-more)').count()) === 4 && /Emails, texts and records/.test(await txt('#onbBody .facts > div:nth-child(4)')) && /may email or text you about work/.test(await txt('#onbBody .facts > div:nth-child(4)')) && (await txt(T('crew-onb-notice'))) === 'Read the full crew notice' && (await box(T('crew-onb-notice'))).height >= 44 && await p.locator(T('crew-onb-terms')).isVisible() && await p.locator(T('crew-onb-privacy')).isVisible() && (await txt(T('crew-onb-join'))) === 'Join the team');
+  ok('onboarding 4: the four facts (emails, texts and records last), the crew-notice link and the agreement with the one Crew notice link (no team step: Round 79 has a headline, a note and a video)' + full, (await txt(T('crew-onb-step'))) === 'Step 4 of 4' && (await p.locator('#onbBody .facts > div:not(.facts-more)').count()) === 4 && /Emails, texts and records/.test(await txt('#onbBody .facts > div:nth-child(4)')) && /may email or text you about work/.test(await txt('#onbBody .facts > div:nth-child(4)')) && (await txt(T('crew-onb-notice'))) === 'Read the full crew notice' && (await box(T('crew-onb-notice'))).height >= 44 && (await txt(T('crew-onb-terms'))) === 'Crew notice' && (await p.locator(T('crew-onb-privacy')).count()) === 0 && (await txt(T('crew-onb-join'))) === 'Join the team');
   await p.click(T('crew-onb-notice')); await p.waitForTimeout(150);
   ok('the crew notice: a page with the business name filled in, eight short parts, version line, back to the step' + full, await p.locator(T('crew-notice')).isVisible() && !(await p.locator(T('crew-onb')).isVisible()) && (await go()) === '/crew-notice' && (await p.locator('#noticeBody p').count()) === 8 && /Who holds your details/.test(await txt(T('crew-notice-body'))) && /No marketing/.test(await txt(T('crew-notice-body'))) && /Sano Painting is your employer/.test(await txt(T('crew-notice-body'))) && /Version 1/.test(await txt(T('crew-notice-meta'))) && await noHScroll());
   await p.screenshot({ path: OUT + `c5-notice-${tag}.png` });
@@ -591,8 +648,10 @@ async function run(b, W, H, tag) {
   ok('Back returns to step 4 with nothing lost' + full, await p.locator(T('crew-onb')).isVisible() && (await txt(T('crew-onb-step'))) === 'Step 4 of 4' && (await p.locator(T('crew-onb-agree')).getAttribute('aria-checked')) === 'false');
   await p.click(T('crew-onb-join')); await p.waitForTimeout(150);
   ok('onboarding 4: Join without the tick shows the one line' + full, (await txt(T('crew-onb-err'))) === 'Tick the agreement to continue.');
-  await p.click(T('crew-onb-terms')); await p.waitForTimeout(100);
-  ok('onboarding 4: the Terms link opens /terms without ticking the box' + full, (await go()) === '/terms' && (await p.locator(T('crew-onb-agree')).getAttribute('aria-checked')) === 'false');
+  await p.click(T('crew-onb-terms')); await p.waitForTimeout(150);
+  ok('onboarding 4: the Crew notice link in the agreement opens the notice without ticking the box (live since 2 Nov: the notice is the one agreement)' + full, await p.locator(T('crew-notice')).isVisible() && (await go()) === '/crew-notice' && (await p.locator(T('crew-onb-privacy')).count()) === 0);
+  await p.click(T('crew-notice-back')); await p.waitForTimeout(150);
+  ok('…back on step 4, still unticked' + full, (await p.locator(T('crew-onb-agree')).getAttribute('aria-checked')) === 'false');
   await p.screenshot({ path: OUT + `c5-onb-4-${tag}.png` });
   await p.click(T('crew-onb-agree') + ' .box'); await p.waitForTimeout(100);
   ok('onboarding 4: tapping the box ticks it' + full, (await p.locator(T('crew-onb-agree')).getAttribute('aria-checked')) === 'true');
@@ -627,7 +686,9 @@ async function run(b, W, H, tag) {
   await p.click(T('crew-onb-join')); await p.waitForTimeout(150);
   ok('finish mode: done screen and Go to Today' + full, /You're all set, Mia\./.test(await txt(T('crew-onb-done'))) && await p.locator(T('crew-onb-today')).isVisible());
   await p.click(T('crew-onb-today')); await p.waitForTimeout(200);
-  ok('finish mode: Go to Today lands on Today' + full, await p.locator(T('crew-pane-dashboard')).isVisible());
+  ok('finish mode: Go to Today asks for a PIN first on a phone without one' + full, await p.locator(T('crew-set-pin')).isVisible());
+  await p.click(T('set-pin-skip')); await p.waitForTimeout(200);
+  ok('finish mode: Not now lands on the Dashboard' + full, await p.locator(T('crew-pane-dashboard')).isVisible());
 
   // profile
   await p.goto(U + '?screen=profile'); await p.waitForTimeout(300);
