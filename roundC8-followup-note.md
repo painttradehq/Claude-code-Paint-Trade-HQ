@@ -1,0 +1,3 @@
+C8 follow-up, one line of test code — the red test you flagged. In `backend/tests/test_c5_crew_documents.py`, `test_02_register_ok_and_login_trim`, change the exact-keys assertion to the five keys the register response now has: `assert set(r.json()) == {"id", "name", "email", "pending", "owner_first"}`. Touch nothing else in that file and no other file. Run `tests/test_c5_crew_documents.py` and `tests/test_c8_crew_invites.py` through `scripts/run_tests.sh`; TS_ rows torn down as always. Round C8 is accepted as reported — thank you. Reply starting with "C8 follow-up done" with the two files' pass counts, then stop. Do not start another round. Do not offer next action items.
+
+(Drafted 28 Nov 2026 ~09:15 UTC. NOT sent — waits for Josh's "send".)
