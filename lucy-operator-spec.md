@@ -439,3 +439,23 @@ Josh, after the token explanation: "This is certainly unaffordable… we need to
 - **Sent** as Part D, queued behind Parts A–C (Emergent was running Part A): the message in `lucy-completion-report-message.md`.
 - **Low or normal effort** — read as a question to answer. Answer given: stay on low. Measured in the cost round, both passed all 16: normal (setup C) US$0.87 cold / 0.28 warm / 106 s for the set; low (setup D) 0.80 / 0.21 / 75 s. What the record checks cannot show is the quality of her wording, so Part A's side-by-side gets a third column at no cost — her words on Sonnet 5.5 at default effort, from run C already on file. It is one setting (`AI_EFFORT`) to change later.
 - **Seen in Emergent's Part A work so far:** the photo-path check asked for caught a real fault — with her thinking in the held conversation, approving a card after a photo was refused by the API ("the block is bound to a different conversation"), because the app rewrote the photo to "[photo]". Emergent now holds the conversation as it was sent. A card made on Opus 5 and approved on Sonnet 5.5 went through with its follow-up.
+
+## 31. Parts A–D built — Emergent's reports and the code read (checked 28 Nov on Josh's "check")
+
+All four are in the saved code (GitHub `main` `3ece9f7`; commits `579a9fa` A, `dc44041` B, `9ad50c9` C, `19ede01` D). Publish is Josh's click. Test accounts only throughout; 0 TS_ rows left.
+
+**A — Lucy on `claude-sonnet-5-5`, effort low.** `AI_MODEL` default changed, `AI_EFFORT` default `low`, one `output_config` (read in `services/ai_provider.py`). Neither is set in the preview, so the live app follows the code on publish. The cost set on the new default: 16 of 16, US$0.81 cold / 0.23 warm / 81 s (setup D was 0.80 / 0.21 / 75). **The photo check caught a real fault:** with her thinking in the held conversation, approving a card after a photo was refused by the API ("the block is bound to a different conversation"); fixed by holding the conversation as sent, photo included, until the card is over. A card made on Opus 5 and approved on Sonnet 5.5 went through, with and without a thinking block held. Spent about US$0.45.
+
+**Low against normal effort — what the side-by-side and the checks show.** The wording reads alike on the simple tasks. Two slips at low, one observation each: with a photo she wrote "I can't open the photo myself" although it was in the conversation (at high she described it: "a thin, jagged vertical line just left of the window"); on Josh's ten-item task she first said no client had "test" in the name, then "I should have searched before saying…". Neither showed at default effort. The tool kept only the first 500 characters of each reply in the earlier runs (6,000 from now on).
+
+**B — a failed task says why.** `_chat_turn` saves Lucy's message before raising: the route's own words, or "Something went wrong on my side." with what was already done. The generic "AI request failed" is treated as having no words of its own. The last-resort call proved on the real API: accepted with the tools kept and `tool_choice` none; her answer listed Done and Left to do; "carry on" finished the rest with no duplicates. Josh's own long request no longer reaches ten rounds on the new model: 6 calls, 19.8 seconds, ending on the send card (it took 90 seconds on Opus 5 on the live app). Checks 4–6 are Emergent's own harness, not the testing agent.
+
+**C — "Open live project".** Built as the brief; the testing agent 5 of 5 at both widths. Seen and not changed: in the Quotes side panel's status timeline the step cells ("Draft · 4m ago") are wider than their boxes.
+
+**D — Lucy sends the app's own completion report.** `get_completion_report` and `send_completion_report`, Lucy-only, the send always its own card; the report, PDF, window and client page untouched. Added beyond the brief: both take the job's id or its exact name, because her job list returns only the 20 newest. To know: the "what I can do" Jobs line now wraps onto two lines; the report's default message lower-cases the job name and mentions before-and-after photos even when there are none (the existing wording). Emergent's own runs, not the testing agent.
+
+**What's new draft #47:** fourteen cards now, still a draft.
+
+**At Emergent now:** the crew chat's C8 prototype is saved there, waiting for Josh's five answers — not this chat's.
+
+**Open, Josh's call:** effort — the recommendation is now normal (the model's default), on the two slips above; one setting to change, on his "send".
