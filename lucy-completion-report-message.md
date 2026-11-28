@@ -1,4 +1,4 @@
-# Lucy sends the app's own completion report — NOT SENT, waits for Josh's "send"
+# Lucy sends the app's own completion report — SENT to Emergent 28 Nov on Josh's word ("send the completion report one too"), as Part D behind the three parts
 
 Josh, 28 Nov: "Please check the completion report. Lucy made me one and sent it, but it's an email format. I wanted it to be a PDF attached — a completion report with all the details of completion and colours and photos, preferably a before and after photo, similar to a presentation but for finishing a job."
 
@@ -18,7 +18,7 @@ If Josh wants the report itself to look different — more like the presentation
 
 ---
 
-## The message to send
+## The message as sent (it went with a Part D heading, the shared rules, and one addition to Part A's side-by-side: a third column from run C — Sonnet 5.5 at default effort)
 
 # Lucy sends the app's own completion report
 
