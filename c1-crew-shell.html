@@ -567,7 +567,7 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
 .pdfprev .pp-sig{display:block;max-width:150px;width:100%;height:50px;object-fit:contain;object-position:left bottom;margin-bottom:4px}
 .pdfprev .pp-foot{margin-top:14px;font-size:10px;color:#777}
 
-/* ---- C10: the crew demo — three short moving pictures of what changed (the edge time clock, the work line by line, the quote) ---- */
+/* ---- C10: the crew demo — two short moving pictures of what changed (the edge time clock, the work line by line) ---- */
 .sheet.demo{max-height:94%;padding-top:6px}
 .demo-top{display:flex;align-items:center;justify-content:space-between;min-height:44px}
 .demo-kicker{font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
@@ -616,19 +616,7 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
 .dm-f2{left:96px;top:123px;animation:dmTap 5.2s infinite}
 @keyframes dmOpen{0%,28%{max-height:0}40%,90%{max-height:44px}99%,100%{max-height:0}}
 @keyframes dmTap{0%,12%{opacity:0}18%,28%{opacity:.42}34%,100%{opacity:0}}
-/* 3 — the quote, without the prices */
-.dm-qrow{display:flex;align-items:center;gap:7px}
-.dm-qico{width:18px;height:18px;border-radius:6px;background:var(--accent-bg);flex-shrink:0}
-.dm-paper{position:absolute;inset:0;background:var(--bg);padding:14px 12px;transform:translateX(104%);animation:dmPaper 5.2s infinite;z-index:3}
-.dm-sheet{background:#fff;border:1px solid var(--border);border-radius:5px;padding:9px 9px 6px;height:100%}
-.dm-qword{font-family:var(--font-display);font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--accent);text-align:right;margin-bottom:5px}
-.dm-th{display:flex;gap:5px;border-bottom:1.5px solid var(--accent);padding-bottom:3px;margin-top:8px;font-size:5.5px;font-weight:700;letter-spacing:.08em;color:var(--text-muted)}
-.dm-th b{flex:1;font-weight:700}
-.dm-tr{display:flex;gap:5px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)}
-.dm-tr .dm-bar{margin:0}
-.dm-f3{left:92px;top:171px;animation:dmTap 5.2s infinite}
-@keyframes dmPaper{0%,30%{transform:translateX(104%)}42%,90%{transform:translateX(0)}99%,100%{transform:translateX(104%)}}
-@media (prefers-reduced-motion: reduce){.dm-phone *{animation:none !important}.dm-finger{display:none}.dm-panel{transform:translate(0,-50%)}.dm-scrim{opacity:1}.dm-detail{max-height:44px}.dm-paper{transform:none}}
+@media (prefers-reduced-motion: reduce){.dm-phone *{animation:none !important}.dm-finger{display:none}.dm-panel{transform:translate(0,-50%)}.dm-scrim{opacity:1}.dm-detail{max-height:44px}}
 </style>
 </head>
 <body>
@@ -860,7 +848,7 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
         <div class="list">
           <button class="row" data-testid="crew-me-demo" id="meDemo">
             <span class="ico"><svg><use href="#i-play"/></svg></span>
-            <span class="row-t"><span class="row-title">What's new in the app</span><span class="row-sub">A short look at the time clock and the quote</span></span>
+            <span class="row-t"><span class="row-title">What's new in the app</span><span class="row-sub">A short look at the time clock and the job page</span></span>
             <svg class="chev"><use href="#i-chev"/></svg>
           </button>
           <button class="row signout" data-testid="crew-me-signout" id="signOut">
@@ -1149,7 +1137,7 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
       <div style="display:flex;gap:10px;margin-top:12px"><button class="btn btn-outline" id="pwCancel" data-testid="crew-pw-cancel" style="flex:1">Cancel</button><button class="btn btn-primary" id="pwSave" data-testid="crew-pw-save" style="flex:1">Save</button></div>
     </div>
   </div>
-  <!-- C10 — the crew demo: once after the update (and from Me › What's new in the app), three short moving pictures -->
+  <!-- C10 — the crew demo: once after the update (and from Me › What's new in the app), two short moving pictures -->
   <div class="scrim hide" id="demoSheet" data-testid="crew-demo">
     <div class="sheet demo" role="dialog" aria-label="What's new in the app">
       <div class="sheet-grab"></div>
@@ -2372,13 +2360,6 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
         <div class="dm-card"><div class="dm-row"><div class="dm-bar" style="max-width:70%"></div><i></i></div><div class="dm-row"><div class="dm-bar" style="max-width:84%"></div><i></i></div><div class="dm-detail"><div class="dm-detail-in"><div class="dm-photo"></div><div style="flex:1">${DM_BARS([92, 70, 48])}</div></div></div><div class="dm-row"><div class="dm-bar" style="max-width:58%"></div><i></i></div></div>
         <div class="dm-card"><div class="dm-row"><div class="dm-bar" style="max-width:66%"></div><i></i></div></div></div>
         <div class="dm-finger dm-f2"></div></div>` },
-    { title: 'The quote, without the prices',
-      body: 'On a job, Open the quote shows what the client agreed to: the work, the materials, the colours and the terms.',
-      stage: `<div class="dm-phone" data-testid="crew-demo-pic-quote"><div class="dm-pad"><div class="dm-bar" style="width:30%"></div><div class="dm-bar dark" style="width:78%"></div><div class="dm-lbl">The work · 3 areas · 9 lines</div>
-        <div class="dm-card">${DM_BARS([82, 60])}</div><div class="dm-card">${DM_BARS([70, 88])}</div>
-        <div class="dm-card"><div class="dm-qrow"><div class="dm-qico"></div><div style="flex:1"><div class="dm-bar dark" style="width:58%;height:7px"></div><div class="dm-bar" style="width:90%;margin:0"></div></div></div></div></div>
-        <div class="dm-paper"><div class="dm-sheet"><div class="dm-qword">QUOTE</div>${DM_BARS([52, 74])}<div class="dm-th"><b>DESCRIPTION</b><span>QTY</span><span>UNIT</span></div>${[78, 62, 84, 55].map(w => `<div class="dm-tr"><div class="dm-bar" style="flex:1;max-width:${w}%"></div><div style="flex:1"></div><div class="dm-bar" style="width:11px"></div><div class="dm-bar" style="width:13px"></div></div>`).join('')}</div></div>
-        <div class="dm-finger dm-f3"></div></div>` },
   ];
   const demo = { i: 0, seen: false };
   function renderDemo(){
