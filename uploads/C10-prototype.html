@@ -573,7 +573,8 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
 .demo-kicker{font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
 .demo-skip{height:44px;padding:0 4px 0 14px;color:var(--accent);font-weight:600;font-size:14.5px}
 .demo-stage{display:flex;justify-content:center;padding:2px 0 14px}
-.sheet.demo h2{font-size:22px;line-height:1.2;margin:0 0 6px}
+.sheet.demo h2{font-size:22px;line-height:26px;min-height:52px;margin:0 0 6px}
+.sheet.demo .btn{box-sizing:border-box;height:52px;min-height:0;margin:0}
 .demo-body{font-size:15px;line-height:1.5;color:var(--text-secondary);min-height:92px}
 .demo-dots{display:flex;gap:6px;justify-content:center;margin-top:6px}
 .demo-dots i{width:7px;height:7px;border-radius:4px;background:var(--border-strong);transition:width .2s}
@@ -616,7 +617,7 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
 .dm-f2{left:96px;top:123px;animation:dmTap 5.2s infinite}
 @keyframes dmOpen{0%,28%{max-height:0}40%,90%{max-height:44px}99%,100%{max-height:0}}
 @keyframes dmTap{0%,12%{opacity:0}18%,28%{opacity:.42}34%,100%{opacity:0}}
-@media (prefers-reduced-motion: reduce){.dm-phone *{animation:none !important}.dm-finger{display:none}.dm-panel{transform:translate(0,-50%)}.dm-scrim{opacity:1}.dm-detail{max-height:44px}}
+@media (prefers-reduced-motion: reduce){.dm-phone *{animation:none !important}.dm-finger{display:none}.dm-panel{transform:translate(0,-50%)}.dm-scrim{opacity:1}.dm-detail{max-height:44px}.dm-dot,.dm-edge{background:var(--success)}.dm-status .on{opacity:1}.dm-status .off{opacity:0}}
 </style>
 </head>
 <body>
@@ -848,7 +849,7 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
         <div class="list">
           <button class="row" data-testid="crew-me-demo" id="meDemo">
             <span class="ico"><svg><use href="#i-play"/></svg></span>
-            <span class="row-t"><span class="row-title">What's new in the app</span><span class="row-sub">A short look at the time clock and the job page</span></span>
+            <span class="row-t"><span class="row-title">What's new in the app</span><span class="row-sub">A short tour of the changes</span></span>
             <svg class="chev"><use href="#i-chev"/></svg>
           </button>
           <button class="row signout" data-testid="crew-me-signout" id="signOut">
@@ -2352,12 +2353,12 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
       body: 'Tap the line on the left edge of the screen, or swipe in from it, to sign in and out. It is there on every screen, and it turns green while you are on the clock.',
       stage: `<div class="dm-phone" data-testid="crew-demo-pic-clock"><div class="dm-pad"><div class="dm-bar" style="width:46%"></div><div class="dm-bar dark" style="width:70%"></div><div class="dm-card">${DM_BARS([80, 55])}</div><div class="dm-card">${DM_BARS([64, 86, 40])}</div><div class="dm-card">${DM_BARS([72, 50])}</div></div>
         <div class="dm-edge"></div><div class="dm-chev"></div><div class="dm-scrim"></div>
-        <div class="dm-panel"><div class="dm-clock"><div class="dm-status"><i class="dm-dot"></i><span class="off">Signed out</span><span class="on">Signed in</span></div><div class="dm-bar dark" style="width:88%;margin-top:7px"></div><div class="dm-bar" style="width:62%"></div><div class="dm-btn">Sign in</div></div></div>
+        <div class="dm-panel" data-testid="crew-demo-pic-panel"><div class="dm-clock"><div class="dm-status"><i class="dm-dot"></i><span class="off">Signed out</span><span class="on">Signed in</span></div><div class="dm-bar dark" style="width:88%;margin-top:7px"></div><div class="dm-bar" style="width:62%"></div><div class="dm-btn">Sign in</div></div></div>
         <div class="dm-finger dm-f1"></div></div>` },
     { title: 'The whole job, line by line',
       body: 'Open a job to see every area and every line of the work. Tap a line for its note, its paint and the marked photos.',
       stage: `<div class="dm-phone" data-testid="crew-demo-pic-work"><div class="dm-pad"><div class="dm-bar" style="width:30%"></div><div class="dm-bar dark" style="width:78%"></div><div class="dm-lbl">The work · 3 areas · 9 lines</div>
-        <div class="dm-card"><div class="dm-row"><div class="dm-bar" style="max-width:70%"></div><i></i></div><div class="dm-row"><div class="dm-bar" style="max-width:84%"></div><i></i></div><div class="dm-detail"><div class="dm-detail-in"><div class="dm-photo"></div><div style="flex:1">${DM_BARS([92, 70, 48])}</div></div></div><div class="dm-row"><div class="dm-bar" style="max-width:58%"></div><i></i></div></div>
+        <div class="dm-card"><div class="dm-row"><div class="dm-bar" style="max-width:70%"></div><i></i></div><div class="dm-row"><div class="dm-bar" style="max-width:84%"></div><i></i></div><div class="dm-detail" data-testid="crew-demo-pic-detail"><div class="dm-detail-in"><div class="dm-photo"></div><div style="flex:1">${DM_BARS([92, 70, 48])}</div></div></div><div class="dm-row"><div class="dm-bar" style="max-width:58%"></div><i></i></div></div>
         <div class="dm-card"><div class="dm-row"><div class="dm-bar" style="max-width:66%"></div><i></i></div></div></div>
         <div class="dm-finger dm-f2"></div></div>` },
   ];
@@ -2378,7 +2379,8 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
   $('#meDemo').addEventListener('click', (e) => { e.stopPropagation(); openDemo(); });
   { let x0 = null; const sh = $('#demoSheet .sheet');   // a swipe turns the page
     sh.addEventListener('pointerdown', (e) => { x0 = e.clientX; e.stopPropagation(); });
-    sh.addEventListener('pointerup', (e) => { if (x0 === null) return; const dx = e.clientX - x0; x0 = null; if (dx < -50) demoStep(1); else if (dx > 50) demoStep(-1); }); }
+    sh.addEventListener('pointerup', (e) => { if (x0 === null) return; const dx = e.clientX - x0; x0 = null; if (dx < -50 && demo.i < DEMO.length - 1) demoStep(1); else if (dx > 50) demoStep(-1); }); }   // a swipe never goes past the last page
+  $('#demoSheet').addEventListener('click', (e) => { if (e.target === $('#demoSheet')) closeDemo(); });   // a tap on the dim closes it, like Skip
 
   function openQuote(id){ qu.job = id; hideC5(); $('#s-app').classList.add('hide'); $('#s-job').classList.add('hide'); $('#s-quote').classList.remove('hide'); renderQuote(); $('#quoteBody').scrollTop = 0; document.body.dataset.lastGo = '/employee/project/' + id + '/quote'; }
   $('#quoteBack').addEventListener('click', () => { $('#s-quote').classList.add('hide'); openJob(qu.job); });

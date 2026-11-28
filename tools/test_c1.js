@@ -594,15 +594,20 @@ async function run(b, W, H, tag) {
   ok('…it does not come back on the next visit to the Dashboard' + full, !(await p.locator(T('crew-demo')).isVisible()));
   await p.goto(U + '?screen=app&tab=today&demo=1'); await p.waitForTimeout(400); await p.click(T('crew-demo-skip')); await p.waitForTimeout(200);
   ok('Skip closes it and marks it seen too' + full, !(await p.locator(T('crew-demo')).isVisible()) && (await go()) === 'demo:seen');
+  await p.goto(U + '?screen=app&tab=today&demo=1'); await p.waitForTimeout(400);
+  const top1 = (await box(T('crew-demo-kicker'))).y; await p.click(T('crew-demo-next')); await p.waitForTimeout(200); const top2 = (await box(T('crew-demo-kicker'))).y;
+  ok('the sheet does not jump between the pages (the title keeps two lines of room)' + full, Math.abs(top1 - top2) < 1.5);
+  await p.mouse.click(W / 2, 30); await p.waitForTimeout(200);
+  ok('a tap on the dim closes it and marks it seen' + full, !(await p.locator(T('crew-demo')).isVisible()) && (await go()) === 'demo:seen');
   await p.goto(U + '?screen=app&tab=me'); await p.waitForTimeout(300);
-  ok('Me › Account: "What\'s new in the app" above Sign out' + full, /What's new in the app\s*A short look at the time clock and the job page/.test(await txt(T('crew-me-demo'))) && (await box(T('crew-me-demo'))).y < (await box(T('crew-me-signout'))).y && (await box(T('crew-me-demo'))).height >= 56);
+  ok('Me › Account: "What\'s new in the app" above Sign out' + full, /What's new in the app\s*A short tour of the changes/.test(await txt(T('crew-me-demo'))) && (await box(T('crew-me-demo'))).y < (await box(T('crew-me-signout'))).y && (await box(T('crew-me-demo'))).height >= 56);
   await p.click(T('crew-me-demo')); await p.waitForTimeout(250);
   ok('…it plays the demo again from the first picture' + full, await p.locator(T('crew-demo')).isVisible() && (await txt(T('crew-demo-title'))) === 'The time clock moved to the left edge');
   await p.click(T('crew-demo-skip')); await p.waitForTimeout(150);
   await p.emulateMedia({ reducedMotion: 'reduce' });
   await p.click(T('crew-me-demo')); await p.waitForTimeout(500);
   const r1 = await panelX(); await p.waitForTimeout(900); const r2 = await panelX();
-  ok('with reduced motion the pictures stand still on their end state (the panel out)' + full, r1 > 80 && Math.abs(r1 - r2) < 1);
+  ok('with reduced motion the pictures stand still on their end state (the panel out, signed in and green)' + full, r1 > 80 && Math.abs(r1 - r2) < 1 && (await p.evaluate(() => getComputedStyle(document.querySelector('.dm-status .on')).opacity)) === '1');
   await p.emulateMedia({ reducedMotion: 'no-preference' });
 
   // ---- C8: invites and the first sign-in ----
