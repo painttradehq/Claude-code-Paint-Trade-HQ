@@ -467,40 +467,54 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
 .edge-panel .clock-big{font-size:30px}
 .edge-swipe{font-size:12.5px;color:var(--text-muted);text-align:center;margin-top:12px}
 .sect .sect-sub{text-transform:none;letter-spacing:0;font-weight:500}
-/* the quote, as the owner's paper reads, minus the money */
-.paper{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:18px 16px 6px}
-.paper-biz{font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
-.paper-no{font-family:var(--font-display);font-weight:600;font-size:26px;letter-spacing:-.01em;margin:2px 0 6px;line-height:1.15}
-.paper-for{font-size:14.5px;color:var(--text-secondary);line-height:1.45}
-.paper-for b{color:var(--text-primary);font-weight:600}
-.paper-intro{font-size:15px;line-height:1.5;margin:14px 0 2px;padding-top:14px;border-top:1px solid var(--border)}
-.qa{padding:14px 0 6px;border-top:1px solid var(--border);margin-top:12px}
-.qa-h{display:flex;align-items:baseline;gap:10px;min-width:0}
-.qa-num{font-family:var(--font-display);font-weight:600;font-size:13px;color:var(--text-muted);letter-spacing:.04em;flex-shrink:0;width:22px}
-.qa-name{font-family:var(--font-display);font-weight:600;font-size:19px;letter-spacing:-.01em;flex:1;min-width:0}
-.qa-dims{font-size:13px;color:var(--text-muted);white-space:nowrap}
-.ql{padding:10px 0 8px 32px;border-top:1px dashed var(--border)}
-.qa .ql:first-of-type{border-top:0}
-.ql-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
-.ql-name{font-size:15.5px;font-weight:600;line-height:1.3}
-.ql-qty{font-size:14px;color:var(--text-secondary);white-space:nowrap;font-variant-numeric:tabular-nums}
-.ql-sub{font-size:13.5px;color:var(--text-secondary);margin-top:2px;line-height:1.4}
-.qnote{font-size:14px;line-height:1.45;margin-top:8px;padding:8px 10px;border-radius:var(--radius-sm);background:var(--surface-sunken);color:var(--text-primary)}
-.qnote.internal{background:var(--warning-bg);color:#5A2E0B}
-.qtag{display:inline-block;margin-left:6px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--warning);vertical-align:1px}
-.qa .qnote.area{margin:8px 0 2px 32px}
-.qgrid{padding:8px 0 2px;grid-template-columns:repeat(3,1fr)}
-.qsect{font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin:16px 0 8px;padding-top:14px;border-top:1px solid var(--border)}
-.qrow{display:flex;justify-content:space-between;gap:12px;padding:8px 0;font-size:14.5px;line-height:1.4;border-top:1px dashed var(--border)}
-.qrow:first-of-type{border-top:0}
-.qrow .l{flex:1;min-width:0}
-.qrow .l small{display:block;font-size:13px;color:var(--text-secondary)}
-.qrow .r{text-align:right;white-space:nowrap;color:var(--text-secondary);font-variant-numeric:tabular-nums}
-.qrow .swatch{width:22px;height:22px;border-radius:7px;border:1px solid var(--border);flex-shrink:0;margin-top:1px}
-.qrow.sw{align-items:flex-start}
-.qrow.sw .l{display:flex;gap:10px}
-.qul{margin:0;padding:0 0 0 18px;font-size:14.5px;line-height:1.5;color:var(--text-primary)}
-.qul li{margin:3px 0}
+/* the quote = the client's PDF (services/pdf.py: white paper, serif business name, big accent QUOTE, ABOUT US tiles, PREPARED FOR / JOB DETAILS cards, the tables, 1-col TERMS, the thank-you) rendered for the phone, minus every money field */
+.paper{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);padding:16px 14px 14px;color:#1F1B2E;font-size:13.5px;line-height:1.45}
+.ptag{color:#6B6479;font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
+.phero{display:flex;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid #E4DED2;margin-bottom:14px}
+.pbiz{min-width:0}
+.pname{font-family:var(--font-display);font-weight:700;font-size:19px;letter-spacing:-.2px;line-height:1.2}
+.pbl{margin:2px 0 0;font-size:12px;color:#6B6479;overflow-wrap:anywhere}
+.pdoc{text-align:right;flex-shrink:0}
+.ptitle{font-family:var(--font-display);font-weight:700;font-size:30px;letter-spacing:-1px;line-height:1;color:var(--accent);margin-bottom:6px}
+.pkv{font-size:12px;color:#6B6479;margin-top:3px;white-space:nowrap}
+.pkv b{color:#1F1B2E;font-weight:700}
+.pkv span{color:#1F1B2E;font-variant-numeric:tabular-nums;margin-left:6px}
+.ppill{display:inline-block;margin-top:7px;padding:2px 9px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;background:#f0f0f0;color:#444}
+.ppill.sent{background:#DBEAFE;color:#1E40AF}.ppill.viewed{background:#FEF3C7;color:#92400E}.ppill.accepted{background:#DCFCE7;color:#166534}
+.psect{margin-bottom:14px}
+.pabout p{margin:6px 0 0;font-size:13.5px;line-height:1.5;color:#1f2937}
+.pstats{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.pstat{width:calc(50% - 3px);background:#F5F2EB;border-radius:6px;padding:8px 10px}
+.pstat b{display:block;font-size:14px;font-weight:800}
+.pstat span{display:block;color:#6B6479;font-size:11.5px;margin-top:2px}
+.pinfo{display:flex;flex-direction:column;gap:8px}
+.qcard{display:block;padding:11px 12px;border-radius:8px}
+.qcard.bordered{border:1px solid #E4DED2}
+.qcard.soft{background:#F5F2EB}
+.pcname{font-size:14.5px;font-weight:800;margin-top:4px}
+.pline{color:#374151;font-size:13px;margin-top:2px}
+.pkv2{display:flex;gap:8px;margin-top:4px;font-size:13px}
+.pkv2 .k{min-width:92px;color:#6B6479;font-weight:700}
+.pkv2 .v{flex:1;color:#1F1B2E}
+.ptbl{padding:5px 0;border-bottom:2px solid var(--accent);margin-top:6px;font-size:11px;font-weight:800;letter-spacing:1.4px}
+table.pitems{width:100%;border-collapse:collapse}
+table.pitems th{padding:7px 0;border-bottom:1px solid #E4DED2;color:#6B6479;font-size:9.5px;font-weight:700;letter-spacing:.8px;text-align:left}
+table.pitems td{padding:7px 0;border-bottom:1px solid #f1f5f9;vertical-align:top;font-size:13px;color:#1f2937}
+table.pitems tr:last-child td{border-bottom:0}
+table.pitems .c{text-align:center;white-space:nowrap;width:44px}
+table.pitems td.nm{font-weight:600;padding-right:8px}
+table.pitems .sub{display:block;color:#6B6479;font-size:12px;font-weight:400;margin-top:1px}
+table.pitems .sub.inl{display:inline;margin-left:8px}
+table.pitems .sub.ital{font-style:italic;white-space:pre-line}
+table.pitems tr.area td{font-weight:700;padding-top:10px}
+.pfoot-sub{color:#6B6479;font-size:12px;margin-top:6px}
+.pterms{margin-top:8px}
+.pterm{margin-bottom:8px}
+.pterm b{display:block;font-size:13px;font-weight:800}
+.pterm span{display:block;color:#374151;font-size:12.5px;margin-top:2px;line-height:1.45}
+.pthanks{margin-top:18px;padding-top:12px;border-top:1px solid #E4DED2;text-align:center}
+.pthanks .big{font-family:var(--font-display);font-size:16px;font-weight:700}
+.pthanks .sub{color:#6B6479;font-size:12.5px;margin-top:4px;overflow-wrap:anywhere}
 .qfoot{font-size:12.5px;color:var(--text-muted);text-align:center;margin:14px 0 4px;line-height:1.45}
 </style>
 </head>
@@ -1031,7 +1045,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
         { area: 'Laundry', meta: '2.4 × 1.8 m', lines: [['Walls & ceiling · 15 m²', '1 coat']] },
         { area: 'Front door', added: 'Added work · approved 9 Oct', lines: [['Front door, both sides', 'prep · primer · 2 coats']] },
       ],
-      paints: [['#F3F1EA', 'Dulux Wash&Wear Low Sheen', 'Natural White · walls'], ['#FDFDFB', 'Dulux Ceiling White', 'White · ceilings'], ['#F7F7F4', 'Dulux Aquanamel Gloss', 'Vivid White · trim and doors']],
+      paints: [['#F3F1EA', 'Dulux Wash&Wear Low Sheen', 'Natural White · walls', ['Living room', 'Hallway', 'Stairwell', 'Laundry']], ['#FDFDFB', 'Dulux Ceiling White', 'White · ceilings', ['Living room', 'Laundry']], ['#F7F7F4', 'Dulux Aquanamel Gloss', 'Vivid White · trim and doors', ['Living room', 'Hallway', 'Stairwell']]],
       files: [['Strata approval.pdf', 'PDF · 240 KB'], ['Colour schedule.jpg', 'Image · 1.1 MB']],
       photos: 5, reports: [['Fri 10 Oct', '7.5 h · Living room walls second coat, ceiling done', true], ['Thu 9 Oct', '8 h · Prep and first coat living room', true]],
       scope: { summary: 'Full interior repaint of the living areas, hallway and stairwell in Natural White, ceilings in Ceiling White, all trim and doors in Vivid White gloss. Walls washed and patched, two coats throughout; the stairwell handrail stripped back and primed.', hours: 46.5, areaPhotos: [],
@@ -1040,7 +1054,7 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
             { name: 'Walls', qty: '48 m²', sub: 'prep · 2 coats', note: 'Hairline cracks above the window. Rake out and fill before the first coat.', product: 'Dulux Wash&Wear Low Sheen · Natural White', hours: 9.5, photos: [{ label: 'Window wall', note: 'Cracks here and here', marks: [{ t: 'c', x: 62, y: 28, r: 9 }, { t: 'c', x: 30, y: 66, r: 7 }] }, { label: 'TV wall', note: '', marks: [{ t: 'a', x1: 18, y1: 82, x2: 48, y2: 50 }] }] },
             { name: 'Ceiling', qty: '21 m²', sub: '1 coat', product: 'Dulux Ceiling White · White', hours: 3, photos: [] },
             { name: 'Skirting & architraves', qty: '19 lm', sub: 'primer · 2 coats', note: 'Gloss. Mask the new carpet edge.', product: 'Dulux Aquanamel Gloss · Vivid White', hours: 2.5, photos: [{ label: 'Skirting, east wall', note: '', marks: [{ t: 'c', x: 50, y: 70, r: 10 }] }] } ] },
-          { name: 'Hallway', dims: '6 × 1.2 m', note: '', hours: 10, lines: [
+          { name: 'Hallway', dims: '6 × 1.2 m', note: 'Doors are painted off their hinges, both sides.', noteOnQuote: true, hours: 10, lines: [
             { name: 'Walls', qty: '35 m²', sub: '2 coats', product: 'Dulux Wash&Wear Low Sheen · Natural White', hours: 6, photos: [] },
             { name: 'Doors', qty: '4', unit: 'each', sub: 'primer · 2 coats', note: 'Both sides. Number them before they come off.', product: 'Dulux Aquanamel Gloss · Vivid White', hours: 4, photos: [{ label: 'Door 2, hinge side', note: 'Chipped edge', marks: [{ t: 'c', x: 40, y: 42, r: 8 }] }] } ] },
           { name: 'Stairwell', dims: '', note: 'Scaffold tower is in the garage.', hours: 12, lines: [
@@ -1049,14 +1063,16 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
           { name: 'Laundry', dims: '2.4 × 1.8 m', note: '', hours: 4, lines: [ { name: 'Walls & ceiling', qty: '15 m²', sub: '1 coat', hours: 4, photos: [] } ] },
         ],
         added: [{ title: 'Front door, both sides', approved: 'approved 9 Oct', sub: 'prep · primer · 2 coats', timeframe: 'half a day' }] },
-      quote: { number: 'Q-0042', date: '29 Sep 2026',
-        optional: [{ name: 'Laundry cupboard doors', qty: '2', unit: 'each', sub: 'primer · 2 coats', chosen: true }, { name: 'Garage interior', qty: '38 m²', sub: '2 coats', chosen: false }],
-        paint: [{ product: 'Dulux Wash&Wear Low Sheen · Natural White', litres: '14.2 L', tins: '1 × 10 L · 1 × 4 L' }, { product: 'Dulux Ceiling White · White', litres: '5.1 L', tins: '1 × 10 L' }, { product: 'Dulux Aquanamel Gloss · Vivid White', litres: '3.4 L', tins: '1 × 4 L' }],
-        terms: ['Furniture moved to the middle of each room by the client before we start', 'Power and water on site', 'Colours as the schedule; a change after the first coat is added work', 'Rubbish removed; drop sheets on all floors'] } },
+      quote: { number: 'Q-0042', issued: '29 Sep 2026', valid: '29 Oct 2026', status: 'accepted', duration: '2 weeks', start: 'Mon 6 Oct 2026',
+        business: { name: 'Sano Painting', abn: '12 345 678 901', address: 'Brunswick VIC 3056', phone: '0412 000 111', email: 'hello@sanopainting.com.au' },
+        about: { blurb: "We're a small, owner-operated painting crew focused on tidy prep, clean lines and finishing on the day we said. You deal with the painter — not a middleman — from first quote to final walk-through.", stats: [['12 yrs', 'in business'], ['480+', 'homes painted'], ['4.9 ★', 'Google rating'], ['Insured', 'public liability']] },
+        materials: [{ name: 'Drop sheets, masking and sundries', qty: '1', unit: 'job', sub: 'Living room · Hallway · Stairwell · Laundry' }],
+        optional: [{ name: 'Garage interior', qty: '38', unit: 'm²', sub: 'Garage · 2 coats' }],
+        terms: [['Quote validity', 'This quote is valid for 30 days from the date issued.'], ['Access and preparation', 'Furniture moved to the middle of each room by the client before we start; power and water on site.'], ['Colours', 'Colours as the schedule; a change after the first coat is treated as added work.'], ['Clean-up', 'Rubbish removed and drop sheets on all floors throughout.']] } },
     { id: 'j2', name: '2/88 Lygon St, Carlton', client: 'Harrow Strata', addr: '2/88 Lygon St, Carlton', status: 'up', pill: 'Starts Mon 20 Oct', dates: 'Mon 20 Oct → Wed 29 Oct', crew: ['Mia'], weather: { emoji: '🌧️', temp: 14, cond: 'Light rain', rain: 80, wind: 35, max: 15 }, site: { name: 'Priya Raman', phone: '0412 555 018' },
       access: 'Strata lets us in from 7:30 am. Lift key from the concierge.',
       work: [{ area: 'Whole apartment', meta: '', lines: [['Walls · 120 m²', '2 coats'], ['Ceilings · 62 m²', '1 coat'], ['Trim · 60 lm', 'primer · 2 coats']] }],
-      paints: [['#EFE9DD', 'Dulux Wash&Wear Low Sheen', 'Lexicon Quarter · walls']], files: [], photos: 0, reports: [], quote: { number: 'Q-0047', date: '8 Oct 2026' } },
+      paints: [['#EFE9DD', 'Dulux Wash&Wear Low Sheen', 'Lexicon Quarter · walls', ['Whole apartment']]], files: [], photos: 0, reports: [], quote: { number: 'Q-0047', issued: '8 Oct 2026', valid: '7 Nov 2026', status: 'sent', business: { name: 'Sano Painting', abn: '12 345 678 901', address: 'Brunswick VIC 3056', phone: '0412 000 111', email: 'hello@sanopainting.com.au' } } },
     { id: 'j3', name: 'Patel exterior', client: 'Raj Patel', addr: '5 Elm Grove, Coburg', status: 'done', pill: 'Done Fri 3 Oct', dates: 'Mon 29 Sep → Fri 3 Oct', crew: ['Mia', 'Tom', 'Lee'],
       access: '', work: [{ area: 'Exterior', meta: '', lines: [['Weatherboards · 140 m²', 'prep · 2 coats'], ['Eaves & fascia · 46 lm', 'primer · 2 coats']] }],
       paints: [['#DCD6CB', 'Dulux Weathershield Low Sheen', 'Tranquil Retreat · boards']], files: [['Site plan.pdf', 'PDF · 90 KB']], photos: 12, reports: [['Fri 3 Oct', '6 h · Final coat eaves, clean-up', true]] },
@@ -2051,33 +2067,31 @@ textarea.tin{min-height:84px;resize:none;line-height:1.4}
     const row = e.target.closest('[data-line]'); if (!row || row.dataset.plain) return; const k = row.dataset.line; if (sc.open.has(k)) sc.open.delete(k); else sc.open.add(k); keepScroll = $('#jobBody').scrollTop; openJob(sc.job);
   });
 
-  // ---- C7: the quote — the owner's paper, in order, without the money (GET /projects/mine/{id}/quote, an allow-list of the estimate) ----
+  // ---- C7: the quote = the client's PDF (services/pdf.py, section order hero → about → prepared for/job details → what we will do → materials → optional extras → products and colours → terms → thank-you), rendered for the phone with every money field left out; GET /projects/mine/{id}/quote is an allow-list of the same ----
   const qu = { job: null };
   function renderQuote(){
-    const j = jobs.find(x => x.id === qu.job); if (!j) return; const S = scopeOf(j); const Q = j.quote || {}; const showPhotos = q.get('photos') !== '0';
+    const j = jobs.find(x => x.id === qu.job); if (!j) return; const S = scopeOf(j); const Q = j.quote || {}; const B = Q.business || { name: BIZ };
     $('#quoteBackLbl').textContent = j.name;
-    $('#quoteTitle').textContent = 'Quote';   // the paper below carries the number, the client and the date once
-    $('#quoteMeta').textContent = Q.number ? `${Q.number} · as your employer built it, without the prices` : 'As your employer built it, without the prices';
-    const note = (n, onQuote, cls) => n ? `<div class="qnote ${onQuote ? '' : 'internal'} ${cls || ''}" data-testid="crew-quote-note">${esc(n)}${onQuote ? '' : '<span class="qtag">crew only</span>'}</div>` : '';
-    const line = (l, k) => `<div class="ql" data-testid="crew-quote-line"><div class="ql-top"><div class="ql-name">${esc(l.name)}</div><div class="ql-qty">${l.qty ? esc(l.qty) + (l.unit ? ' ' + esc(l.unit) : '') : ''}</div></div>${l.sub || l.product ? `<div class="ql-sub">${[l.sub, l.product].filter(Boolean).map(esc).join(' · ')}${sc.hours && l.hours ? ' · ' + hrs(l.hours) : ''}</div>` : ''}${note(l.note, l.onQuote)}${showPhotos && l.photos && l.photos.length ? `<div class="grid qgrid">${l.photos.map((ph, pi) => `<button class="ph" data-testid="crew-quote-photo" data-photo="${k}-${pi}" aria-label="${esc(ph.label)}"><span>${esc(ph.label)}</span>${marksSvg(ph.marks)}</button>`).join('')}</div>` : ''}</div>`;
-    const areas = S.areas.map((a, ai) => `<div class="qa" data-testid="crew-quote-area"><div class="qa-h"><span class="qa-num">${String(ai + 1).padStart(2, '0')}</span><span class="qa-name">${esc(a.name)}</span>${a.dims ? `<span class="qa-dims">${esc(a.dims)}</span>` : ''}</div>${note(a.note, a.noteOnQuote, 'area')}${a.lines.map((l, li) => line(l, ai + '-' + li)).join('')}</div>`).join('');
-    const optional = Q.optional && Q.optional.length ? `<div class="qsect">Optional extras</div>${Q.optional.map(o => `<div class="qrow" data-testid="crew-quote-optional"><span class="l">${esc(o.name)}${o.qty ? ` · ${esc(o.qty)}${o.unit ? ' ' + esc(o.unit) : ''}` : ''}<small>${esc(o.sub)}</small></span><span class="r"><span class="pill ${o.chosen ? 'live' : ''}">${o.chosen ? 'Chosen' : 'Not chosen'}</span></span></div>`).join('')}` : '';
-    const products = j.paints && j.paints.length ? `<div class="qsect">Products &amp; colours</div>${j.paints.map(p => `<div class="qrow sw" data-testid="crew-quote-product"><span class="l"><span class="swatch" style="background:${p[0]}"></span><span>${esc(p[1])}<small>${esc(p[2])}</small></span></span></div>`).join('')}` : '';
-    const paint = Q.paint && Q.paint.length ? `<div class="qsect">Paint for this job</div>${Q.paint.map(p => `<div class="qrow" data-testid="crew-quote-paint"><span class="l">${esc(p.product)}<small>${esc(p.tins)}</small></span><span class="r">${esc(p.litres)}</span></div>`).join('')}` : '';
-    const added = S.added && S.added.length ? `<div class="qsect">Added work</div>${S.added.map(w => `<div class="qrow" data-testid="crew-quote-added"><span class="l">${esc(w.title)}<small>${esc(w.sub)}${w.timeframe ? ' · ' + esc(w.timeframe) : ''}</small></span><span class="r"><span class="pill added">${esc(w.approved)}</span></span></div>`).join('')}` : '';
-    const terms = Q.terms && Q.terms.length ? `<div class="qsect">Notes &amp; exclusions</div><ul class="qul" data-testid="crew-quote-terms">${Q.terms.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '';
-    $('#quoteBody').innerHTML = `<div class="paper" data-testid="crew-quote-paper">
-      <div class="paper-biz">${esc(BIZ)}</div>
-      <div class="paper-no">${Q.number ? 'Quote ' + esc(Q.number) : 'Quote'}</div>
-      <div class="paper-for"><b>${esc(j.client)}</b><br>${esc(j.addr)}${Q.date ? `<br>${esc(Q.date)}` : ''}</div>
-      ${S.summary ? `<div class="paper-intro" data-testid="crew-quote-intro">${esc(S.summary)}</div>` : ''}
-      ${areas}${optional}${products}${paint}${added}${terms}
-      <div class="qfoot" data-testid="crew-quote-foot">Your employer's copy also carries the prices and payment terms.</div>
-    </div>`;
+    $('#quoteMeta').textContent = (Q.number ? Q.number + ' · ' : '') + "the client's copy, without the prices";
+    const tag = (t) => `<div class="ptag">${esc(t)}</div>`;
+    const bl = [B.abn ? 'ABN ' + B.abn : '', B.address, B.phone, B.email].filter(Boolean).map(x => `<p class="pbl">${esc(x)}</p>`).join('');
+    const hero = `<div class="phero"><div class="pbiz"><div class="pname">${esc(B.name)}</div>${bl}</div><div class="pdoc"><div class="ptitle">QUOTE</div>${Q.number ? `<div class="pkv"><b>Quote #</b><span>${esc(Q.number)}</span></div>` : ''}${Q.issued ? `<div class="pkv"><b>Date issued</b><span>${esc(Q.issued)}</span></div>` : ''}${Q.valid ? `<div class="pkv"><b>Valid until</b><span>${esc(Q.valid)}</span></div>` : ''}${Q.status ? `<div><span class="ppill ${esc(Q.status)}">${esc(Q.status)}</span></div>` : ''}</div></div>`;
+    const about = Q.about ? `<div class="psect pabout">${tag('About us')}<p>${esc(Q.about.blurb)}</p>${Q.about.stats && Q.about.stats.length ? `<div class="pstats">${Q.about.stats.map(st => `<div class="pstat"><b>${esc(st[0])}</b><span>${esc(st[1])}</span></div>`).join('')}</div>` : ''}</div>` : '';
+    const jobKv = [['Site', j.addr], ['Est. duration', Q.duration], ['Start', Q.start]].filter(x => x[1]).map(x => `<div class="pkv2"><span class="k">${x[0]}</span><span class="v">${esc(x[1])}</span></div>`).join('');
+    const info = `<div class="psect pinfo"><div class="qcard bordered">${tag('Prepared for')}<div class="pcname">${esc(j.client)}</div><div class="pline">${esc(j.addr)}</div></div>${jobKv ? `<div class="qcard soft">${tag('Job details')}${jobKv}</div>` : ''}</div>`;   // the client's phone and email never reach crew
+    const row = (name, sub, qty, unit, tid) => `<tr data-testid="${tid}"><td class="nm">${esc(name)}${sub ? `<span class="sub">${esc(sub)}</span>` : ''}</td><td class="c">${esc(qty || '')}</td><td class="c">${esc(unit || '')}</td></tr>`;
+    const splitQty = (l) => { const m = /^([\d.]+)\s*(.*)$/.exec(l.qty || ''); return m ? [m[1], l.unit || m[2] || 'job'] : [l.qty || '1', l.unit || 'job']; };
+    const work = S.areas.map(a => `<tr class="area" data-testid="crew-quote-area"><td class="nm" colspan="3">${esc(a.name)}${a.dims ? `<span class="sub inl">${esc(a.dims)}</span>` : ''}${a.note && a.noteOnQuote ? `<div class="sub ital">${esc(a.note)}</div>` : ''}</td></tr>${a.lines.map(l => { const [qn, un] = splitQty(l); return row(l.name, [a.name, l.sub, l.onQuote ? l.note : null].filter(Boolean).join(' · '), qn, un, 'crew-quote-line'); }).join('')}`).join('');
+    const table = (title, body, foot) => `<div class="psect"><div class="ptbl">${esc(title)}</div><table class="pitems"><thead><tr><th>DESCRIPTION</th><th class="c">QTY</th><th class="c">UNIT</th></tr></thead><tbody>${body}</tbody></table>${foot || ''}</div>`;
+    const materials = Q.materials && Q.materials.length ? table('MATERIALS SUPPLIED', Q.materials.map(m => row(m.name, m.sub, m.qty, m.unit, 'crew-quote-material')).join('')) : '';
+    const optional = Q.optional && Q.optional.length ? table('OPTIONAL EXTRAS', Q.optional.map(o => row(o.name, o.sub, o.qty, o.unit, 'crew-quote-optional')).join(''), `<div class="pfoot-sub">Not included in the total. Tick any you would like on the online quote, or tell us when you accept.</div>`) : '';
+    const products = j.paints && j.paints.length ? `<div class="psect"><div class="ptbl">PRODUCTS AND COLOURS</div><table class="pitems"><thead><tr><th>PRODUCT</th><th>COLOUR</th><th>WHERE</th></tr></thead><tbody>${j.paints.map(p => { const [col, surf] = (p[2] || '').split(' · '); return `<tr data-testid="crew-quote-product"><td class="nm">${esc(p[1])}<span class="sub">${esc(surf || '')}</span></td><td>${esc(col || 'To be confirmed')}</td><td>${esc((p[3] || []).join(', '))}</td></tr>`; }).join('')}</tbody></table></div>` : '';
+    const terms = Q.terms && Q.terms.length ? `<div class="psect">${tag('Terms & conditions')}<div class="pterms" data-testid="crew-quote-terms">${Q.terms.map((t, i) => `<div class="pterm"><b>${i + 1}. ${esc(t[0])}</b><span>${esc(t[1])}</span></div>`).join('')}</div></div>` : '';
+    const thanks = `<div class="pthanks" data-testid="crew-quote-foot"><div class="big">${esc(Q.thanks || 'Thank you for the opportunity to quote.')}</div><div class="sub">Questions? ${[B.phone ? 'Call ' + B.phone : '', B.email ? 'email ' + B.email : ''].filter(Boolean).join(' or ') || 'reach out anytime'}.</div></div>`;
+    $('#quoteBody').innerHTML = `<div class="paper" data-testid="crew-quote-paper">${hero}${about}${info}${table('WHAT WE WILL DO', work)}${materials}${optional}${products}${terms}${thanks}</div><div class="qfoot" data-testid="crew-quote-note">The client's copy also carries the prices, the total and the payment terms.</div>`;
   }
   function openQuote(id){ qu.job = id; hideC5(); $('#s-app').classList.add('hide'); $('#s-job').classList.add('hide'); $('#s-quote').classList.remove('hide'); renderQuote(); $('#quoteBody').scrollTop = 0; document.body.dataset.lastGo = '/employee/project/' + id + '/quote'; }
   $('#quoteBack').addEventListener('click', () => { $('#s-quote').classList.add('hide'); openJob(qu.job); });
-  $('#quoteBody').addEventListener('click', (e) => { const ph = e.target.closest('[data-photo]'); if (!ph) return; const [ai, li, pi] = ph.dataset.photo.split('-').map(Number); const l = scopeOf(jobs.find(x => x.id === qu.job)).areas[ai].lines[li]; lbShow(l, l.photos[pi]); });
 
   // ---- Follow-up G: the Terms-updated gate ----
   // GET /employee/legal/status → {current_version, accepted_version, needs_notice, updated}; POST /employee/legal/accept → {terms_version, terms_accepted_at}
