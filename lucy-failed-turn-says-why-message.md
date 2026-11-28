@@ -1,4 +1,4 @@
-# Lucy — a long task that fails says why, and what was done — NOT SENT, waits for Josh's "send"
+# Lucy — a long task that fails says why, and what was done — SENT 28 Nov as Part B of `lucy-sonnet-and-fixes-message.md`
 
 Josh, 28 Nov, with a screenshot — one long request (a client, an estimate with seven lines, send, wait for approval, deposit invoice, crew, finish, invoice, completion report) answered by "Lucy could not answer just now." — "same thing happened?" Then: "I clicked publish, check the code again."
 

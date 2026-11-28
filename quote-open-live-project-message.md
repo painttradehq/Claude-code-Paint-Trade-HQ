@@ -1,4 +1,4 @@
-# A quote that has a job says "Open live project" — NOT SENT. Waits for Josh's "send"
+# A quote that has a job says "Open live project" — SENT 28 Nov as Part C of `lucy-sonnet-and-fixes-message.md`
 
 Josh, 28 Nov: "In the side bar of an accepted quote it says Create live project, while the accepted quote gets a project automatically — so that should say Visit live project or Manage this project or something else."
 

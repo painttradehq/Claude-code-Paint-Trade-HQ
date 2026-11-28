@@ -1,4 +1,4 @@
-# Lucy on Sonnet 5.5 · a failed task says why · a quote with a job says "Open live project" — one message, three parts — WAITS for the crew chat's Round C7 to finish at Emergent; goes the moment it reports done
+# Lucy on Sonnet 5.5 · a failed task says why · a quote with a job says "Open live project" — one message, three parts — SENT to Emergent 28 Nov 05:57 UTC on Josh's word, once the crew chat's Round C7 had reported done
 
 Josh, 28 Nov: "Switch Lucy to Sonnet 5.5 and send it. And send the other ones too, all at once."
 
@@ -12,7 +12,7 @@ No prototype: nothing new to look at — a setting, words in a bubble that exist
 
 ---
 
-## The message to send
+## The message as sent
 
 # Three parts: Lucy on Sonnet 5.5 · a failed task says why · a quote with a job says "Open live project"
 
