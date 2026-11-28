@@ -1,27 +1,28 @@
-# Lucy at normal effort · Lucy does not draft contracts or consents — NOT SENT, waits for Josh's "send"
+# Lucy at normal effort · Lucy drafts contracts and consents only on the full package — NOT SENT, waits for Josh's "send"
 
-Josh, 28 Nov: "One more small thing goes with the next round: tell Lucy not to draft any contract in the app, as PTHQ wants to have a package to sell the draft contracts and consents as a package."
+Josh, 28 Nov: "One more small thing goes with the next round: tell Lucy not to draft any contract in the app, as PTHQ wants to have a package to sell the draft contracts and consents as a package." Then, the same day: **"Change it: Lucy only drafts contracts and others only in the full package."**
 
-The next round is the effort change recommended to him after Parts A–D (low → normal, on two slips seen at low). He has not yet said "send" for it; this message carries both and goes on his word.
+**Read as:** the full package is **Enterprise** — the top one of the three, the one that already includes "HR contracts with e-sign". On it Lucy drafts contracts, consents and the like as she does today; on the others she does not.
 
-## What the code shows (app repo `3ece9f7`)
+The next round is also the effort change recommended to him after Parts A–D (low → normal). He has not yet said "send"; this message carries both and goes on his word.
 
-- **How Lucy can draft a contract in the app today:** `save_contract_template` (`services/connector_tools.py`) — "Save the wording of a crew document template as its next version". It writes the Contracts page's templates: employment agreement, confidentiality, code of conduct, safety agreement, **social media & photo consent**, other. It is in the connector's REGISTRY, so Lucy has it and so does an outside Claude connected to the app.
-- She can also simply write contract wording in a chat reply or an email.
-- `get_contract_templates` only reads (name, category, a short preview). Issuing a document has no ability — it stays in the app.
-- Nothing in her instructions mentions contracts.
+## What the code shows (app repo, `main` on 28 Nov)
 
-**Written to the letter of his ask — Lucy only.** Two edges left for his word, not in the message:
-1. the outside-Claude connector keeps `save_contract_template`;
-2. the terms on a quote (`update_quote` can set a quote's `terms`).
+- **The packages** (`services/plans.py`): Starter 59, Small business 179, Enterprise 249. **Lucy** comes with Small business; **Contracts** ("HR contracts with e-sign") comes with Enterprise. `plans.has(owner, "contracts")` answers whether a business has it — true on Enterprise, on a trial, for an invited tester and for the platform owner.
+- **The Contracts page is already kept to Enterprise**, but only at the door: the plan gate (`services/plan_gate.py`) refuses requests to `/api/contracts…`. Lucy's ability `save_contract_template` calls the same code from inside, past that door — so **a Small business owner can have Lucy write contract templates today.** The same ability is in the connector for an outside Claude, also past the door.
+- She can also simply write contract wording in a chat reply or an email. Nothing in her instructions mentions contracts.
 
-No prototype: an instruction and one ability taken off her list.
+**So the rule sits on the ability itself,** not only on Lucy: whoever calls it — Lucy or an outside Claude through the connector — it follows the package. That is one check in one place, and without it the rule is walked around through the connector.
+
+**Still left for his word, not in the message:** the terms on a quote (`update_quote` can set a quote's `terms`).
+
+No prototype: an instruction and a check.
 
 ---
 
 ## The message to send
 
-# Two small parts: Lucy at normal effort · Lucy does not draft contracts or consents
+# Two small parts: Lucy at normal effort · Lucy drafts contracts and consents only on the full package
 
 **Josh's rules, first:** no test runs on his account — not signed in to, not read, not written; every database read carries the TS_ business's own filter; seed only through the dry-run server; TS_ rows only, removed after; nothing leaves.
 
@@ -37,34 +38,42 @@ Your Part A report showed two slips at low effort that did not show at the defau
 
 No What's new card. Report: a short section at the end of `memory/reports/lucy-cost-report.md`.
 
-## Part 2 — Lucy does not draft contracts or consents
+## Part 2 — contracts and consents are drafted only on the package that includes Contracts
 
-Josh: "Tell Lucy not to draft any contract in the app — PTHQ wants to have a package to sell the draft contracts and consents."
+Josh: "Lucy only drafts contracts and others only in the full package."
 
-1. **The ability leaves her list.** `save_contract_template` is no longer one of Lucy's tools — not offered to the model, refused as a step of `do_steps` in her usual words. The connector's REGISTRY is not changed in this part. `get_contract_templates` stays: she may say what templates the business has.
-2. **Her instructions** — add to `ADMIN_SYSTEM_PROMPT`, in her own style:
-   - She does not write or rewrite the wording of a contract, an agreement or a consent form — not in a chat reply, not in an email or a text, not into a template, not as a file. That covers employment agreements, subcontractor agreements, confidentiality, codes of conduct, safety agreements, photo and social media consents, client contracts, and any other agreement or consent.
-   - Asked for one, she says exactly: "I don't draft contracts or consent forms. Your templates are on the Contracts page — you can edit and issue them there." Nothing added, no partial draft, no outline, no "here are the clauses you'd want".
-   - What she still does: lists the business's templates by name, says where they are, and answers questions about who has a document expiring or unsigned from what she can read.
-   - Mentioning a contract in a message is fine ("the signed contract is attached"); writing its wording is not.
-3. **Her "what I can do" answer** does not change.
+The full package is the one whose plan includes the `contracts` feature — Enterprise today. Use `plans.has(owner, "contracts")` as the one rule, so trials, invited testers and the platform owner behave as they do everywhere else, and a renamed or re-arranged package needs no change here.
+
+Today the Contracts page is refused to the other packages by the plan gate, but `save_contract_template` calls the same code from inside, past the gate — a Small business owner can have Lucy write contract templates.
+
+1. **The ability follows the package.** `save_contract_template` and `get_contract_templates` are refused for a business whose package does not include Contracts — in the ability itself, so it holds for Lucy and for an outside Claude through the connector. The refusal is in the app's own plan words, naming the package from the plan table ("Enterprise" today).
+2. **Lucy's list follows it too.** On a package without Contracts, neither ability is offered to the model and neither can be a step of `do_steps`.
+3. **Her instructions follow it.** Build this paragraph of `ADMIN_SYSTEM_PROMPT` from the package:
+   - **With Contracts:** nothing new — she drafts and saves contract and consent wording as today.
+   - **Without Contracts:** she does not write or rewrite the wording of a contract, an agreement or a consent form — not in a chat reply, not in an email or a text, not into a template, not as a file. That covers employment agreements, subcontractor agreements, confidentiality, codes of conduct, safety agreements, photo and social media consents, client contracts, and any other agreement or consent. Asked for one, she says exactly: "Drafting contracts and consent forms comes with the {package name} package. The owner can change the package in Settings › Billing." Nothing added — no partial draft, no outline, no "here are the clauses you'd want".
+   - Either way, mentioning a contract in a message is fine ("the signed contract is attached"); writing its wording is what the rule is about.
+4. **Her "what I can do" answer** does not change.
 
 ### Checks for Part 2
 
 Pure / in-process:
-1. Lucy's tool list for an admin with everything on has no `save_contract_template`; the connector's REGISTRY still has it.
-2. `do_steps` with a `save_contract_template` step is refused; nothing is saved.
+1. A business with Contracts: both abilities on Lucy's list; saving a template's wording works as today.
+2. A business without: neither on her list; a `do_steps` step naming either is refused; the ability called directly (as the connector does) is refused in the plan's words; no template changes.
+3. A trial, an invited tester and the platform owner: as 1.
+4. The package changes from Small business to Enterprise: her next message has the abilities and the other paragraph.
 
-On screen with the testing agent, a TS_ admin, **1440 then 1024**, real model:
-3. "Draft an employment contract for a new painter" → her sentence, word for word. No template changed, no card.
-4. "Write a photo consent form I can send to a client" → her sentence.
-5. "Rewrite our confidentiality agreement to add a non-compete clause" → her sentence; the template's version is unchanged.
-6. "Just give me the main clauses for a subcontractor agreement" → her sentence; no clauses.
-7. "Email TS_ client a simple painting contract" → her sentence; no send card.
-8. "What contract templates do we have?" → she lists them by name and points to the Contracts page.
+On screen with the testing agent, real model, **1440 then 1024** — a TS_ business on Small business:
+5. "Draft an employment contract for a new painter" → her sentence, word for word, naming Enterprise. No template changed, no card.
+6. "Write a photo consent form I can send to a client" → her sentence.
+7. "Just give me the main clauses for a subcontractor agreement" → her sentence; no clauses.
+8. "Email TS_ client a simple painting contract" → her sentence; no send card.
 9. "Email TS_ client that the signed contract is attached" → the normal send card.
 
-No What's new card. Report: `memory/reports/lucy-no-contracts-report.md`.
+A TS_ business on Enterprise:
+10. "Rewrite our confidentiality agreement to add a non-solicitation clause" → she does it as today; the template's next version is saved.
+11. "What contract templates do we have?" → she lists them by name.
+
+No What's new card. Report: `memory/reports/lucy-contracts-by-package-report.md`.
 
 ## Rules
 
