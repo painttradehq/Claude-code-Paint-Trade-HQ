@@ -13,7 +13,7 @@ Spec (verbatim from `c10-crew-demo-notes.md`):
 
 # C10 — The crew demo (spec v1.2, 28 Nov 2026)
 
-Prototype `c1-crew-shell.html` (260,072 bytes, md5 247fcbbb5d582b3f485379e2e6b1894c) at 390 × 844, then 360 × 800: `?screen=app&tab=today&demo=1` (the demo over the Dashboard), `?screen=app&tab=me` → **What's new in the app** (the replay). Live facts read from `main` at f237013 and re-read by a second reader, who also read the pinned libraries' source (react-native-web 0.21.2, async-storage 2.2.0, bottom-tabs 7.18); fifteen corrections folded in. Round C9 does not edit the two screens this round edits or `PhotoSheet.tsx`; re-read the cited lines before building. Frontend only; no backend change.
+Prototype `c1-crew-shell.html` (260,072 bytes, md5 247fcbbb5d582b3f485379e2e6b1894c) at 390 × 844, then 360 × 800: `?screen=app&tab=today&demo=1` (the demo over the Dashboard), `?screen=app&tab=me` → **What's new in the app** (the replay). Live facts read from `main` at f237013 and checked by a second reader against the pinned libraries' source. Round C9 does not edit the two screens this round edits or `PhotoSheet.tsx`; re-read the cited lines before building. Frontend only; no backend change.
 
 ## 1. What this round builds
 
@@ -35,9 +35,8 @@ The quote has no page in the demo (Josh, 28 Nov: "do just the one and two"); not
 - `frontend/app/employee/(tabs)/me.tsx`: `user` :23; `useState` imported :4; the Account section :79–83 — `<Row first icon="keypad-outline" title="PIN sign-in" … testID="crew-me-pin" />` then `<Row icon="log-out-outline" title="Sign out" tone="danger" … testID="crew-me-signout" />`. `Row` (`(tabs)/_layout.tsx:104`) takes `icon, title, sub, onPress, testID, first` (and `count, tone, right, dim, dot`); its sub is one line (`numberOfLines={1}` :112) with about 208 px of room at 360 wide.
 - `frontend/components/crew/PhotoSheet.tsx`: `Sheet({ visible, onClose, title?, children, testID })` :9–19 — a `Modal` (slide), a `Pressable` scrim whose press is `onClose` (`{testID}-scrim`), a `Pressable` sheet (`testID`) anchored to the bottom (`sh.sheet` :61: padding 8 top, 28 bottom, 16 sides, max width 430, no max height, no scroll view) with the grab bar; it takes no other props. `SheetButton({ label, onPress, primary, testID, disabled })` :28 — without `primary` it is the outline look (`sh.btnOutline` :69); `sh.btn` :67 is 52 px tall with `marginTop: 8` and takes no style. Two buttons side by side are done as in `components/crew/PasswordSheet.tsx:37–40`: a row with `gap: 10` and each button in a `<View style={{ flex: 1 }}>`.
 - On the web a `Modal` is portaled to `document.body` above everything (z-index 9999): the edge clock (`components/crew/EdgeClock.tsx`, handle zIndex 40) and the tab bar are under it, and the column's edge swipe cannot fire inside it. react-native-web fires `onPress` from the DOM `click`: a touch drag makes no click, but a **mouse** drag begun on the sheet and released over the dim clicks the scrim. The sheet `Pressable` takes the responder on touch start, so a pan handler that only asks on move (EdgeClock's capture pattern :51) is never asked inside it.
-- A flag kept on the phone with AsyncStorage: `utils/crewPin.ts:1,5–11` (default import from `@react-native-async-storage/async-storage`; on the web it is `localStorage` under the raw key). (`CrewAlerts.tsx` keeps its dismissal in bare `localStorage`, one flag per phone — not the pattern to copy.) Sign-out clears only the auth keys and the PIN device; two crew members can use one phone, so the flag is per crew member.
-- Animation in the crew app today: `Animated.timing(…, { duration: 220, useNativeDriver: Platform.OS !== 'web' })` (`EdgeClock.tsx:44–46`); no loop and no reduced-motion handling in the crew app. On react-native-web `AccessibilityInfo.isReduceMotionEnabled()` returns a Promise of the `prefers-reduced-motion` match; `aria-hidden` is forwarded to the DOM and `accessibilityElementsHidden` is not; `interpolate` accepts percent strings (`'-104%'` → `'0%'`) when every output has the same shape.
-- No committed script signs a crew member in through the browser; the crew screen harnesses (`c7_ui.py`, `c7_switches.py`, `c8_ui.py`) live in the git-ignored `test_reports/`.
+- A flag kept on the phone with AsyncStorage: `utils/crewPin.ts:1,5–11` (default import from `@react-native-async-storage/async-storage`; on the web it is `localStorage` under the raw key). Sign-out clears only the auth keys and the PIN device; two crew members can use one phone, so the flag is per crew member.
+- Animation in the crew app today is `Animated.timing` in `EdgeClock.tsx:44–46`; no loop, no reduced-motion handling. On react-native-web `AccessibilityInfo.isReduceMotionEnabled()` returns a Promise; `aria-hidden` is forwarded to the DOM (`accessibilityElementsHidden` is not); `interpolate` accepts percent strings when every output has the same shape.
 
 ## 3. Strings (exact)
 
@@ -79,7 +78,7 @@ Me row: title `What's new in the app`, sub `A short tour of the changes`.
     demoSeen(user.id).then((seen) => { if (alive.current && !seen) setDemo(true); });
   }, [ready, notifsLoaded, focused, user?.id, popup, notifs]);
   ```
-  `notifsLoaded` is required as well as `ready` because `ready` can come from the 4 s timer; without it the demo could open and the popup arrive over it.
+  `notifsLoaded` is needed as well as `ready`, which can come from the 4 s timer.
 - `<AppDemo visible={demo} onClose={() => { setDemo(false); if (user?.id) markDemoSeen(user.id); }} />` beside the popup at the end of the screen. Nothing else on the Dashboard changes.
 
 ### 4.3 `app/employee/(tabs)/me.tsx`
