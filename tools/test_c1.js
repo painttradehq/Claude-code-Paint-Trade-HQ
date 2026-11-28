@@ -53,7 +53,7 @@ async function run(b, W, H, tag) {
   ok("the weather chip sits by the date: today's job's suburb, temperature and sky" + full, (await txt(T('crew-today-weather'))) === '⛅21° · Partly cloudy' && (await box(T('crew-today-weather'))).y < 60);
   ok('the Dashboard has no clock card of its own and no on-the-clock chip while signed out' + full, (await p.locator('#t-today ' + T('crew-today-clock')).count()) === 0 && !(await p.locator(T('crew-dash-onclock')).isVisible()));
   await p.click(T('crew-edge-handle')); await p.waitForTimeout(300);
-  ok('tapping the handle slides the time clock in from the left: the clock card, Sign in, the My hours row; the rest dimmed' + full, await edgeVisible() && await p.locator(T('crew-today-clock-btn')).isVisible() && /This week 43 h 00 m/.test(await txt(T('crew-edge-hours'))) && (await box('#edgeBox')).x === 0 && (await box('#edgeBox')).width <= W * 0.86 + 1 && (await box(T('crew-edge-close'))).height >= 44);
+  ok('tapping the handle slides the time clock in from the left: a sheet the size of the clock card, centred, nothing else in it (no hours row); the rest dimmed' + full, await edgeVisible() && await p.locator(T('crew-today-clock-btn')).isVisible() && (await p.locator(T('crew-edge-hours')).count()) === 0 && (await box('#edgeBox')).x === 0 && (await box('#edgeBox')).width <= W * 0.86 + 1 && (await box('#edgeBox')).height < H * 0.7 && Math.abs(((await box('#edgeBox')).y + (await box('#edgeBox')).height / 2) - H / 2) < 3 && (await box(T('crew-edge-close'))).height >= 44);
   await p.screenshot({ path: OUT + `c7-edge-${tag}.png` });
   await p.click(T('crew-edge-close')); await p.waitForTimeout(300);
   ok('× closes it' + full, !(await edgeVisible()));
