@@ -548,6 +548,24 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
 .mail-body .small{font-size:13.5px;color:var(--text-secondary)}
 .mono{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.02em}
 .mail-foot{font-size:12.5px;color:var(--text-muted);border-top:1px solid var(--border);margin-top:14px;padding-top:10px;line-height:1.45}
+
+/* ---- C9: the quote cannot be selected, copied or printed; the sign sheet draws; what prints on the signed copy ---- */
+#s-quote .paper, #s-quote .paper *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+@media print{#s-quote .paper, #s-quote [data-testid="crew-quote-note"]{display:none !important}}
+.sigpad{position:relative;border:1px solid var(--border-strong);border-radius:12px;background:#fff;overflow:hidden}
+.sigpad canvas{display:block;width:100%;height:150px;touch-action:none;cursor:crosshair}
+.sigpad .sig-line{position:absolute;left:16px;right:16px;bottom:36px;border-bottom:1px solid var(--border-strong);pointer-events:none}
+.sigpad .sig-hint{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:12.5px;color:var(--text-muted);pointer-events:none}
+.sigpad .sig-clear{position:absolute;top:0;right:0;height:44px;padding:0 14px;font-size:14px;font-weight:600;color:var(--accent)}
+.pdfprev{background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:var(--shadow-card);padding:16px;color:#222;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.5}
+.pdfprev .pp-biz{font-size:16px;font-weight:700}
+.pdfprev .pp-sub{font-size:10.5px;color:#555;border-bottom:2px solid #333;padding-bottom:7px;margin-bottom:12px}
+.pdfprev .pp-h1{font-size:14.5px;font-weight:700;margin-bottom:8px}
+.pdfprev .pp-text{font-family:Georgia,serif;font-size:11.5px;white-space:pre-wrap;color:#333}
+.pdfprev .pp-cols{display:flex;gap:12px;border-top:1px solid #999;margin-top:14px;padding-top:10px;font-size:11px}
+.pdfprev .pp-col{flex:1;min-width:0}
+.pdfprev .pp-sig{display:block;max-width:150px;width:100%;height:50px;object-fit:contain;object-position:left bottom;margin-bottom:4px}
+.pdfprev .pp-foot{margin-top:14px;font-size:10px;color:#777}
 </style>
 </head>
 <body>
@@ -908,6 +926,16 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
       <div class="meta" id="mailMeta" data-testid="crew-mail-meta"></div>
     </div>
     <div class="form-body" id="mailBody" data-testid="crew-mail-body" style="padding-top:4px"></div>
+  </section>
+
+  <!-- ================= C9: WHAT PRINTS ON THE SIGNED COPY (prototype-only preview of the PDF's signature block) ================= -->
+  <section id="s-pdfprev" class="hide" data-testid="crew-pdfprev" style="flex:1;display:flex;flex-direction:column;min-height:0">
+    <div class="jobhdr">
+      <div class="row2"><button class="back" id="pdfBack" data-testid="crew-pdfprev-back"><svg><use href="#i-back"/></svg>My documents</button></div>
+      <div class="job-title">What prints on the signed copy</div>
+      <div class="meta" id="pdfMeta" data-testid="crew-pdfprev-meta"></div>
+    </div>
+    <div class="form-body" id="pdfBody" data-testid="crew-pdfprev-body" style="padding-top:4px"></div>
   </section>
 
   <!-- ================= C5: PROFILE (stack) ================= -->
@@ -1665,7 +1693,7 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
     { id: 'd3', name: 'Safety agreement', status: 'ended', sent: '2026-05-01', signed: '2026-05-02', countersigned: '2026-05-02', ended: '2026-09-30', content: 'SAFETY AGREEMENT\n\nReplaced by the site safety plan of 30 Sep 2026.' },
   ];
   const cStatus = (c) => c.status === 'sent' ? { cls: 'wait', txt: 'Awaiting signature' } : c.status === 'signed' ? { cls: 'live', txt: 'Signed' } : { cls: 'ended', txt: 'Ended' };
-  function hideC5(){ ['#s-onb', '#s-profile', '#s-docs', '#s-doc', '#s-reset', '#s-notice', '#s-terms', '#s-quote', '#s-pin', '#s-mail', '#s-feedback', '#s-events', '#s-training', '#s-video', '#s-coaching', '#s-going', '#s-rating', '#s-equip', '#s-item'].forEach(x => $(x).classList.add('hide')); }
+  function hideC5(){ ['#s-onb', '#s-profile', '#s-docs', '#s-doc', '#s-reset', '#s-notice', '#s-terms', '#s-quote', '#s-pin', '#s-mail', '#s-pdfprev', '#s-feedback', '#s-events', '#s-training', '#s-video', '#s-coaching', '#s-going', '#s-rating', '#s-equip', '#s-item'].forEach(x => $(x).classList.add('hide')); }
   function stackOpen(id){ $('#s-app').classList.add('hide'); $('#s-login').classList.add('hide'); hideC5(); $(id).classList.remove('hide'); const b = $(id + ' .form-body'); if (b) b.scrollTop = 0; }
   const MARK = $('#s-login .mark').innerHTML;
   $('#pinLogin .mark').innerHTML = MARK; $('#pinMark').innerHTML = MARK;
@@ -1902,15 +1930,54 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
   }
   function openDoc(id){ const c = contracts.find(x => x.id === id); if (!c) return; stackOpen('#s-doc'); renderDoc(c); document.body.dataset.lastGo = '/employee/contracts/' + id; }
   function closeDoc(){ $('#s-doc').classList.add('hide'); openDocs(); }
-  const sig = { id: '', text: '', err: '' };
+  // C9 — sign by drawing (the pad the client signs the quote with), or by typing the name as before. PUT /employee-contracts/{id}/sign {signature_data, signature_type: 'drawn' | 'typed'} — the route takes both today.
+  const sig = { id: '', mode: 'draw', text: '', err: '', has: false };
+  const sigErrHtml = () => sig.err ? `<div class="err" data-testid="crew-sign-err" role="alert">${esc(sig.err)}</div>` : '';
   function renderSign(){
     const c = contracts.find(x => x.id === sig.id);
     $('#signTitle').textContent = 'Sign ' + c.name;
-    $('#signBody').innerHTML = `<div class="hint" style="margin:0 4px 10px;font-size:14px;color:var(--text-secondary)">By signing below, you confirm that you have read, understood, and agree to the terms of this document.</div><div class="fld"><label for="sigIn">Type your full name</label><input id="sigIn" data-testid="crew-sign-input" class="tin ${sig.err ? 'bad' : ''}" value="${esc(sig.text)}" autocomplete="name" autocapitalize="words">${sig.err ? `<div class="err" data-testid="crew-sign-err">${esc(sig.err)}</div>` : ''}</div><div class="sigprev" data-testid="crew-sign-preview">${esc(sig.text)}</div>`;
+    const seg = `<div class="seg" data-testid="crew-sign-mode" role="tablist"><button class="${sig.mode === 'draw' ? 'on' : ''}" data-sigmode="draw" data-testid="crew-sign-mode-draw" role="tab" aria-selected="${sig.mode === 'draw'}">Draw</button><button class="${sig.mode === 'type' ? 'on' : ''}" data-sigmode="type" data-testid="crew-sign-mode-type" role="tab" aria-selected="${sig.mode === 'type'}">Type</button></div>`;
+    const draw = `<div class="sigpad" data-testid="crew-sign-pad-box"><canvas id="sigPad" data-testid="crew-sign-pad" aria-label="Draw your signature"></canvas><div class="sig-line"></div><div class="sig-hint" id="sigHint" data-testid="crew-sign-pad-hint">Sign here with your finger</div><button class="sig-clear" id="sigClear" data-testid="crew-sign-clear">Clear</button></div>`;
+    const type = `<div class="fld"><label for="sigIn">Type your full name</label><input id="sigIn" data-testid="crew-sign-input" class="tin ${sig.err ? 'bad' : ''}" value="${esc(sig.text)}" autocomplete="name" autocapitalize="words"></div><div class="sigprev" data-testid="crew-sign-preview">${esc(sig.text)}</div>`;
+    $('#signBody').innerHTML = `<div class="hint" style="margin:0 4px 4px;font-size:14px;color:var(--text-secondary)">By signing below, you confirm that you have read, understood, and agree to the terms of this document.</div>${seg}${sig.mode === 'draw' ? draw : type}<div id="sigErrBox">${sigErrHtml()}</div>`;
+    if (sig.mode === 'draw') bindPad();
   }
-  function openSign(id){ sig.id = id; sig.text = ''; sig.err = ''; renderSign(); $('#signSheet').classList.remove('hide'); }
+  function bindPad(){
+    const c = $('#sigPad'); c.width = Math.max(2, Math.round(c.clientWidth * 2)); c.height = Math.max(2, Math.round(c.clientHeight * 2));
+    const ctx = c.getContext('2d'); ctx.lineWidth = 5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1E1C1A';
+    let down = false; sig.has = false;
+    const pos = (e) => { const r = c.getBoundingClientRect(); return { x: (e.clientX - r.left) * c.width / r.width, y: (e.clientY - r.top) * c.height / r.height }; };
+    c.addEventListener('pointerdown', (e) => { down = true; try { c.setPointerCapture(e.pointerId); } catch (_) {} const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); e.preventDefault(); e.stopPropagation(); });   // a stroke is never an edge swipe
+    c.addEventListener('pointermove', (e) => { if (!down) return; const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); if (!sig.has) { sig.has = true; $('#sigHint').classList.add('hide'); if (sig.err) { sig.err = ''; $('#sigErrBox').innerHTML = ''; } } e.preventDefault(); e.stopPropagation(); });
+    const up = () => { down = false; };
+    c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up);
+    $('#sigClear').addEventListener('click', () => { ctx.clearRect(0, 0, c.width, c.height); sig.has = false; $('#sigHint').classList.remove('hide'); });
+  }
+  function openSign(id){ Object.assign(sig, { id, mode: 'draw', text: '', err: '', has: false }); $('#signSheet').classList.remove('hide'); renderSign(); }
   function closeSign(){ $('#signSheet').classList.add('hide'); }
-  function confirmSign(){ if (!sig.text.trim()) { sig.err = 'Type your full name to sign.'; renderSign(); return; } const c = contracts.find(x => x.id === sig.id); c.status = 'signed'; c.signed = '2026-10-14'; closeSign(); renderDoc(c); renderDocs(); }
+  function confirmSign(){
+    const c = contracts.find(x => x.id === sig.id);
+    if (sig.mode === 'draw') { if (!sig.has) { sig.err = 'Draw your signature to sign.'; $('#sigErrBox').innerHTML = sigErrHtml(); return; } c.sigType = 'drawn'; c.sigData = $('#sigPad').toDataURL('image/png'); }
+    else { if (!sig.text.trim()) { sig.err = 'Type your full name to sign.'; renderSign(); return; } c.sigType = 'typed'; c.sigName = sig.text.trim(); }
+    c.status = 'signed'; c.signed = '2026-10-14'; document.body.dataset.lastGo = `PUT /employee-contracts/${c.id}/sign ${c.sigType}`; closeSign(); renderDoc(c); renderDocs();
+  }
+  $('#signBody').addEventListener('click', (e) => { const b = e.target.closest('[data-sigmode]'); if (!b || b.dataset.sigmode === sig.mode) return; sig.mode = b.dataset.sigmode; sig.err = ''; renderSign(); });
+
+  // C9 — what prints on the signed copy (the contract PDF's signature block): the drawn image above the crew member's name, the way the owner's prints.
+  const SQUIGGLE = (d) => `<svg class="pp-sig" viewBox="0 0 150 50" aria-hidden="true"><path d="${d}" fill="none" stroke="#1E1C1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  function openPdfPrev(id, forced){
+    const c = contracts.find(x => x.id === id) || contracts[0]; if (!c) return;
+    const kind = forced || c.sigType || 'typed';
+    const crewSig = kind === 'drawn' ? (c.sigData ? `<img class="pp-sig" src="${c.sigData}" alt="" data-testid="crew-pdfprev-crew-sig">` : SQUIGGLE('M6 34 C 16 6, 26 46, 38 24 S 56 8, 66 30 S 84 44, 96 20 S 118 14, 128 30 L 144 22').replace('<svg class="pp-sig"', '<svg class="pp-sig" data-testid="crew-pdfprev-crew-sig"')) : '';
+    stackOpen('#s-pdfprev');
+    $('#pdfMeta').textContent = `${c.name} · signed ${kind === 'drawn' ? 'by drawing' : 'by typing'}`;
+    $('#pdfBody').innerHTML = `<div class="pdfprev" data-testid="crew-pdfprev-page"><div class="pp-biz">${esc(BIZ)}</div><div class="pp-sub">ABN 12 345 678 901 · 4 Example St, Brunswick VIC 3056</div><div class="pp-h1">${esc(c.name)}</div><div class="pp-text">${esc(c.content.split('\n').slice(0, 4).join('\n'))}\n…</div>
+      <div class="pp-cols"><div class="pp-col" data-testid="crew-pdfprev-crew">${crewSig}<b>Mia Nguyen</b><br>Signed (${kind} in the crew app)<br>14 Oct 2026, 9:12 am<br>IP 203.0.113.24</div><div class="pp-col" data-testid="crew-pdfprev-owner">${SQUIGGLE('M8 30 C 22 4, 30 44, 46 22 S 74 40, 88 18 S 112 36, 142 14')}<b>For ${esc(BIZ)}: Josh Sano</b><br>Countersigned<br>15 Oct 2026, 8:03 am</div></div>
+      <div class="pp-foot">Template v3 · Document 4F2A91C0 · Paint Trade HQ record</div></div>
+      <div class="hint" style="margin:12px 4px 0" data-testid="crew-pdfprev-note">${kind === 'drawn' ? 'New: the drawn signature prints above the name, the way the owner’s does.' : 'A typed signature prints the name alone, as today.'}</div>`;
+    document.body.dataset.lastGo = 'pdf-preview:' + kind;
+  }
+  $('#pdfBack').addEventListener('click', () => { $('#s-pdfprev').classList.add('hide'); openDocs(); });
 
   function openPhotoSheet(ctx){ ds.ctx = ctx; $('#photoSheet').classList.remove('hide'); }
   function closePhotoSheet(){ $('#photoSheet').classList.add('hide'); }
@@ -2207,6 +2274,8 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
     const thanks = `<div class="pthanks" data-testid="crew-quote-foot"><div class="big">${esc(Q.thanks || 'Thank you for the opportunity to quote.')}</div><div class="sub">Questions? ${[B.phone ? 'Call ' + B.phone : '', B.email ? 'email ' + B.email : ''].filter(Boolean).join(' or ') || 'reach out anytime'}.</div></div>`;
     $('#quoteBody').innerHTML = `<div class="paper" data-testid="crew-quote-paper">${hero}${about}${info}${table('WHAT WE WILL DO', work)}${materials}${optional}${products}${terms}${thanks}</div><div class="qfoot" data-testid="crew-quote-note">The client's copy also carries the prices, the total and the payment terms.</div>`;
   }
+  // C9 — the quote is the owner's document: the paper cannot be selected, copied, dragged out or printed (a deterrent; a photo of the screen is still possible).
+  ['copy', 'cut', 'contextmenu', 'dragstart', 'selectstart'].forEach((ev) => $('#s-quote').addEventListener(ev, (e) => { const el = e.target && e.target.nodeType === 1 ? e.target : (e.target && e.target.parentElement); if (el && el.closest('.paper')) { e.preventDefault(); document.body.dataset.lastBlocked = ev; } }));
   function openQuote(id){ qu.job = id; hideC5(); $('#s-app').classList.add('hide'); $('#s-job').classList.add('hide'); $('#s-quote').classList.remove('hide'); renderQuote(); $('#quoteBody').scrollTop = 0; document.body.dataset.lastGo = '/employee/project/' + id + '/quote'; }
   $('#quoteBack').addEventListener('click', () => { $('#s-quote').classList.add('hide'); openJob(qu.job); });
 
@@ -2356,6 +2425,7 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
   else if (q.get('screen') === 'events') { showApp('me'); openEvents(); }
   else if (q.get('screen') === 'profile') { showApp('me'); openProfile(); }
   else if (q.get('screen') === 'docs') { showApp('me'); openDocs(); }
+  else if (q.get('screen') === 'contract-pdf') { showApp('me'); openPdfPrev(q.get('id') || 'd1', q.get('sig') || null); }
   else if (q.get('screen') === 'reset') { openReset(q.get('from') || 'login', q.get('email') || (q.get('step') ? 'mia@example.com' : '')); const st = parseInt(q.get('step') || '1', 10); if (st > 1) { rs.step = st; renderReset(); } }
   else if (q.get('screen') === 'training') { showApp('ops'); openTraining(); }
   else if (q.get('screen') === 'video') { showApp('learn'); openVideo(q.get('id') || 'v3', q.get('from') || 'training'); }
