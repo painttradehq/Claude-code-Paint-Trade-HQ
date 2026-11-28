@@ -459,3 +459,13 @@ All four are in the saved code (GitHub `main` `3ece9f7`; commits `579a9fa` A, `d
 **At Emergent now:** the crew chat's C8 prototype is saved there, waiting for Josh's five answers — not this chat's.
 
 **Open, Josh's call:** effort — the recommendation is now normal (the model's default), on the two slips above; one setting to change, on his "send".
+
+## 32. Lucy does not draft contracts or consents — written with the effort change, not sent (28 Nov)
+
+Josh: "One more small thing goes with the next round: tell Lucy not to draft any contract in the app, as PTHQ wants to have a package to sell the draft contracts and consents as a package."
+
+**Read in the code (`3ece9f7`):** Lucy can draft into the app through `save_contract_template` (the Contracts page's templates: employment, confidentiality, conduct, safety, social media & photo consent, other), and can write contract wording in a reply or an email; her instructions say nothing about contracts. The same ability is in the connector for an outside Claude.
+
+**Written — `lucy-effort-and-no-contracts-message.md`, waits for "send":** Part 1, effort back to the model's normal (`AI_EFFORT` default `high`), with the photo check and one run of the cost set; Part 2, `save_contract_template` leaves Lucy's list and her instructions say she does not write the wording of any contract, agreement or consent form, in any place — her fixed sentence: "I don't draft contracts or consent forms. Your templates are on the Contracts page — you can edit and issue them there." She still lists the templates and where they are. No prototype.
+
+**Left for Josh's word, not in the message:** the outside-Claude connector keeps the same ability; the terms on a quote (`update_quote` sets `terms`). Her sentence does not mention the package — it is not on sale yet.
