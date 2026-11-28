@@ -1,4 +1,4 @@
-# Lucy — what she costs: measure it, cut the waste, price the cheaper setups — NOT SENT, waits for Josh's "send"
+# Lucy — what she costs: measure it, cut the waste, price the cheaper setups — SENT to Emergent 28 Nov on Josh's word ("send the cost round")
 
 Josh, 28 Nov, after the token explanation: "This is certainly going to be a costly process… this is certainly unaffordable… we need to investigate why this is happening and find a solution here."
 
@@ -25,7 +25,7 @@ By arithmetic on those (estimates, until Part 1 measures): one simple question w
 
 ---
 
-## The message to send
+## The message as sent
 
 # Lucy — what she costs: measure it, cut the waste, price the cheaper setups
 

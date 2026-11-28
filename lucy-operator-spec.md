@@ -363,7 +363,7 @@ Josh: "check and do these: Read On Open, Reply Drafts" (two more of Emergent's s
 
 Its other suggestions (deposit clarity, dashboard speed, the older tests) wait for Josh's word.
 
-## 26. What Lucy costs — the code read and the round written (28 Nov, not sent)
+## 26. What Lucy costs — the code read and the round written (28 Nov; sent, see §27)
 
 Josh, after the token explanation: "This is certainly unaffordable… we need to investigate why this is happening and find a solution here."
 
@@ -378,6 +378,14 @@ Josh, after the token explanation: "This is certainly unaffordable… we need to
 
 **By arithmetic (estimates until measured):** one simple question with one lookup is about US$0.13 cold and US$0.05 warm today; about US$0.05 / US$0.02 on Sonnet 5.5; under half a cent on Haiku 5.5. Josh's heaviest test day (281,313 of the 300,000 allowance) was about US$2. A day at the full allowance is about US$2–3, so the worst case is about US$60–90 a month for a business that hits the cap every day — the US$45–225 said earlier was too wide at the top.
 
-**The round — `lucy-cost-emergent-message.md`, waits for "send":** (1) measure a fixed set of twelve everyday tasks plus the four one-shot features on a TS_ test account — calls, tokens, cold and warm dollars, pass/fail; (2) cut the waste — tools loaded on demand (tool search, the five most-used kept loaded), the last-resort call keeps its tools — kept only if every task still passes and the cost falls; (3) price the same set on Opus 5.5, Sonnet 5.5 (default and low effort) and Haiku 5.5, switching nothing. Josh picks from the table. No prototype — nothing he looks at changes.
+**The round — `lucy-cost-emergent-message.md`:** (1) measure a fixed set of twelve everyday tasks plus the four one-shot features on a TS_ test account — calls, tokens, cold and warm dollars, pass/fail; (2) cut the waste — tools loaded on demand (tool search, the five most-used kept loaded), the last-resort call keeps its tools — kept only if every task still passes and the cost falls; (3) price the same set on Opus 5.5, Sonnet 5.5 (default and low effort) and Haiku 5.5, switching nothing. Josh picks from the table. No prototype — nothing he looks at changes.
 
 **Not in the round, noted:** the cache life (5 minutes or 1 hour) needs real gaps between messages from real customers — none to read without Josh's account; the other path he raised — his own Claude account through the connector — already works and costs the app nothing.
+
+## 27. The cost round sent; Live Progress built at Emergent (28 Nov)
+
+**Sent** on Josh's "send the cost round" — the message in `lucy-cost-emergent-message.md`, as written. Emergent accepted it (queued). The quote wording fix (`quote-open-live-project-message.md`) still waits for its own "send", after this round.
+
+**Live Progress — read at Emergent before sending.** Josh answered its question himself ("a", 28 Nov 00:30 UTC) and it is built, in the preview only: one line beside the dots that names the step Lucy is on, in fixed words from the server (no AI, no allowance used) — "Thinking…", "Looking at quotes", the card's own title for a change ("Start a quote", "Invoice from a quote"), "Reading your inbox", "Looking at the files", "Saving that". Two differences from what it showed him: most steps take under a second, so the line mostly shows the last step with a tick; a repeat reads "(2)", not "1 of 2". Approving a card keeps its own "Working — step x of n" line. Tested by Emergent itself at 1440 and 1024 on TS_ accounts on the dry-run server; the testing agent was not used; no What's new line added. Its new suggestions (friendlier step words, card progress, a finished chime, deposit clarity) wait for Josh's word.
+
+**Parked the same day (`admin-remaining.md`):** Lucy's setup into Settings under Crew app; AI credits (see use, buy more); AI pricing. Order recorded: cost round → Josh picks the model → pricing → the credits screen.
