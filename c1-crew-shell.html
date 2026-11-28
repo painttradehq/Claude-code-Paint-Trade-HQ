@@ -1632,7 +1632,7 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
 
   // ---- deep links for review / tests ----
   if (q.get('error') === 'restricted') { $('#loginErrorText').textContent = RESTRICTED; $('#loginError').classList.remove('hide'); }
-  if (q.get('error') === 'pending') { $('#loginErrorText').textContent = "Your account is waiting for Josh to approve it. We'll text you when you're in."; $('#loginError').classList.remove('hide'); }   // C8 proposal — the approval gate
+  if (q.get('error') === 'pending') { $('#loginErrorText').textContent = "Your account is waiting for Josh to approve it. We'll email you when you're in."; $('#loginError').classList.remove('hide'); }   // C8 proposal — the approval gate
 
   // ================= C5: documents — onboarding, profile, my documents =================
   const DOC_CAT = [
@@ -1808,7 +1808,7 @@ table.pitems tr.area td{font-weight:700;padding-top:10px}
     } else {
       const okIco = `<span class="ico ok" style="width:64px;height:64px;border-radius:32px;margin:10px auto 14px"><svg style="width:30px;height:30px"><use href="#i-check"/></svg></span>`;
       if (onb.finish) { body = `<div class="onb-top">${okIco}<div class="onb-title" data-testid="crew-onb-done">You're all set, ${esc(first)}.</div><div class="onb-sub">From now on sign in with <b>${esc(onb.email)}</b> and your new password.</div></div>`; bar = `<button class="btn btn-primary" data-testid="crew-onb-today" data-onb="today">Go to Today</button>`; }
-      else if (onb.gate) { body = `<div class="onb-top">${okIco}<div class="onb-title" data-testid="crew-onb-pending">Thanks, ${esc(first)}.</div><div class="onb-sub">${esc(ownerFirst)} needs to approve you before you can sign in. We'll text <b>${esc(onb.phone || 'your mobile')}</b> when you're in — usually the same day.</div></div>`; bar = `<button class="btn btn-outline" data-testid="crew-onb-signin" data-onb="signin">Done</button>`; }   // C8 proposal — the approval gate
+      else if (onb.gate) { body = `<div class="onb-top">${okIco}<div class="onb-title" data-testid="crew-onb-pending">Thanks, ${esc(first)}.</div><div class="onb-sub">${esc(ownerFirst)} needs to approve you before you can sign in. We'll email <b>${esc(onb.email)}</b> when you're in — usually the same day.</div></div>`; bar = `<button class="btn btn-outline" data-testid="crew-onb-signin" data-onb="signin">Done</button>`; }   // C8 proposal — the approval gate
       else if (onb.auto) { body = `<div class="onb-top">${okIco}<div class="onb-title" data-testid="crew-onb-done">You're on the team, ${esc(first)}.</div><div class="onb-sub">You're signed in on this phone. Set a PIN so you can clock on with four digits.</div></div>`; bar = `<button class="btn btn-primary" data-testid="crew-onb-setpin" data-onb="setpin">Set a PIN</button>`; }   // C8 proposal — signed in by the join itself
       else { body = `<div class="onb-top">${okIco}<div class="onb-title" data-testid="crew-onb-done">You're on the team, ${esc(first)}.</div><div class="onb-sub">Sign in with <b>${esc(onb.email)}</b> and the password you just created.</div></div>`; bar = `<button class="btn btn-primary" data-testid="crew-onb-signin" data-onb="signin">Sign in</button>`; }
     }

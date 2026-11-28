@@ -597,7 +597,7 @@ async function run(b, W, H, tag) {
   await p.click(T('crew-onb-setpin')); await p.waitForTimeout(150); await p.fill(T('set-pin-input'), '2468'); await p.waitForTimeout(100); await p.fill(T('set-pin-input'), '2468'); await p.waitForTimeout(200);
   ok('…Set a PIN → the pad → the Dashboard, no password typed' + full, await p.locator(T('crew-pane-dashboard')).isVisible());
   await p.goto(U + '?screen=onboarding&step=5&agree=1&gate=1'); await p.waitForTimeout(300); await p.click(T('crew-onb-join')); await p.waitForTimeout(150);
-  ok('proposal — approval gate: "Thanks, Mia." with the owner\'s name and the mobile number; Done' + full, /Thanks, Mia\./.test(await txt(T('crew-onb-pending'))) && /Josh needs to approve you/.test(await txt('#onbBody')) && /0412 345 678/.test(await txt('#onbBody')) && (await txt(T('crew-onb-signin'))) === 'Done');
+  ok('proposal — approval gate: "Thanks, Mia." with the owner\'s name and the email we will write to; Done' + full, /Thanks, Mia\./.test(await txt(T('crew-onb-pending'))) && /Josh needs to approve you/.test(await txt('#onbBody')) && /mia@example\.com/.test(await txt('#onbBody')) && (await txt(T('crew-onb-signin'))) === 'Done');
   await p.screenshot({ path: OUT + `c8-onb-pending-${tag}.png` });
   await p.goto(U + '?screen=onboarding'); await p.waitForTimeout(300);
   ok('onboarding 0: the "You\'ll need" list has no emergency contact (not asked since 2 Nov)' + full, !/emergency contact/i.test(await txt('#onbBody')) && /Your home address/.test(await txt('#onbBody')));

@@ -69,4 +69,4 @@ Small. Backend: the branded owner-added email, the join-link send route and its 
 
 `crew-pin-login`, `crew-pin-hello`, `crew-pin-pad`, `crew-pin-input`, `crew-pin-box-0..3`, `crew-pin-error`, `crew-pin-use-password`; `crew-set-pin`, `set-pin-title`, `set-pin-pad`, `set-pin-input`, `set-pin-error`, `set-pin-skip`; `crew-mail`, `crew-mail-back`, `crew-mail-meta`, `crew-mail-body`, `crew-mail-card`, `crew-mail-subject`, `crew-mail-cta`, `crew-mail-note`; `crew-onb-address`, `crew-onb-suburb`, `crew-onb-pending`, `crew-onb-setpin`; `crew-alerts-card`, `crew-alerts-title`, `crew-alerts-on`, `crew-alerts-dismiss`. Removed: `crew-onb-emergency`, `crew-onb-privacy` (the agreement has the one link).
 
-Prototype suite: 608 checks, 304 per viewport, all passing at 390 × 844 and 360 × 800.
+Prototype suite: 608 checks, 304 per viewport, all passing at 390 × 844 and 360 × 800 (shell md5 981ce619cc41a193bdf0496c8f447a47, 240,310 bytes).
