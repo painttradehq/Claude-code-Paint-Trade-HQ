@@ -391,3 +391,31 @@ Josh, after the token explanation: "This is certainly unaffordable… we need to
 **Parked the same day (`admin-remaining.md`):** Lucy's setup into Settings under Crew app; AI credits (see use, buy more); AI pricing. Order recorded: cost round → Josh picks the model → pricing → the credits screen.
 
 **28 Nov, later — "Lucy could not answer just now" again (Josh's screenshot, one long request: client, estimate with seven lines, send, wait for approval, deposit invoice, crew, finish, invoice, completion report).** Checked: GitHub `main` is still `a71a8f3` — the 30-second limit, no "Still working" line — so the long-task fix exists only in the preview. Emergent was mid cost round at the time, changing Lucy's server files in the preview. Which cause applies depends on where he ran it (asked): the live app → the fix is not published; the preview → a turn cut by Emergent's work there. Told him: no Publish until the cost round reports; look for a half-made client and quote before asking again; the request cannot run in one go either way (she stops at the first card, cannot watch for an approval, takes ten steps a turn at most, and has no completion-report ability — only "Complete a job").
+
+## 28. The cost round's report; the published code read again (28 Nov)
+
+**Josh: "I clicked publish, check the code again."** GitHub `main` is now `14df5fb` (saved after 01:50 UTC): the inbox round, the long-task fix, Live Progress and the cost round are all in it. The live server itself cannot be seen from here.
+
+**Why the bare line can still show (read in `14df5fb`).** With the fix, "Lucy could not answer just now." is shown when the server answers with no words, or when the request is cut at about 60 seconds, the panel waits, and the turn then ends on the server without a reply. `_chat_turn` saves Lucy's message only on success, so a turn that fails after the cut leaves nothing — not the reason, not the changes already made. The reason is only in the audit log (Lucy's gear › Open the audit log; the row's Result preview). Whether Josh's failure was this is not known until he reads that row. The fix is written, not sent: `lucy-failed-turn-says-why-message.md` (a failed turn leaves a reply with the reason and what was done; out of steps she says what is done and what is left; that last-resort call proved on the real API).
+
+**The cost round — Emergent's report (`memory/reports/lucy-cost-report.md`).** Nothing switched; the preview runs `claude-opus-5` (the setting is unset).
+
+- On every chat call: 104 tools = 17,515 tokens, instructions 2,677 — about 20,200 tokens (more than the 14,000 estimated from the code).
+- A simple question on today's setup: US$0.14 cold, US$0.02–0.04 warm. Josh's ten-item task: US$0.37 cold.
+- The set of 16 tasks, all passed on every setup (one run each; pass = the record is right, not a judgement of wording):
+
+| Setup | Cold US$ | Warm US$ | Seconds |
+|---|---|---|---|
+| A · Opus 5 (today) | 2.34 | 0.94 | 160 |
+| B · Opus 5.5 | 1.72 | 0.55 | 125 |
+| C · Sonnet 5.5 | 0.87 | 0.28 | 106 |
+| D · Sonnet 5.5, low effort | 0.80 | 0.21 | 75 |
+| E · Haiku 5.5 | 0.05 | 0.02 | 90 |
+
+- **Tools on demand: built, measured, taken out.** A quiet first message got much cheaper (the set cold 2.34 → 1.54) but back-to-back use got dearer (warm 0.94 → 1.11) and long jobs slower (Josh's task 38 → 68 seconds, past the 60-second cut). The code stays behind one switch (`ON_DEMAND`).
+- The last-resort call now keeps its tools (kept).
+- One behaviour difference: on Opus 5.5 she recorded the $500 on the overdue invoice without asking which; the others asked first.
+- Spent: about US$7.60, about US$4 of it on Emergent's own spoiled tries.
+- **Two slips Emergent reported against Josh's rules:** it read the newest row of four collections (jobs, invoices, events, clients) with no business filter while looking up field names — field names printed, no values, whose rows unknown; and in the Live Progress round it seeded TS_ businesses through the preview backend, so two TS_ quotes were really sent to made-up `@ts-pthq.example` addresses. The next message carries both as rules (every read filtered to the TS_ business; seed only through the dry-run server).
+
+**Open, Josh's call:** which setup Lucy runs on. Emergent's own suggestions (model switch, photo path check on the newer models, twenty tools loaded, a cost meter) wait for his word.
