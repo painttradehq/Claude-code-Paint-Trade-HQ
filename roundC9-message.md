@@ -1,0 +1,120 @@
+Round C9 — Sign by drawing, the drawing on the signed contract, and the crew Quote screen copy-protected; plus the one test line left open by C8. Save this file as `memory/specs/crew/c9-round-message.md` and the spec below (from "# C9 —" to the end) as `memory/specs/crew/c9-sign-quote-protect-notes.md`. The prototype is the `c1-crew-shell.html` Josh uploads with this brief (248,853 bytes, md5 e41450cdff7c2b85386a9b1542f24e36): save it over `memory/specs/crew/c1-crew-shell.html`. Open it at 390 × 844 first, then 360 × 800: `?screen=doc&id=d1` then Sign this document (the sheet: Draw first, Type the other tab), `?screen=contract-pdf&id=d1&sig=drawn` and `&sig=typed` (a prototype-only picture of the PDF's signature block), `?screen=quote&id=j1` (try to select or copy the paper). Everything else in the prototype is live already and is not this round's.
+
+Rules for this round:
+1. Touch only the files §4 and §5 name. Frontend: new `components/crew/SignaturePad.tsx`, `app/employee/contracts.tsx` (the sign sheet and `confirmSign` only), `app/employee/project/[id]/quote.tsx` (the protection only). Backend: `routes/contracts.py` (`sign_document`'s check, `_pdf_bytes`'s optional fifth parameter and the image in the left cell, new `_crew_sig`, the two callers), new `tests/test_c9_crew_contract_sign.py`, `tests/test_c5_crew_documents.py` (the one assertion, §5.4). Nothing under `app/admin/*`; `app/quote/[token].tsx`, `components/crew/PhotoSheet.tsx`, `services/pdf.py`, `services/blobs.py` and the three existing contract test files untouched. No new package (`react-native-signature-canvas` and `react-native-webview` are installed); no env change. If something you need is not on this list, stop and say so in the report rather than widening.
+2. Every string is in §3. No notices, no banners, no pop-up alerts, no duplication. The crew app has no AI of any kind.
+3. A signature is evidence: nothing about how it is stored, timed, IP-stamped or audited changes; signed rows are never edited; the drawing is private (the `private_files` row, served only through the routes that exist). The PDF change is the image in the left cell and nothing else. `_pdf_bytes` keeps working with four positional arguments. No seed data; no write to any real tenant; the owner's real tenant read-only; `TS_` rows only, deleted at the end.
+4. The quote's protection is web-only code inside the quote screen, removed when the screen loses focus; every other screen selects and copies as before. It adds no words and changes nothing to the eye.
+5. Testing agent at **390 × 844 first, then 360 × 800**, with a **phone user agent and touch**, on the `TS_` tenant: §6 items 1–5, including the two downloaded PDFs rendered to images. No `rm -rf` outside `memory/tmp` and `/tmp`; never interrupt a suite run mid-seed; test counts from `pytest --collect-only`.
+6. Create the What's new entry as a **Draft** (text in §7). Never publish.
+7. Report at the end, starting with the words **"Round C9 done"**, as `memory/reports/roundC9-sign-quote-report.md`: each verify item (§6) as agent-tested or Unverified with the testing-agent iteration numbers at both sizes; the two PDFs and their page images (paths); the native pad as built and Unverified; backend changes, env changes (none), new routes (none), deleted files (none); the test count from `pytest --collect-only`; the full suite before and after; then a "spec silences" list for the owner. Then stop. Do not start another round. Do not offer next action items.
+
+Spec (verbatim from `c9-sign-quote-protect-notes.md`):
+
+# C9 — Sign by drawing, and the quote copy-protected (spec v1, 28 Nov 2026)
+
+Prototype `c1-crew-shell.html` (248,853 bytes, md5 e41450cdff7c2b85386a9b1542f24e36) at 390 × 844, then 360 × 800. Live facts checked against `main` at f237013 (28 Nov, after Round C8). Three pieces: the crew sign sheet draws (typing stays), the drawn signature prints on the signed contract, and the crew Quote screen cannot be selected, copied or printed. Plus one line of test code left over from C8.
+
+## 1. What this round builds
+
+**A. Sign by drawing** (`?screen=doc&id=d1` → Sign this document). The sign sheet opens on **Draw**: the same pad a client signs a quote with — a white box, a baseline, "Sign here with your finger", **Clear**. **Type** is the other tab and is today's sheet unchanged (the name field and the script preview). Confirm & sign sends the drawing as a PNG. An empty pad gives one line. Nothing else on the document screen changes.
+
+**B. The drawing prints on the signed copy** (`?screen=contract-pdf&id=d1&sig=drawn`, a prototype-only preview of the PDF's signature block; `&sig=typed` for today's look). On the contract PDF the crew member's drawn signature sits above their name, the way the owner's uploaded signature sits above the countersign name today. A typed signature prints the name alone, as today. The PDF is made when the owner countersigns, so the image appears on documents countersigned after this round; stored copies are not regenerated.
+
+**C. The quote is copy-protected** (`?screen=quote&id=j1`). On the crew Quote screen nothing on the paper can be selected; copy, cut, the long-press menu and dragging are refused; printing the page shows none of the paper. The job page (addresses, paint names, the scope) stays selectable: the protection is the quote's alone. This is a deterrent, not a lock: a photo of the screen is still possible, and the words still travel to the phone to be shown.
+
+**D. C8's open test line** (§5.4).
+
+## 2. Live facts (main at f237013)
+
+- `frontend/app/employee/contracts.tsx` (one file: the list, the document, the question box, the sign sheet). State :30 `sign, signName, signErr, signing`. `confirmSign` :39–43: empty → "Type your full name to sign."; `api.put('/employee-contracts/{id}/sign', { signature_data: signName.trim(), signature_type: 'typed' })`; on success `setSign(false); setSignName(''); await load()`; the server's `detail` shows in `signErr`. The sheet :81–88: `<Sheet visible={sign} onClose title={`Sign ${open.name}`} testID="crew-sign">` → `sh.hint` (the sentence) → `sh.label` "Type your full name" → `TextInput` `crew-sign-input` → `s.preview` `crew-sign-preview` → `sh.err` `crew-sign-err` → Cancel `crew-sign-cancel` / `Confirm & sign` (`Signing…`) `crew-sign-confirm`. `Sheet, SheetButton, sh` come from `components/crew/PhotoSheet.tsx` (`Sheet` :9–19 is a RN `Modal` with a `Pressable` scrim and a `Pressable` sheet; no scroll view, no pan handler).
+- A segmented control already exists in the crew app: `app/employee/training/index.tsx` styles `s.seg, s.segBtn, s.segOn, s.segTxt, s.segTxtOn` :100–104 (All | Saved), local to that file.
+- `components/crew/VideoPlayer.tsx` is the repo's pattern for a web / native split in one file: `Platform.OS === 'web'` picks `WebPlayer` (`React.createElement('iframe', …)`), native does `const { WebView } = require('react-native-webview')` inside `NativePlayer` :52. There are no `.web.tsx` / `.native.tsx` files in the repo.
+- `frontend/package.json`: `react-native-signature-canvas ^5.0.1` :68 (installed, used nowhere), `react-native-webview 13.15.0`, `react-native-web ^0.21.0`.
+- The client's pad: `app/quote/[token].tsx:23–31` `SignPad` — an HTML `<canvas width={900} height={260}>` shown 150 px tall, `touchAction: 'none'`, mouse and touch handlers, 2.5 px round stroke `#1E1C1A`, `toDataURL('image/png')` on stroke end, Clear, the hint "Sign here with your finger or mouse". Admin-era web code; read it, do not import it.
+- `backend/routes/contracts.py`: `SignBody` :537–539 (`signature_data: str`, `signature_type: str = "typed"`); `sign_document` :547–575 — 400 "This document is no longer open for signing", 409 "Template version mismatch", 400 "Type or draw your signature" on empty; `method = "drawn" if signature_type == "drawn" else "typed"`; a drawn value starting `data:` is stored as a `private_files` row `{_id, owner_admin_id, kind: "signature", content_type, data: <base64>, doc_id, created_at}` with `signature_file_id` on the document; **anything else, including a "drawn" value that is not a data URL, is stored as text in `signature_data`**; `signed_at`, `signed_ip`, `signature_type`, `content_signed`, `signature_url`, the audit line "Signed by {name} ({method}) · IP {ip}". `_pdf_bytes(doc, emp, biz, tz_name)` :337–361 builds the HTML and calls `services.pdf._render`; the signature table :356–358 — left cell `<b>{employee name}</b><br>Signed ({signature_type} in the crew app)<br>{when}<br>IP {ip}`, right cell `{sig}<b>For {business}: {countersigned_by}</b><br>Countersigned<br>{when}`, where `sig` :349–350 is the owner's `business_profile.signature_url` as `<img style="display:block;max-width:180px;max-height:60px;margin-bottom:4px">`, only when countersigned. `_pdf_bytes` is called twice: `countersign` :377 (the PDF is stored then) and `_signed_pdf` :501 (re-rendered only when the stored file is gone). `admin_signature` :510–513 serves the crew image to the admin through `_serve_private`. `my_documents` :231–237 and `_public` :88 never return `signature_data`. The router is mounted behind `require_crew` (`server.py:1381`); the crew routes use `get_current_employee`.
+- `services/pdf._render` :260–263 passes the HTML through `blobs.inline_blob_urls_sync` (rewrites `/api/blobs/{id}` only; a `data:` URL is untouched) and WeasyPrint.
+- Existing tests that must stay green untouched: `tests/test_r22_contracts.py:100–108` and `tests/test_r78_contracts.py:15,55` sign `drawn` with a real 1 × 1 PNG data URL (70 bytes decoded); `tests/test_r87_fix_h.py:116–127` imports `_pdf_bytes` in process and calls it with **four positional arguments**; its helper `_has_image(pdf)` :24 inflates the PDF's object streams to find an image (WeasyPrint packs the dictionaries), and `_run` :52 runs a coroutine against the test database.
+- `frontend/app/employee/project/[id]/quote.tsx` (Round C7, unchanged since): `useFocusEffect` :63 loads the quote; the screen root `testID="crew-quote"` :168; the paper `testID="crew-quote-paper"` :175; every string is a RN `Text`. No `userSelect`, `selectable` or copy handling exists anywhere under `app/employee` or `components/crew`: on the web the text is selectable today. react-native-web renders `testID` as `data-testid`.
+- `tests/test_c5_crew_documents.py:63` asserts the register response is exactly `{"id", "name", "email"}`; Round C8 added `pending` and `owner_first`, so `test_02` is red.
+
+## 3. Strings (exact)
+
+Sign sheet: the sentence unchanged ("By signing below, you confirm that you have read, understood, and agree to the terms of this document."); tabs **Draw** | **Type**; the pad's hint `Sign here with your finger`; **Clear**; empty pad on confirm `Draw your signature to sign.`; the Type tab's words unchanged ("Type your full name", "Type your full name to sign."); buttons unchanged ("Cancel", "Confirm & sign", "Signing…").
+
+Server, a drawn value that is not a PNG or is too large: 400 `Signature must be a drawn PNG image.`
+
+PDF: the left cell's words unchanged — "Signed (drawn in the crew app)" already follows `signature_type`.
+
+The quote screen gains no words.
+
+## 4. Frontend (`app/employee/*`, `components/crew/*` only)
+
+### 4.1 `components/crew/SignaturePad.tsx` (new)
+`export function SignaturePad({ onChange, testID }: { onChange: (dataUrl: string | null) => void; testID?: string })`. One file, the `VideoPlayer` pattern.
+- **Web** (`Platform.OS === 'web'`): a `View` (white, `borderWidth: 1`, `borderColor: t.colors.borderStrong`, `borderRadius: 12`, `overflow: 'hidden'`, height 150) holding `React.createElement('canvas', { ref, 'data-testid': testID, 'aria-label': 'Draw your signature', style: { display: 'block', width: '100%', height: 150, touchAction: 'none', cursor: 'crosshair' }, onPointerDown, onPointerMove, onPointerUp, onPointerCancel })`. On mount set `canvas.width = clientWidth * 2`, `canvas.height = clientHeight * 2`. Pointer down: `setPointerCapture`, `beginPath`, `moveTo`, `preventDefault`, `stopPropagation`. Move while down: `lineTo`, `stroke` (5 px at that scale, round cap and join, `#1E1C1A`), mark dirty. Up or cancel: when dirty, `onChange(canvas.toDataURL('image/png'))`. Over it, absolutely placed and `pointerEvents: 'none'`: a 1 px baseline 16 px in from each side, 36 px from the bottom, and the hint 10 px from the bottom (12.5 px, `t.colors.textMuted`, centred, `testID={`${testID}-hint`}`), hidden once dirty. Top right: a `Pressable` **Clear** (44 px tall, `paddingHorizontal: 14`, 14 px semi-bold, `t.colors.accent`, `testID="crew-sign-clear"`) → `clearRect`, not dirty, hint back, `onChange(null)`.
+- **Native**: the same box, hint and Clear around `react-native-signature-canvas`, required inside the native branch as `VideoPlayer` requires the WebView: `penColor="#1E1C1A"`, `imageType="image/png"`, `descriptionText=""`, `webStyle` hiding the package's own footer and border, `onEnd={() => ref.current?.readSignature()}`, `onOK={(d) => onChange(d)}`, `onEmpty` and `onClear` → `onChange(null)`; Clear calls `ref.current?.clearSignature()`. The native branch is built and reported **Unverified** (this round's screen checks run on the web); if requiring the package breaks the web bundle, stop and say so rather than adding a file split.
+
+### 4.2 `app/employee/contracts.tsx`
+- State: `mode: 'draw' | 'type'` (default `'draw'`), `sigData: string | null`. Opening the sheet (the Sign bar's `onPress`) resets `mode` to `'draw'`, `sigData` to null and `signErr` to null; `signName` keeps today's behaviour.
+- The sheet's body: the sentence; the control **Draw** | **Type** (`testID` `crew-sign-mode`, the buttons `crew-sign-mode-draw` / `crew-sign-mode-type`, `accessibilityState={{ selected }}`), full width with two equal buttons, 38 px tall, `borderRadius: 12` outside and 9 inside, the look of the training screen's control (copy the five style entries; do not import across screens); then, by `mode`: `<SignaturePad onChange={(d) => { setSigData(d); if (d) setSignErr(null); }} testID="crew-sign-pad" />`, or today's label, input and preview unchanged; then the error line and the two buttons unchanged. Switching tabs clears `signErr`; the typed name survives a switch; a drawing does not (the pad remounts empty and `sigData` goes null).
+- `confirmSign`: draw → no `sigData` → "Draw your signature to sign."; else `api.put(..., { signature_data: sigData, signature_type: 'drawn' })`. Type → today's code. Success and failure handling unchanged.
+- A stroke must never be read as anything else: the sheet does not close, scroll or move while drawing, and a stroke that starts at the pad's left edge does not open the edge time clock (the sheet is a `Modal` above the crew column; verify it, §6.1).
+
+### 4.3 `app/employee/project/[id]/quote.tsx` — the protection (web only; native `Text` is not selectable unless asked, so never pass `selectable`)
+- Once, on mount, when `Platform.OS === 'web'`: add a `<style id="crew-quote-guard">` to `document.head` if it is not there: `[data-testid="crew-quote-paper"],[data-testid="crew-quote-paper"] *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}@media print{[data-testid="crew-quote-paper"],[data-testid="crew-quote-note"]{display:none !important}}`.
+- While the screen is focused (inside the existing `useFocusEffect`, or a second one), on the web: `document` listeners for `copy`, `cut`, `contextmenu`, `dragstart` and `selectstart` that call `preventDefault()` when the event's target (its parent element for a text node) is inside `[data-testid="crew-quote-paper"]`; removed in the cleanup, so every other screen copies as before.
+- No visual change, no new words, no new test id.
+
+## 5. Backend
+
+### 5.1 `routes/contracts.py` — `sign_document`
+When `method == "drawn"`: the value must start with `data:image/png;base64,`, decode as base64, start with the PNG magic bytes (`\x89PNG\r\n\x1a\n`) and be at most 400,000 bytes decoded; otherwise 400 `Signature must be a drawn PNG image.` and nothing is written. No minimum size (the two existing tests sign with a 70-byte PNG). A valid drawing is stored exactly as today (the `private_files` row, `signature_file_id`). The typed path is unchanged.
+
+### 5.2 `routes/contracts.py` — the PDF
+- `_pdf_bytes(doc, emp, biz, tz_name, crew_sig: str | None = None)` — the fifth parameter optional, so `test_r87_fix_h.py` keeps passing as written. When `crew_sig` is given, the left cell starts with `<img src="{html.escape(crew_sig, quote=True)}" alt="" style="display:block;max-width:180px;max-height:60px;margin-bottom:4px">` before the name; nothing else in the cell changes.
+- `async def _crew_sig(doc) -> str | None`: only for `signature_type == "drawn"` with a `signature_file_id`; read `private_files` `{_id, owner_admin_id: doc["owner_admin_id"], kind: "signature"}`; return `data:image/png;base64,{data}` when the row has `data` and its `content_type` is `image/png`, else None (a missing or odd row prints the name alone, never an error).
+- The two callers pass it: `countersign` :377 and `_signed_pdf` :501 (`await _crew_sig(doc)`).
+- Nothing else in the file moves: no new route, the admin's `GET …/signature` unchanged, `my_documents` unchanged.
+
+### 5.3 Tests — `tests/test_c9_crew_contract_sign.py` (TS_ Alpha; the `test_r78_contracts.py` fixture pattern: save a TS_ template, issue to `CREW_A`, delete the documents, their `employee_documents`, `notifications` and `private_files` rows — GridFS included — in the teardown)
+1. In process, the `test_r87_fix_h.py:116` pattern: `_pdf_bytes(doc, emp, biz, tz)` with a typed doc and no owner signature → `not _has_image(pdf)`; the same with `crew_sig="data:image/png;base64,…"` (a real PNG) and `signature_type: "drawn"` → `_has_image(pdf)`; four positional arguments still work.
+2. Over HTTP: sign `drawn` with a real PNG → 200; the document reads `signature_type == "drawn"`, a `private_files` row of kind `signature` exists for it, and the crew list (`/employee-contracts/mine`) carries no `signature_data`.
+3. Refusals, each 400 with the exact line and the document still `sent`: `drawn` with `data:text/html;base64,…`; `drawn` with `data:image/png;base64,` + bytes that are not a PNG; `drawn` with a plain string; `drawn` with a PNG header padded past 400,000 bytes.
+4. Typed still signs (200, `signature_type == "typed"`).
+5. Countersign the drawn document as the owner (`{"name": "TS_ Alpha Owner"}`), then `GET /employee-contracts/{id}/my-pdf` as the crew member → 200, `%PDF`, `_has_image` true; the typed document countersigned the same way → `_has_image` false (the TS_ owner's profile has no signature; assert that first, and skip with a reason if it does).
+6. `crew_b` signing `crew_a`'s document → 404.
+
+Count from `pytest --collect-only`.
+
+### 5.4 `tests/test_c5_crew_documents.py` (one line)
+`test_02_register_ok_and_login_trim`: the exact-keys assertion becomes `{"id", "name", "email", "pending", "owner_first"}`. Nothing else in the file.
+
+## 6. Verify (testing agent, 390 × 844 first, then 360 × 800, iPhone UA with touch, TS_ Alpha; the owner's tenant read-only)
+
+1. **Sign sheet**: a TS_ document awaiting signature → Sign this document → the sheet on **Draw**: the sentence, the tabs, the pad 150 px tall with the hint and Clear (44 px); no name field. Confirm on an empty pad → the one line. Draw (touch) → ink on the canvas, the hint gone, the line gone; the sheet did not move; a stroke begun at the pad's left edge did not open the time clock. Clear → empty, the hint back. Draw → Confirm & sign → the request carries `signature_type: "drawn"` and a `data:image/png;base64,` value → the pill reads Signed, the Sign bar is gone.
+2. **Type**: on a second TS_ document, the Type tab → today's field and preview; empty confirm → "Type your full name to sign."; a name → signs as `typed`. Switching tabs keeps the typed name.
+3. **The signed copy**: countersign both through the API as the TS_ owner; download each as the crew member ("Download my signed copy"), save to `/app/test_reports/c9_signed_drawn.pdf` and `c9_signed_typed.pdf`, and render page 1 of each to an image: the drawn one shows the signature above the crew member's name with "Signed (drawn in the crew app)", the time and the IP; the typed one shows the name alone.
+4. **The quote**: on the TS_ quote screen `getComputedStyle(el).userSelect` is `none` on a line, a term and the business block; a programmatic select-all of the paper yields none of its words; `copy`, `cut` and `contextmenu` dispatched on the paper come back `defaultPrevented`; under print media the paper is not visible. Then the job page: its text is selectable and a `copy` there is not prevented (the listeners left with the screen).
+5. **Tests** green (count from `pytest --collect-only`; `test_r22_contracts.py`, `test_r78_contracts.py`, `test_r87_fix_h.py` and `test_c5_crew_documents.py` untouched or as §5.4 and green); the full suite before and after (chunked, with the pause; never interrupt a run mid-seed); TS_ torn down (0 rows); `app/admin/*` diff empty; no `rm -rf` outside `memory/tmp` and `/tmp`; nothing published.
+
+## 7. What's new — Draft (never published)
+
+Card title **Sign with your finger**. Text: "Crew can sign a document by drawing their signature, the way a client signs a quote. Typing a name still works. The drawn signature prints on the signed copy, above the name. The quote in the crew app can no longer be copied or printed."
+
+## 8. Decisions (taken 28 Nov on Josh's "add this into the next round and send"; reversible)
+
+1. **Draw first, Type stays.** Some people cannot draw a clean line on a phone; the record keeps which way was used either way.
+2. **The protection covers the Quote screen only.** The job page stays selectable so a crew member can copy an address or a paint name. Alternative: the scope too.
+3. **A deterrent, not a lock.** Parked: the crew member's name as a faint watermark across the quote, and blocking screenshots in the phone build.
+4. **Only documents countersigned from now on** carry the drawing; stored PDFs are not regenerated.
+5. **PNG only, 400 KB at most.**
+
+## 9. Test ids
+
+New: `crew-sign-mode`, `crew-sign-mode-draw`, `crew-sign-mode-type`, `crew-sign-pad`, `crew-sign-pad-hint`, `crew-sign-clear`. Unchanged: `crew-sign`, `crew-sign-input`, `crew-sign-preview`, `crew-sign-err`, `crew-sign-cancel`, `crew-sign-confirm`, `crew-contract-sign`, `crew-quote`, `crew-quote-paper`, `crew-quote-note`.
+
+## 10. Handover to the admin chat (not this round)
+
+- The client's drawn signature is saved on the accepted quote (`signature_data_url`) but nothing in `services/pdf.py` prints it on the quote PDF.
+- The Contracts drawer says "Drawn in the crew app" and could show the image (`GET /employee-contracts/{id}/signature` exists).
