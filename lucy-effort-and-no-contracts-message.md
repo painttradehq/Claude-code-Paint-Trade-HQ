@@ -1,4 +1,4 @@
-# Three small parts: Lucy at normal effort · Lucy drafts contracts and consents only on the full package · a crew member's copy of a contract cannot be copied from — NOT SENT, waits for Josh's "send"
+# Three small parts: Lucy at normal effort · Lucy drafts contracts and consents only on the full package · a crew member's copy of a contract cannot be copied from — SENT to Emergent 28 Nov on Josh's word ("send"), after the crew chat's Round C9 had reported done
 
 Josh, 28 Nov, in order:
 1. "One more small thing goes with the next round: tell Lucy not to draft any contract in the app, as PTHQ wants to have a package to sell the draft contracts and consents as a package."
@@ -26,7 +26,7 @@ No prototype: nothing new to look at — the PDF looks the same.
 
 ---
 
-## The message to send
+## The message as sent (with two lines added for Round C9: the drawn signature prints as part of the page; the C9 contract tests stay green)
 
 # Three small parts: Lucy at normal effort · Lucy drafts contracts and consents only on the full package · a crew member's copy of a contract cannot be copied from
 

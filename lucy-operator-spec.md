@@ -478,3 +478,9 @@ Josh: "One more small thing goes with the next round: tell Lucy not to draft any
 - **Part 3, new — the crew's PDF copy.** Read in `routes/contracts.py`: a crew member gets the wording on the crew app's My contracts screen and as the signed-copy PDF (the email attachment after the countersign, and `my-pdf` behind the crew app's Download button); both PDFs are text. The round makes the crew's copy pages-as-pictures (`locked_copy`, pypdfium2 already installed) in exactly those two places; the owner's copy stays text; if the locked copy can't be made, the text one is not sent. A "no copying" flag on a text PDF was not chosen — some viewers ignore it.
 - **The screen half is the crew chat's** (`app/employee/contracts.tsx` draws the wording as selectable text). Note written for Josh to pass on: `crew-chat-note-contract-copy-protect.md`.
 - Told Josh what cannot be stopped: screenshots, retyping, a photo of the screen.
+
+## 33. The three small parts sent (28 Nov)
+
+On Josh's "send": `lucy-effort-and-no-contracts-message.md` — effort back to normal, Lucy drafting contracts and consents only on Enterprise (Lucy only, connector untouched), and the crew's PDF copy of a contract as pictures. Emergent accepted it (queued).
+
+**Read at Emergent before sending:** the crew chat's Round C9 had just reported done — crew sign by drawing (the drawn signature now prints on the signed contract PDF, `routes/contracts.py`), and **the crew Quote screen copy-protected** (nothing on the paper can be selected, copied, cut or printed; web only). Two lines were added to Part 3 for it: the drawn signature prints as part of the locked page; the C9 contract tests stay green. C9 protected the crew's Quote screen, not the contract screen — the note `crew-chat-note-contract-copy-protect.md` for the crew chat still stands.
